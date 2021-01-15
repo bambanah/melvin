@@ -1,0 +1,16 @@
+{
+  "name": "NDIS-Invoice-Generator",
+  "version": "1.0.0",
+  "description": "Tool to generate invoices for NDIS work.",
+  "main": "index.js",
+  "repository": "https://github.com/Bambanah/NDIS-Invoice-Generator",
+  "author": "Lachlan Underhill",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^4.17.11",
+    "concurrently": "^5.3.0"
+  },
+  "scripts": {
+    "dev": "concurrently \"cd client && yarn dev\" \"cd server && yarn dev\""
+  }
+}
