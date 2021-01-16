@@ -35,7 +35,10 @@ export default function InvoiceList() {
         </thead>
         <tbody>
           {invoices.map((invoice: InvoiceType) => (
-            <Invoice invoice={invoice} />
+            <Invoice
+              invoice={invoice}
+              key={invoice.invoice_no + invoice.client_no}
+            />
           ))}
         </tbody>
       </table>

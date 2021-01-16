@@ -1,117 +1,105 @@
-import { useFormik } from "formik";
 import React, { useState } from "react";
+import {
+  Formik,
+  FormikHelpers,
+  FormikProps,
+  Form,
+  Field,
+  FieldProps,
+  FieldArray,
+} from "formik";
 import { createInvoice } from "../services/firebase";
 import { Invoice } from "../types";
 
 export default function CreateInvoice() {
-  // const [clientNo, setClientNo] = useState("");
-  // const [clientName, setClientName] = useState("");
-  // const [billTo, setBillTo] = useState("");
-  // const [invoiceNumber, setInvoiceNumber] = useState("");
-  // const [activityCodes, setActivityCodes] = useState([]);
-  // const [activityDurations, setActivityDurations] = useState([]);
+  const Input = ({
+    value,
+    labelText,
+  }: {
+    value: string;
+    labelText?: string;
+  }) => {
+    return (
+      <div className="field">
+        <label className="label" htmlFor={value}>
+          {labelText || value}
+        </label>
+        <Field
+          className="input"
+          id={value}
+          name={value}
+          placeholder={labelText || value}
+        />
+      </div>
+    );
+  };
 
-  // const [numActivities, setNumActivities] = useState(1);
-
-  // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-
-  //   const newInvoice: Invoice = {
-  //     client_no: clientNo,
-  //     client_name: clientName,
-  //     bill_to: billTo,
-  //     date: new Date(),
-  //     invoice_no: invoiceNumber,
-  //     activity_ref: [],
-  //     activity_duration: [],
-  //   };
-
-  //   createInvoice(newInvoice);
-  // };
-
-  const initialInvoice: Invoice = {
+  const initialValues: Invoice = {
     client_no: "",
     client_name: "",
     bill_to: "",
     invoice_no: "",
     date: new Date(),
-    activity_ref: [],
-    activity_duration: [],
+    activity_ref: [""],
+    activity_duration: [""],
   };
 
-  const formik = useFormik({
-    initialValues: {
-      client_no: "",
-      client_name: "",
-      bill_to: "",
-      invoice_no: "",
-    },
-
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-    },
-  });
-
   return (
-    <form onSubmit={formik.handleSubmit}>
-      <div className="field">
-        <label className="label" htmlFor="clientNo">
-          Client Number
-        </label>
-        <input
-          className="input"
-          type="string"
-          id="client_no"
-          name="client_no"
-          value={formik.values.client_no}
-          onChange={formik.handleChange}
-          required={true}
-        />
-      </div>
+    <Formik
+      initialValues={initialValues}
+      onSubmit={(values, actions) => {
+        console.log({ values, actions });
 
-      <div className="field">
-        <label className="label" htmlFor="clientName">
-          Client Name
-        </label>
-        <input
-          className="input"
-          type="text"
-          id="client_name"
-          value={formik.values.client_name}
-          onChange={formik.handleChange}
-          required={true}
-        />
-      </div>
+        createInvoice(values);
 
-      <div className="field">
-        <label className="label" htmlFor="billTo">
-          Bill To
-        </label>
-        <input
-          className="input"
-          type="text"
-          id="bill_to"
-          value={formik.values.bill_to}
-          onChange={formik.handleChange}
-          required={true}
-        />
-      </div>
+        actions.setSubmitting(false);
+      }}
+    >
+      {({ values }) => (
+        <Form className="form">
+          <Input value="client_no" labelText="Client Number" />
+          <Input value="client_name" labelText="Client Name" />
+          <Input value="bill_to" labelText="Bill To" />
+          <Input value="invoice_no" labelText="Invoice Number" />
 
-      <div className="field">
-        <label className="label" htmlFor="billTo">
-          Invoice Number
-        </label>
-        <input
-          className="input"
-          type="string"
-          id="invoice_no"
-          value={formik.values.invoice_no}
-          onChange={formik.handleChange}
-          required={true}
-        />
-      </div>
+          <FieldArray
+            name="activity_ref"
+            render={(arrayHelpers) => (
+              <>
+                {values.activity_ref && values.activity_ref.length > 0 ? (
+                  <>
+                    {values.activity_ref.map((activity_ref, index) => (
+                      <React.Fragment key={index}>
+                        <Input value={`activity_ref.${index}`} />
+                      </React.Fragment>
+                    ))}
 
-      <input type="submit" value="Submit" className="button" />
-    </form>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        arrayHelpers.insert(values.activity_ref.length, "")
+                      } // insert an empty string at a position
+                    >
+                      +
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => arrayHelpers.insert(0, "")} // insert an empty string at a position
+                  >
+                    +
+                  </button>
+                )}
+              </>
+            )}
+          />
+
+          <button className="button" type="submit">
+            Submit
+          </button>
+        </Form>
+      )}
+    </Formik>
   );
 }
