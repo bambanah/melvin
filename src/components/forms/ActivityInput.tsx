@@ -7,20 +7,26 @@ const ActivityInput = ({
 	ref_text,
 	ref_error,
 	ref_touched,
-	duration_value,
-	duration_text,
-	duration_error,
-	duration_touched,
+	time_text,
+	start_value,
+	start_error,
+	start_touched,
+	end_value,
+	end_error,
+	end_touched,
 	activities,
 }: {
 	ref_value: string;
 	ref_text?: string;
 	ref_error?: string;
 	ref_touched?: boolean;
-	duration_value: string;
-	duration_text?: string;
-	duration_error?: string;
-	duration_touched?: boolean;
+	time_text?: string;
+	start_value: string;
+	start_error?: string;
+	start_touched?: boolean;
+	end_value: string;
+	end_error?: string;
+	end_touched?: boolean;
 	activities: ActivityObject;
 }) => {
 	return (
@@ -41,16 +47,6 @@ const ActivityInput = ({
 						))}
 					</Field>
 				</div>
-			</div>
-			<div className="control is-expanded">
-				<Field
-					className={`input ${
-						duration_touched && duration_error && "is-danger"
-					}`}
-					id={duration_value}
-					name={duration_value}
-					placeholder={duration_text || duration_value}
-				/>
 			</div>
 		</div>
 	);

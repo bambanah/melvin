@@ -32,45 +32,45 @@ export default function GeneratePDF({ invoice }: { invoice: Invoice }) {
 
 		// Write activity table
 		getActivities().then((activityDetails: ActivityObject) => {
-			let activities: (string | CellDef)[][] = [];
-			let sumTotal = 0;
+			// let activities: (string | CellDef)[][] = [];
+			// let sumTotal = 0;
 
-			invoice.activity_ref.forEach((activity_ref, index) => {
-				const activityId = activity_ref.split("/")[1];
+			// invoice.activity_ref.forEach((activity_ref, index) => {
+			// 	const activityId = activity_ref.split("/")[1];
 
-				const totalCost =
-					activityDetails[activityId].rate *
-					parseInt(invoice.activity_duration[index]);
-				sumTotal += totalCost;
+			// 	const totalCost =
+			// 		activityDetails[activityId].rate *
+			// 		parseInt(invoice.activity_duration[index]);
+			// 	sumTotal += totalCost;
 
-				let activity: string[] = [
-					date,
-					`${activityDetails[activityId].description}\n${activityId}`,
-					`$${activityDetails[activityId].rate}\n/${activityDetails[activityId].rate_type}`,
-					invoice.activity_duration[index],
-					`$${totalCost.toFixed(2)}`,
-				];
+			// 	let activity: string[] = [
+			// 		date,
+			// 		`${activityDetails[activityId].description}\n${activityId}`,
+			// 		`$${activityDetails[activityId].rate}\n/${activityDetails[activityId].rate_type}`,
+			// 		invoice.activity_duration[index],
+			// 		`$${totalCost.toFixed(2)}`,
+			// 	];
 
-				activities.push(activity);
-			});
+			// 	activities.push(activity);
+			// });
 
-			activities.push(["", "", "", "Total", `$${sumTotal.toFixed(2)}`]);
-			activities.push([
-				{
-					content:
-						"Phoebe Nicholas\nABN: 71 105 617 976\nBank: Up\nBSB: 633 123\nAccount Number: 177 757 663",
-					colSpan: 5,
-					rowSpan: 2,
-					styles: { halign: "left" },
-				},
-			]);
+			// activities.push(["", "", "", "Total", `$${sumTotal.toFixed(2)}`]);
+			// activities.push([
+			// 	{
+			// 		content:
+			// 			"Phoebe Nicholas\nABN: 71 105 617 976\nBank: Up\nBSB: 633 123\nAccount Number: 177 757 663",
+			// 		colSpan: 5,
+			// 		rowSpan: 2,
+			// 		styles: { halign: "left" },
+			// 	},
+			// ]);
 
-			autoTable(doc, {
-				head: [["Date", "Description", "Rate", "Duration", "Total"]],
-				body: activities,
-				startY: 40,
-				theme: "plain",
-			});
+			// autoTable(doc, {
+			// 	head: [["Date", "Description", "Rate", "Duration", "Total"]],
+			// 	body: activities,
+			// 	startY: 40,
+			// 	theme: "plain",
+			// });
 
 			doc.save();
 		});

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { streamInvoices } from "../services/firebase";
-import firebase from "firebase";
+import firebase from "firebase/app";
 import { Invoice as InvoiceType } from "../types";
 import GeneratePDF from "./pdf/GeneratePDF";
 
@@ -32,7 +32,7 @@ export default function InvoiceList() {
 						<th>Invoice Number</th>
 						<th>Client Name</th>
 						<th>Client Number</th>
-						<th>PDF?</th>
+						<th>PDF</th>
 					</tr>
 				</thead>
 				<tbody>

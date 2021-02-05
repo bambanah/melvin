@@ -1,4 +1,4 @@
-import firebase from "firebase";
+import firebase from "firebase/app";
 
 export interface Invoice {
 	[index: string]: any;
@@ -6,8 +6,12 @@ export interface Invoice {
 	client_no: string;
 	bill_to: string;
 	date: firebase.firestore.Timestamp;
-	activity_ref: string[];
-	activity_duration: string[];
+	activities: {
+		activity_ref: string;
+		start_time: string;
+		end_time: string;
+		duration: number;
+	}[];
 	invoice_no: string;
 }
 
