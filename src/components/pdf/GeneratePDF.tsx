@@ -3,7 +3,7 @@ import autoTable, { CellDef } from "jspdf-autotable";
 import React from "react";
 import { getActivities } from "../../services/firebase";
 import { ActivityObject, Invoice } from "../../types";
-import { formatDate } from "../../services/helpers";
+import { formatDate, getPrettyDuration } from "../../services/helpers";
 
 export default function GeneratePDF({ invoice }: { invoice: Invoice }) {
 	const generatePDF = () => {
@@ -38,23 +38,28 @@ export default function GeneratePDF({ invoice }: { invoice: Invoice }) {
 				const activityId = activity.activity_ref.split("/")[1];
 
 				let totalCost = 0;
+				let countString = "";
 
 				if (activityDetails[activityId].rate_type === "hr") {
 					totalCost = activityDetails[activityId].rate * activity.duration;
+
+					const prettyDuration = getPrettyDuration(activity.duration);
+
+					countString = `${activity.start_time?.toLowerCase()}-${activity.end_time?.toLowerCase()}\n(${prettyDuration})`;
 				} else {
 					totalCost =
 						activityDetails[activityId].rate * parseInt(activity.distance);
+
+					countString = `${activity.distance} km`;
 				}
 
 				sumTotal += totalCost;
 
 				let activityString: string[] = [
-					activity.date,
 					`${activityDetails[activityId].description}\n${activityId}`,
+					activity.date,
+					countString,
 					`$${activityDetails[activityId].rate}\n/${activityDetails[activityId].rate_type}`,
-					activity.duration
-						? activity.duration.toString()
-						: activity.distance.toString(),
 					`$${totalCost.toFixed(2)}`,
 				];
 
@@ -73,7 +78,7 @@ export default function GeneratePDF({ invoice }: { invoice: Invoice }) {
 			]);
 
 			autoTable(doc, {
-				head: [["Date", "Description", "Rate", "Count", "Total"]],
+				head: [["Description", "Date", "Count", "Rate", "Total"]],
 				body: activities,
 				startY: 40,
 				theme: "plain",

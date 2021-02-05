@@ -32,3 +32,16 @@ export const getDuration = (startTime: string, endTime: string) => {
 	const duration = moment.duration(startMoment.diff(endMoment));
 	return Math.abs(duration.asHours());
 };
+
+export const getPrettyDuration = (hours: number) => {
+	const duration = moment.duration(hours, "hours");
+
+	let durationString = "";
+
+	if (duration.hours() > 0)
+		durationString += `${duration.hours()} hour${
+			duration.hours() === 1 ? "" : "s"
+		}, `;
+
+	return durationString + `${duration.minutes()} minutes`;
+};
