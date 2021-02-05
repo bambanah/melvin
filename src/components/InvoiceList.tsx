@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { streamInvoices } from "../services/firebase";
+import { deleteInvoice, streamInvoices } from "../services/firebase";
 import firebase from "firebase/app";
 import { Invoice as InvoiceType } from "../types";
 import GeneratePDF from "./pdf/GeneratePDF";
@@ -33,6 +33,7 @@ export default function InvoiceList() {
 						<th>Client Name</th>
 						<th>Client Number</th>
 						<th>PDF</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -56,6 +57,14 @@ const Invoice = ({ invoice }: { invoice: InvoiceType }) => {
 			<td>{invoice.client_no}</td>
 			<td>
 				<GeneratePDF invoice={invoice} />
+			</td>
+			<td>
+				<button
+					className="button has-background-danger has-text-white has-text-weight-bold"
+					onClick={() => deleteInvoice(invoice.invoice_no)}
+				>
+					X
+				</button>
 			</td>
 		</tr>
 	);

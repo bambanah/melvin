@@ -10,8 +10,7 @@ export default function GeneratePDF({ invoice }: { invoice: Invoice }) {
 		const margin = 15;
 
 		var doc = new jsPDF();
-
-		doc.setFontSize(15);
+		doc.setFontSize(20);
 		doc.text("Tax Invoice", 150, margin);
 
 		doc.setFontSize(10);
@@ -32,45 +31,53 @@ export default function GeneratePDF({ invoice }: { invoice: Invoice }) {
 
 		// Write activity table
 		getActivities().then((activityDetails: ActivityObject) => {
-			// let activities: (string | CellDef)[][] = [];
-			// let sumTotal = 0;
+			let activities: (string | CellDef)[][] = [];
+			let sumTotal = 0;
 
-			// invoice.activity_ref.forEach((activity_ref, index) => {
-			// 	const activityId = activity_ref.split("/")[1];
+			invoice.activities.forEach((activity, index) => {
+				const activityId = activity.activity_ref.split("/")[1];
 
-			// 	const totalCost =
-			// 		activityDetails[activityId].rate *
-			// 		parseInt(invoice.activity_duration[index]);
-			// 	sumTotal += totalCost;
+				let totalCost = 0;
 
-			// 	let activity: string[] = [
-			// 		date,
-			// 		`${activityDetails[activityId].description}\n${activityId}`,
-			// 		`$${activityDetails[activityId].rate}\n/${activityDetails[activityId].rate_type}`,
-			// 		invoice.activity_duration[index],
-			// 		`$${totalCost.toFixed(2)}`,
-			// 	];
+				if (activityDetails[activityId].rate_type === "hr") {
+					totalCost = activityDetails[activityId].rate * activity.duration;
+				} else {
+					totalCost =
+						activityDetails[activityId].rate * parseInt(activity.distance);
+				}
 
-			// 	activities.push(activity);
-			// });
+				sumTotal += totalCost;
 
-			// activities.push(["", "", "", "Total", `$${sumTotal.toFixed(2)}`]);
-			// activities.push([
-			// 	{
-			// 		content:
-			// 			"Phoebe Nicholas\nABN: 71 105 617 976\nBank: Up\nBSB: 633 123\nAccount Number: 177 757 663",
-			// 		colSpan: 5,
-			// 		rowSpan: 2,
-			// 		styles: { halign: "left" },
-			// 	},
-			// ]);
+				let activityString: string[] = [
+					activity.date,
+					`${activityDetails[activityId].description}\n${activityId}`,
+					`$${activityDetails[activityId].rate}\n/${activityDetails[activityId].rate_type}`,
+					activity.duration
+						? activity.duration.toString()
+						: activity.distance.toString(),
+					`$${totalCost.toFixed(2)}`,
+				];
 
-			// autoTable(doc, {
-			// 	head: [["Date", "Description", "Rate", "Duration", "Total"]],
-			// 	body: activities,
-			// 	startY: 40,
-			// 	theme: "plain",
-			// });
+				activities.push(activityString);
+			});
+
+			activities.push(["", "", "", "Total", `$${sumTotal.toFixed(2)}`]);
+			activities.push([
+				{
+					content:
+						"Phoebe Nicholas\nABN: 71 105 617 976\nBank: Up\nBSB: 633 123\nAccount Number: 177 757 663",
+					colSpan: 5,
+					rowSpan: 2,
+					styles: { halign: "left" },
+				},
+			]);
+
+			autoTable(doc, {
+				head: [["Date", "Description", "Rate", "Count", "Total"]],
+				body: activities,
+				startY: 40,
+				theme: "plain",
+			});
 
 			doc.save();
 		});

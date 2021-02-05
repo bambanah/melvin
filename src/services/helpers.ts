@@ -24,3 +24,11 @@ export const timestampToString = (timeValue: firebase.firestore.Timestamp) => {
 
 	return timeString;
 };
+
+export const getDuration = (startTime: string, endTime: string) => {
+	const startMoment = moment(startTime, "HH:mmA");
+	const endMoment = moment(endTime, "HH:mmA");
+
+	const duration = moment.duration(startMoment.diff(endMoment));
+	return Math.abs(duration.asHours());
+};

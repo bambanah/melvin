@@ -53,6 +53,25 @@ export const createInvoice = (invoice: Invoice) => {
 		});
 };
 
+export const deleteInvoice = async (invoice_no: string) => {
+	var invoiceQuery = firestore
+		.collection("invoices")
+		.where("invoice_no", "==", invoice_no);
+
+	await invoiceQuery.get().then((querySnapshot) => {
+		querySnapshot.forEach((doc) => {
+			doc.ref
+				.delete()
+				.then(() => {
+					console.log("Document successfully deleted!");
+				})
+				.catch((error) => {
+					console.error("Error removing document: ", error);
+				});
+		});
+	});
+};
+
 export const getActivities = async () => {
 	let activities: ActivityObject = {};
 

@@ -2,17 +2,34 @@ import firebase from "firebase/app";
 
 export interface Invoice {
 	[index: string]: any;
+	invoice_no: string;
 	client_name: string;
 	client_no: string;
 	bill_to: string;
 	date: firebase.firestore.Timestamp;
 	activities: {
 		activity_ref: string;
-		start_time: string;
-		end_time: string;
+		date: string;
+		start_time?: string;
+		end_time?: string;
 		duration: number;
+		distance: string;
 	}[];
-	invoice_no: string;
+}
+
+export interface Errors {
+	invoice_no?: string;
+	client_no?: string;
+	client_name?: string;
+	bill_to?: string;
+	activities?: {
+		activity_ref?: string;
+		date?: string;
+		start_time?: string;
+		end_time?: string;
+		duration?: string;
+		distance?: string;
+	}[];
 }
 
 export interface Activity {

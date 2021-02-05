@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Formik, Form, getIn } from "formik";
 import { createInvoice, getLastInvoiceDetails } from "../services/firebase";
 
-import { Invoice } from "../types";
+import { Errors, Invoice } from "../types";
 import FieldInput from "./forms/FieldInput";
 import firebase from "firebase/app";
 import ActivityList from "./forms/ActivityList";
+import { getDuration } from "../services/helpers";
 
 export default function CreateInvoice() {
 	const [lastInvoice, setLastInvoice] = useState({} as Invoice);
@@ -13,18 +14,16 @@ export default function CreateInvoice() {
 
 	useEffect(() => {
 		getLastInvoiceDetails().then((invoice: Invoice) => {
-			let formInvoice: Invoice = {} as Invoice;
-
 			if (invoice.invoice_no) {
 				invoice.invoice_no = incrementInvoiceId(invoice.invoice_no);
 			} else {
 				invoice = {
-					client_name: "",
 					client_no: "",
+					client_name: "",
 					bill_to: "",
-					date: firebase.firestore.Timestamp.fromDate(new Date()),
-					activities: [],
 					invoice_no: "",
+					activities: [],
+					date: firebase.firestore.Timestamp.fromDate(new Date()),
 				};
 			}
 
@@ -42,15 +41,7 @@ export default function CreateInvoice() {
 	};
 
 	const validate = (values: Invoice) => {
-		const errors: {
-			client_no?: string;
-			client_name?: string;
-			bill_to?: string;
-			date?: string;
-			activity_ref?: string[];
-			activity_duration?: string[];
-			invoice_no?: string;
-		} = {};
+		const errors: Errors = {};
 
 		if (!values.client_no) {
 			errors.client_no = "Required";
@@ -68,45 +59,30 @@ export default function CreateInvoice() {
 			errors.invoice_no = "Required";
 		}
 
-		// if (values.activity_ref) {
-		// 	errors.activity_ref = [];
+		// if (values.activities) {
+		// 	errors.activities = [];
 
-		// 	values.activity_ref.forEach((activity) => {
-		// 		if (activity === "") {
-		// 			errors.activity_ref?.push("Required");
-		// 		} else {
-		// 			errors.activity_ref?.push("");
+		// 	values.activities.forEach((activity, index) => {
+		// 		let activityError = {
+		// 			date: "",
+		// 			start_time: "",
+		// 			end_time: "",
+		// 			duration: "",
+		// 			distance: "",
+		// 		};
+
+		// 		if (!activity.activity_ref) {
+		// 			Object.assign(activityError, { activity_ref: "Required" });
 		// 		}
+		// 		if (!activity.date) {
+		// 			Object.assign(activityError, { date: "Required." });
+		// 		}
+
+		// 		errors.activities?.push(activityError);
 		// 	});
 		// }
 
-		// if (values.activity_duration) {
-		// 	errors.activity_duration = [];
-
-		// 	values.activity_duration.forEach((duration) => {
-		// 		if (!duration) {
-		// 			errors.activity_duration?.push("Required");
-		// 		} else {
-		// 			errors.activity_duration?.push("");
-		// 		}
-		// 	});
-
-		// 	if (errors.activity_duration.length === 0)
-		// 		delete errors.activity_duration;
-		// }
-
-		// Delete activity errors if they only contain empty strings ie. no errors
-		// if (
-		// 	errors.activity_duration &&
-		// 	errors.activity_duration?.filter((e) => e !== "").length === 0
-		// )
-		// 	delete errors.activity_duration;
-		if (
-			errors.activity_ref &&
-			errors.activity_ref?.filter((e) => e !== "").length === 0
-		)
-			delete errors.activity_ref;
-
+		console.log(values);
 		return errors;
 	};
 
@@ -115,6 +91,15 @@ export default function CreateInvoice() {
 			<Formik
 				initialValues={lastInvoice}
 				onSubmit={(values, actions) => {
+					console.log("document creating");
+					values.activities.forEach((activity, index) => {
+						if (activity.start_time && activity.end_time) {
+							values.activities[index].duration = getDuration(
+								activity.start_time,
+								activity.end_time
+							);
+						}
+					});
 					createInvoice(values);
 
 					actions.setSubmitting(false);
@@ -126,7 +111,7 @@ export default function CreateInvoice() {
 				}}
 				validate={validate}
 			>
-				{({ values, errors, touched, setFieldValue }) => (
+				{({ values, errors, touched, setFieldValue, handleChange }) => (
 					<Form className="form">
 						<FieldInput
 							value="client_no"
@@ -159,6 +144,7 @@ export default function CreateInvoice() {
 							touched={touched}
 							getIn={getIn}
 							setFieldValue={setFieldValue}
+							handleChange={handleChange}
 						/>
 
 						<button className="button" type="submit">
