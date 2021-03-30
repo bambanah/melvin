@@ -7,7 +7,7 @@ import { formatDate, getPrettyDuration } from "../../services/helpers";
 
 export default function GeneratePDF({ invoice }: { invoice: Invoice }) {
 	const generatePDF = () => {
-		const margin = 15;
+		const margin = 20;
 
 		var doc = new jsPDF();
 		doc.setFontSize(20);
@@ -55,7 +55,7 @@ export default function GeneratePDF({ invoice }: { invoice: Invoice }) {
 
 				sumTotal += totalCost;
 
-				let activityString: string[] = [
+				let activityStrings: string[] = [
 					`${activityDetails[activityId].description}\n${activityId}`,
 					activity.date,
 					countString,
@@ -63,25 +63,57 @@ export default function GeneratePDF({ invoice }: { invoice: Invoice }) {
 					`$${totalCost.toFixed(2)}`,
 				];
 
-				activities.push(activityString);
+				const activityRow = activityStrings.map((activityString) => {
+					return {
+						content: activityString,
+						// styles: { fontStyle: activityString === "" },
+					};
+				});
+
+				activities.push(activityRow);
 			});
 
 			activities.push(["", "", "", "Total", `$${sumTotal.toFixed(2)}`]);
+			activities.push([
+				{ content: "", colSpan: 5, styles: { fillColor: "#fff" } },
+			]);
 			activities.push([
 				{
 					content:
 						"Phoebe Nicholas\nABN: 71 105 617 976\nBank: Up\nBSB: 633 123\nAccount Number: 177 757 663",
 					colSpan: 5,
 					rowSpan: 2,
-					styles: { halign: "left" },
+					styles: {
+						minCellHeight: 45,
+						halign: "left",
+						fillColor: "#FFF",
+						fontStyle: "normal",
+						lineWidth: 0.2,
+						lineColor: "#000",
+					},
 				},
 			]);
 
 			autoTable(doc, {
 				head: [["Description", "Date", "Count", "Rate", "Total"]],
 				body: activities,
-				startY: 40,
-				theme: "plain",
+				startY: 45,
+				margin: margin,
+				theme: "striped",
+				headStyles: {
+					lineColor: "#000",
+					fillColor: "#FFF",
+					textColor: "#000",
+				},
+				columnStyles: {
+					0: {
+						cellWidth: 40,
+						fontStyle: "bold",
+					},
+					2: {
+						cellWidth: 40,
+					},
+				},
 			});
 
 			doc.save();
