@@ -105,6 +105,9 @@ export default function GeneratePDF({ invoice }: { invoice: Invoice }) {
 					fillColor: "#FFF",
 					textColor: "#000",
 				},
+				bodyStyles: {
+					textColor: "#000",
+				},
 				columnStyles: {
 					0: {
 						cellWidth: 40,
@@ -122,7 +125,7 @@ export default function GeneratePDF({ invoice }: { invoice: Invoice }) {
 
 	return (
 		<div>
-			<button onClick={generatePDF} className="button">
+			<button onClick={generatePDF} className="button is-info">
 				Generate PDF
 			</button>
 		</div>

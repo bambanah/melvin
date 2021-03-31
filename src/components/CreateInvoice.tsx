@@ -8,7 +8,11 @@ import firebase from "firebase/app";
 import ActivityList from "./forms/ActivityList";
 import { getDuration } from "../services/helpers";
 
-export default function CreateInvoice() {
+export default function CreateInvoice({
+	setCreating,
+}: {
+	setCreating: (creating: boolean) => void;
+}) {
 	const [lastInvoice, setLastInvoice] = useState({} as Invoice);
 	const [loaded, setLoaded] = useState(false);
 
@@ -147,9 +151,19 @@ export default function CreateInvoice() {
 							handleChange={handleChange}
 						/>
 
-						<button className="button" type="submit">
-							Submit
-						</button>
+						<div className="field is-grouped">
+							<p className="control">
+								<button className="button is-primary" type="submit">
+									Submit
+								</button>
+							</p>
+
+							<p className="control">
+								<button className="button" onClick={() => setCreating(false)}>
+									Cancel
+								</button>
+							</p>
+						</div>
 					</Form>
 				)}
 			</Formik>

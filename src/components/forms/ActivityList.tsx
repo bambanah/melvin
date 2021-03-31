@@ -134,24 +134,31 @@ export default function ActivityList({
 									</React.Fragment>
 								))}
 
-								<button
-									className="button"
-									type="button"
-									onClick={() => {
-										const newActivity = {
-											activity_ref: "",
-											start_time: "",
-											end_time: "",
-											duration: "",
-											distance: "",
-											date: "",
-										};
+								<div className="field">
+									<p className="control">
+										<button
+											className="button is-outlined is-info"
+											type="button"
+											onClick={() => {
+												const newActivity = {
+													activity_ref: "",
+													start_time: "",
+													end_time: "",
+													duration: "",
+													distance: "",
+													date: "",
+												};
 
-										arrayHelpers.insert(values.activities.length, newActivity);
-									}}
-								>
-									+
-								</button>
+												arrayHelpers.insert(
+													values.activities.length,
+													newActivity
+												);
+											}}
+										>
+											Add new activity...
+										</button>
+									</p>
+								</div>
 							</>
 						)}
 					</>
