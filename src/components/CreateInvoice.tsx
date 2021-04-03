@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Formik, Form, getIn } from "formik";
-import { createInvoice, getLastInvoiceDetails } from "../services/firebase";
+import { createInvoice, getLastInvoiceDetails } from "../shared/utils/firebase";
 
 import { Errors, Invoice } from "../types";
 import FieldInput from "./forms/FieldInput";
 import firebase from "firebase/app";
 import ActivityList from "./forms/ActivityList";
-import { getDuration } from "../services/helpers";
+import { getDuration } from "../shared/utils/helpers";
 
 export default function CreateInvoice({
 	setCreating,

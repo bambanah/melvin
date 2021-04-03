@@ -1,7 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
-import { Activity, ActivityObject, Invoice } from "../types";
+import { Activity, ActivityObject, Invoice } from "../../types";
 
 const firebaseConfig = {
 	apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -19,10 +19,14 @@ if (!firebase.apps.length) {
 }
 
 const app = firebase.app();
-// const auth = firebase.auth();
+const auth = firebase.auth();
 const firestore = firebase.firestore();
 
 console.log(app.name ? "Firebase connected." : "Firebase not connected...");
+
+export const getCurrentUser = () => {
+	return auth.currentUser;
+};
 
 export const getInvoices = () => {
 	return firestore.collection("invoices").get();

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { deleteInvoice, streamInvoices } from "../services/firebase";
+import { deleteInvoice, streamInvoices } from "../shared/utils/firebase";
 import firebase from "firebase/app";
 import { Invoice as InvoiceType } from "../types";
 import GeneratePDF from "./pdf/GeneratePDF";

@@ -1,6 +1,6 @@
 import { Field, FieldArray, FormikErrors, FormikTouched } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { getActivities } from "../../services/firebase";
+import { getActivities } from "../../shared/utils/firebase";
 import { ActivityObject, Invoice } from "../../types";
 import TimePicker from "./TimePicker";
 
