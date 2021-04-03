@@ -4,6 +4,7 @@ import React from "react";
 import { getActivities } from "../../services/firebase";
 import { ActivityObject, Invoice } from "../../types";
 import { formatDate, getPrettyDuration } from "../../services/helpers";
+import { StyledButton } from "../../shared/components/Button/Styles";
 
 export default function GeneratePDF({ invoice }: { invoice: Invoice }) {
 	const generatePDF = () => {
@@ -125,9 +126,9 @@ export default function GeneratePDF({ invoice }: { invoice: Invoice }) {
 
 	return (
 		<div>
-			<button onClick={generatePDF} className="button is-info">
+			<StyledButton onClick={generatePDF} className="button is-info">
 				Generate PDF
-			</button>
+			</StyledButton>
 		</div>
 	);
 }

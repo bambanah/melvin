@@ -31,8 +31,6 @@ export default function CreateInvoice({
 				};
 			}
 
-			console.log(invoice);
-
 			setLastInvoice(invoice);
 			setLoaded(true);
 		});
@@ -169,6 +167,6 @@ export default function CreateInvoice({
 			</Formik>
 		);
 	} else {
-		return <div>Loading...</div>;
+		return <div>Loading Previous Invoice...</div>;
 	}
 }

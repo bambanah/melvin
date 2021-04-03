@@ -166,6 +166,6 @@ export default function ActivityList({
 			/>
 		);
 	} else {
-		return <div>Loading...</div>;
+		return <div>Loading Activities...</div>;
 	}
 }
