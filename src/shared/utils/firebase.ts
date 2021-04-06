@@ -19,13 +19,17 @@ if (!firebase.apps.length) {
 }
 
 const app = firebase.app();
-const auth = firebase.auth();
+export const auth = firebase.auth();
 const firestore = firebase.firestore();
 
 console.log(app.name ? "Firebase connected." : "Firebase not connected...");
 
 export const getCurrentUser = () => {
 	return auth.currentUser;
+};
+
+export const isAuthenticated = () => {
+	return auth.currentUser !== null;
 };
 
 export const getInvoices = () => {

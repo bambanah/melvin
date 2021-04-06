@@ -1,37 +1,21 @@
-import React, { useState } from "react";
-import CreateInvoice from "./components/CreateInvoice";
-import InvoiceList from "./components/InvoiceList";
-import { StyledButton } from "./shared/components/Button/Styles";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Login from "./components/auth/Login";
+import NotFound from "./components/NotFound";
+import Home from "./Home";
+import ProtectedRoute from "./shared/components/ProtectedRoute";
+import { AuthProvider } from "./shared/hooks/use-auth";
 
 function App() {
-	const [creating, setCreating] = useState(false);
-
-	const ToggleButton = () => {
-		return (
-			<StyledButton className="button" onClick={() => setCreating(!creating)}>
-				Create Invoice
-			</StyledButton>
-		);
-	};
-
 	return (
-		<section className="section">
-			<div className="container">
-				<h1 className="title">Invoices</h1>
-
-				<div className="section">
-					{creating ? (
-						<CreateInvoice setCreating={setCreating} />
-					) : (
-						<ToggleButton />
-					)}
-				</div>
-
-				<div className="section">
-					<InvoiceList />
-				</div>
-			</div>
-		</section>
+		<AuthProvider>
+			<Router>
+				<Switch>
+					<ProtectedRoute exact path="/" component={Home} />
+					<Route exact path="/login" component={Login} />
+					<Route exact path="*" component={NotFound} />
+				</Switch>
+			</Router>
+		</AuthProvider>
 	);
 }
 
