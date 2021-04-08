@@ -2,6 +2,7 @@ import firebase from "firebase/app";
 
 export interface Invoice {
 	[index: string]: any;
+	owner: string;
 	invoice_no: string;
 	client_name: string;
 	client_no: string;

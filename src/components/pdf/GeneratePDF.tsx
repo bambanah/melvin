@@ -1,9 +1,9 @@
 import jsPDF from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
 import React from "react";
-import { getActivities } from "../../services/firebase";
+import { getActivities } from "../../shared/utils/firebase";
 import { ActivityObject, Invoice } from "../../types";
-import { formatDate, getPrettyDuration } from "../../services/helpers";
+import { formatDate, getPrettyDuration } from "../../shared/utils/helpers";
 import { StyledButton } from "../../shared/components/Button/Styles";
 
 export default function GeneratePDF({ invoice }: { invoice: Invoice }) {

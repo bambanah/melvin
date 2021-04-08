@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { deleteInvoice, streamInvoices } from "../services/firebase";
+import { deleteInvoice, streamInvoices } from "../shared/utils/firebase";
 import firebase from "firebase/app";
 import { Invoice as InvoiceType } from "../types";
 import GeneratePDF from "./pdf/GeneratePDF";
@@ -19,7 +19,7 @@ export default function InvoiceList() {
 
 				setInvoices(updatedInvoices);
 			},
-			error: () => console.error("grocery-list-item-get-fail"),
+			error: () => console.error("Couldn't get invoices."),
 		});
 		return unsubscribe;
 	}, []);
