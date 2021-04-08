@@ -44,12 +44,16 @@ export const signIn = async () => {
 };
 
 export const getInvoices = () => {
-	return firestore.collection("invoices").get();
+	return firestore
+		.collection("invoices")
+		.where("owner", "==", auth.currentUser?.uid)
+		.get();
 };
 
 export const streamInvoices = (observer: any) => {
 	return firestore
 		.collection("invoices")
+		.where("owner", "==", auth.currentUser?.uid)
 		.orderBy("date", "desc")
 		.onSnapshot(observer);
 };
@@ -118,6 +122,7 @@ export const getLastInvoiceDetails = async () => {
 
 	await firestore
 		.collection("invoices")
+		.where("owner", "==", auth.currentUser?.uid)
 		.orderBy("date", "desc")
 		.limit(1)
 		.get()

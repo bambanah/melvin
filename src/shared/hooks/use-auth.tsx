@@ -15,9 +15,7 @@ export const AuthProvider: React.FC = ({ children }) => {
 	const [loading, setLoading] = useState(true);
 	useEffect(() => {
 		return auth.onIdTokenChanged(async (user) => {
-			console.log(user);
 			if (user) {
-				// const token = await user.getIdToken();
 				setUser(user);
 			} else {
 				setUser(null);
