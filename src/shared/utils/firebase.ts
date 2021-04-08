@@ -32,6 +32,17 @@ export const isAuthenticated = () => {
 	return auth.currentUser !== null;
 };
 
+export const signIn = async () => {
+	try {
+		await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+		const provider = new firebase.auth.GoogleAuthProvider();
+		return await auth.signInWithPopup(provider);
+	} catch (err) {
+		console.error(err.message);
+	}
+};
+
 export const getInvoices = () => {
 	return firestore.collection("invoices").get();
 };

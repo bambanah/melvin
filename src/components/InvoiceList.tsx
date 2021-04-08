@@ -19,7 +19,7 @@ export default function InvoiceList() {
 
 				setInvoices(updatedInvoices);
 			},
-			error: () => console.error("grocery-list-item-get-fail"),
+			error: () => console.error("Couldn't get invoices."),
 		});
 		return unsubscribe;
 	}, []);
