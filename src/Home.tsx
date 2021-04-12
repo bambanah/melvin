@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import CreateInvoice from "./components/CreateInvoice";
 import InvoiceList from "./components/InvoiceList";
-import { StyledButton } from "./shared/components/Button/Styles";
+import Button from "./shared/components/Button";
 
 export default function Home() {
 	const [creating, setCreating] = useState(false);
 
 	const ToggleButton = () => {
 		return (
-			<StyledButton className="button" onClick={() => setCreating(!creating)}>
+			<Button primary onClick={() => setCreating(!creating)}>
 				Create Invoice
-			</StyledButton>
+			</Button>
 		);
 	};
 
