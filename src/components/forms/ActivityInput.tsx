@@ -1,6 +1,20 @@
 import { Field } from "formik";
-import React from "react";
 import { ActivityObject } from "../../types";
+
+interface Props {
+	ref_value: string;
+	ref_text?: string;
+	ref_error?: string;
+	ref_touched?: boolean;
+	time_text?: string;
+	start_value: string;
+	start_error?: string;
+	start_touched?: boolean;
+	end_value: string;
+	end_error?: string;
+	end_touched?: boolean;
+	activities: ActivityObject;
+}
 
 const ActivityInput = ({
 	ref_value,
@@ -15,20 +29,7 @@ const ActivityInput = ({
 	end_error,
 	end_touched,
 	activities,
-}: {
-	ref_value: string;
-	ref_text?: string;
-	ref_error?: string;
-	ref_touched?: boolean;
-	time_text?: string;
-	start_value: string;
-	start_error?: string;
-	start_touched?: boolean;
-	end_value: string;
-	end_error?: string;
-	end_touched?: boolean;
-	activities: ActivityObject;
-}) => {
+}: Props) => {
 	return (
 		<div className="field is-grouped">
 			<div className="control is-expanded">

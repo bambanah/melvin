@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Formik, Form, getIn } from "formik";
-import { createInvoice, getLastInvoiceDetails } from "../services/firebase";
+import {
+	auth,
+	createInvoice,
+	getLastInvoiceDetails,
+} from "../shared/utils/firebase";
 
 import { Errors, Invoice } from "../types";
 import FieldInput from "./forms/FieldInput";
 import firebase from "firebase/app";
 import ActivityList from "./forms/ActivityList";
-import { getDuration } from "../services/helpers";
+import { getDuration } from "../shared/utils/helpers";
 
 export default function CreateInvoice({
 	setCreating,
@@ -18,23 +22,27 @@ export default function CreateInvoice({
 
 	useEffect(() => {
 		getLastInvoiceDetails().then((invoice: Invoice) => {
-			if (invoice.invoice_no) {
-				invoice.invoice_no = incrementInvoiceId(invoice.invoice_no);
+			if (auth.currentUser && invoice) {
+				if (invoice.invoice_no) {
+					invoice.invoice_no = incrementInvoiceId(invoice.invoice_no);
+					invoice.owner = auth.currentUser.uid;
+				} else {
+					invoice = {
+						owner: auth.currentUser?.uid,
+						client_no: "",
+						client_name: "",
+						bill_to: "",
+						invoice_no: "",
+						activities: [],
+						date: firebase.firestore.Timestamp.fromDate(new Date()),
+					};
+				}
+
+				setLastInvoice(invoice);
+				setLoaded(true);
 			} else {
-				invoice = {
-					client_no: "",
-					client_name: "",
-					bill_to: "",
-					invoice_no: "",
-					activities: [],
-					date: firebase.firestore.Timestamp.fromDate(new Date()),
-				};
+				console.log("Not logged in.");
 			}
-
-			console.log(invoice);
-
-			setLastInvoice(invoice);
-			setLoaded(true);
 		});
 	}, []);
 
@@ -86,7 +94,6 @@ export default function CreateInvoice({
 		// 	});
 		// }
 
-		console.log(values);
 		return errors;
 	};
 
@@ -95,7 +102,6 @@ export default function CreateInvoice({
 			<Formik
 				initialValues={lastInvoice}
 				onSubmit={(values, actions) => {
-					console.log("document creating");
 					values.activities.forEach((activity, index) => {
 						if (activity.start_time && activity.end_time) {
 							values.activities[index].duration = getDuration(
@@ -104,6 +110,7 @@ export default function CreateInvoice({
 							);
 						}
 					});
+
 					createInvoice(values);
 
 					actions.setSubmitting(false);
@@ -169,6 +176,6 @@ export default function CreateInvoice({
 			</Formik>
 		);
 	} else {
-		return <div>Loading...</div>;
+		return <div>Loading Previous Invoice...</div>;
 	}
 }
