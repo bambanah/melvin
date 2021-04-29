@@ -1,4 +1,5 @@
 import { useHistory } from "react-router";
+import Button from "../../shared/components/Button";
 import { signIn } from "../../shared/utils/firebase";
 
 export default function Login() {
@@ -10,9 +11,11 @@ export default function Login() {
 	};
 
 	return (
-		<div>
-			<h1>Login</h1>
-			<button onClick={handleClick}>Login</button>
+		<div className="section">
+			<div className="container">
+				<h1 className="title">Login</h1>
+				<Button onClick={handleClick}>Login</Button>
+			</div>
 		</div>
 	);
 }

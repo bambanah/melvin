@@ -43,6 +43,14 @@ export const signIn = async () => {
 	}
 };
 
+export const signOut = async () => {
+	try {
+		await auth.signOut();
+	} catch (err) {
+		console.error(err.message);
+	}
+};
+
 export const getInvoices = () => {
 	return firestore
 		.collection("invoices")

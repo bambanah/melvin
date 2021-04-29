@@ -71,29 +71,6 @@ export default function CreateInvoice({
 			errors.invoice_no = "Required";
 		}
 
-		// if (values.activities) {
-		// 	errors.activities = [];
-
-		// 	values.activities.forEach((activity, index) => {
-		// 		let activityError = {
-		// 			date: "",
-		// 			start_time: "",
-		// 			end_time: "",
-		// 			duration: "",
-		// 			distance: "",
-		// 		};
-
-		// 		if (!activity.activity_ref) {
-		// 			Object.assign(activityError, { activity_ref: "Required" });
-		// 		}
-		// 		if (!activity.date) {
-		// 			Object.assign(activityError, { date: "Required." });
-		// 		}
-
-		// 		errors.activities?.push(activityError);
-		// 	});
-		// }
-
 		return errors;
 	};
 
@@ -103,6 +80,11 @@ export default function CreateInvoice({
 				initialValues={lastInvoice}
 				onSubmit={(values, actions) => {
 					values.activities.forEach((activity, index) => {
+						if (activity.activity_ref === "") {
+							values.activities.splice(index, 1);
+							console.log("Removing activity");
+						}
+
 						if (activity.start_time && activity.end_time) {
 							values.activities[index].duration = getDuration(
 								activity.start_time,
@@ -110,6 +92,8 @@ export default function CreateInvoice({
 							);
 						}
 					});
+
+					console.log(values);
 
 					createInvoice(values);
 

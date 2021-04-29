@@ -2,13 +2,14 @@ import { FunctionComponent } from "react";
 import styled from "styled-components";
 
 const StyledButton = styled.button<{ primary?: boolean }>`
-	display: inline-flex;
+	display: inline-block;
 	border: 2px solid var(--color-dark);
 	padding: 0.5rem 1rem;
 	border-radius: 0px;
 	background: none;
 	cursor: pointer;
 	transition-duration: 0.1s;
+	max-height: 37px;
 
 	border-color: ${(props) =>
 		props.primary ? "var(--color-primary-dark)" : "var(--color-dark)"};
