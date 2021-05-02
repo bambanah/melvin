@@ -1,6 +1,9 @@
 import { Field, FieldArray, FormikErrors, FormikTouched } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
+import styled from "styled-components";
 import Button from "../../shared/components/Button";
+import Control from "../../shared/components/form/Control";
+import Error from "../../shared/components/form/Error";
 import Text from "../../shared/components/Text";
 import { getActivities } from "../../shared/utils/firebase";
 import { ActivityObject, Invoice } from "../../types";
@@ -14,6 +17,35 @@ interface PropInterface {
 	setFieldValue: Function;
 	handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
+
+const ActivityListContainer = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+`;
+
+const ActivityRow = styled.div`
+	display: flex;
+	gap: 0.4rem;
+
+	input {
+		&:first-of-type {
+			width: 10rem;
+		}
+	}
+`;
+
+const Inputs = styled.div`
+	flex: 1 0 auto;
+	display: flex;
+	gap: 0.4rem;
+`;
+
+const HourlyText = styled.span`
+	line-height: 40px;
+	width: 4rem;
+`;
 
 export default function ActivityList({
 	values,
@@ -43,18 +75,16 @@ export default function ActivityList({
 						{values.activities && (
 							<>
 								<Text className="label">Activities</Text>
-								{values.activities.map((activity_value, index) => (
-									<div
-										className="field is-grouped"
-										key={activity_value + index.toString()}
-									>
-										<Field
-											className="input"
-											id={`activities.${index}.date`}
-											name={`activities.${index}.date`}
-											placeholder="DD-MM-YYYY"
-										/>
-										<div className="control">
+								<ActivityListContainer>
+									{values.activities.map((activity_value, index) => (
+										<ActivityRow key={activity_value + index.toString()}>
+											<Field
+												className="input"
+												id={`activities.${index}.date`}
+												name={`activities.${index}.date`}
+												placeholder="DD-MM-YYYY"
+											/>
+
 											<div
 												className={`select ${
 													getIn(touched, `activities.${index}.activity_ref`) &&
@@ -78,45 +108,49 @@ export default function ActivityList({
 														)
 													)}
 												</Field>
+														<Error
+															error={getIn(errors, `activities.${index}.activity_ref`)}
+															touched={getIn(touched, `activities.${index}.activity_ref`)}
+														/>
 											</div>
-										</div>
 
-										{activity_value.activity_ref.length > 0 && (
-											<>
-												{activities[activity_value.activity_ref.split("/")[1]]
-													.rate_type === "hr" && (
-													<>
-														<TimePicker
-															formValue={`activities.${index}.start_time`}
-															setFieldValue={setFieldValue}
-														/>
-
-														<TimePicker
-															formValue={`activities.${index}.end_time`}
-															setFieldValue={setFieldValue}
-														/>
-													</>
-												)}
-
-												{activities[activity_value.activity_ref.split("/")[1]]
-													.rate_type === "km" && (
-													<div className="field">
-														<div className="control has-icons-right">
-															<input
-																className="input"
-																value={values.activities[index].distance}
-																name={`activities.${index}.distance`}
-																onChange={handleChange}
+											{activity_value.activity_ref.length > 0 && (
+												<>
+													{activities[activity_value.activity_ref.split("/")[1]]
+														.rate_type === "hr" && (
+														<Inputs>
+															<TimePicker
+																formValue={`activities.${index}.start_time`}
+																setFieldValue={setFieldValue}
 															/>
-															<span className="icon is-small is-right">km</span>
-														</div>
-													</div>
-												)}
 
-												{activities[activity_value.activity_ref.split("/")[1]]
-													.rate_type === "minutes" && (
-													<div className="field">
-														<div className="control has-icons-right">
+															<TimePicker
+																formValue={`activities.${index}.end_time`}
+																setFieldValue={setFieldValue}
+															/>
+														</Inputs>
+													)}
+
+													{activities[activity_value.activity_ref.split("/")[1]]
+														.rate_type === "km" && (
+														<Inputs>
+															<Control className="control has-icons-right is-expanded">
+																<input
+																	className="input"
+																	value={values.activities[index].distance}
+																	name={`activities.${index}.distance`}
+																	onChange={handleChange}
+																/>
+																<span className="icon is-small is-right">
+																	km
+																</span>
+															</Control>
+														</Inputs>
+													)}
+
+													{activities[activity_value.activity_ref.split("/")[1]]
+														.rate_type === "minutes" && (
+														<Control className="control has-icons-right">
 															<input
 																className="input"
 																value={values.activities[index].duration}
@@ -126,39 +160,49 @@ export default function ActivityList({
 															<span className="icon is-small is-right">
 																min
 															</span>
-														</div>
-													</div>
-												)}
+														</Control>
+													)}
 
-												<span className="field">
-													$
-													{
+													<HourlyText>
+														{/* {(activity_value.duration ||
+															activity_value.distance) &&
+															`$${(
+																activities[
+																	activity_value.activity_ref.split("/")[1]
+																].rate *
+																(activity_value.duration ||
+																	parseInt(activity_value.distance, 10))
+															).toFixed(2)} @ `} */}
+														$
+														{
+															activities[
+																activity_value.activity_ref.split("/")[1]
+															].rate
+														}
+														/
+														{activity_value.activity_ref.length > 0 &&
 														activities[
 															activity_value.activity_ref.split("/")[1]
-														].rate
-													}
-													/
-													{activity_value.activity_ref.length > 0 &&
-													activities[activity_value.activity_ref.split("/")[1]]
-														.rate_type === "minutes"
-														? "hr"
-														: activities[
-																activity_value.activity_ref.split("/")[1]
-														  ].rate_type}
-												</span>
-											</>
-										)}
+														].rate_type === "minutes"
+															? "hr"
+															: activities[
+																	activity_value.activity_ref.split("/")[1]
+															  ].rate_type}
+													</HourlyText>
+												</>
+											)}
 
-										<Button
-											className="button is-danger is-light"
-											onClick={() => {
-												arrayHelpers.remove(index);
-											}}
-										>
-											X
-										</Button>
-									</div>
-								))}
+											<Button
+												className="button is-danger is-light"
+												onClick={() => {
+													arrayHelpers.remove(index);
+												}}
+											>
+												X
+											</Button>
+										</ActivityRow>
+									))}
+								</ActivityListContainer>
 
 								<div className="field">
 									<p className="control">

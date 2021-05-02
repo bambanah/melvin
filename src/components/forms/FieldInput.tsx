@@ -1,5 +1,6 @@
 import { Field } from "formik";
 import React from "react";
+import Error from "../../shared/components/form/Error";
 
 const FieldInput = ({
 	value,
@@ -9,20 +10,21 @@ const FieldInput = ({
 }: {
 	value: string;
 	labelText?: string;
-	error?: string;
-	touched?: boolean;
+	error: string | undefined;
+	touched: boolean | undefined;
 }) => (
-		<div className="field">
-			<label className="label" htmlFor={value}>
-				{labelText || value}
-			</label>
-			<Field
-				className={`input ${touched && error && "is-danger"}`}
-				id={value}
-				name={value}
-				placeholder={labelText || value}
-			/>
-		</div>
-	);
+	<div className="field">
+		<label className="label" htmlFor={value}>
+			{labelText || value}
+		</label>
+		<Field
+			className={`input ${touched && error && "is-danger"}`}
+			id={value}
+			name={value}
+			placeholder={labelText || value}
+		/>
+		<Error error={error} touched={touched} />
+	</div>
+);
 
 export default FieldInput;
