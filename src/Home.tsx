@@ -10,10 +10,13 @@ export default function Home() {
 	const auth = useAuth();
 
 	const ToggleButton = () => (
-			<Button primary onClick={() => setCreating(!creating)}>
-				Create Invoice
-			</Button>
-		);
+		<Button
+			className="button is-primary"
+			onClick={() => setCreating(!creating)}
+		>
+			Create Invoice
+		</Button>
+	);
 
 	return (
 		<section className="section">

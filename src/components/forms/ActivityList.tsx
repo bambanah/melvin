@@ -1,5 +1,6 @@
 import { Field, FieldArray, FormikErrors, FormikTouched } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
+import Button from "../../shared/components/Button";
 import Text from "../../shared/components/Text";
 import { getActivities } from "../../shared/utils/firebase";
 import { ActivityObject, Invoice } from "../../types";
@@ -41,118 +42,122 @@ export default function ActivityList({
 					<>
 						{values.activities && (
 							<>
-								<Text>Activities</Text>
+								<Text className="label">Activities</Text>
 								{values.activities.map((activity_value, index) => (
-									<React.Fragment key={activity_value + index.toString()}>
-										<div className="field is-grouped">
-											<Field
-												className="input"
-												id={`activities.${index}.date`}
-												name={`activities.${index}.date`}
-												placeholder="DD-MM-YYYY"
-											/>
-											<div className="control">
-												<div
-													className={`select ${
-														getIn(
-															touched,
-															`activities.${index}.activity_ref`
-														) &&
-														getIn(errors, `activities.${index}.activity_ref`) &&
-														"is-danger"
-													}`}
+									<div
+										className="field is-grouped"
+										key={activity_value + index.toString()}
+									>
+										<Field
+											className="input"
+											id={`activities.${index}.date`}
+											name={`activities.${index}.date`}
+											placeholder="DD-MM-YYYY"
+										/>
+										<div className="control">
+											<div
+												className={`select ${
+													getIn(touched, `activities.${index}.activity_ref`) &&
+													getIn(errors, `activities.${index}.activity_ref`) &&
+													"is-danger"
+												}`}
+											>
+												<Field
+													id={`activities.${index}.activity_ref`}
+													as="select"
+													name={`activities.${index}.activity_ref`}
 												>
-													<Field
-														id={`activities.${index}.activity_ref`}
-														as="select"
-														name={`activities.${index}.activity_ref`}
-													>
-														<option disabled value="">
-															Select activity...
-														</option>
-														{Object.entries(activities).map(
-															([activityId, activity]) => (
-																<option value={`activities/${activityId}`}>
-																	{activity.description}
-																</option>
-															)
-														)}
-													</Field>
-												</div>
+													<option disabled value="">
+														Select activity...
+													</option>
+													{Object.entries(activities).map(
+														([activityId, activity]) => (
+															<option value={`activities/${activityId}`}>
+																{activity.description}
+															</option>
+														)
+													)}
+												</Field>
 											</div>
+										</div>
 
-											{activity_value.activity_ref.length > 0 && (
-												<>
-													{activities[activity_value.activity_ref.split("/")[1]]
-														.rate_type === "hr" && (
-														<>
-															<TimePicker
-																formValue={`activities.${index}.start_time`}
-																setFieldValue={setFieldValue}
+										{activity_value.activity_ref.length > 0 && (
+											<>
+												{activities[activity_value.activity_ref.split("/")[1]]
+													.rate_type === "hr" && (
+													<>
+														<TimePicker
+															formValue={`activities.${index}.start_time`}
+															setFieldValue={setFieldValue}
+														/>
+
+														<TimePicker
+															formValue={`activities.${index}.end_time`}
+															setFieldValue={setFieldValue}
+														/>
+													</>
+												)}
+
+												{activities[activity_value.activity_ref.split("/")[1]]
+													.rate_type === "km" && (
+													<div className="field">
+														<div className="control has-icons-right">
+															<input
+																className="input"
+																value={values.activities[index].distance}
+																name={`activities.${index}.distance`}
+																onChange={handleChange}
 															/>
+															<span className="icon is-small is-right">km</span>
+														</div>
+													</div>
+												)}
 
-															<TimePicker
-																formValue={`activities.${index}.end_time`}
-																setFieldValue={setFieldValue}
+												{activities[activity_value.activity_ref.split("/")[1]]
+													.rate_type === "minutes" && (
+													<div className="field">
+														<div className="control has-icons-right">
+															<input
+																className="input"
+																value={values.activities[index].duration}
+																name={`activities.${index}.duration`}
+																onChange={handleChange}
 															/>
-														</>
-													)}
-
-													{activities[activity_value.activity_ref.split("/")[1]]
-														.rate_type === "km" && (
-														<div className="field">
-															<div className="control has-icons-right">
-																<input
-																	className="input"
-																	value={values.activities[index].distance}
-																	name={`activities.${index}.distance`}
-																	onChange={handleChange}
-																/>
-																<span className="icon is-small is-right">
-																	km
-																</span>
-															</div>
+															<span className="icon is-small is-right">
+																min
+															</span>
 														</div>
-													)}
+													</div>
+												)}
 
-													{activities[activity_value.activity_ref.split("/")[1]]
-														.rate_type === "minutes" && (
-														<div className="field">
-															<div className="control has-icons-right">
-																<input
-																	className="input"
-																	value={values.activities[index].duration}
-																	name={`activities.${index}.duration`}
-																	onChange={handleChange}
-																/>
-																<span className="icon is-small is-right">
-																	min
-																</span>
-															</div>
-														</div>
-													)}
-
-													<span>
-														$
-														{
-															activities[
-																activity_value.activity_ref.split("/")[1]
-															].rate
-														}
-														/
-														{activity_value.activity_ref.length > 0 &&
+												<span className="field">
+													$
+													{
 														activities[
 															activity_value.activity_ref.split("/")[1]
-														].rate_type === "minutes"
-															? "hr"
-															: activities[
-																	activity_value.activity_ref.split("/")[1]
-															  ].rate_type}
-													</span>
-												</>
-											)}
-										</div>
-									</React.Fragment>
+														].rate
+													}
+													/
+													{activity_value.activity_ref.length > 0 &&
+													activities[activity_value.activity_ref.split("/")[1]]
+														.rate_type === "minutes"
+														? "hr"
+														: activities[
+																activity_value.activity_ref.split("/")[1]
+														  ].rate_type}
+												</span>
+											</>
+										)}
+
+										<Button
+											className="button is-danger is-light"
+											onClick={() => {
+												arrayHelpers.remove(index);
+											}}
+										>
+											X
+										</Button>
+									</div>
 								))}
 
 								<div className="field">

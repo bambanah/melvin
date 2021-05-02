@@ -67,7 +67,8 @@ export default function InvoiceList() {
 						<th>Client Number</th>
 						<th>PDF</th>
 						<th>Total</th>
-						<th>X</th>
+						{/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+						<th />
 					</tr>
 				</thead>
 				<tbody>
