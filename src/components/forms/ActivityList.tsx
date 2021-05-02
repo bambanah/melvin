@@ -126,7 +126,7 @@ export default function ActivityList({
 																	onChange={handleChange}
 																/>
 																<span className="icon is-small is-right">
-																	m
+																	min
 																</span>
 															</div>
 														</div>

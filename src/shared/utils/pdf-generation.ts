@@ -18,7 +18,7 @@ const generatePDF = (invoice: Invoice) => {
 
 	// Write details at top of page
 	const invoiceDetails = [
-		`Date: ${date}`,
+		`Invoice Date: ${date}`,
 		`Client Name: ${invoice.client_name}`,
 		`Client Number: ${invoice.client_no}`,
 		`Bill To: ${invoice.bill_to}`,
@@ -93,7 +93,17 @@ const generatePDF = (invoice: Invoice) => {
 		activities.push(currentActivity);
 
 		// Bottom section
-		activities.push(["", "", "", "Total", `$${sumTotal.toFixed(2)}`]);
+		activities.push([
+			{
+				content: "Total",
+				colSpan: 4,
+				styles: { fontStyle: "bold", halign: "right" },
+			},
+			{
+				content: `$${sumTotal.toFixed(2)}`,
+				styles: { fontStyle: "bold" },
+			},
+		]);
 		activities.push([
 			{ content: "", colSpan: 5, styles: { fillColor: "#fff" } },
 		]);
@@ -107,7 +117,7 @@ const generatePDF = (invoice: Invoice) => {
 					minCellHeight: 45,
 					halign: "left",
 					fillColor: "#FFF",
-					fontStyle: "normal",
+					fontStyle: "bold",
 					lineWidth: 0.2,
 					lineColor: "#000",
 				},
@@ -115,7 +125,15 @@ const generatePDF = (invoice: Invoice) => {
 		]);
 
 		autoTable(doc, {
-			head: [["Description", "Date", "Count", "Rate", "Total"]],
+			head: [
+				[
+					"Description",
+					"Date",
+					"Count",
+					{ content: "Rate", styles: { halign: "right" } },
+					"Total",
+				],
+			],
 			body: activities,
 			startY: 45,
 			margin,
@@ -130,7 +148,7 @@ const generatePDF = (invoice: Invoice) => {
 			},
 			columnStyles: {
 				0: {
-					cellWidth: 40,
+					cellWidth: 50,
 					fontStyle: "bold",
 				},
 				1: {
@@ -138,6 +156,7 @@ const generatePDF = (invoice: Invoice) => {
 				},
 				3: {
 					cellWidth: 20,
+					halign: "right",
 				},
 			},
 		});
