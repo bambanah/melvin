@@ -15,21 +15,23 @@ export default function TimePicker({
 		setFieldValue(formValue, e.target.value);
 	};
 
+	const timeFormat = "h:mmA";
+
 	const options = [];
-	let timeValue = moment("12:00AM", "HH:mmA");
-	const endTime = moment("11:59PM", "HH:mmA");
+	let timeValue = moment("12:00AM", timeFormat);
+	const endTime = moment("11:59PM", timeFormat);
 
 	while (timeValue.isBefore(endTime)) {
 		options.push(
 			<option
-				key={timeValue.format("HH:mmA")}
-				value={timeValue.format("HH:mmA")}
+				key={timeValue.format(timeFormat)}
+				value={timeValue.format(timeFormat)}
 			>
-				{timeValue.format("HH:mmA")}
+				{timeValue.format(timeFormat)}
 			</option>
 		);
 
-		timeValue = timeValue.add(15, "minutes");
+		timeValue = timeValue.add(5, "minutes");
 	}
 
 	return (

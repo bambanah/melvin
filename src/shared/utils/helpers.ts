@@ -45,8 +45,7 @@ export const getPrettyDuration = (hours: number) => {
 			duration.hours() === 1 ? "" : "s"
 		}`;
 
-	if (duration.minutes() > 0)
-		durationString += `, ${duration.minutes()} minutes`;
+	if (duration.minutes() > 0) durationString += `, ${duration.minutes()} mins`;
 
 	return durationString;
 };
