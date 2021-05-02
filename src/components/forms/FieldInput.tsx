@@ -11,8 +11,7 @@ const FieldInput = ({
 	labelText?: string;
 	error?: string;
 	touched?: boolean;
-}) => {
-	return (
+}) => (
 		<div className="field">
 			<label className="label" htmlFor={value}>
 				{labelText || value}
@@ -25,6 +24,5 @@ const FieldInput = ({
 			/>
 		</div>
 	);
-};
 
 export default FieldInput;

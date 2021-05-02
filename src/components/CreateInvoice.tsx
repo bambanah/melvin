@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Formik, Form, getIn } from "formik";
+import firebase from "firebase/app";
 import {
 	auth,
 	createInvoice,
@@ -8,7 +9,6 @@ import {
 
 import { Errors, Invoice } from "../types";
 import FieldInput from "./forms/FieldInput";
-import firebase from "firebase/app";
 import ActivityList from "./forms/ActivityList";
 import { getDuration } from "../shared/utils/helpers";
 
@@ -20,8 +20,16 @@ export default function CreateInvoice({
 	const [lastInvoice, setLastInvoice] = useState({} as Invoice);
 	const [loaded, setLoaded] = useState(false);
 
+	const incrementInvoiceId = (invoiceId: string) => {
+		const newNumber: number =
+			parseInt(invoiceId.replace(/([A-Za-z])+/g, ""), 10) + 1;
+
+		return invoiceId.replace(/([0-9])+/, newNumber.toString());
+	};
+
 	useEffect(() => {
-		getLastInvoiceDetails().then((invoice: Invoice) => {
+		getLastInvoiceDetails().then((lastInvoiceDetails: Invoice) => {
+			let invoice = lastInvoiceDetails;
 			if (auth.currentUser && invoice) {
 				if (invoice.invoice_no) {
 					invoice.invoice_no = incrementInvoiceId(invoice.invoice_no);
@@ -41,16 +49,10 @@ export default function CreateInvoice({
 				setLastInvoice(invoice);
 				setLoaded(true);
 			} else {
-				console.log("Not logged in.");
+				console.warn("Not logged in.");
 			}
 		});
 	}, []);
-
-	const incrementInvoiceId = (invoiceId: string) => {
-		let newNumber: number = parseInt(invoiceId.replace(/([A-Za-z])+/g, "")) + 1;
-
-		return invoiceId.replace(/([0-9])+/, newNumber.toString());
-	};
 
 	const validate = (values: Invoice) => {
 		const errors: Errors = {};
@@ -82,7 +84,6 @@ export default function CreateInvoice({
 					values.activities.forEach((activity, index) => {
 						if (activity.activity_ref === "") {
 							values.activities.splice(index, 1);
-							console.log("Removing activity");
 						}
 
 						if (activity.start_time && activity.end_time) {
@@ -148,7 +149,11 @@ export default function CreateInvoice({
 							</p>
 
 							<p className="control">
-								<button className="button" onClick={() => setCreating(false)}>
+								<button
+									className="button"
+									onClick={() => setCreating(false)}
+									type="button"
+								>
 									Cancel
 								</button>
 							</p>
@@ -157,7 +162,6 @@ export default function CreateInvoice({
 				)}
 			</Formik>
 		);
-	} else {
-		return <div>Loading Previous Invoice...</div>;
 	}
+	return <div>Loading Previous Invoice...</div>;
 }

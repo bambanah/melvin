@@ -1,13 +1,14 @@
 import jsPDF from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
-import { getActivities } from "../../shared/utils/firebase";
+import { getActivities } from "./firebase";
 import { ActivityObject, Invoice } from "../../types";
-import { formatDate, getPrettyDuration } from "../../shared/utils/helpers";
+import { formatDate, getPrettyDuration } from "./helpers";
 
-export const generatePDF = (invoice: Invoice) => {
+const generatePDF = (invoice: Invoice) => {
 	const margin = 20;
 
-	var doc = new jsPDF();
+	// eslint-disable-next-line new-cap
+	const doc = new jsPDF();
 	doc.setFontSize(20);
 	doc.text("Tax Invoice", 150, margin);
 
@@ -29,10 +30,10 @@ export const generatePDF = (invoice: Invoice) => {
 
 	// Write activity table
 	getActivities().then((activityDetails: ActivityObject) => {
-		let activities: (string | CellDef)[][] = [];
+		const activities: (string | CellDef)[][] = [];
 		let sumTotal = 0;
 
-		invoice.activities.forEach((activity, index) => {
+		invoice.activities.forEach((activity) => {
 			const activityId = activity.activity_ref.split("/")[1];
 
 			let totalCost = 0;
@@ -46,7 +47,7 @@ export const generatePDF = (invoice: Invoice) => {
 				countString = `${activity.start_time?.toLowerCase()}-${activity.end_time?.toLowerCase()}\n(${prettyDuration})`;
 			} else if (activityDetails[activityId].rate_type === "km") {
 				totalCost =
-					activityDetails[activityId].rate * parseInt(activity.distance);
+					activityDetails[activityId].rate * parseInt(activity.distance, 10);
 
 				countString = `${activity.distance} km`;
 			} else if (activityDetails[activityId].rate_type === "minutes") {
@@ -56,7 +57,7 @@ export const generatePDF = (invoice: Invoice) => {
 
 			sumTotal += totalCost;
 
-			let activityStrings: string[] = [
+			const activityStrings: string[] = [
 				`${activityDetails[activityId].description}\n${activityId}`,
 				activity.date,
 				countString,
@@ -68,12 +69,10 @@ export const generatePDF = (invoice: Invoice) => {
 				`$${totalCost.toFixed(2)}`,
 			];
 
-			const activityRow = activityStrings.map((activityString) => {
-				return {
-					content: activityString,
-					// styles: { fontStyle: activityString === "" },
-				};
-			});
+			const activityRow = activityStrings.map((activityString) => ({
+				content: activityString,
+				// styles: { fontStyle: activityString === "" },
+			}));
 
 			activities.push(activityRow);
 		});
@@ -103,7 +102,7 @@ export const generatePDF = (invoice: Invoice) => {
 			head: [["Description", "Date", "Count", "Rate", "Total"]],
 			body: activities,
 			startY: 45,
-			margin: margin,
+			margin,
 			theme: "striped",
 			headStyles: {
 				lineColor: "#000",
@@ -127,3 +126,5 @@ export const generatePDF = (invoice: Invoice) => {
 		doc.save();
 	});
 };
+
+export default generatePDF;

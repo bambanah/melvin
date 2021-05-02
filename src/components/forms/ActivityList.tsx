@@ -1,5 +1,6 @@
 import { Field, FieldArray, FormikErrors, FormikTouched } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
+import Text from "../../shared/components/Text";
 import { getActivities } from "../../shared/utils/firebase";
 import { ActivityObject, Invoice } from "../../types";
 import TimePicker from "./TimePicker";
@@ -40,15 +41,15 @@ export default function ActivityList({
 					<>
 						{values.activities && (
 							<>
-								<label className="label">Activities</label>
+								<Text>Activities</Text>
 								{values.activities.map((activity_value, index) => (
-									<React.Fragment key={index}>
+									<React.Fragment key={activity_value + index.toString()}>
 										<div className="field is-grouped">
 											<Field
 												className="input"
 												id={`activities.${index}.date`}
 												name={`activities.${index}.date`}
-												placeholder={"DD-MM-YYYY"}
+												placeholder="DD-MM-YYYY"
 											/>
 											<div className="control">
 												<div
@@ -60,7 +61,6 @@ export default function ActivityList({
 														getIn(errors, `activities.${index}.activity_ref`) &&
 														"is-danger"
 													}`}
-													key={`activities.${index}.activity_ref`}
 												>
 													<Field
 														id={`activities.${index}.activity_ref`}
@@ -186,7 +186,6 @@ export default function ActivityList({
 				)}
 			/>
 		);
-	} else {
-		return <div>Loading Activities...</div>;
 	}
+	return <div>Loading Activities...</div>;
 }

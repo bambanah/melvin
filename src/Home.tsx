@@ -9,13 +9,11 @@ export default function Home() {
 	const [creating, setCreating] = useState(false);
 	const auth = useAuth();
 
-	const ToggleButton = () => {
-		return (
+	const ToggleButton = () => (
 			<Button primary onClick={() => setCreating(!creating)}>
 				Create Invoice
 			</Button>
 		);
-	};
 
 	return (
 		<section className="section">

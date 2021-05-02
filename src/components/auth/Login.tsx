@@ -1,9 +1,10 @@
-import { useHistory } from "react-router";
+import React from "react";
+import { useHistory } from "react-router-dom";
 import Button from "../../shared/components/Button";
 import { signIn } from "../../shared/utils/firebase";
 
 export default function Login() {
-	let history = useHistory();
+	const history = useHistory();
 	const handleClick = () => {
 		signIn().then(() => {
 			history.push("/");
