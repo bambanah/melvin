@@ -33,8 +33,25 @@ const generatePDF = (invoice: Invoice) => {
 		const activities: (string | CellDef)[][] = [];
 		let sumTotal = 0;
 
+		// Sort invoice based on activity
+		invoice.activities.sort((a, b) => {
+			if (a.activity_ref > b.activity_ref) return 1;
+			if (b.activity_ref > a.activity_ref) return -1;
+			return 0;
+		});
+
+		let lastActivityId = "";
+		let currentActivity = ["", "", "", "", ""];
+
 		invoice.activities.forEach((activity) => {
 			const activityId = activity.activity_ref.split("/")[1];
+
+			const isNewActivity = lastActivityId !== activityId;
+
+			if (isNewActivity && lastActivityId !== "") {
+				activities.push(currentActivity);
+				currentActivity = ["", "", "", "", ""];
+			}
 
 			let totalCost = 0;
 			let countString = "";
@@ -44,12 +61,12 @@ const generatePDF = (invoice: Invoice) => {
 
 				const prettyDuration = getPrettyDuration(activity.duration);
 
-				countString = `${activity.start_time?.toLowerCase()}-${activity.end_time?.toLowerCase()}\n(${prettyDuration})`;
+				countString = `${activity.start_time?.toLowerCase()}-${activity.end_time?.toLowerCase()} (${prettyDuration})`;
 			} else if (activityDetails[activityId].rate_type === "km") {
 				totalCost =
 					activityDetails[activityId].rate * parseInt(activity.distance, 10);
 
-				countString = `${activity.distance} km`;
+				countString = `${activity.distance} kilometres`;
 			} else if (activityDetails[activityId].rate_type === "minutes") {
 				totalCost = activityDetails[activityId].rate * (activity.duration / 60);
 				countString = `${activity.duration} minutes`;
@@ -57,26 +74,25 @@ const generatePDF = (invoice: Invoice) => {
 
 			sumTotal += totalCost;
 
-			const activityStrings: string[] = [
-				`${activityDetails[activityId].description}\n${activityId}`,
-				activity.date,
-				countString,
-				`$${activityDetails[activityId].rate}\n/${
-					activityDetails[activityId].rate_type === "minutes"
-						? "hr"
-						: activityDetails[activityId].rate_type
-				}`,
-				`$${totalCost.toFixed(2)}`,
-			];
+			currentActivity[0] += isNewActivity
+				? `${activityDetails[activityId].description}\n${activityId}\n`
+				: "";
+			currentActivity[1] += `${activity.date}\n`;
+			currentActivity[2] += `${countString}\n`;
+			currentActivity[3] += `$${activityDetails[activityId].rate}/${
+				activityDetails[activityId].rate_type === "minutes"
+					? "hr"
+					: activityDetails[activityId].rate_type
+			}\n`;
+			currentActivity[4] += `$${totalCost.toFixed(2)}\n`;
 
-			const activityRow = activityStrings.map((activityString) => ({
-				content: activityString,
-				// styles: { fontStyle: activityString === "" },
-			}));
-
-			activities.push(activityRow);
+			lastActivityId = activityId;
 		});
 
+		// Push last activity
+		activities.push(currentActivity);
+
+		// Bottom section
 		activities.push(["", "", "", "Total", `$${sumTotal.toFixed(2)}`]);
 		activities.push([
 			{ content: "", colSpan: 5, styles: { fillColor: "#fff" } },
@@ -117,8 +133,11 @@ const generatePDF = (invoice: Invoice) => {
 					cellWidth: 40,
 					fontStyle: "bold",
 				},
-				2: {
-					cellWidth: 40,
+				1: {
+					cellWidth: 20,
+				},
+				3: {
+					cellWidth: 20,
 				},
 			},
 		});
