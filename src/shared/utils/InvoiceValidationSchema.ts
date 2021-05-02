@@ -12,6 +12,7 @@ const InvoiceValidationSchema = yup.object().shape({
 	activities: yup.array().of(
 		yup.object().shape({
 			activity_ref: yup.string().required("Required"),
+			date: yup.string().required("Required"),
 		})
 	),
 });

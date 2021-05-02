@@ -1,6 +1,6 @@
 import { Field } from "formik";
 import React from "react";
-import Error from "../../shared/components/form/Error";
+import ErrorMessage from "../../shared/components/form/ErrorMessage";
 
 const FieldInput = ({
 	value,
@@ -23,7 +23,7 @@ const FieldInput = ({
 			name={value}
 			placeholder={labelText || value}
 		/>
-		<Error error={error} touched={touched} />
+		<ErrorMessage error={error} touched={touched} />
 	</div>
 );
 

@@ -5,7 +5,7 @@ interface ErrorProps {
 	touched: boolean | undefined;
 }
 
-const Error = ({ error, touched }: ErrorProps) => {
+const ErrorMessage = ({ error, touched }: ErrorProps) => {
 	if (error && touched) {
 		return <p className="help is-danger">{error}</p>;
 	}
@@ -13,4 +13,4 @@ const Error = ({ error, touched }: ErrorProps) => {
 	return null;
 };
 
-export default Error;
+export default ErrorMessage;

@@ -3,7 +3,6 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import styled from "styled-components";
 import Button from "../../shared/components/Button";
 import Control from "../../shared/components/form/Control";
-import Error from "../../shared/components/form/Error";
 import Text from "../../shared/components/Text";
 import { getActivities } from "../../shared/utils/firebase";
 import { ActivityObject, Invoice } from "../../types";
@@ -79,7 +78,11 @@ export default function ActivityList({
 									{values.activities.map((activity_value, index) => (
 										<ActivityRow key={activity_value + index.toString()}>
 											<Field
-												className="input"
+												className={`input ${
+													getIn(touched, `activities.${index}.date`) &&
+													getIn(errors, `activities.${index}.date`) &&
+													"is-danger"
+												}`}
 												id={`activities.${index}.date`}
 												name={`activities.${index}.date`}
 												placeholder="DD-MM-YYYY"
@@ -108,10 +111,6 @@ export default function ActivityList({
 														)
 													)}
 												</Field>
-														<Error
-															error={getIn(errors, `activities.${index}.activity_ref`)}
-															touched={getIn(touched, `activities.${index}.activity_ref`)}
-														/>
 											</div>
 
 											{activity_value.activity_ref.length > 0 && (
