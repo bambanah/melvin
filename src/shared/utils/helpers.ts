@@ -1,5 +1,7 @@
 import firebase from "firebase/app";
 import moment from "moment";
+import { Invoice } from "../../types";
+import { getActivities } from "./firebase";
 
 export const formatDate = (timestamp: firebase.firestore.Timestamp) => {
 	const date = timestamp.toDate();
@@ -47,4 +49,31 @@ export const getPrettyDuration = (hours: number) => {
 		durationString += `, ${duration.minutes()} minutes`;
 
 	return durationString;
+};
+
+export const getTotalCost = async (invoice: Invoice) => {
+	let totalCost = 0;
+
+	const activityDetails = await getActivities();
+
+	invoice.activities.forEach((activity) => {
+		const activityId = activity.activity_ref.split("/")[1];
+
+		if (activityDetails[activityId].rate_type === "hr") {
+			totalCost += activityDetails[activityId].rate * activity.duration;
+		} else if (activityDetails[activityId].rate_type === "km") {
+			totalCost +=
+				activityDetails[activityId].rate * parseInt(activity.distance);
+		} else if (activityDetails[activityId].rate_type === "minutes") {
+			totalCost += activityDetails[activityId].rate * (activity.duration / 60);
+		}
+	});
+
+	return totalCost;
+};
+
+export const getTotalString = (invoice: Invoice) => {
+	return getTotalCost(invoice).then((cost) => {
+		return `$${cost.toFixed(2)}`;
+	});
 };
