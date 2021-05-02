@@ -18,7 +18,7 @@ const ActivityInput = ({
 	activities,
 }: Props) => (
 	<div className="field is-grouped">
-		<div className="control is-expanded">
+		<div className="control">
 			<div
 				className={`select ${ref_touched && ref_error && "is-danger"}`}
 				key={ref_value}

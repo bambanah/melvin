@@ -104,9 +104,11 @@ const generatePDF = (invoice: Invoice) => {
 				styles: { fontStyle: "bold" },
 			},
 		]);
+
 		activities.push([
 			{ content: "", colSpan: 5, styles: { fillColor: "#fff" } },
 		]);
+
 		activities.push([
 			{
 				content:
