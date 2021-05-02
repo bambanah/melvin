@@ -43,6 +43,14 @@ export const signIn = async () => {
 	}
 };
 
+export const signOut = async () => {
+	try {
+		await auth.signOut();
+	} catch (err) {
+		console.error(err.message);
+	}
+};
+
 export const getInvoices = () => {
 	return firestore
 		.collection("invoices")
@@ -79,7 +87,8 @@ export const createInvoice = (invoice: Invoice) => {
 export const deleteInvoice = async (invoice_no: string) => {
 	var invoiceQuery = firestore
 		.collection("invoices")
-		.where("invoice_no", "==", invoice_no);
+		.where("invoice_no", "==", invoice_no)
+		.where("owner", "==", getCurrentUser()?.uid);
 
 	await invoiceQuery.get().then((querySnapshot) => {
 		querySnapshot.forEach((doc) => {

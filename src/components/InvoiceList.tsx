@@ -3,6 +3,7 @@ import { deleteInvoice, streamInvoices } from "../shared/utils/firebase";
 import firebase from "firebase/app";
 import { Invoice as InvoiceType } from "../types";
 import GeneratePDF from "./pdf/GeneratePDF";
+import { getTotalString } from "../shared/utils/helpers";
 
 export default function InvoiceList() {
 	const [invoices, setInvoices] = useState<InvoiceType[]>([]);
@@ -33,6 +34,7 @@ export default function InvoiceList() {
 						<th>Client Name</th>
 						<th>Client Number</th>
 						<th>PDF</th>
+						<th>Total</th>
 						<th></th>
 					</tr>
 				</thead>
@@ -50,6 +52,12 @@ export default function InvoiceList() {
 }
 
 const Invoice = ({ invoice }: { invoice: InvoiceType }) => {
+	const [cost, setTotalCost] = useState<null | string>(null);
+
+	useEffect(() => {
+		getTotalString(invoice).then((costString) => setTotalCost(costString));
+	}, [invoice]);
+
 	return (
 		<tr>
 			<td>{invoice.invoice_no}</td>
@@ -58,10 +66,13 @@ const Invoice = ({ invoice }: { invoice: InvoiceType }) => {
 			<td>
 				<GeneratePDF invoice={invoice} />
 			</td>
+			<td>{cost}</td>
 			<td>
 				<button
 					className="button has-background-danger has-text-white has-text-weight-bold"
-					onClick={() => deleteInvoice(invoice.invoice_no)}
+					onClick={() => {
+						deleteInvoice(invoice.invoice_no);
+					}}
 				>
 					X
 				</button>
