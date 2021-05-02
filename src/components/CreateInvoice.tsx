@@ -7,10 +7,11 @@ import {
 	getLastInvoiceDetails,
 } from "../shared/utils/firebase";
 
-import { Errors, Invoice } from "../types";
+import { Invoice } from "../types";
 import FieldInput from "./forms/FieldInput";
 import ActivityList from "./forms/ActivityList";
 import { getDuration } from "../shared/utils/helpers";
+import InvoiceValidationSchema from "../shared/utils/InvoiceValidationSchema";
 
 export default function CreateInvoice({
 	setCreating,
@@ -54,28 +55,6 @@ export default function CreateInvoice({
 		});
 	}, []);
 
-	const validate = (values: Invoice) => {
-		const errors: Errors = {};
-
-		if (!values.client_no) {
-			errors.client_no = "Required";
-		}
-
-		if (!values.client_name) {
-			errors.client_name = "Required";
-		}
-
-		if (!values.bill_to) {
-			errors.bill_to = "Required";
-		}
-
-		if (!values.invoice_no) {
-			errors.invoice_no = "Required";
-		}
-
-		return errors;
-	};
-
 	if (loaded) {
 		return (
 			<Formik
@@ -103,7 +82,7 @@ export default function CreateInvoice({
 						incrementInvoiceId(values.invoice_no)
 					);
 				}}
-				validate={validate}
+				validationSchema={InvoiceValidationSchema}
 			>
 				{({ values, errors, touched, setFieldValue, handleChange }) => (
 					<Form className="form">
@@ -113,18 +92,21 @@ export default function CreateInvoice({
 							error={errors.client_no}
 							touched={touched.client_no}
 						/>
+
 						<FieldInput
 							value="client_name"
 							labelText="Client Name"
 							error={errors.client_name}
 							touched={touched.client_name}
 						/>
+
 						<FieldInput
 							value="bill_to"
 							labelText="Bill To"
 							error={errors.bill_to}
 							touched={touched.bill_to}
 						/>
+
 						<FieldInput
 							value="invoice_no"
 							labelText="Invoice Number"

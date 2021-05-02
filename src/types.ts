@@ -18,21 +18,6 @@ export interface Invoice {
 	}[];
 }
 
-export interface Errors {
-	invoice_no?: string;
-	client_no?: string;
-	client_name?: string;
-	bill_to?: string;
-	activities?: {
-		activity_ref?: string;
-		date?: string;
-		start_time?: string;
-		end_time?: string;
-		duration?: string;
-		distance?: string;
-	}[];
-}
-
 export interface Activity {
 	description: string;
 	rate: number;
