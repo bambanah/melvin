@@ -22,15 +22,12 @@ const app = firebase.app();
 export const auth = firebase.auth();
 const firestore = firebase.firestore();
 
+// eslint-disable-next-line no-console
 console.log(app.name ? "Firebase connected." : "Firebase not connected...");
 
-export const getCurrentUser = () => {
-	return auth.currentUser;
-};
+export const getCurrentUser = () => auth.currentUser;
 
-export const isAuthenticated = () => {
-	return auth.currentUser !== null;
-};
+export const isAuthenticated = () => auth.currentUser !== null;
 
 export const signIn = async () => {
 	try {
@@ -40,6 +37,7 @@ export const signIn = async () => {
 		return await auth.signInWithPopup(provider);
 	} catch (err) {
 		console.error(err.message);
+		return null;
 	}
 };
 
@@ -51,24 +49,21 @@ export const signOut = async () => {
 	}
 };
 
-export const getInvoices = () => {
-	return firestore
+export const getInvoices = () =>
+	firestore
 		.collection("invoices")
 		.where("owner", "==", auth.currentUser?.uid)
 		.get();
-};
 
-export const streamInvoices = (observer: any) => {
-	return firestore
+export const streamInvoices = (observer: any) =>
+	firestore
 		.collection("invoices")
 		.where("owner", "==", auth.currentUser?.uid)
 		.orderBy("date", "desc")
 		.onSnapshot(observer);
-};
 
-export const getSingleInvoice = (invoiceId: string) => {
-	return firestore.collection("invoice").doc(invoiceId).get();
-};
+export const getSingleInvoice = (invoiceId: string) =>
+	firestore.collection("invoice").doc(invoiceId).get();
 
 export const createInvoice = (invoice: Invoice) => {
 	invoice.date = firebase.firestore.Timestamp.now();
@@ -76,36 +71,28 @@ export const createInvoice = (invoice: Invoice) => {
 	firestore
 		.collection("invoices")
 		.add(invoice)
-		.then(function () {
-			console.log("Document successfully written!");
-		})
-		.catch(function (error) {
+		.catch((error) => {
 			console.error("Error writing document: ", error);
 		});
 };
 
 export const deleteInvoice = async (invoice_no: string) => {
-	var invoiceQuery = firestore
+	const invoiceQuery = firestore
 		.collection("invoices")
 		.where("invoice_no", "==", invoice_no)
 		.where("owner", "==", getCurrentUser()?.uid);
 
 	await invoiceQuery.get().then((querySnapshot) => {
 		querySnapshot.forEach((doc) => {
-			doc.ref
-				.delete()
-				.then(() => {
-					console.log("Document successfully deleted!");
-				})
-				.catch((error) => {
-					console.error("Error removing document: ", error);
-				});
+			doc.ref.delete().catch((error) => {
+				console.error("Error removing document: ", error);
+			});
 		});
 	});
 };
 
 export const getActivities = async () => {
-	let activities: ActivityObject = {};
+	const activities: ActivityObject = {};
 
 	await firestore
 		.collection("activities")
@@ -113,7 +100,7 @@ export const getActivities = async () => {
 		.then((querySnapshot) => {
 			querySnapshot.forEach((doc: firebase.firestore.DocumentData) => {
 				const activity: Activity = doc.data();
-				const id = doc.id;
+				const { id } = doc;
 
 				activities[id] = activity;
 			});

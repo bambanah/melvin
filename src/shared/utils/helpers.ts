@@ -7,8 +7,8 @@ export const formatDate = (timestamp: firebase.firestore.Timestamp) => {
 	const date = timestamp.toDate();
 
 	const YYYY = date.getFullYear();
-	const MM = ("0" + (date.getMonth() + 1)).slice(-2);
-	const DD = ("0" + date.getDate()).slice(-2);
+	const MM = `0${date.getMonth() + 1}`.slice(-2);
+	const DD = `0${date.getDate()}`.slice(-2);
 
 	return `${DD}/${MM}/${YYYY}`;
 };
@@ -63,7 +63,7 @@ export const getTotalCost = async (invoice: Invoice) => {
 			totalCost += activityDetails[activityId].rate * activity.duration;
 		} else if (activityDetails[activityId].rate_type === "km") {
 			totalCost +=
-				activityDetails[activityId].rate * parseInt(activity.distance);
+				activityDetails[activityId].rate * parseInt(activity.distance, 10);
 		} else if (activityDetails[activityId].rate_type === "minutes") {
 			totalCost += activityDetails[activityId].rate * (activity.duration / 60);
 		}
@@ -72,8 +72,5 @@ export const getTotalCost = async (invoice: Invoice) => {
 	return totalCost;
 };
 
-export const getTotalString = (invoice: Invoice) => {
-	return getTotalCost(invoice).then((cost) => {
-		return `$${cost.toFixed(2)}`;
-	});
-};
+export const getTotalString = (invoice: Invoice) =>
+	getTotalCost(invoice).then((cost) => `$${cost.toFixed(2)}`);

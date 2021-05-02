@@ -1,9 +1,41 @@
 import React, { useState, useEffect } from "react";
-import { deleteInvoice, streamInvoices } from "../shared/utils/firebase";
 import firebase from "firebase/app";
+import { deleteInvoice, streamInvoices } from "../shared/utils/firebase";
 import { Invoice as InvoiceType } from "../types";
-import GeneratePDF from "./pdf/GeneratePDF";
 import { getTotalString } from "../shared/utils/helpers";
+import Button from "../shared/components/Button";
+import generatePDF from "../shared/utils/pdf-generation";
+
+const Invoice = ({ invoice }: { invoice: InvoiceType }) => {
+	const [cost, setTotalCost] = useState<null | string>(null);
+
+	useEffect(() => {
+		getTotalString(invoice).then((costString) => setTotalCost(costString));
+	}, [invoice]);
+
+	return (
+		<tr>
+			<td>{invoice.invoice_no}</td>
+			<td>{invoice.client_name}</td>
+			<td>{invoice.client_no}</td>
+			<td>
+				<Button onClick={() => generatePDF(invoice)}>Generate PDF</Button>
+			</td>
+			<td>{cost}</td>
+			<td>
+				<button
+					className="button has-background-danger has-text-white has-text-weight-bold"
+					onClick={() => {
+						deleteInvoice(invoice.invoice_no);
+					}}
+					type="button"
+				>
+					X
+				</button>
+			</td>
+		</tr>
+	);
+};
 
 export default function InvoiceList() {
 	const [invoices, setInvoices] = useState<InvoiceType[]>([]);
@@ -35,7 +67,7 @@ export default function InvoiceList() {
 						<th>Client Number</th>
 						<th>PDF</th>
 						<th>Total</th>
-						<th></th>
+						<th>X</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -50,33 +82,3 @@ export default function InvoiceList() {
 		</div>
 	);
 }
-
-const Invoice = ({ invoice }: { invoice: InvoiceType }) => {
-	const [cost, setTotalCost] = useState<null | string>(null);
-
-	useEffect(() => {
-		getTotalString(invoice).then((costString) => setTotalCost(costString));
-	}, [invoice]);
-
-	return (
-		<tr>
-			<td>{invoice.invoice_no}</td>
-			<td>{invoice.client_name}</td>
-			<td>{invoice.client_no}</td>
-			<td>
-				<GeneratePDF invoice={invoice} />
-			</td>
-			<td>{cost}</td>
-			<td>
-				<button
-					className="button has-background-danger has-text-white has-text-weight-bold"
-					onClick={() => {
-						deleteInvoice(invoice.invoice_no);
-					}}
-				>
-					X
-				</button>
-			</td>
-		</tr>
-	);
-};

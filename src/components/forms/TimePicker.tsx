@@ -15,9 +15,9 @@ export default function TimePicker({
 		setFieldValue(formValue, e.target.value);
 	};
 
-	let options = [];
+	const options = [];
 	let timeValue = moment("12:00AM", "HH:mmA");
-	let endTime = moment("11:59PM", "HH:mmA");
+	const endTime = moment("11:59PM", "HH:mmA");
 
 	while (timeValue.isBefore(endTime)) {
 		options.push(

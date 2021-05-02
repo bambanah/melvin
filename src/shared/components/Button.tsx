@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import React, { FunctionComponent } from "react";
 import styled from "styled-components";
 
 const StyledButton = styled.button<{ primary?: boolean }>`
@@ -21,11 +21,11 @@ const StyledButton = styled.button<{ primary?: boolean }>`
 	}
 `;
 
-type ButtonProps = {
+interface ButtonProps extends React.HTMLProps<HTMLButtonElement> {
 	onClick?: () => void;
 	disabled?: boolean;
 	primary?: boolean;
-};
+}
 
 const defaultProps: ButtonProps = {
 	onClick: () => {},
@@ -38,7 +38,7 @@ const Button: FunctionComponent<ButtonProps> = ({
 	onClick,
 	disabled,
 	primary,
-}) => {
+}: ButtonProps) => {
 	const handleClick = () => {
 		if (!disabled && onClick) {
 			onClick();
