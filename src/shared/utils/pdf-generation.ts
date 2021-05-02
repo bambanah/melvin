@@ -1,4 +1,3 @@
-
 import jsPDF from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
 import { getActivities } from "../../shared/utils/firebase";
@@ -45,11 +44,14 @@ export const generatePDF = (invoice: Invoice) => {
 				const prettyDuration = getPrettyDuration(activity.duration);
 
 				countString = `${activity.start_time?.toLowerCase()}-${activity.end_time?.toLowerCase()}\n(${prettyDuration})`;
-			} else {
+			} else if (activityDetails[activityId].rate_type === "km") {
 				totalCost =
 					activityDetails[activityId].rate * parseInt(activity.distance);
 
 				countString = `${activity.distance} km`;
+			} else if (activityDetails[activityId].rate_type === "minutes") {
+				totalCost = activityDetails[activityId].rate * (activity.duration / 60);
+				countString = `${activity.duration} minutes`;
 			}
 
 			sumTotal += totalCost;
@@ -58,7 +60,11 @@ export const generatePDF = (invoice: Invoice) => {
 				`${activityDetails[activityId].description}\n${activityId}`,
 				activity.date,
 				countString,
-				`$${activityDetails[activityId].rate}\n/${activityDetails[activityId].rate_type}`,
+				`$${activityDetails[activityId].rate}\n/${
+					activityDetails[activityId].rate_type === "minutes"
+						? "hr"
+						: activityDetails[activityId].rate_type
+				}`,
 				`$${totalCost.toFixed(2)}`,
 			];
 

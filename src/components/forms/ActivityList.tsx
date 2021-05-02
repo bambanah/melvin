@@ -115,6 +115,23 @@ export default function ActivityList({
 														</div>
 													)}
 
+													{activities[activity_value.activity_ref.split("/")[1]]
+														.rate_type === "minutes" && (
+														<div className="field">
+															<div className="control has-icons-right">
+																<input
+																	className="input"
+																	value={values.activities[index].duration}
+																	name={`activities.${index}.duration`}
+																	onChange={handleChange}
+																/>
+																<span className="icon is-small is-right">
+																	m
+																</span>
+															</div>
+														</div>
+													)}
+
 													<span>
 														$
 														{
@@ -124,9 +141,13 @@ export default function ActivityList({
 														}
 														/
 														{activity_value.activity_ref.length > 0 &&
-															activities[
-																activity_value.activity_ref.split("/")[1]
-															].rate_type}
+														activities[
+															activity_value.activity_ref.split("/")[1]
+														].rate_type === "minutes"
+															? "hr"
+															: activities[
+																	activity_value.activity_ref.split("/")[1]
+															  ].rate_type}
 													</span>
 												</>
 											)}
