@@ -93,8 +93,6 @@ export default function CreateInvoice({
 						}
 					});
 
-					console.log(values);
-
 					createInvoice(values);
 
 					actions.setSubmitting(false);

@@ -87,7 +87,8 @@ export const createInvoice = (invoice: Invoice) => {
 export const deleteInvoice = async (invoice_no: string) => {
 	var invoiceQuery = firestore
 		.collection("invoices")
-		.where("invoice_no", "==", invoice_no);
+		.where("invoice_no", "==", invoice_no)
+		.where("owner", "==", getCurrentUser()?.uid);
 
 	await invoiceQuery.get().then((querySnapshot) => {
 		querySnapshot.forEach((doc) => {
