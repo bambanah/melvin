@@ -4,9 +4,11 @@ import InvoiceList from "./components/InvoiceList";
 import Button from "./shared/components/Button";
 import { useAuth } from "./shared/hooks/use-auth";
 import { signOut } from "./shared/utils/firebase";
+import { Invoice } from "./types";
 
 export default function Home() {
 	const [creating, setCreating] = useState(false);
+	const [invoice, setInvoice] = useState<Invoice | null>(null);
 	const auth = useAuth();
 
 	const ToggleButton = () => (
@@ -17,6 +19,11 @@ export default function Home() {
 			Create Invoice
 		</Button>
 	);
+
+	const loadInvoice = (invoiceToLoad: Invoice) => {
+		setInvoice(invoiceToLoad);
+		setCreating(true);
+	};
 
 	return (
 		<section className="section">
@@ -31,14 +38,18 @@ export default function Home() {
 
 				<div className="section">
 					{creating ? (
-						<CreateInvoice setCreating={setCreating} />
+						<CreateInvoice
+							invoiceToLoad={invoice}
+							setInvoiceToLoad={setInvoice}
+							setCreating={setCreating}
+						/>
 					) : (
 						<ToggleButton />
 					)}
 				</div>
 
 				<div className="section">
-					<InvoiceList />
+					<InvoiceList loadInvoice={loadInvoice} />
 				</div>
 			</div>
 		</section>

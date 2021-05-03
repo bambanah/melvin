@@ -19,7 +19,10 @@ const Button: FunctionComponent<ButtonProps> = (
 	{ children, onClick, disabled, type, className }: ButtonProps,
 	...rest
 ) => {
-	const handleClick = () => {
+	const handleClick = (e: React.MouseEvent) => {
+		// Stop parent click function from triggering (load invoice)
+		e.stopPropagation();
+
 		if (!disabled && onClick) {
 			onClick();
 		}

@@ -51,8 +51,8 @@ export default function ActivityList({
 	touched,
 	errors,
 	getIn,
-	setFieldValue,
 	handleChange,
+	setFieldValue,
 }: PropInterface) {
 	const [activities, setActivities] = useState({} as ActivityObject);
 	const [loaded, setLoaded] = useState(false);

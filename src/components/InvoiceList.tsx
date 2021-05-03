@@ -1,12 +1,31 @@
 import React, { useState, useEffect } from "react";
 import firebase from "firebase/app";
+import styled from "styled-components";
 import { deleteInvoice, streamInvoices } from "../shared/utils/firebase";
 import { Invoice as InvoiceType } from "../types";
 import { getTotalString } from "../shared/utils/helpers";
 import Button from "../shared/components/Button";
 import generatePDF from "../shared/utils/pdf-generation";
 
-const Invoice = ({ invoice }: { invoice: InvoiceType }) => {
+const InvoiceRow = styled.div`
+	display: flex;
+	justify-content: space-between;
+	padding: 2rem;
+	border-bottom: 1px solid #5e5e5e;
+
+	&:hover {
+		background-color: #eee;
+		cursor: pointer;
+	}
+`;
+
+const Invoice = ({
+	invoice,
+	loadInvoice,
+}: {
+	invoice: InvoiceType;
+	loadInvoice: (invoice: InvoiceType) => void;
+}) => {
 	const [cost, setTotalCost] = useState<null | string>(null);
 
 	useEffect(() => {
@@ -14,30 +33,35 @@ const Invoice = ({ invoice }: { invoice: InvoiceType }) => {
 	}, [invoice]);
 
 	return (
-		<tr>
-			<td>{invoice.invoice_no}</td>
-			<td>{invoice.client_name}</td>
-			<td>{invoice.client_no}</td>
-			<td>
-				<Button onClick={() => generatePDF(invoice)}>Generate PDF</Button>
-			</td>
-			<td>{cost}</td>
-			<td>
-				<button
-					className="button has-background-danger has-text-white has-text-weight-bold"
-					onClick={() => {
-						deleteInvoice(invoice.invoice_no);
-					}}
-					type="button"
-				>
-					X
-				</button>
-			</td>
-		</tr>
+		<InvoiceRow
+			onClick={() => {
+				loadInvoice(invoice);
+			}}
+		>
+			<span>{invoice.invoice_no}</span>
+			<span>{invoice.client_name}</span>
+			<span>{invoice.client_no}</span>
+
+			<Button onClick={() => generatePDF(invoice)}>Generate PDF</Button>
+			<span>{cost}</span>
+			<Button
+				className="button has-background-danger has-text-white has-text-weight-bold"
+				onClick={() => {
+					deleteInvoice(invoice.invoice_no);
+				}}
+				type="button"
+			>
+				X
+			</Button>
+		</InvoiceRow>
 	);
 };
 
-export default function InvoiceList() {
+export default function InvoiceList({
+	loadInvoice,
+}: {
+	loadInvoice: (invoice: InvoiceType) => void;
+}) {
 	const [invoices, setInvoices] = useState<InvoiceType[]>([]);
 
 	useEffect(() => {
@@ -59,27 +83,13 @@ export default function InvoiceList() {
 
 	return (
 		<div className="content">
-			<table className="table">
-				<thead>
-					<tr>
-						<th>Invoice Number</th>
-						<th>Client Name</th>
-						<th>Client Number</th>
-						<th>PDF</th>
-						<th>Total</th>
-						{/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-						<th />
-					</tr>
-				</thead>
-				<tbody>
-					{invoices.map((invoice: InvoiceType) => (
-						<Invoice
-							invoice={invoice}
-							key={invoice.invoice_no + invoice.client_no}
-						/>
-					))}
-				</tbody>
-			</table>
+			{invoices.map((invoice: InvoiceType) => (
+				<Invoice
+					invoice={invoice}
+					key={invoice.invoice_no + invoice.client_no}
+					loadInvoice={loadInvoice}
+				/>
+			))}
 		</div>
 	);
 }
