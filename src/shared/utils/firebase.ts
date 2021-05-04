@@ -1,7 +1,13 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
-import { Activity, ActivityObject, Invoice } from "../../types";
+import {
+	Activity,
+	ActivityObject,
+	Invoice,
+	Template,
+	TemplateObject,
+} from "../types";
 
 const firebaseConfig = {
 	apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -109,10 +115,6 @@ export const getActivities = async () => {
 	return activities;
 };
 
-export const getNextInvoiceNumber = () => {};
-
-export const checkInvoiceNumberValid = () => {};
-
 export const getLastInvoiceDetails = async () => {
 	let lastInvoice = {} as Invoice;
 
@@ -130,3 +132,47 @@ export const getLastInvoiceDetails = async () => {
 
 	return lastInvoice;
 };
+
+export const createTemplate = (template: Template) => {
+	template.date = firebase.firestore.Timestamp.now();
+
+	firestore
+		.collection("templates")
+		.add(template)
+		.catch((error) => {
+			console.error("Error writing document: ", error);
+		});
+};
+
+export const getTemplates = async () => {
+	const templates: TemplateObject = {};
+
+	await firestore
+		.collection("templates")
+		.get()
+		.then((querySnapshot) => {
+			querySnapshot.forEach((doc: firebase.firestore.DocumentData) => {
+				const template: Template = doc.data();
+				const { id } = doc;
+
+				templates[id] = template;
+			});
+		});
+
+	return templates;
+};
+
+// export const deleteTemplate = async (template_no: string) => {
+// 	const invoiceQuery = firestore
+// 		.collection("invoices")
+// 		.where("invoice_no", "==", invoice_no)
+// 		.where("owner", "==", getCurrentUser()?.uid);
+
+// 	await invoiceQuery.get().then((querySnapshot) => {
+// 		querySnapshot.forEach((doc) => {
+// 			doc.ref.delete().catch((error) => {
+// 				console.error("Error removing document: ", error);
+// 			});
+// 		});
+// 	});
+// };

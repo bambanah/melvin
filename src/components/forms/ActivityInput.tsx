@@ -1,6 +1,6 @@
 import React from "react";
 import { Field } from "formik";
-import { ActivityObject } from "../../types";
+import { ActivityObject } from "../../shared/types";
 
 interface Props {
 	ref_value: string;

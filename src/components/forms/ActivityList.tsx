@@ -5,7 +5,7 @@ import Button from "../../shared/components/Button";
 import Control from "../../shared/components/form/Control";
 import Text from "../../shared/components/Text";
 import { getActivities } from "../../shared/utils/firebase";
-import { ActivityObject, Invoice } from "../../types";
+import { ActivityObject, Invoice } from "../../shared/types";
 import TimePicker from "./TimePicker";
 
 interface PropInterface {

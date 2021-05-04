@@ -3,22 +3,28 @@ import styled from "styled-components";
 import CreateInvoice from "./components/CreateInvoice";
 import InvoiceList from "./components/InvoiceList";
 import Button from "./shared/components/Button";
+import ButtonGroup from "./shared/components/ButtonGroup";
 import { useAuth } from "./shared/hooks/use-auth";
 import { signOut } from "./shared/utils/firebase";
-import { Invoice } from "./types";
+import { Invoice } from "./shared/types";
+import TemplateList from "./components/TemplateList";
 
 export default function Home() {
 	const [creating, setCreating] = useState(false);
 	const [invoice, setInvoice] = useState<Invoice | null>(null);
 	const auth = useAuth();
 
-	const ToggleButton = () => (
+	const CreateInvoiceButton = () => (
 		<Button
 			className="button is-primary"
 			onClick={() => setCreating(!creating)}
 		>
 			Create Invoice
 		</Button>
+	);
+
+	const UseTemplateButton = () => (
+		<Button className="button is-outlined">Create Invoice From Template</Button>
 	);
 
 	const CreateInvoiceSection = styled.div`
@@ -53,9 +59,15 @@ export default function Home() {
 							setCreating={setCreating}
 						/>
 					) : (
-						<ToggleButton />
+						<ButtonGroup>
+							<CreateInvoiceButton />
+							<UseTemplateButton />
+						</ButtonGroup>
 					)}
 				</CreateInvoiceSection>
+				<div className="section">
+					<TemplateList />
+				</div>
 
 				<div className="section">
 					<InvoiceList loadInvoice={loadInvoice} />

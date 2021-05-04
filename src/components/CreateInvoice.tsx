@@ -7,10 +7,13 @@ import {
 	getLastInvoiceDetails,
 } from "../shared/utils/firebase";
 
-import { Invoice } from "../types";
+import { Invoice } from "../shared/types";
 import FieldInput from "./forms/FieldInput";
 import ActivityList from "./forms/ActivityList";
-import { getDuration } from "../shared/utils/helpers";
+import {
+	createTemplateFromInvoice,
+	getDuration,
+} from "../shared/utils/helpers";
 import InvoiceValidationSchema from "../shared/utils/InvoiceValidationSchema";
 import Button from "../shared/components/Button";
 
@@ -121,6 +124,17 @@ export default function CreateInvoice({
 					<p className="control">
 						<button className="button is-primary" type="submit">
 							Submit
+						</button>
+					</p>
+					<p className="control">
+						<button
+							className="is-outlined"
+							type="button"
+							onClick={() => {
+								createTemplateFromInvoice(values);
+							}}
+						>
+							Save as Template
 						</button>
 					</p>
 					<p className="control">

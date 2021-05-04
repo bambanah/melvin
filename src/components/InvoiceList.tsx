@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import firebase from "firebase/app";
 import styled from "styled-components";
 import { deleteInvoice, streamInvoices } from "../shared/utils/firebase";
-import { Invoice as InvoiceType } from "../types";
+import { Invoice as InvoiceType } from "../shared/types";
 import { getTotalString } from "../shared/utils/helpers";
 import Button from "../shared/components/Button";
 import generatePDF from "../shared/utils/pdf-generation";
