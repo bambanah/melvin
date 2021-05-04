@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import styled from "styled-components";
 import CreateInvoice from "./components/CreateInvoice";
 import InvoiceList from "./components/InvoiceList";
 import Button from "./shared/components/Button";
@@ -20,6 +21,14 @@ export default function Home() {
 		</Button>
 	);
 
+	const CreateInvoiceSection = styled.div`
+		background-color: #f1f1f1;
+
+		padding: 1.5rem;
+		border-radius: 4px;
+		box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+	`;
+
 	const loadInvoice = (invoiceToLoad: Invoice) => {
 		setInvoice(invoiceToLoad);
 		setCreating(true);
@@ -36,7 +45,7 @@ export default function Home() {
 					</div>
 				</div>
 
-				<div className="section">
+				<CreateInvoiceSection className={`section ${creating && "expanded"}`}>
 					{creating ? (
 						<CreateInvoice
 							invoiceToLoad={invoice}
@@ -46,7 +55,7 @@ export default function Home() {
 					) : (
 						<ToggleButton />
 					)}
-				</div>
+				</CreateInvoiceSection>
 
 				<div className="section">
 					<InvoiceList loadInvoice={loadInvoice} />
