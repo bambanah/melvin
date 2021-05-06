@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { TemplateObject } from "../shared/types";
-import { getTemplates } from "../shared/utils/firebase";
+import React, { useEffect, useState } from 'react';
+import { TemplateObject } from '../shared/types';
+import { getTemplates } from '../shared/utils/firebase';
 
 export default function TemplateList() {
 	const [templates, setTemplates] = useState({} as TemplateObject);
@@ -21,7 +21,7 @@ export default function TemplateList() {
 	return (
 		<ul>
 			{Object.entries(templates).map(([templateId, template]) => (
-				<li>
+				<li key={templateId}>
 					Template ({templateId}): {template.template_name}
 				</li>
 			))}

@@ -1,29 +1,27 @@
-import React, { useEffect, useState } from "react";
-import { getIn, withFormik, FormikProps } from "formik";
-import firebase from "firebase/app";
+import React, { useEffect, useState } from 'react';
+import { getIn, withFormik, FormikProps } from 'formik';
+import firebase from 'firebase/app';
 import {
 	auth,
 	createInvoice,
 	getLastInvoiceDetails,
-} from "../shared/utils/firebase";
+} from '../shared/utils/firebase';
 
-import { Invoice } from "../shared/types";
-import FieldInput from "./forms/FieldInput";
-import ActivityList from "./forms/ActivityList";
+import { Invoice } from '../shared/types';
+import FieldInput from './forms/FieldInput';
+import ActivityList from './forms/ActivityList';
 import {
 	createTemplateFromInvoice,
 	getDuration,
-} from "../shared/utils/helpers";
-import InvoiceValidationSchema from "../shared/utils/InvoiceValidationSchema";
-import Button from "../shared/components/Button";
+} from '../shared/utils/helpers';
+import InvoiceValidationSchema from '../shared/utils/InvoiceValidationSchema';
+import Button from '../shared/components/Button';
 
 export default function CreateInvoice({
 	invoiceToLoad,
-	setInvoiceToLoad,
 	setCreating,
 }: {
 	invoiceToLoad: Invoice | null;
-	setInvoiceToLoad: (invoice: Invoice | null) => void;
 	setCreating: (creating: boolean) => void;
 }) {
 	const [lastInvoice, setLastInvoice] = useState({} as Invoice);
@@ -31,7 +29,7 @@ export default function CreateInvoice({
 
 	const incrementInvoiceId = (invoiceId: string) => {
 		const newNumber: number =
-			parseInt(invoiceId.replace(/([A-Za-z])+/g, ""), 10) + 1;
+			parseInt(invoiceId.replace(/([A-Za-z])+/g, ''), 10) + 1;
 
 		return invoiceId.replace(/([0-9])+/, newNumber.toString());
 	};
@@ -41,7 +39,6 @@ export default function CreateInvoice({
 			const invoice = { ...invoiceToLoad };
 			invoice.invoice_no = incrementInvoiceId(invoice.invoice_no);
 			setLastInvoice(invoice);
-			setInvoiceToLoad(null);
 			setLoaded(true);
 		} else {
 			getLastInvoiceDetails().then((lastInvoiceDetails: Invoice) => {
@@ -53,10 +50,10 @@ export default function CreateInvoice({
 					} else {
 						invoice = {
 							owner: auth.currentUser?.uid,
-							client_no: "",
-							client_name: "",
-							bill_to: "",
-							invoice_no: "",
+							client_no: '',
+							client_name: '',
+							bill_to: '',
+							invoice_no: '',
 							activities: [],
 							date: firebase.firestore.Timestamp.fromDate(new Date()),
 						};
@@ -65,7 +62,7 @@ export default function CreateInvoice({
 					setLastInvoice(invoice);
 					setLoaded(true);
 				} else {
-					console.warn("Not logged in.");
+					console.warn('Not logged in.');
 				}
 			});
 		}
@@ -128,7 +125,7 @@ export default function CreateInvoice({
 					</p>
 					<p className="control">
 						<button
-							className="is-outlined"
+							className="button is-outlined"
 							type="button"
 							onClick={() => {
 								createTemplateFromInvoice(values);
@@ -155,14 +152,14 @@ export default function CreateInvoice({
 		mapPropsToValues: () => lastInvoice,
 		handleSubmit: (values, actions) => {
 			values.activities.forEach((activity, index) => {
-				if (activity.activity_ref === "") {
+				if (activity.activity_ref === '') {
 					values.activities.splice(index, 1);
 				}
 
 				if (activity.start_time && activity.end_time) {
 					values.activities[index].duration = getDuration(
 						activity.start_time,
-						activity.end_time
+						activity.end_time,
 					);
 				}
 			});
@@ -175,7 +172,7 @@ export default function CreateInvoice({
 
 		validationSchema: InvoiceValidationSchema,
 
-		displayName: "BasicForm",
+		displayName: 'BasicForm',
 	})(Form);
 
 	if (loaded) {
