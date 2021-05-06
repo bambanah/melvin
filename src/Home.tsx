@@ -39,7 +39,9 @@ export default function Home() {
 					<h1 className="title">Invoices</h1>
 					<div className="is-flex is-flex-direction-row ">
 						{auth.user && <span className="mr-2 mt-2">{auth.user.email}</span>}
-						<Button onClick={() => signOut()}>Log Out</Button>
+						<Button className="button" onClick={() => signOut()}>
+							Log Out
+						</Button>
 					</div>
 				</div>
 

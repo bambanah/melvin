@@ -5,20 +5,20 @@ interface ButtonProps extends React.HTMLProps<HTMLButtonElement> {
 	onClick?: () => void;
 	disabled?: boolean;
 	type?: "button" | "submit" | "reset";
-	className?: string;
 }
 
 const defaultProps: ButtonProps = {
 	onClick: () => {},
 	disabled: false,
-	type: "button",
-	className: "button",
 };
 
-const Button: FunctionComponent<ButtonProps> = (
-	{ children, onClick, disabled, type, className }: ButtonProps,
+const Button: FunctionComponent<ButtonProps> = ({
+	children,
+	onClick,
+	disabled,
+	type,
 	...rest
-) => {
+}: ButtonProps) => {
 	const handleClick = (e: React.MouseEvent) => {
 		// Stop parent click function from triggering (load invoice)
 		e.stopPropagation();
@@ -32,8 +32,7 @@ const Button: FunctionComponent<ButtonProps> = (
 		<button
 			onClick={handleClick}
 			disabled={disabled}
-			type={type}
-			className={className}
+			type={type || "button"}
 			{...rest}
 		>
 			{children}

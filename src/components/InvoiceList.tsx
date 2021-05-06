@@ -42,7 +42,9 @@ const Invoice = ({
 			<span>{invoice.client_name}</span>
 			<span>{invoice.client_no}</span>
 
-			<Button onClick={() => generatePDF(invoice)}>Generate PDF</Button>
+			<Button className="button" onClick={() => generatePDF(invoice)}>
+				Generate PDF
+			</Button>
 			<span>{cost}</span>
 			<Button
 				className="button has-background-danger has-text-white has-text-weight-bold"

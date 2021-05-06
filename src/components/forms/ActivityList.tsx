@@ -105,10 +105,13 @@ export default function ActivityList({
 													</option>
 													{Object.entries(activities).map(
 														([activityId, activity]) => (
-															<option value={`activities/${activityId}`}>
+															<option
+																key={activity.description}
+																value={`activities/${activityId}`}
+															>
 																{activity.description}
 															</option>
-														)
+														),
 													)}
 												</Field>
 											</div>
@@ -220,7 +223,7 @@ export default function ActivityList({
 
 												arrayHelpers.insert(
 													values.activities.length,
-													newActivity
+													newActivity,
 												);
 											}}
 										>

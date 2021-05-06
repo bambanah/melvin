@@ -10,12 +10,10 @@ import {
 import { Invoice } from "../shared/types";
 import FieldInput from "./forms/FieldInput";
 import ActivityList from "./forms/ActivityList";
-import {
-	createTemplateFromInvoice,
-	getDuration,
-} from "../shared/utils/helpers";
+import { getDuration } from "../shared/utils/helpers";
 import InvoiceValidationSchema from "../shared/utils/InvoiceValidationSchema";
 import Button from "../shared/components/Button";
+import SaveAsTemplateButton from "./forms/SaveAsTemplateButton";
 
 export default function CreateInvoice({
 	invoiceToLoad,
@@ -119,19 +117,11 @@ export default function CreateInvoice({
 
 				<div className="field is-grouped">
 					<p className="control">
-						<button className="button is-primary" type="submit">
+						<Button className="button is-primary" type="submit">
 							Submit
-						</button>
+						</Button>
 					</p>
-					<p className="control">
-						<button
-							className="button is-outlined"
-							type="button"
-							onClick={() => createTemplateFromInvoice(values)}
-						>
-							Save as Template
-						</button>
-					</p>
+					<SaveAsTemplateButton values={values} />
 					<p className="control">
 						<Button
 							className="button"
