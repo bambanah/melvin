@@ -1,12 +1,12 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import Login from './components/auth/Login';
-import NotFound from './components/NotFound';
-import Home from './Home';
-import GlobalStyle from './shared/GlobalStyle';
-import ProtectedRoute from './shared/components/ProtectedRoute';
-import { AuthProvider } from './shared/hooks/use-auth';
+import React from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import Login from "./components/auth/Login";
+import NotFound from "./components/NotFound";
+import Home from "./Home";
+import GlobalStyle from "./shared/GlobalStyle";
+import ProtectedRoute from "./shared/components/ProtectedRoute";
+import { AuthProvider } from "./shared/hooks/use-auth";
 
 function App() {
 	return (

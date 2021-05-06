@@ -1,8 +1,8 @@
-import firebase from 'firebase/app';
-import moment from 'moment';
-import { toast } from 'react-toastify';
-import { Invoice, Template } from '../types';
-import { createTemplate, getActivities } from './firebase';
+import firebase from "firebase/app";
+import moment from "moment";
+import { toast } from "react-toastify";
+import { Invoice, Template } from "../types";
+import { createTemplate, getActivities } from "./firebase";
 
 export const formatDate = (timestamp: firebase.firestore.Timestamp) => {
 	const date = timestamp.toDate();
@@ -15,7 +15,7 @@ export const formatDate = (timestamp: firebase.firestore.Timestamp) => {
 };
 
 export const stringToTimestamp = (timeValue: string) => {
-	const date = moment(timeValue, 'HH:mmA').toDate();
+	const date = moment(timeValue, "HH:mmA").toDate();
 	const timestamp = firebase.firestore.Timestamp.fromDate(date);
 
 	return timestamp;
@@ -23,27 +23,27 @@ export const stringToTimestamp = (timeValue: string) => {
 
 export const timestampToString = (timeValue: firebase.firestore.Timestamp) => {
 	const date = timeValue.toDate();
-	const timeString = moment(date).format('HH:mmA');
+	const timeString = moment(date).format("HH:mmA");
 
 	return timeString;
 };
 
 export const getDuration = (startTime: string, endTime: string) => {
-	const startMoment = moment(startTime, 'HH:mmA');
-	const endMoment = moment(endTime, 'HH:mmA');
+	const startMoment = moment(startTime, "HH:mmA");
+	const endMoment = moment(endTime, "HH:mmA");
 
 	const duration = moment.duration(startMoment.diff(endMoment));
 	return Math.abs(duration.asHours());
 };
 
 export const getPrettyDuration = (hours: number) => {
-	const duration = moment.duration(hours, 'hours');
+	const duration = moment.duration(hours, "hours");
 
-	let durationString = '';
+	let durationString = "";
 
 	if (duration.hours() > 0)
 		durationString += `${duration.hours()} hour${
-			duration.hours() === 1 ? '' : 's'
+			duration.hours() === 1 ? "" : "s"
 		}`;
 
 	if (duration.minutes() > 0) durationString += `, ${duration.minutes()} mins`;
@@ -57,14 +57,14 @@ export const getTotalCost = async (invoice: Invoice) => {
 	const activityDetails = await getActivities();
 
 	invoice.activities.forEach((activity) => {
-		const activityId = activity.activity_ref.split('/')[1];
+		const activityId = activity.activity_ref.split("/")[1];
 
-		if (activityDetails[activityId].rate_type === 'hr') {
+		if (activityDetails[activityId].rate_type === "hr") {
 			totalCost += activityDetails[activityId].rate * activity.duration;
-		} else if (activityDetails[activityId].rate_type === 'km') {
+		} else if (activityDetails[activityId].rate_type === "km") {
 			totalCost +=
 				activityDetails[activityId].rate * parseInt(activity.distance, 10);
-		} else if (activityDetails[activityId].rate_type === 'minutes') {
+		} else if (activityDetails[activityId].rate_type === "minutes") {
 			totalCost += activityDetails[activityId].rate * (activity.duration / 60);
 		}
 	});
@@ -77,7 +77,7 @@ export const getTotalString = (invoice: Invoice) =>
 
 export const createTemplateFromInvoice = (invoice: Invoice) => {
 	invoice.activities.map((activity) => {
-		activity.date = '';
+		activity.date = "";
 		return activity;
 	});
 
@@ -87,5 +87,5 @@ export const createTemplateFromInvoice = (invoice: Invoice) => {
 	};
 
 	createTemplate(template);
-	toast.info('Template saved!');
+	toast.info("Template saved!");
 };

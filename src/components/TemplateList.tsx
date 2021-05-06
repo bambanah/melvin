@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import Button from '../shared/components/Button';
-import { Invoice, TemplateObject } from '../shared/types';
-import { getTemplates } from '../shared/utils/firebase';
+import React, { useEffect, useState } from "react";
+import Button from "../shared/components/Button";
+import { Invoice, TemplateObject } from "../shared/types";
+import { getTemplates } from "../shared/utils/firebase";
 
 const TemplateList = ({
 	setInvoice,
@@ -22,7 +22,7 @@ const TemplateList = ({
 	if (templates !== null && loaded) {
 		if (showModal) {
 			return (
-				<div className={`modal ${showModal && 'is-active'}`}>
+				<div className={`modal ${showModal && "is-active"}`}>
 					<div
 						className="modal-background"
 						role="presentation"

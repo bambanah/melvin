@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import CreateInvoice from './components/CreateInvoice';
-import InvoiceList from './components/InvoiceList';
-import Button from './shared/components/Button';
-import ButtonGroup from './shared/components/ButtonGroup';
-import { useAuth } from './shared/hooks/use-auth';
-import { signOut } from './shared/utils/firebase';
-import { Invoice } from './shared/types';
-import TemplateList from './components/TemplateList';
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import CreateInvoice from "./components/CreateInvoice";
+import InvoiceList from "./components/InvoiceList";
+import Button from "./shared/components/Button";
+import ButtonGroup from "./shared/components/ButtonGroup";
+import { useAuth } from "./shared/hooks/use-auth";
+import { signOut } from "./shared/utils/firebase";
+import { Invoice } from "./shared/types";
+import TemplateList from "./components/TemplateList";
 
 const CreateInvoiceSection = styled.div`
 	background-color: #f1f1f1;
@@ -43,7 +43,7 @@ export default function Home() {
 					</div>
 				</div>
 
-				<CreateInvoiceSection className={`section ${creating && 'expanded'}`}>
+				<CreateInvoiceSection className={`section ${creating && "expanded"}`}>
 					{creating ? (
 						<CreateInvoice invoiceToLoad={invoice} setCreating={setCreating} />
 					) : (
