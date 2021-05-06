@@ -127,9 +127,7 @@ export default function CreateInvoice({
 						<button
 							className="button is-outlined"
 							type="button"
-							onClick={() => {
-								createTemplateFromInvoice(values);
-							}}
+							onClick={() => createTemplateFromInvoice(values)}
 						>
 							Save as Template
 						</button>
