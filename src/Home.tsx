@@ -1,12 +1,15 @@
 import React, { useState } from "react";
+import styled from "styled-components";
 import CreateInvoice from "./components/CreateInvoice";
 import InvoiceList from "./components/InvoiceList";
 import Button from "./shared/components/Button";
 import { useAuth } from "./shared/hooks/use-auth";
 import { signOut } from "./shared/utils/firebase";
+import { Invoice } from "./types";
 
 export default function Home() {
 	const [creating, setCreating] = useState(false);
+	const [invoice, setInvoice] = useState<Invoice | null>(null);
 	const auth = useAuth();
 
 	const ToggleButton = () => (
@@ -17,6 +20,19 @@ export default function Home() {
 			Create Invoice
 		</Button>
 	);
+
+	const CreateInvoiceSection = styled.div`
+		background-color: #f1f1f1;
+
+		padding: 1.5rem;
+		border-radius: 4px;
+		box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+	`;
+
+	const loadInvoice = (invoiceToLoad: Invoice) => {
+		setInvoice(invoiceToLoad);
+		setCreating(true);
+	};
 
 	return (
 		<section className="section">
@@ -29,16 +45,20 @@ export default function Home() {
 					</div>
 				</div>
 
-				<div className="section">
+				<CreateInvoiceSection className={`section ${creating && "expanded"}`}>
 					{creating ? (
-						<CreateInvoice setCreating={setCreating} />
+						<CreateInvoice
+							invoiceToLoad={invoice}
+							setInvoiceToLoad={setInvoice}
+							setCreating={setCreating}
+						/>
 					) : (
 						<ToggleButton />
 					)}
-				</div>
+				</CreateInvoiceSection>
 
 				<div className="section">
-					<InvoiceList />
+					<InvoiceList loadInvoice={loadInvoice} />
 				</div>
 			</div>
 		</section>
