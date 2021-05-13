@@ -1,9 +1,9 @@
 import { Field, FieldArray, FormikErrors, FormikTouched } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import styled from "styled-components";
-import Button from "../../shared/components/Button";
-import Control from "../../shared/components/form/Control";
-import Text from "../../shared/components/Text";
+import Button from "../Button";
+import Control from "../form/Control";
+import Text from "../../components/Text";
 import { getActivities } from "../../shared/utils/firebase";
 import { ActivityObject, Invoice } from "../../shared/types";
 import TimePicker from "./TimePicker";

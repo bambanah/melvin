@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
 import firebase from "firebase/app";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { deleteInvoice, streamInvoices } from "../shared/utils/firebase";
 import { Invoice as InvoiceType } from "../shared/types";
+import { deleteInvoice, streamInvoices } from "../shared/utils/firebase";
 import { getTotalString } from "../shared/utils/helpers";
-import Button from "../shared/components/Button";
 import generatePDF from "../shared/utils/pdf-generation";
+import Button from "./Button";
 
 const InvoiceRow = styled.div`
 	display: flex;

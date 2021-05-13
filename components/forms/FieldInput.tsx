@@ -1,6 +1,6 @@
 import { Field } from "formik";
 import React from "react";
-import ErrorMessage from "../../shared/components/form/ErrorMessage";
+import ErrorMessage from "../form/ErrorMessage";
 
 const FieldInput = ({
 	value,

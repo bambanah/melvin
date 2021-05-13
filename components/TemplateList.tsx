@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Button from "../shared/components/Button";
+import Button from "./Button";
 import { Invoice, TemplateObject } from "../shared/types";
 import { getTemplates } from "../shared/utils/firebase";
 
@@ -32,9 +32,7 @@ const TemplateList = ({
 						<ul>
 							{Object.entries(templates).map(([templateId, template]) => (
 								<li key={templateId}>
-									<Button
-										onClick={() => setInvoice(template)}
-									>
+									<Button onClick={() => setInvoice(template)}>
 										{template.template_name}
 									</Button>
 								</li>

@@ -12,7 +12,7 @@ import FieldInput from "./forms/FieldInput";
 import ActivityList from "./forms/ActivityList";
 import { getDuration } from "../shared/utils/helpers";
 import InvoiceValidationSchema from "../shared/utils/InvoiceValidationSchema";
-import Button from "../shared/components/Button";
+import Button from "./Button";
 import SaveAsTemplateButton from "./forms/SaveAsTemplateButton";
 
 export default function CreateInvoice({

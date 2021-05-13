@@ -1,7 +1,7 @@
 import { Field } from "formik";
 import moment from "moment";
 import React from "react";
-import Control from "../../shared/components/form/Control";
+import Control from "../form/Control";
 
 interface PropInterface {
 	formValue: string;
