@@ -117,17 +117,13 @@ export default function CreateInvoice({
 
 				<div className="field is-grouped">
 					<p className="control">
-						<Button className="button is-primary" type="submit">
+						<Button primary type="submit">
 							Submit
 						</Button>
 					</p>
 					<SaveAsTemplateButton values={values} />
 					<p className="control">
-						<Button
-							className="button"
-							type="button"
-							onClick={() => setCreating(false)}
-						>
+						<Button type="button" onClick={() => setCreating(false)}>
 							Cancel
 						</Button>
 					</p>

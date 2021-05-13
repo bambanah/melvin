@@ -42,12 +42,10 @@ const Invoice = ({
 			<span>{invoice.client_name}</span>
 			<span>{invoice.client_no}</span>
 
-			<Button className="button" onClick={() => generatePDF(invoice)}>
-				Generate PDF
-			</Button>
+			<Button onClick={() => generatePDF(invoice)}>Generate PDF</Button>
 			<span>{cost}</span>
 			<Button
-				className="button has-background-danger has-text-white has-text-weight-bold"
+				className="has-background-danger has-text-white has-text-weight-bold"
 				onClick={() => {
 					deleteInvoice(invoice.invoice_no);
 				}}

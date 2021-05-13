@@ -39,9 +39,7 @@ export default function Home() {
 					<h1 className="title">Invoices</h1>
 					<div className="is-flex is-flex-direction-row ">
 						{user && <span className="mr-2 mt-2">{user.email}</span>}
-						<Button className="button" onClick={() => signOut()}>
-							Log Out
-						</Button>
+						<Button onClick={() => signOut()}>Log Out</Button>
 					</div>
 				</div>
 
@@ -50,10 +48,7 @@ export default function Home() {
 						<CreateInvoice invoiceToLoad={invoice} setCreating={setCreating} />
 					) : (
 						<ButtonGroup>
-							<Button
-								className="button is-primary"
-								onClick={() => setCreating(!creating)}
-							>
+							<Button primary onClick={() => setCreating(!creating)}>
 								Create Invoice
 							</Button>
 							<TemplateList setInvoice={setInvoice} />

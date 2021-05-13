@@ -42,19 +42,38 @@ const BlandButton: FunctionComponent<ButtonProps> = ({
 
 BlandButton.defaultProps = defaultProps;
 
-const Button = styled(({ ...rest }) => <BlandButton {...rest} />)`
+const Button = styled(({ primary, ...rest }) => <BlandButton {...rest} />)`
+	font-size: 1rem;
+	height: 2.5em;
 	background-color: white;
-	border-color: #dbdbdb;
-	border-width: 1px;
+	border: 1px solid #dbdbdb;
+	border-radius: 4px;
 	color: #363636;
 	cursor: pointer;
-	justify-content: center;
 	padding-bottom: calc(0.5em - 1px);
 	padding-left: 1em;
 	padding-right: 1em;
 	padding-top: calc(0.5em - 1px);
-	text-align: center;
-	white-space: nowrap;
+
+	transition: all 0.05s ease;
+
+	&:hover {
+		background-color: #f0f0f0;
+		border-color: #cbcbcb;
+	}
+	${(props) => {
+		if (props.primary) {
+			return `
+				background-color: #00d1b2;
+				border-color: transparent;
+				color: #fff;
+
+				&:hover {
+					background-color: #00c4a7;
+				}
+			`;
+		}
+	}}
 `;
 
 export default Button;

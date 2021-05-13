@@ -195,7 +195,7 @@ export default function ActivityList({
 											)}
 
 											<Button
-												className="button is-danger is-light"
+												className="is-danger is-light"
 												onClick={() => {
 													arrayHelpers.remove(index);
 												}}
@@ -208,8 +208,7 @@ export default function ActivityList({
 
 								<div className="field">
 									<p className="control">
-										<button
-											className="button is-outlined is-info"
+										<Button
 											type="button"
 											onClick={() => {
 												const newActivity = {
@@ -228,7 +227,7 @@ export default function ActivityList({
 											}}
 										>
 											Add new activity...
-										</button>
+										</Button>
 									</p>
 								</div>
 							</>
