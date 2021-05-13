@@ -33,7 +33,6 @@ const TemplateList = ({
 							{Object.entries(templates).map(([templateId, template]) => (
 								<li key={templateId}>
 									<Button
-										className="button"
 										onClick={() => setInvoice(template)}
 									>
 										{template.template_name}
@@ -46,13 +45,13 @@ const TemplateList = ({
 			);
 		}
 		return (
-			<Button className="button is-outlined" onClick={() => toggleModal(true)}>
+			<Button className="is-outlined" onClick={() => toggleModal(true)}>
 				Load from Template
 			</Button>
 		);
 	}
 
-	return <div>Loading...</div>;
+	return <div>Loading templates...</div>;
 };
 
 export default TemplateList;

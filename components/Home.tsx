@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import CreateInvoice from "./components/CreateInvoice";
-import InvoiceList from "./components/InvoiceList";
-import Button from "./shared/components/Button";
-import ButtonGroup from "./shared/components/ButtonGroup";
-import { useAuth } from "./shared/hooks/use-auth";
-import { signOut } from "./shared/utils/firebase";
-import { Invoice } from "./shared/types";
-import TemplateList from "./components/TemplateList";
+import CreateInvoice from "./CreateInvoice";
+import InvoiceList from "./InvoiceList";
+import Button from "../shared/components/Button";
+import ButtonGroup from "../shared/components/ButtonGroup";
+import { useAuth } from "../shared/hooks/use-auth";
+import { signOut } from "../shared/utils/firebase";
+import { Invoice } from "../shared/types";
+import TemplateList from "./TemplateList";
 
 const CreateInvoiceSection = styled.div`
 	background-color: #f1f1f1;
@@ -20,7 +20,7 @@ const CreateInvoiceSection = styled.div`
 export default function Home() {
 	const [creating, setCreating] = useState(false);
 	const [invoice, setInvoice] = useState<Invoice | null>(null);
-	const auth = useAuth();
+	const { user } = useAuth();
 
 	// Set creating whenever an invoice is added
 	useEffect(() => {
@@ -38,10 +38,8 @@ export default function Home() {
 				<div className="is-flex is-flex-direction-row is-justify-content-space-between">
 					<h1 className="title">Invoices</h1>
 					<div className="is-flex is-flex-direction-row ">
-						{auth.user && <span className="mr-2 mt-2">{auth.user.email}</span>}
-						<Button className="button" onClick={() => signOut()}>
-							Log Out
-						</Button>
+						{user && <span className="mr-2 mt-2">{user.email}</span>}
+						<Button onClick={() => signOut()}>Log Out</Button>
 					</div>
 				</div>
 
@@ -50,10 +48,7 @@ export default function Home() {
 						<CreateInvoice invoiceToLoad={invoice} setCreating={setCreating} />
 					) : (
 						<ButtonGroup>
-							<Button
-								className="button is-primary"
-								onClick={() => setCreating(!creating)}
-							>
+							<Button primary onClick={() => setCreating(!creating)}>
 								Create Invoice
 							</Button>
 							<TemplateList setInvoice={setInvoice} />

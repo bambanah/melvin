@@ -1,13 +1,12 @@
+import Router from "next/router";
 import React from "react";
-import { useHistory } from "react-router-dom";
-import Button from "../../shared/components/Button";
-import { signIn } from "../../shared/utils/firebase";
+import Button from "../shared/components/Button";
+import { signIn } from "../shared/utils/firebase";
 
 export default function Login() {
-	const history = useHistory();
 	const handleClick = () => {
 		signIn().then(() => {
-			history.push("/");
+			Router.push("/");
 		});
 	};
 

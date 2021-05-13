@@ -13,7 +13,7 @@ export default function SaveAsTemplateButton({ values }: { values: Invoice }) {
 	return (
 		<>
 			<p className="control">
-				<Button className="button is-outlined" onClick={() => setShow(true)}>
+				<Button className="is-outlined" onClick={() => setShow(true)}>
 					Save as Template
 				</Button>
 			</p>
@@ -24,9 +24,7 @@ export default function SaveAsTemplateButton({ values }: { values: Invoice }) {
 					role="presentation"
 				/>
 				<div className="modal-content card">
-					<Button className="button" onClick={handleClick}>
-						Create
-					</Button>
+					<Button onClick={handleClick}>Create</Button>
 				</div>
 			</div>
 		</>
