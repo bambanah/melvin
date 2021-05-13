@@ -29,7 +29,7 @@ export default function TimePicker({
 				value={timeValue.format(timeFormat)}
 			>
 				{timeValue.format(timeFormat)}
-			</option>
+			</option>,
 		);
 
 		timeValue = timeValue.add(5, "minutes");

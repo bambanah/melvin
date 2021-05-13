@@ -52,7 +52,7 @@ const TemplateList = ({
 		);
 	}
 
-	return <div>Loading...</div>;
+	return <div>Loading templates...</div>;
 };
 
 export default TemplateList;
