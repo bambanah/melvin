@@ -7,9 +7,7 @@ import CreateInvoice from "../components/CreateInvoice";
 import InvoiceList from "../components/InvoiceList";
 import Layout from "../components/Layout";
 import TemplateList from "../components/TemplateList";
-import { useAuth } from "../shared/hooks/useAuth";
 import { Invoice } from "../shared/types";
-import { signOut } from "../shared/utils/firebase";
 
 const CreateInvoiceSection = styled.div`
 	background-color: #f1f1f1;
@@ -22,7 +20,6 @@ const CreateInvoiceSection = styled.div`
 export default function Home() {
 	const [creating, setCreating] = useState(false);
 	const [invoice, setInvoice] = useState<Invoice | null>(null);
-	const { user } = useAuth();
 
 	// Set creating whenever an invoice is added
 	useEffect(() => {
@@ -41,13 +38,7 @@ export default function Home() {
 			</Head>
 			<section className="section">
 				<div className="container">
-					<div className="is-flex is-flex-direction-row is-justify-content-space-between">
-						<h1 className="title">Invoices</h1>
-						<div className="is-flex is-flex-direction-row ">
-							{user && <span className="mr-2 mt-2">{user.email}</span>}
-							<Button onClick={() => signOut()}>Log Out</Button>
-						</div>
-					</div>
+					<h1 className="title">Invoices</h1>
 
 					<CreateInvoiceSection className={`section ${creating && "expanded"}`}>
 						{creating ? (
