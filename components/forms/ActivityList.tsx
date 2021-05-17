@@ -3,7 +3,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import styled from "styled-components";
 import Button from "../Button";
 import Control from "../form/Control";
-import Text from "../../components/Text";
+import Text from "../Text";
 import { getActivities } from "../../shared/utils/firebase";
 import { ActivityObject, Invoice } from "../../shared/types";
 import TimePicker from "./TimePicker";

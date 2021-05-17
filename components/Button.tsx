@@ -61,6 +61,7 @@ const Button = styled(({ primary, ...rest }) => <BlandButton {...rest} />)`
 		background-color: #f0f0f0;
 		border-color: #cbcbcb;
 	}
+
 	${(props) => {
 		if (props.primary) {
 			return `
@@ -73,6 +74,8 @@ const Button = styled(({ primary, ...rest }) => <BlandButton {...rest} />)`
 				}
 			`;
 		}
+
+		return null;
 	}}
 `;
 

@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { useAuth } from "../shared/hooks/useAuth";
 import { signOut } from "../shared/utils/firebase";
 import Button from "./Button";
-import ActiveLink from "./Link";
+import NextLink from "./NavLink";
 
 interface Props {
 	children: React.ReactNode;
@@ -33,17 +33,6 @@ const NavLinks = styled.div`
 	flex: 1 0 auto;
 	align-items: center;
 	justify-content: center;
-
-	a {
-		text-decoration: none;
-		color: ${(props) => props.theme.colors.fg};
-		margin: 0 0.7rem;
-		font-weight: bold;
-
-		&:hover {
-			color: ${(props) => props.theme.colors.bg};
-		}
-	}
 `;
 
 const Container = styled.div`
@@ -91,8 +80,8 @@ const Layout: React.FC<Props> = ({ children }) => {
 			<Header>
 				<div className="nav-logo">NDIS</div>
 				<NavLinks>
-					<ActiveLink href="/invoices">Invoices</ActiveLink>
-					<ActiveLink href="/templates">Templates</ActiveLink>
+					<NextLink href="/invoices">Invoices</NextLink>
+					<NextLink href="/templates">Templates</NextLink>
 				</NavLinks>
 				<div className="nav-auth">
 					{user && <span className="mr-2 mt-2">{user.email}</span>}

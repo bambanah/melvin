@@ -12,7 +12,9 @@ import "bulma/css/bulma.css";
 const theme = {
 	colors: {
 		fg: "black",
-		bg: "red",
+		bg: "#f5f5f5",
+		accent:
+			"linear-gradient(24deg, rgba(126,249,145,1) 0%, rgba(120,199,254,1) 100%)",
 	},
 };
 
