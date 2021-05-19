@@ -25,7 +25,15 @@ const Header = styled.header`
 `;
 
 const NavLogo = styled.div`
-	flex: 0 0 20%;
+	flex: 0 0 30%;
+	display: flex;
+	align-items: center;
+
+	a:last-of-type {
+		margin-left: 1rem;
+		font-family: "Roboto Mono";
+		font-size: 0.8rem;
+	}
 `;
 
 const NavLinks = styled.div`
@@ -36,7 +44,8 @@ const NavLinks = styled.div`
 `;
 
 const NavAuth = styled.div`
-	flex: 0 0 20%;
+	flex: 0 0 30%;
+	text-align: right;
 `;
 
 const Container = styled.div`
@@ -51,7 +60,7 @@ const Container = styled.div`
 
 const Content = styled.div`
 	display: flex;
-	width: 90vw;
+	width: 95vw;
 	max-width: 1200px;
 	min-width: 800px;
 	margin-top: 4rem;
@@ -86,7 +95,8 @@ const Layout: React.FC<Props> = ({ children }) => {
 		<Container>
 			<Header>
 				<NavLogo>
-					<a href="https://www.ndis.gov.au/providers/price-guides-and-pricing#ndis-price-guide-2020-21">
+					{/* <a href="https://www.ndis.gov.au/providers/price-guides-and-pricing#ndis-price-guide-2020-21"> */}
+					<a href="/">
 						<Image
 							src="/ndis-logo.png"
 							alt="NDIS Logo"
@@ -94,6 +104,7 @@ const Layout: React.FC<Props> = ({ children }) => {
 							height={35}
 						/>
 					</a>
+					<a href="/price-guide-3-21.pdf">Price Guide</a>
 				</NavLogo>
 
 				<NavLinks>
