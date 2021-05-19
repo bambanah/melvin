@@ -1,11 +1,11 @@
 import { Field, FieldArray, FormikErrors, FormikTouched } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import styled from "styled-components";
-import Button from "../../shared/components/Button";
-import Control from "../../shared/components/form/Control";
-import Text from "../../shared/components/Text";
+import Button from "../Button";
+import Control from "../form/Control";
+import Text from "../Text";
 import { getActivities } from "../../shared/utils/firebase";
-import { ActivityObject, Invoice } from "../../types";
+import { ActivityObject, Invoice } from "../../shared/types";
 import TimePicker from "./TimePicker";
 
 interface PropInterface {
@@ -105,10 +105,13 @@ export default function ActivityList({
 													</option>
 													{Object.entries(activities).map(
 														([activityId, activity]) => (
-															<option value={`activities/${activityId}`}>
+															<option
+																key={activity.description}
+																value={`activities/${activityId}`}
+															>
 																{activity.description}
 															</option>
-														)
+														),
 													)}
 												</Field>
 											</div>
@@ -192,7 +195,7 @@ export default function ActivityList({
 											)}
 
 											<Button
-												className="button is-danger is-light"
+												className="is-danger is-light"
 												onClick={() => {
 													arrayHelpers.remove(index);
 												}}
@@ -205,8 +208,7 @@ export default function ActivityList({
 
 								<div className="field">
 									<p className="control">
-										<button
-											className="button is-outlined is-info"
+										<Button
 											type="button"
 											onClick={() => {
 												const newActivity = {
@@ -220,12 +222,12 @@ export default function ActivityList({
 
 												arrayHelpers.insert(
 													values.activities.length,
-													newActivity
+													newActivity,
 												);
 											}}
 										>
 											Add new activity...
-										</button>
+										</Button>
 									</p>
 								</div>
 							</>

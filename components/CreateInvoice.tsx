@@ -7,20 +7,19 @@ import {
 	getLastInvoiceDetails,
 } from "../shared/utils/firebase";
 
-import { Invoice } from "../types";
+import { Invoice } from "../shared/types";
 import FieldInput from "./forms/FieldInput";
 import ActivityList from "./forms/ActivityList";
 import { getDuration } from "../shared/utils/helpers";
 import InvoiceValidationSchema from "../shared/utils/InvoiceValidationSchema";
-import Button from "../shared/components/Button";
+import Button from "./Button";
+import SaveAsTemplateButton from "./forms/SaveAsTemplateButton";
 
 export default function CreateInvoice({
 	invoiceToLoad,
-	setInvoiceToLoad,
 	setCreating,
 }: {
 	invoiceToLoad: Invoice | null;
-	setInvoiceToLoad: (invoice: Invoice | null) => void;
 	setCreating: (creating: boolean) => void;
 }) {
 	const [lastInvoice, setLastInvoice] = useState({} as Invoice);
@@ -38,7 +37,6 @@ export default function CreateInvoice({
 			const invoice = { ...invoiceToLoad };
 			invoice.invoice_no = incrementInvoiceId(invoice.invoice_no);
 			setLastInvoice(invoice);
-			setInvoiceToLoad(null);
 			setLoaded(true);
 		} else {
 			getLastInvoiceDetails().then((lastInvoiceDetails: Invoice) => {
@@ -119,16 +117,13 @@ export default function CreateInvoice({
 
 				<div className="field is-grouped">
 					<p className="control">
-						<button className="button is-primary" type="submit">
+						<Button primary type="submit">
 							Submit
-						</button>
+						</Button>
 					</p>
+					<SaveAsTemplateButton values={values} />
 					<p className="control">
-						<Button
-							className="button"
-							type="button"
-							onClick={() => setCreating(false)}
-						>
+						<Button type="button" onClick={() => setCreating(false)}>
 							Cancel
 						</Button>
 					</p>
@@ -148,7 +143,7 @@ export default function CreateInvoice({
 				if (activity.start_time && activity.end_time) {
 					values.activities[index].duration = getDuration(
 						activity.start_time,
-						activity.end_time
+						activity.end_time,
 					);
 				}
 			});

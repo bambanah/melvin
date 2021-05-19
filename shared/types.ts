@@ -18,6 +18,13 @@ export interface Invoice {
 	}[];
 }
 
+export interface Template extends Invoice {
+	template_name: string;
+}
+export interface TemplateObject {
+	[id: string]: Template;
+}
+
 export interface Activity {
 	description: string;
 	rate: number;

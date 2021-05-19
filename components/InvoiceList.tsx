@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
 import firebase from "firebase/app";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { Invoice as InvoiceType } from "../shared/types";
 import { deleteInvoice, streamInvoices } from "../shared/utils/firebase";
-import { Invoice as InvoiceType } from "../types";
 import { getTotalString } from "../shared/utils/helpers";
-import Button from "../shared/components/Button";
 import generatePDF from "../shared/utils/pdf-generation";
+import Button from "./Button";
 
 const InvoiceRow = styled.div`
 	display: flex;
@@ -21,10 +21,10 @@ const InvoiceRow = styled.div`
 
 const Invoice = ({
 	invoice,
-	loadInvoice,
+	setInvoice,
 }: {
 	invoice: InvoiceType;
-	loadInvoice: (invoice: InvoiceType) => void;
+	setInvoice: (invoice: InvoiceType) => void;
 }) => {
 	const [cost, setTotalCost] = useState<null | string>(null);
 
@@ -35,7 +35,7 @@ const Invoice = ({
 	return (
 		<InvoiceRow
 			onClick={() => {
-				loadInvoice(invoice);
+				setInvoice(invoice);
 			}}
 		>
 			<span>{invoice.invoice_no}</span>
@@ -45,7 +45,7 @@ const Invoice = ({
 			<Button onClick={() => generatePDF(invoice)}>Generate PDF</Button>
 			<span>{cost}</span>
 			<Button
-				className="button has-background-danger has-text-white has-text-weight-bold"
+				className="has-background-danger has-text-white has-text-weight-bold"
 				onClick={() => {
 					deleteInvoice(invoice.invoice_no);
 				}}
@@ -58,9 +58,9 @@ const Invoice = ({
 };
 
 export default function InvoiceList({
-	loadInvoice,
+	setInvoice,
 }: {
-	loadInvoice: (invoice: InvoiceType) => void;
+	setInvoice: (invoice: InvoiceType) => void;
 }) {
 	const [invoices, setInvoices] = useState<InvoiceType[]>([]);
 
@@ -87,7 +87,7 @@ export default function InvoiceList({
 				<Invoice
 					invoice={invoice}
 					key={invoice.invoice_no + invoice.client_no}
-					loadInvoice={loadInvoice}
+					setInvoice={setInvoice}
 				/>
 			))}
 		</div>
