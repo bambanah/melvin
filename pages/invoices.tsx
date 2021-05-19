@@ -36,31 +36,24 @@ export default function Home() {
 			<Head>
 				<title>Invoices</title>
 			</Head>
-			<section className="section">
-				<div className="container">
-					<h1 className="title">Invoices</h1>
+			<h1 className="title">Invoices</h1>
 
-					<CreateInvoiceSection className={`section ${creating && "expanded"}`}>
-						{creating ? (
-							<CreateInvoice
-								invoiceToLoad={invoice}
-								setCreating={setCreating}
-							/>
-						) : (
-							<ButtonGroup>
-								<Button primary onClick={() => setCreating(!creating)}>
-									Create Invoice
-								</Button>
-								<TemplateList setInvoice={setInvoice} />
-							</ButtonGroup>
-						)}
-					</CreateInvoiceSection>
+			<CreateInvoiceSection className={`section ${creating && "expanded"}`}>
+				{creating ? (
+					<CreateInvoice invoiceToLoad={invoice} setCreating={setCreating} />
+				) : (
+					<ButtonGroup>
+						<Button primary onClick={() => setCreating(!creating)}>
+							Create Invoice
+						</Button>
+						<TemplateList setInvoice={setInvoice} />
+					</ButtonGroup>
+				)}
+			</CreateInvoiceSection>
 
-					<div className="section">
-						<InvoiceList setInvoice={setInvoice} />
-					</div>
-				</div>
-			</section>
+			<div className="section">
+				<InvoiceList setInvoice={setInvoice} />
+			</div>
 		</Layout>
 	);
 }

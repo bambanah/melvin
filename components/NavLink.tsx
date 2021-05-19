@@ -13,6 +13,7 @@ interface StyleProps {
 }
 
 const StyledLink = styled.a<StyleProps>`
+	font-family: "Roboto Mono";
 	text-decoration: none;
 	color: ${({ theme }) => theme.colors.fg};
 	margin: 0 0.7rem;

@@ -8,6 +8,7 @@ import { AuthProvider } from "../shared/hooks/useAuth";
 
 import "react-toastify/dist/ReactToastify.css";
 import "bulma/css/bulma.css";
+import "../styles/index.scss";
 
 const theme = {
 	colors: {

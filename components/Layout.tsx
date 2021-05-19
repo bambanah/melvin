@@ -2,10 +2,11 @@ import { useRouter } from "next/router";
 import React from "react";
 import { ClimbingBoxLoader } from "react-spinners";
 import styled from "styled-components";
+import Image from "next/image";
 import { useAuth } from "../shared/hooks/useAuth";
 import { signOut } from "../shared/utils/firebase";
 import Button from "./Button";
-import NextLink from "./NavLink";
+import NavLink from "./NavLink";
 
 interface Props {
 	children: React.ReactNode;
@@ -21,11 +22,10 @@ const Header = styled.header`
 
 	background-color: white;
 	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+`;
 
-	.nav-logo,
-	.nav-auth {
-		flex: 0 0 20%;
-	}
+const NavLogo = styled.div`
+	flex: 0 0 20%;
 `;
 
 const NavLinks = styled.div`
@@ -33,6 +33,10 @@ const NavLinks = styled.div`
 	flex: 1 0 auto;
 	align-items: center;
 	justify-content: center;
+`;
+
+const NavAuth = styled.div`
+	flex: 0 0 20%;
 `;
 
 const Container = styled.div`
@@ -47,7 +51,10 @@ const Container = styled.div`
 
 const Content = styled.div`
 	display: flex;
-	width: 800px;
+	width: 90vw;
+	max-width: 1200px;
+	min-width: 800px;
+	margin-top: 4rem;
 	height: 100%;
 	flex: 1 0 auto;
 	flex-direction: column;
@@ -78,16 +85,28 @@ const Layout: React.FC<Props> = ({ children }) => {
 	return (
 		<Container>
 			<Header>
-				<div className="nav-logo">NDIS</div>
+				<NavLogo>
+					<a href="https://www.ndis.gov.au/providers/price-guides-and-pricing#ndis-price-guide-2020-21">
+						<Image
+							src="/ndis-logo.png"
+							alt="NDIS Logo"
+							width={70}
+							height={35}
+						/>
+					</a>
+				</NavLogo>
+
 				<NavLinks>
-					<NextLink href="/invoices">Invoices</NextLink>
-					<NextLink href="/templates">Templates</NextLink>
+					<NavLink href="/invoices">Invoices</NavLink>
+					<NavLink href="/templates">Templates</NavLink>
 				</NavLinks>
-				<div className="nav-auth">
+
+				<NavAuth>
 					{user && <span className="mr-2 mt-2">{user.email}</span>}
 					<Button onClick={() => signOut()}>Log Out</Button>
-				</div>
+				</NavAuth>
 			</Header>
+
 			<Content>
 				{loadingAuthState ? (
 					<SpinnerContainer>
