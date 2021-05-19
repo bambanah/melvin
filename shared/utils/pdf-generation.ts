@@ -163,7 +163,8 @@ const generatePDF = (invoice: Invoice) => {
 			},
 		});
 
-		doc.save();
+		const filename = `${invoice.invoice_no}-${date}`;
+		doc.save(filename);
 	});
 };
 
