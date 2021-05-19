@@ -1,16 +1,22 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
-import { Activity, ActivityObject, Invoice } from "../../types";
+import {
+	Activity,
+	ActivityObject,
+	Invoice,
+	Template,
+	TemplateObject,
+} from "../types";
 
 const firebaseConfig = {
-	apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-	authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-	databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
-	projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-	storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-	messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-	appId: process.env.REACT_APP_FIREBASE_APP_ID,
+	apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+	authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+	databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+	projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+	storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+	messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+	appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 // If no firebase app is initialised, initialise the app
@@ -109,10 +115,6 @@ export const getActivities = async () => {
 	return activities;
 };
 
-export const getNextInvoiceNumber = () => {};
-
-export const checkInvoiceNumberValid = () => {};
-
 export const getLastInvoiceDetails = async () => {
 	let lastInvoice = {} as Invoice;
 
@@ -130,3 +132,47 @@ export const getLastInvoiceDetails = async () => {
 
 	return lastInvoice;
 };
+
+export const createTemplate = (template: Template) => {
+	template.date = firebase.firestore.Timestamp.now();
+
+	firestore
+		.collection("templates")
+		.add(template)
+		.catch((error) => {
+			console.error("Error writing document: ", error);
+		});
+};
+
+export const getTemplates = async () => {
+	const templates: TemplateObject = {};
+
+	await firestore
+		.collection("templates")
+		.get()
+		.then((querySnapshot) => {
+			querySnapshot.forEach((doc: firebase.firestore.DocumentData) => {
+				const template: Template = doc.data();
+				const { id } = doc;
+
+				templates[id] = template;
+			});
+		});
+
+	return templates;
+};
+
+// export const deleteTemplate = async (template_no: string) => {
+// 	const invoiceQuery = firestore
+// 		.collection("invoices")
+// 		.where("invoice_no", "==", invoice_no)
+// 		.where("owner", "==", getCurrentUser()?.uid);
+
+// 	await invoiceQuery.get().then((querySnapshot) => {
+// 		querySnapshot.forEach((doc) => {
+// 			doc.ref.delete().catch((error) => {
+// 				console.error("Error removing document: ", error);
+// 			});
+// 		});
+// 	});
+// };

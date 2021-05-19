@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
 import { getActivities } from "./firebase";
-import { ActivityObject, Invoice } from "../../types";
+import { ActivityObject, Invoice } from "../types";
 import { formatDate, getPrettyDuration } from "./helpers";
 
 const generatePDF = (invoice: Invoice) => {
@@ -163,7 +163,8 @@ const generatePDF = (invoice: Invoice) => {
 			},
 		});
 
-		doc.save();
+		const filename = `${invoice.invoice_no}-${date}`;
+		doc.save(filename);
 	});
 };
 

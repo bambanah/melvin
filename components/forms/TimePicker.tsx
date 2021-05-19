@@ -1,7 +1,7 @@
 import { Field } from "formik";
 import moment from "moment";
 import React from "react";
-import Control from "../../shared/components/form/Control";
+import Control from "../form/Control";
 
 interface PropInterface {
 	formValue: string;
@@ -29,7 +29,7 @@ export default function TimePicker({
 				value={timeValue.format(timeFormat)}
 			>
 				{timeValue.format(timeFormat)}
-			</option>
+			</option>,
 		);
 
 		timeValue = timeValue.add(5, "minutes");

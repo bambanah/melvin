@@ -1,7 +1,8 @@
 import firebase from "firebase/app";
 import moment from "moment";
-import { Invoice } from "../../types";
-import { getActivities } from "./firebase";
+import { toast } from "react-toastify";
+import { Invoice, Template } from "../types";
+import { createTemplate, getActivities } from "./firebase";
 
 export const formatDate = (timestamp: firebase.firestore.Timestamp) => {
 	const date = timestamp.toDate();
@@ -45,7 +46,10 @@ export const getPrettyDuration = (hours: number) => {
 			duration.hours() === 1 ? "" : "s"
 		}`;
 
-	if (duration.minutes() > 0) durationString += `, ${duration.minutes()} mins`;
+	if (duration.minutes() > 0)
+		durationString = `${
+			durationString.length > 0 ? `${durationString}, ` : ""
+		}${duration.minutes()} mins`;
 
 	return durationString;
 };
@@ -73,3 +77,18 @@ export const getTotalCost = async (invoice: Invoice) => {
 
 export const getTotalString = (invoice: Invoice) =>
 	getTotalCost(invoice).then((cost) => `$${cost.toFixed(2)}`);
+
+export const createTemplateFromInvoice = (invoice: Invoice) => {
+	invoice.activities.map((activity) => {
+		activity.date = "";
+		return activity;
+	});
+
+	const template: Template = {
+		...invoice,
+		template_name: invoice.client_name,
+	};
+
+	createTemplate(template);
+	toast.info("Template saved!");
+};
