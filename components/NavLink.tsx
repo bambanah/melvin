@@ -13,24 +13,17 @@ interface StyleProps {
 }
 
 const StyledLink = styled.a<StyleProps>`
-	font-family: "Roboto Mono";
+	font-family: "Inter";
 	text-decoration: none;
-	color: ${({ theme }) => theme.colors.fg};
+	color: ${({ active, theme }) =>
+		active ? theme.colors.brand : theme.colors.fg};
 	margin: 0 0.7rem;
-	font-weight: bold;
+	font-weight: ${({ active }) => (active ? "bold" : "500")};
 	padding: 0 0.2rem;
 	border-bottom: 2px solid transparent;
 
-	background: ${(props) =>
-		props.active
-			? "linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)"
-			: "none"};
-	-webkit-text-fill-color: ${(props) =>
-		props.active ? "transparent" : "none"};
-	background-clip: text;
-
 	&:hover {
-		border-bottom-color: black;
+		border-bottom-color: ${(props) => props.theme.colors.brand};
 	}
 `;
 
