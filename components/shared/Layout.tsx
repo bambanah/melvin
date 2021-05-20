@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { ClimbingBoxLoader } from "react-spinners";
 import styled from "styled-components";
-import { useAuth } from "../shared/hooks/useAuth";
+import { useAuth } from "../../shared/hooks/useAuth";
 import Navbar from "./Navbar";
 
 interface Props {

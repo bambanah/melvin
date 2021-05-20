@@ -1,9 +1,9 @@
 import { Field, FieldArray, FormikErrors, FormikTouched } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import styled from "styled-components";
-import Button from "../Button";
+import Button from "../shared/Button";
 import Control from "../form/Control";
-import Text from "../Text";
+import Text from "../shared/text/Text";
 import { getActivities } from "../../shared/utils/firebase";
 import { ActivityObject, Invoice } from "../../shared/types";
 import TimePicker from "./TimePicker";
@@ -111,7 +111,7 @@ export default function ActivityList({
 															>
 																{activity.description}
 															</option>
-														),
+														)
 													)}
 												</Field>
 											</div>
@@ -222,7 +222,7 @@ export default function ActivityList({
 
 												arrayHelpers.insert(
 													values.activities.length,
-													newActivity,
+													newActivity
 												);
 											}}
 										>

@@ -1,8 +1,8 @@
-import type { AppProps } from "next/app";
 import Head from "next/head";
 import React from "react";
 import { ToastContainer } from "react-toastify";
 import { ThemeProvider } from "styled-components";
+import type { AppProps } from "next/app";
 import GlobalStyle from "../shared/GlobalStyle";
 import { AuthProvider } from "../shared/hooks/useAuth";
 

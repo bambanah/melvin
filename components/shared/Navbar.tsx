@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 import Image from "next/image";
-import { useAuth } from "../shared/hooks/useAuth";
-import { signOut } from "../shared/utils/firebase";
+import { useAuth } from "../../shared/hooks/useAuth";
+import { signOut } from "../../shared/utils/firebase";
 import Button from "./Button";
-import NavLink from "./NavLink";
+import NavLink from "../NavLink";
 
 const Header = styled.header`
 	position: fixed;
@@ -86,6 +86,7 @@ const Navbar = () => {
 				<NavLinks>
 					<NavLink href="/invoices">Invoices</NavLink>
 					<NavLink href="/templates">Templates</NavLink>
+					<NavLink href="/activities">Activities</NavLink>
 				</NavLinks>
 
 				<NavAuth>

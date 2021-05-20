@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Button from "./Button";
+import Button from "./shared/Button";
 import { Invoice, TemplateObject } from "../shared/types";
 import { getTemplates } from "../shared/utils/firebase";
 

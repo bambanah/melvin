@@ -5,7 +5,7 @@ import { Invoice as InvoiceType } from "../shared/types";
 import { deleteInvoice, streamInvoices } from "../shared/utils/firebase";
 import { getTotalString } from "../shared/utils/helpers";
 import generatePDF from "../shared/utils/pdf-generation";
-import Button from "./Button";
+import Button from "./shared/Button";
 
 const InvoiceRow = styled.div`
 	display: flex;

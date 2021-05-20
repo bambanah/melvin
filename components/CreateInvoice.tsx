@@ -9,10 +9,10 @@ import {
 
 import { Invoice } from "../shared/types";
 import FieldInput from "./forms/FieldInput";
-import ActivityList from "./forms/ActivityList";
+import ActivityList from "./forms/InvoiceActivityList";
 import { getDuration } from "../shared/utils/helpers";
 import InvoiceValidationSchema from "../shared/utils/InvoiceValidationSchema";
-import Button from "./Button";
+import Button from "./shared/Button";
 import SaveAsTemplateButton from "./forms/SaveAsTemplateButton";
 
 export default function CreateInvoice({
@@ -143,7 +143,7 @@ export default function CreateInvoice({
 				if (activity.start_time && activity.end_time) {
 					values.activities[index].duration = getDuration(
 						activity.start_time,
-						activity.end_time,
+						activity.end_time
 					);
 				}
 			});
