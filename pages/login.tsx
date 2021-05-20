@@ -1,6 +1,6 @@
 import Router from "next/router";
 import React from "react";
-import Button from "../components/shared/Button";
+import Button from "../shared/components/Button";
 import { signIn } from "../shared/utils/firebase";
 
 export default function Login() {

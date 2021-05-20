@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 import Image from "next/image";
-import { useAuth } from "../../shared/hooks/useAuth";
-import { signOut } from "../../shared/utils/firebase";
+import { useAuth } from "../hooks/useAuth";
+import { signOut } from "../utils/firebase";
 import Button from "./Button";
-import NavLink from "../NavLink";
+import NavLink from "../../components/NavLink";
 
 const Header = styled.header`
 	position: fixed;

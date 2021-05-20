@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Button from "../shared/Button";
+import Button from "../../shared/components/Button";
 import { Invoice } from "../../shared/types";
 import { createTemplateFromInvoice } from "../../shared/utils/helpers";
 

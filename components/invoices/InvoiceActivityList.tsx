@@ -1,12 +1,12 @@
 import { Field, FieldArray, FormikErrors, FormikTouched } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import styled from "styled-components";
-import Button from "../shared/Button";
-import Control from "../form/Control";
-import Text from "../shared/text/Text";
+import Button from "../../shared/components/Button";
+import Text from "../../shared/components/text/Text";
 import { getActivities } from "../../shared/utils/firebase";
 import { ActivityObject, Invoice } from "../../shared/types";
 import TimePicker from "./TimePicker";
+import Control from "./Control";
 
 interface PropInterface {
 	values: Invoice;

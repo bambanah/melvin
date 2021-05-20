@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import Button from "../components/shared/Button";
+import Button from "../shared/components/Button";
 import ActivityList from "../components/activities/ActivityList";
-import Layout from "../components/shared/Layout";
-import Title from "../components/shared/text/Title";
+import Layout from "../shared/components/Layout";
+import Title from "../shared/components/text/Title";
 import CreateActivityForm from "../components/activities/CreateActivityForm";
 
 const CreateActivityContainer = styled.div`

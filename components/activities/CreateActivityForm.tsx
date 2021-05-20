@@ -2,15 +2,15 @@ import { FormikProps, withFormik } from "formik";
 import React from "react";
 import styled from "styled-components";
 import Activity from "../../models/Activity";
-import ActivityValidationSchema from "../../shared/schemas/ActivityValidationSchema";
+import ActivityValidationSchema from "../../schema/ActivityValidationSchema";
 import { errorIn } from "../../shared/utils/helpers";
-import Button from "../shared/Button";
-import ButtonGroup from "../shared/ButtonGroup";
-import Form from "../shared/forms/Form";
-import Input from "../shared/forms/Input";
-import Label from "../shared/forms/Label";
-import Select from "../shared/forms/Select";
-import Subheading from "../shared/text/Subheading";
+import Button from "../../shared/components/Button";
+import ButtonGroup from "../../shared/components/ButtonGroup";
+import Form from "../../shared/components/forms/Form";
+import Input from "../../shared/components/forms/Input";
+import Label from "../../shared/components/forms/Label";
+import Select from "../../shared/components/forms/Select";
+import Subheading from "../../shared/components/text/Subheading";
 
 interface Props {
 	setCreating: (creating: boolean) => void;

@@ -29,7 +29,7 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"fix": "eslint . --fix"
+		"lint": "eslint . --fix"
 	},
 	"eslintConfig": {
 		"extends": [

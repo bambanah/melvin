@@ -28,6 +28,10 @@ if (!firebase.apps.length) {
 export const auth = firebase.auth();
 const firestore = firebase.firestore();
 
+//
+// --- Auth ---
+//
+
 export const getCurrentUser = () => auth.currentUser;
 
 export const isAuthenticated = () => auth.currentUser !== null;
@@ -51,6 +55,10 @@ export const signOut = async () => {
 		console.error(err.message);
 	}
 };
+
+//
+// --- Invoices ---
+//
 
 export const getInvoices = () =>
 	firestore
@@ -100,24 +108,6 @@ export const deleteInvoice = async (invoice_no: string) => {
 	});
 };
 
-export const getActivities = async () => {
-	const activities: ActivityObject = {};
-
-	await firestore
-		.collection("activities")
-		.get()
-		.then((querySnapshot) => {
-			querySnapshot.forEach((doc: firebase.firestore.DocumentData) => {
-				const activity: Activity = doc.data();
-				const { id } = doc;
-
-				activities[id] = activity;
-			});
-		});
-
-	return activities;
-};
-
 export const getLastInvoiceDetails = async () => {
 	let lastInvoice = {} as Invoice;
 
@@ -135,6 +125,10 @@ export const getLastInvoiceDetails = async () => {
 
 	return lastInvoice;
 };
+
+//
+// --- Templates ---
+//
 
 export const createTemplate = (template: Template) => {
 	template.date = firebase.firestore.Timestamp.now();
@@ -165,20 +159,9 @@ export const getTemplates = async () => {
 	return templates;
 };
 
-// export const deleteTemplate = async (template_no: string) => {
-// 	const invoiceQuery = firestore
-// 		.collection("invoices")
-// 		.where("invoice_no", "==", invoice_no)
-// 		.where("owner", "==", getCurrentUser()?.uid);
-
-// 	await invoiceQuery.get().then((querySnapshot) => {
-// 		querySnapshot.forEach((doc) => {
-// 			doc.ref.delete().catch((error) => {
-// 				console.error("Error removing document: ", error);
-// 			});
-// 		});
-// 	});
-// };
+//
+// --- Activities ---
+//
 
 export const createActivity = (activity: Activity) => {
 	activity.owner = auth.currentUser?.uid;
@@ -201,3 +184,21 @@ export const streamActivities = (observer: any) =>
 		.where("owner", "==", auth.currentUser?.uid)
 		.orderBy("date", "desc")
 		.onSnapshot(observer);
+
+export const getActivities = async () => {
+	const activities: ActivityObject = {};
+
+	await firestore
+		.collection("activities")
+		.get()
+		.then((querySnapshot) => {
+			querySnapshot.forEach((doc: firebase.firestore.DocumentData) => {
+				const activity: Activity = doc.data();
+				const { id } = doc;
+
+				activities[id] = activity;
+			});
+		});
+
+	return activities;
+};
