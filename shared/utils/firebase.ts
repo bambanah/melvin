@@ -1,6 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
+import { toast } from "react-toastify";
 import {
 	Activity,
 	ActivityObject,
@@ -73,6 +74,9 @@ export const createInvoice = (invoice: Invoice) => {
 	firestore
 		.collection("invoices")
 		.add(invoice)
+		.then(() => {
+			toast.success("Invoice created");
+		})
 		.catch((error) => {
 			console.error("Error writing document: ", error);
 		});
@@ -86,9 +90,12 @@ export const deleteInvoice = async (invoice_no: string) => {
 
 	await invoiceQuery.get().then((querySnapshot) => {
 		querySnapshot.forEach((doc) => {
-			doc.ref.delete().catch((error) => {
-				console.error("Error removing document: ", error);
-			});
+			doc.ref
+				.delete()
+				.then(() => toast.error("Invoice deleted"))
+				.catch((error) => {
+					console.error("Error removing document: ", error);
+				});
 		});
 	});
 };

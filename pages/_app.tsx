@@ -15,6 +15,7 @@ const theme = {
 		fg: "#363636",
 		bg: "#f5f5f5",
 		link: "#3273dc",
+		brand: "#6B2875",
 		accent:
 			"linear-gradient(24deg, rgba(126,249,145,1) 0%, rgba(120,199,254,1) 100%)",
 	},
