@@ -6,7 +6,6 @@ import ActivityValidationSchema from "../../shared/schemas/ActivityValidationSch
 import { errorIn } from "../../shared/utils/helpers";
 import Button from "../shared/Button";
 import ButtonGroup from "../shared/ButtonGroup";
-import ErrorMessage from "../shared/forms/ErrorMessage";
 import Form from "../shared/forms/Form";
 import Input from "../shared/forms/Input";
 import Label from "../shared/forms/Label";

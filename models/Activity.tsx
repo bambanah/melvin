@@ -1,23 +1,4 @@
-interface ActivityType {
-	description: string;
-	rate_type: string;
-	weekday: {
-		item_code: string;
-		rate: number | undefined;
-	};
-	weeknight: {
-		item_code: string;
-		rate: number | undefined;
-	};
-	saturday: {
-		item_code: string;
-		rate: number | undefined;
-	};
-	sunday: {
-		item_code: string;
-		rate: number | undefined;
-	};
-}
+import { Activity as ActivityType } from "../shared/types";
 
 export default class Activity implements ActivityType {
 	description = "";

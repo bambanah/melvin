@@ -27,23 +27,24 @@ export interface TemplateObject {
 }
 
 export interface Activity {
+	owner?: string;
 	description: string;
 	rate_type: string;
-	week_day: {
+	weekday: {
 		item_code: string;
-		rate: number;
+		rate: number | undefined;
 	};
-	week_night: {
+	weeknight: {
 		item_code: string;
-		rate: number;
+		rate: number | undefined;
 	};
 	saturday: {
 		item_code: string;
-		rate: number;
+		rate: number | undefined;
 	};
 	sunday: {
 		item_code: string;
-		rate: number;
+		rate: number | undefined;
 	};
 }
 

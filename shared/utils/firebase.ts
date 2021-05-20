@@ -179,3 +179,25 @@ export const getTemplates = async () => {
 // 		});
 // 	});
 // };
+
+export const createActivity = (activity: Activity) => {
+	activity.owner = auth.currentUser?.uid;
+
+	firestore
+		.collection("activities")
+		.add(activity)
+		.then(() => {
+			toast.success("Activity created");
+		})
+		.catch((error) => {
+			console.error("Error writing document: ", error);
+			toast.error("Couldn't save activity - try again later");
+		});
+};
+
+export const streamActivities = (observer: any) =>
+	firestore
+		.collection("activities")
+		.where("owner", "==", auth.currentUser?.uid)
+		.orderBy("date", "desc")
+		.onSnapshot(observer);
