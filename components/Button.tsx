@@ -43,6 +43,7 @@ const BlandButton: FunctionComponent<ButtonProps> = ({
 BlandButton.defaultProps = defaultProps;
 
 const Button = styled(({ primary, ...rest }) => <BlandButton {...rest} />)`
+	font-family: "Inter";
 	font-size: 1rem;
 	height: 2.5em;
 	background-color: white;

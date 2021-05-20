@@ -8,12 +8,13 @@ import { AuthProvider } from "../shared/hooks/useAuth";
 
 import "react-toastify/dist/ReactToastify.css";
 import "bulma/css/bulma.css";
-import "../styles/index.scss";
+import "../styles/font-imports.scss";
 
 const theme = {
 	colors: {
-		fg: "black",
+		fg: "#363636",
 		bg: "#f5f5f5",
+		link: "#3273dc",
 		accent:
 			"linear-gradient(24deg, rgba(126,249,145,1) 0%, rgba(120,199,254,1) 100%)",
 	},

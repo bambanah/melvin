@@ -8,6 +8,7 @@ declare module "styled-components" {
 		colors: {
 			fg: string;
 			bg: string;
+			link: string;
 			accent: string;
 		};
 	}

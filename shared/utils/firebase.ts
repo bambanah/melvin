@@ -24,12 +24,8 @@ if (!firebase.apps.length) {
 	firebase.initializeApp(firebaseConfig);
 }
 
-const app = firebase.app();
 export const auth = firebase.auth();
 const firestore = firebase.firestore();
-
-// eslint-disable-next-line no-console
-console.log(app.name ? "Firebase connected." : "Firebase not connected...");
 
 export const getCurrentUser = () => auth.currentUser;
 

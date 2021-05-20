@@ -1,3 +1,5 @@
+const path = require("path");
+
 module.exports = {
 	async redirects() {
 		return [
@@ -11,5 +13,8 @@ module.exports = {
 	future: {
 		webpack5: true,
 	},
-	distDir: "build",
+	target: "serverless",
+	sassOptions: {
+		includePaths: [path.join(__dirname, "styles")],
+	},
 };
