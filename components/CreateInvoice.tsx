@@ -11,7 +11,7 @@ import { Invoice } from "../shared/types";
 import FieldInput from "./forms/FieldInput";
 import ActivityList from "./forms/InvoiceActivityList";
 import { getDuration } from "../shared/utils/helpers";
-import InvoiceValidationSchema from "../shared/utils/InvoiceValidationSchema";
+import InvoiceValidationSchema from "../shared/schemas/InvoiceValidationSchema";
 import Button from "./shared/Button";
 import SaveAsTemplateButton from "./forms/SaveAsTemplateButton";
 

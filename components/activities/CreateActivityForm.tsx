@@ -1,7 +1,9 @@
-import { FormikProps, getIn, withFormik } from "formik";
+import { FormikProps, withFormik } from "formik";
 import React from "react";
 import styled from "styled-components";
 import Activity from "../../models/Activity";
+import ActivityValidationSchema from "../../shared/schemas/ActivityValidationSchema";
+import { errorIn } from "../../shared/utils/helpers";
 import Button from "../shared/Button";
 import ButtonGroup from "../shared/ButtonGroup";
 import ErrorMessage from "../shared/forms/ErrorMessage";
@@ -66,8 +68,8 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 		<Form onSubmit={handleSubmit} flexDirection="column">
 			<InputGroup>
 				<Heading>General</Heading>
-				<Label htmlFor="description">
-					Description
+				<Label htmlFor="description" required>
+					<span>Description</span>
 					<Input
 						type="text"
 						onChange={handleChange}
@@ -75,21 +77,15 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 						value={values.description}
 						name="description"
 						id="description"
-					/>
-					<ErrorMessage
-						error={errors.description}
-						touched={touched.description}
+						error={errorIn(errors, touched, "description")}
 					/>
 				</Label>
 
-				<Label htmlFor="rate_type">
-					Rate Type
+				<Label htmlFor="rate_type" required>
+					<span>Rate Type</span>
 					<Select
-						onChange={handleChange}
-						onBlur={handleBlur}
-						value={values.rate_type}
 						name="rate_type"
-						id="rate_type"
+						error={errorIn(errors, touched, "rate_type")}
 					>
 						<option value="" disabled>
 							Select...
@@ -98,25 +94,25 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 						<option value="km">p/km</option>
 						<option value="mins">p/minute</option>
 					</Select>
-					<ErrorMessage error={errors.rate_type} touched={touched.rate_type} />
 				</Label>
 			</InputGroup>
 
 			<ActivityRates>
 				<Heading>Rates</Heading>
 				<Subheading>
-					Only the week day rate is required.
-					<br />
-					The rest will use this rate as the default if not provided.
+					Only the weekday rate is required. The rest will use the weekday rate
+					as the default if not provided.
 				</Subheading>
 
-				{["week_day", "week_night", "saturday", "sunday"].map((day) => (
+				{["weekday", "weeknight", "saturday", "sunday"].map((day) => (
 					<ActivityRow>
-						<Label>
-							{day
-								.split("_")
-								.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-								.join(" ")}
+						<Label required={day === "weekday"}>
+							<span>
+								{day
+									.split("_")
+									.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+									.join(" ")}
+							</span>
 						</Label>
 						<Input
 							type="text"
@@ -125,10 +121,7 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 							name={`${day}.item_code`}
 							id={`${day}.item_code`}
 							placeholder="Code"
-						/>
-						<ErrorMessage
-							error={getIn(errors, `${day}.item_code`)}
-							touched={getIn(errors, `${day}.item_code`)}
+							error={errorIn(errors, touched, `${day}.item_code`)}
 						/>
 						<Input
 							type="text"
@@ -137,10 +130,7 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 							name={`${day}.rate`}
 							id={`${day}.rate`}
 							placeholder="Rate"
-						/>
-						<ErrorMessage
-							error={getIn(errors, `${day}.rate`)}
-							touched={getIn(errors, `${day}.rate`)}
+							error={errorIn(errors, touched, `${day}.rate`)}
 						/>
 					</ActivityRow>
 				))}
@@ -167,6 +157,10 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 				setSubmitting(false);
 			}, 1000);
 		},
+		validationSchema: ActivityValidationSchema,
+		validateOnChange: true,
+		validateOnMount: false,
+		validateOnBlur: true,
 		displayName: "Activity Form",
 	})(BaseActivityForm);
 

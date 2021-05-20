@@ -1,9 +1,15 @@
+import { Field } from "formik";
 import React from "react";
 import styled from "styled-components";
 
-const SelectContainer = styled.div`
+interface SelectProps {
+	error?: boolean;
+}
+
+const SelectContainer = styled.div<SelectProps>`
 	border-radius: 3px;
-	border: 1px solid transparent;
+	border: 1px solid
+		${(props) => (props.error ? props.theme.colors.error : "transparent")};
 	outline: none;
 	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
 
@@ -28,7 +34,8 @@ const SelectContainer = styled.div`
 	}
 
 	&:focus {
-		border: 1px solid #6e6e6e;
+		border: 1px solid
+			${(props) => (props.error ? props.theme.colors.error : "#6e6e6e")};
 	}
 
 	&::after {
@@ -43,9 +50,15 @@ const SelectContainer = styled.div`
 	}
 `;
 
-const Select = ({ children }: React.HTMLProps<HTMLSelectElement>) => (
-	<SelectContainer>
-		<select>{children}</select>
+const Select = ({
+	children,
+	name,
+	error,
+}: React.HTMLProps<HTMLSelectElement> & SelectProps) => (
+	<SelectContainer error={error || false}>
+		<Field as="select" id={name} name={name}>
+			{children}
+		</Field>
 	</SelectContainer>
 );
 

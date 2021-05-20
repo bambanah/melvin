@@ -1,4 +1,5 @@
 import firebase from "firebase/app";
+import { FormikErrors, FormikTouched, getIn } from "formik";
 import moment from "moment";
 import { toast } from "react-toastify";
 import { Invoice, Template } from "../types";
@@ -92,3 +93,9 @@ export const createTemplateFromInvoice = (invoice: Invoice) => {
 	createTemplate(template);
 	toast.info("Template saved!");
 };
+
+export const errorIn = (
+	errors: FormikErrors<any>,
+	touched: FormikTouched<any>,
+	value: string
+) => getIn(errors, value) !== undefined && getIn(touched, value);

@@ -1,11 +1,11 @@
 interface ActivityType {
 	description: string;
 	rate_type: string;
-	week_day: {
+	weekday: {
 		item_code: string;
 		rate: number | undefined;
 	};
-	week_night: {
+	weeknight: {
 		item_code: string;
 		rate: number | undefined;
 	};
@@ -24,12 +24,12 @@ export default class Activity implements ActivityType {
 
 	rate_type = "";
 
-	week_day = {
+	weekday = {
 		item_code: "",
 		rate: undefined,
 	};
 
-	week_night = {
+	weeknight = {
 		item_code: "",
 		rate: undefined,
 	};
