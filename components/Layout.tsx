@@ -13,15 +13,28 @@ interface Props {
 }
 
 const Header = styled.header`
+	position: fixed;
+	top: 0;
+	width: 100vw;
+	box-sizing: border-box;
+	z-index: 100;
+	background-color: white;
+	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+`;
+
+const NavContent = styled.div`
+	height: 5rem;
+	width: 100%;
+	padding: 0 2rem;
+	min-width: 700px;
+	max-width: 1100px;
+
+	box-sizing: border-box;
+	margin: auto;
+
 	display: flex;
 	align-items: center;
 	justify-content: space-evenly;
-	width: 100%;
-	height: 5rem;
-	padding: 0 5rem;
-
-	background-color: white;
-	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
 `;
 
 const NavLogo = styled.div`
@@ -46,6 +59,16 @@ const NavLinks = styled.div`
 const NavAuth = styled.div`
 	flex: 0 0 30%;
 	text-align: right;
+
+	span {
+		margin-right: 0.3rem;
+	}
+
+	@media only screen and (max-width: 950px) {
+		span {
+			display: none;
+		}
+	}
 `;
 
 const Container = styled.div`
@@ -59,11 +82,14 @@ const Container = styled.div`
 `;
 
 const Content = styled.div`
+	box-sizing: border-box;
 	display: flex;
-	width: 95vw;
+	width: 100vw;
+	padding: 0 2.5vw;
 	max-width: 1200px;
-	min-width: 800px;
-	margin-top: 4rem;
+	min-width: 700px;
+	/* 5rem for the header, then 2rem gap */
+	margin-top: 7rem;
 	height: 100%;
 	flex: 1 0 auto;
 	flex-direction: column;
@@ -94,28 +120,30 @@ const Layout: React.FC<Props> = ({ children }) => {
 	return (
 		<Container>
 			<Header>
-				<NavLogo>
-					{/* <a href="https://www.ndis.gov.au/providers/price-guides-and-pricing#ndis-price-guide-2020-21"> */}
-					<a href="/">
-						<Image
-							src="/ndis-logo.png"
-							alt="NDIS Logo"
-							width={70}
-							height={35}
-						/>
-					</a>
-					<a href="/price-guide-3-21.pdf">Price Guide</a>
-				</NavLogo>
+				<NavContent>
+					<NavLogo>
+						{/* <a href="https://www.ndis.gov.au/providers/price-guides-and-pricing#ndis-price-guide-2020-21"> */}
+						<a href="/">
+							<Image
+								src="/ndis-logo.png"
+								alt="NDIS Logo"
+								width={70}
+								height={35}
+							/>
+						</a>
+						<a href="/price-guide-3-21.pdf">Price Guide</a>
+					</NavLogo>
 
-				<NavLinks>
-					<NavLink href="/invoices">Invoices</NavLink>
-					<NavLink href="/templates">Templates</NavLink>
-				</NavLinks>
+					<NavLinks>
+						<NavLink href="/invoices">Invoices</NavLink>
+						<NavLink href="/templates">Templates</NavLink>
+					</NavLinks>
 
-				<NavAuth>
-					{user && <span className="mr-2 mt-2">{user.email}</span>}
-					<Button onClick={() => signOut()}>Log Out</Button>
-				</NavAuth>
+					<NavAuth>
+						{user && <span className="mr-2 mt-2">{user.email}</span>}
+						<Button onClick={() => signOut()}>Log Out</Button>
+					</NavAuth>
+				</NavContent>
 			</Header>
 
 			<Content>

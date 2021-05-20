@@ -7,6 +7,7 @@ import CreateInvoice from "../components/CreateInvoice";
 import InvoiceList from "../components/InvoiceList";
 import Layout from "../components/Layout";
 import TemplateList from "../components/TemplateList";
+import Title from "../components/Title";
 import { Invoice } from "../shared/types";
 
 const CreateInvoiceSection = styled.div`
@@ -36,7 +37,7 @@ export default function Home() {
 			<Head>
 				<title>Invoices</title>
 			</Head>
-			<h1 className="title">Invoices</h1>
+			<Title>Invoices</Title>
 
 			<CreateInvoiceSection className={`section ${creating && "expanded"}`}>
 				{creating ? (
