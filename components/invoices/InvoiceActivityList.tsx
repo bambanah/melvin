@@ -179,7 +179,7 @@ export default function ActivityList({
 														{
 															activities[
 																activity_value.activity_ref.split("/")[1]
-															].rate
+															].weekday.rate
 														}
 														/
 														{activity_value.activity_ref.length > 0 &&

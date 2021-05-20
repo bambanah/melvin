@@ -36,15 +36,15 @@ export interface Activity {
 	};
 	weeknight: {
 		item_code: string;
-		rate: number | undefined;
+		rate?: number;
 	};
 	saturday: {
 		item_code: string;
-		rate: number | undefined;
+		rate?: number;
 	};
 	sunday: {
 		item_code: string;
-		rate: number | undefined;
+		rate?: number;
 	};
 }
 

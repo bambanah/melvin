@@ -11,6 +11,7 @@ import Input from "../../shared/components/forms/Input";
 import Label from "../../shared/components/forms/Label";
 import Select from "../../shared/components/forms/Select";
 import Subheading from "../../shared/components/text/Subheading";
+import { createActivity } from "../../shared/utils/firebase";
 
 interface Props {
 	setCreating: (creating: boolean) => void;
@@ -55,6 +56,15 @@ const Heading = styled.h2`
 	font-weight: bold;
 `;
 
+const parseAndHandleChange = (
+	value: string,
+	setFieldValue: (id: string, parsed: number) => void,
+	id: string
+) => {
+	const parsed = parseInt(value, 10);
+	setFieldValue(id, parsed);
+};
+
 const CreateActivityForm = ({ setCreating }: Props) => {
 	const BaseActivityForm = ({
 		values,
@@ -63,6 +73,7 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 		handleChange,
 		handleBlur,
 		handleSubmit,
+		setFieldValue,
 	}: FormikProps<Activity>) => (
 		<Form onSubmit={handleSubmit} flexDirection="column">
 			<InputGroup>
@@ -124,7 +135,13 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 						/>
 						<Input
 							type="text"
-							onChange={handleChange}
+							onChange={(e) =>
+								parseAndHandleChange(
+									e.target.value,
+									setFieldValue,
+									`${day}.rate`
+								)
+							}
 							onBlur={handleBlur}
 							name={`${day}.rate`}
 							id={`${day}.rate`}
@@ -147,14 +164,12 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 	);
 
 	const FormikForm = withFormik({
-		mapPropsToValues: () => new Activity(),
+		mapPropsToValues: () => new Activity() as Activity,
 		handleSubmit: (values, { setSubmitting }) => {
-			setTimeout(() => {
-				// eslint-disable-next-line no-alert
-				alert(JSON.stringify(values, null, 2));
+			createActivity(values);
 
-				setSubmitting(false);
-			}, 1000);
+			setSubmitting(false);
+			setCreating(false);
 		},
 		validationSchema: ActivityValidationSchema,
 		validateOnChange: true,

@@ -168,7 +168,7 @@ export const createActivity = (activity: Activity) => {
 
 	firestore
 		.collection("activities")
-		.add(activity)
+		.add({ ...activity })
 		.then(() => {
 			toast.success("Activity created");
 		})
@@ -182,7 +182,7 @@ export const streamActivities = (observer: any) =>
 	firestore
 		.collection("activities")
 		.where("owner", "==", auth.currentUser?.uid)
-		.orderBy("date", "desc")
+		.orderBy("description", "desc")
 		.onSnapshot(observer);
 
 export const getActivities = async () => {

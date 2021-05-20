@@ -7,21 +7,21 @@ export default class Activity implements ActivityType {
 
 	weekday = {
 		item_code: "",
-		rate: undefined,
+		rate: 0,
 	};
 
 	weeknight = {
 		item_code: "",
-		rate: undefined,
+		rate: 0,
 	};
 
 	saturday = {
 		item_code: "",
-		rate: undefined,
+		rate: 0,
 	};
 
 	sunday = {
 		item_code: "",
-		rate: undefined,
+		rate: 0,
 	};
 }
