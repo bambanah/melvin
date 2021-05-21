@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
 import firebase from "firebase/app";
-import { Activity } from "../../shared/types";
+import { Activity as ActivityType } from "../../shared/types";
 import { streamActivities } from "../../shared/utils/firebase";
+import Activity from "./Activity";
+import Table from "../../shared/components/Table";
 
 function ActivityList() {
-	const [activities, setActivities] = useState<Activity[]>([]);
+	const [activities, setActivities] = useState<ActivityType[]>([]);
 
 	useEffect(() => {
 		const unsubscribe = streamActivities({
 			next: (querySnapshot: firebase.firestore.QuerySnapshot) => {
-				const fetchedActivities: Activity[] = [];
+				const fetchedActivities: ActivityType[] = [];
 				querySnapshot.forEach((document: firebase.firestore.DocumentData) => {
-					const activity: Activity = document.data();
+					const activity: ActivityType = document.data();
 					fetchedActivities.push(activity);
 				});
-				console.log(fetchedActivities);
 				setActivities(fetchedActivities);
 			},
 			error: (err: Error) => console.error(err.message),
@@ -23,15 +24,20 @@ function ActivityList() {
 	}, []);
 
 	return (
-		<ul>
-			{activities.map((activity: Activity) => (
-				// <Invoice
-				// 	invoice={activity}
-				// 	key={activity.weekday.item_code}
-				// />
-				<li>{activity.description}</li>
+		<Table>
+			<tr>
+				<th>Description</th>
+				<th>Weekday Rate</th>
+				<th>Weeknight Rate</th>
+				<th>Saturday Rate</th>
+				<th>Sunday Rate</th>
+				{/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+				<th />
+			</tr>
+			{activities.map((activity: ActivityType) => (
+				<Activity activity={activity} />
 			))}
-		</ul>
+		</Table>
 	);
 }
 

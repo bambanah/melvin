@@ -2,13 +2,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 import { toast } from "react-toastify";
-import {
-	Activity,
-	ActivityObject,
-	Invoice,
-	Template,
-	TemplateObject,
-} from "../types";
+import { Activity, Invoice, Template, TemplateObject } from "../types";
 
 const firebaseConfig = {
 	apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -185,20 +179,20 @@ export const streamActivities = (observer: any) =>
 		.orderBy("description", "desc")
 		.onSnapshot(observer);
 
-export const getActivities = async () => {
-	const activities: ActivityObject = {};
-
-	await firestore
+export const deleteActivity = async (description: string) => {
+	const invoiceQuery = firestore
 		.collection("activities")
-		.get()
-		.then((querySnapshot) => {
-			querySnapshot.forEach((doc: firebase.firestore.DocumentData) => {
-				const activity: Activity = doc.data();
-				const { id } = doc;
+		.where("description", "==", description)
+		.where("owner", "==", getCurrentUser()?.uid);
 
-				activities[id] = activity;
-			});
+	await invoiceQuery.get().then((querySnapshot) => {
+		querySnapshot.forEach((doc) => {
+			doc.ref
+				.delete()
+				.then(() => toast.error("Activity deleted"))
+				.catch((error) => {
+					console.error("Error removing document: ", error);
+				});
 		});
-
-	return activities;
+	});
 };

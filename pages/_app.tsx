@@ -9,6 +9,7 @@ import { AuthProvider } from "../shared/hooks/useAuth";
 import "react-toastify/dist/ReactToastify.css";
 import "bulma/css/bulma.css";
 import "../styles/font-imports.scss";
+import { importIcons } from "../shared/utils/helpers";
 
 const theme = {
 	colors: {
@@ -21,6 +22,9 @@ const theme = {
 			"linear-gradient(24deg, rgba(126,249,145,1) 0%, rgba(120,199,254,1) 100%)",
 	},
 };
+
+// Import Fontawesome Icons
+importIcons();
 
 function App({ Component, pageProps }: AppProps) {
 	return (
