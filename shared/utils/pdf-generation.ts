@@ -9,6 +9,7 @@ const generatePDF = (invoice: Invoice) => {
 
 	// eslint-disable-next-line new-cap
 	const doc = new jsPDF();
+	// doc.setFont("Inter-Regular", "normal");
 	doc.setFontSize(20);
 	doc.text("Tax Invoice", 150, margin);
 
@@ -19,8 +20,8 @@ const generatePDF = (invoice: Invoice) => {
 	// Write details at top of page
 	const invoiceDetails = [
 		`Invoice Date: ${date}`,
-		`Client Name: ${invoice.client_name}`,
-		`Client Number: ${invoice.client_no}`,
+		`Participant Name: ${invoice.client_name}`,
+		`Participant Number: ${invoice.client_no}`,
 		`Bill To: ${invoice.bill_to}`,
 		`Invoice Number: ${invoice.invoice_no}`,
 	];
@@ -57,32 +58,39 @@ const generatePDF = (invoice: Invoice) => {
 			let countString = "";
 
 			if (activityDetails[activityId].rate_type === "hr") {
-				totalCost = activityDetails[activityId].rate * activity.duration;
+				totalCost =
+					activityDetails[activityId].weekday.rate * activity.duration;
 
 				const prettyDuration = getPrettyDuration(activity.duration);
 
 				countString = `${activity.start_time?.toLowerCase()}-${activity.end_time?.toLowerCase()} (${prettyDuration})`;
 			} else if (activityDetails[activityId].rate_type === "km") {
 				totalCost =
-					activityDetails[activityId].rate * parseInt(activity.distance, 10);
+					activityDetails[activityId].weekday.rate *
+					parseInt(activity.distance, 10);
 
 				countString = `${activity.distance} kilometres`;
-			} else if (activityDetails[activityId].rate_type === "minutes") {
-				totalCost = activityDetails[activityId].rate * (activity.duration / 60);
+			} else if (activityDetails[activityId].rate_type === "mins") {
+				totalCost =
+					activityDetails[activityId].weekday.rate * (activity.duration / 60);
 				countString = `${activity.duration} minutes`;
 			}
 
 			sumTotal += totalCost;
 
 			currentActivity[0] += isNewActivity
-				? `${activityDetails[activityId].description}\n${activityId}\n`
+				? `${activityDetails[activityId].description}\n${activityDetails[activityId].weekday.item_code}\n`
 				: "";
 			currentActivity[1] += `${activity.date}\n`;
 			currentActivity[2] += `${countString}\n`;
-			currentActivity[3] += `$${activityDetails[activityId].rate}/${
-				activityDetails[activityId].rate_type === "minutes"
-					? "hr"
-					: activityDetails[activityId].rate_type
+			currentActivity[3] += `$${
+				activityDetails[activityId].rate_type === "mins"
+					? totalCost.toFixed(2)
+					: activityDetails[activityId].weekday.rate
+			}${
+				activityDetails[activityId].rate_type === "mins"
+					? ""
+					: `/${activityDetails[activityId].rate_type}`
 			}\n`;
 			currentActivity[4] += `$${totalCost.toFixed(2)}\n`;
 
@@ -112,7 +120,7 @@ const generatePDF = (invoice: Invoice) => {
 		activities.push([
 			{
 				content:
-					"Phoebe Nicholas\nABN: 71 105 617 976\nBank: Up\nBSB: 633 123\nAccount Number: 177 757 663",
+					"Phoebe Nicholas\nABN: 71 105 617 976\nBank: Up Bank\nBSB: 633 123\nAccount Number: 177 757 663",
 				colSpan: 5,
 				rowSpan: 2,
 				styles: {
@@ -132,7 +140,7 @@ const generatePDF = (invoice: Invoice) => {
 					"Description",
 					"Date",
 					"Count",
-					{ content: "Rate", styles: { halign: "right" } },
+					{ content: "Unit Price", styles: { halign: "right" } },
 					"Total",
 				],
 			],

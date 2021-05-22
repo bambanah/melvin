@@ -74,13 +74,18 @@ export const getTotalCost = async (invoice: Invoice) => {
 	invoice.activities.forEach((activity) => {
 		const activityId = activity.activity_ref.split("/")[1];
 
-		if (activityDetails[activityId].rate_type === "hr") {
-			totalCost += activityDetails[activityId].rate * activity.duration;
-		} else if (activityDetails[activityId].rate_type === "km") {
-			totalCost +=
-				activityDetails[activityId].rate * parseInt(activity.distance, 10);
-		} else if (activityDetails[activityId].rate_type === "minutes") {
-			totalCost += activityDetails[activityId].rate * (activity.duration / 60);
+		const activityDetail = activityDetails[activityId];
+
+		const rate = activityDetail?.weekday.rate;
+
+		if (rate) {
+			if (activityDetail?.rate_type === "hr") {
+				totalCost += rate * activity.duration;
+			} else if (activityDetail?.rate_type === "km") {
+				totalCost += rate * parseInt(activity.distance, 10);
+			} else if (activityDetail?.rate_type === "minutes") {
+				totalCost += rate * (activity.duration / 60);
+			}
 		}
 	});
 

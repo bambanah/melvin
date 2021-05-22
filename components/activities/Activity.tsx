@@ -1,3 +1,5 @@
+/* eslint-disable no-alert */
+/* eslint-disable no-restricted-globals */
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import styled from "styled-components";
@@ -54,24 +56,13 @@ const Activity = ({ activity }: Props) => {
 		setEditing(false);
 	}
 
-	function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-		console.log(e.target.id);
-		let newActivity = activityState;
-		console.log(newActivity);
-		if (newActivity) {
-			newActivity[e.target.id] = e.target.value;
-
-			setActivityState(newActivity);
-		}
-	}
-
 	return (
 		<Row>
 			<td>
 				{editing ? (
 					<LocalInput id="description" value={activityState?.description} />
 				) : (
-					<span>${activity.description}</span>
+					<span>{activity.description}</span>
 				)}
 			</td>
 			<td>
@@ -97,11 +88,7 @@ const Activity = ({ activity }: Props) => {
 			</td>
 			<td>
 				{editing ? (
-					<LocalInput
-						id="saturday.rate"
-						value={activityState?.saturday.rate}
-						onChange={handleChange}
-					/>
+					<LocalInput id="saturday.rate" value={activityState?.saturday.rate} />
 				) : (
 					<span>
 						<strong>${activity.saturday.rate}</strong>/{activity.rate_type}

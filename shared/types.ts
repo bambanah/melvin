@@ -32,7 +32,7 @@ export interface Activity {
 	rate_type: string;
 	weekday: {
 		item_code: string;
-		rate: number | undefined;
+		rate: number;
 	};
 	weeknight: {
 		item_code: string;

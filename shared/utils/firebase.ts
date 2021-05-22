@@ -2,7 +2,13 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 import { toast } from "react-toastify";
-import { Activity, Invoice, Template, TemplateObject } from "../types";
+import {
+	Activity,
+	ActivityObject,
+	Invoice,
+	Template,
+	TemplateObject,
+} from "../types";
 
 const firebaseConfig = {
 	apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -140,6 +146,7 @@ export const getTemplates = async () => {
 
 	await firestore
 		.collection("templates")
+		.where("owner", "==", auth.currentUser?.uid)
 		.get()
 		.then((querySnapshot) => {
 			querySnapshot.forEach((doc: firebase.firestore.DocumentData) => {
@@ -178,6 +185,25 @@ export const streamActivities = (observer: any) =>
 		.where("owner", "==", auth.currentUser?.uid)
 		.orderBy("description", "desc")
 		.onSnapshot(observer);
+
+export const getActivities = async () => {
+	const activities: ActivityObject = {};
+
+	await firestore
+		.collection("activities")
+		.where("owner", "==", auth.currentUser?.uid)
+		.get()
+		.then((querySnapshot) => {
+			querySnapshot.forEach((doc: firebase.firestore.DocumentData) => {
+				const activity: Activity = doc.data();
+				const { id } = doc;
+
+				activities[id] = activity;
+			});
+		});
+
+	return activities;
+};
 
 export const deleteActivity = async (description: string) => {
 	const invoiceQuery = firestore

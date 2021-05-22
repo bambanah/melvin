@@ -25,18 +25,20 @@ function ActivityList() {
 
 	return (
 		<Table>
-			<tr>
-				<th>Description</th>
-				<th>Weekday Rate</th>
-				<th>Weeknight Rate</th>
-				<th>Saturday Rate</th>
-				<th>Sunday Rate</th>
-				{/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-				<th />
-			</tr>
-			{activities.map((activity: ActivityType) => (
-				<Activity activity={activity} />
-			))}
+			<tbody>
+				<tr>
+					<th>Description</th>
+					<th>Weekday Rate</th>
+					<th>Weeknight Rate</th>
+					<th>Saturday Rate</th>
+					<th>Sunday Rate</th>
+					{/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+					<th />
+				</tr>
+				{activities.map((activity: ActivityType) => (
+					<Activity activity={activity} />
+				))}
+			</tbody>
 		</Table>
 	);
 }

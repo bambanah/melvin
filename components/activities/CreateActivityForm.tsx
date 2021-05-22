@@ -61,7 +61,7 @@ const parseAndHandleChange = (
 	setFieldValue: (id: string, parsed: number) => void,
 	id: string
 ) => {
-	const parsed = parseInt(value, 10);
+	const parsed = Number(value);
 	setFieldValue(id, parsed);
 };
 

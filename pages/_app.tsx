@@ -10,6 +10,8 @@ import "react-toastify/dist/ReactToastify.css";
 import "bulma/css/bulma.css";
 import "../styles/font-imports.scss";
 import { importIcons } from "../shared/utils/helpers";
+import addFont from "../shared/Inter-Regular-normal";
+import addInterVariable from "../shared/Inter-Variable-normal";
 
 const theme = {
 	colors: {
@@ -25,6 +27,10 @@ const theme = {
 
 // Import Fontawesome Icons
 importIcons();
+
+// Add Inter font
+addFont();
+addInterVariable();
 
 function App({ Component, pageProps }: AppProps) {
 	return (

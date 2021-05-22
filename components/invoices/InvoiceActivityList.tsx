@@ -65,6 +65,12 @@ export default function ActivityList({
 		});
 	}, []);
 
+	const getActivityDetails = (activity_ref: string) => {
+		const activityDetail = activities[activity_ref];
+
+		return activityDetail;
+	};
+
 	if (loaded) {
 		return (
 			<FieldArray
@@ -118,8 +124,9 @@ export default function ActivityList({
 
 											{activity_value.activity_ref.length > 0 && (
 												<>
-													{activities[activity_value.activity_ref.split("/")[1]]
-														.rate_type === "hr" && (
+													{getActivityDetails(
+														activity_value.activity_ref.split("/")[1]
+													)?.rate_type === "hr" && (
 														<Inputs>
 															<TimePicker
 																formValue={`activities.${index}.start_time`}
@@ -133,8 +140,9 @@ export default function ActivityList({
 														</Inputs>
 													)}
 
-													{activities[activity_value.activity_ref.split("/")[1]]
-														.rate_type === "km" && (
+													{getActivityDetails(
+														activity_value.activity_ref.split("/")[1]
+													)?.rate_type === "km" && (
 														<Inputs>
 															<Control className="control has-icons-right is-expanded">
 																<input
@@ -150,8 +158,9 @@ export default function ActivityList({
 														</Inputs>
 													)}
 
-													{activities[activity_value.activity_ref.split("/")[1]]
-														.rate_type === "minutes" && (
+													{getActivityDetails(
+														activity_value.activity_ref.split("/")[1]
+													)?.rate_type === "mins" && (
 														<Control className="control has-icons-right">
 															<input
 																className="input"
@@ -177,19 +186,19 @@ export default function ActivityList({
 															).toFixed(2)} @ `} */}
 														$
 														{
-															activities[
+															getActivityDetails(
 																activity_value.activity_ref.split("/")[1]
-															].weekday.rate
+															)?.weekday.rate
 														}
 														/
 														{activity_value.activity_ref.length > 0 &&
-														activities[
+														getActivityDetails(
 															activity_value.activity_ref.split("/")[1]
-														].rate_type === "minutes"
+														)?.rate_type === "minutes"
 															? "hr"
-															: activities[
+															: getActivityDetails(
 																	activity_value.activity_ref.split("/")[1]
-															  ].rate_type}
+															  )?.rate_type}
 													</HourlyText>
 												</>
 											)}
