@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
+import moment from "moment";
 import { getActivities } from "./firebase";
 import { ActivityObject, Invoice } from "../types";
 import { formatDate, getPrettyDuration } from "./helpers";
@@ -57,36 +58,68 @@ const generatePDF = (invoice: Invoice) => {
 			let totalCost = 0;
 			let countString = "";
 
-			if (activityDetails[activityId].rate_type === "hr") {
-				totalCost =
-					activityDetails[activityId].weekday.rate * activity.duration;
+			let rate;
+			let itemCode;
+			if (
+				moment(activity.date, "DD/MM/YY").isoWeekday() === 6 &&
+				activityDetails[activityId].saturday.rate !== undefined &&
+				activityDetails[activityId].saturday.rate !== 0 &&
+				activityDetails[activityId].saturday.item_code.length > 0
+			) {
+				// Day is a saturday
+				rate = activityDetails[activityId].saturday.rate;
+				itemCode = activityDetails[activityId].saturday.item_code;
+			} else if (
+				moment(activity.date, "DD/MM/YY").isoWeekday() === 7 &&
+				activityDetails[activityId].sunday.rate !== undefined &&
+				activityDetails[activityId].sunday.rate !== 0 &&
+				activityDetails[activityId].sunday.item_code.length > 0
+			) {
+				// Day is a sunday
+				rate = activityDetails[activityId].sunday.rate;
+				itemCode = activityDetails[activityId].sunday.item_code;
+			} else if (
+				activity.end_time &&
+				moment(activity.end_time, "HH:mmA").isAfter(moment("8:00PM", "HH:mmA"))
+			) {
+				// Day is a weekday and it's after 8pm
+				rate = activityDetails[activityId].weeknight.rate;
+				itemCode = activityDetails[activityId].weeknight.item_code;
+			} else {
+				// Weekday before 8pm
+				rate = activityDetails[activityId].weekday.rate;
+				itemCode = activityDetails[activityId].weekday.item_code;
+			}
 
-				const prettyDuration = getPrettyDuration(activity.duration);
+			if (rate) {
+				if (activityDetails[activityId].rate_type === "hr") {
+					totalCost = rate * activity.duration;
 
-				countString = `${activity.start_time?.toLowerCase()}-${activity.end_time?.toLowerCase()} (${prettyDuration})`;
-			} else if (activityDetails[activityId].rate_type === "km") {
-				totalCost =
-					activityDetails[activityId].weekday.rate *
-					parseInt(activity.distance, 10);
+					const prettyDuration = getPrettyDuration(activity.duration);
 
-				countString = `${activity.distance} kilometres`;
-			} else if (activityDetails[activityId].rate_type === "mins") {
-				totalCost =
-					activityDetails[activityId].weekday.rate * (activity.duration / 60);
-				countString = `${activity.duration} minutes`;
+					countString = `${activity.start_time?.toLowerCase()}-${activity.end_time?.toLowerCase()} (${prettyDuration})`;
+				} else if (activityDetails[activityId].rate_type === "km") {
+					totalCost = rate * parseInt(activity.distance, 10);
+
+					countString = `${activity.distance} kilometres`;
+				} else if (activityDetails[activityId].rate_type === "mins") {
+					totalCost = rate * (activity.duration / 60);
+
+					countString = `${activity.duration} minutes`;
+				}
 			}
 
 			sumTotal += totalCost;
 
 			currentActivity[0] += isNewActivity
-				? `${activityDetails[activityId].description}\n${activityDetails[activityId].weekday.item_code}\n`
+				? `${activityDetails[activityId].description}\n${itemCode}\n`
 				: "";
 			currentActivity[1] += `${activity.date}\n`;
 			currentActivity[2] += `${countString}\n`;
 			currentActivity[3] += `$${
 				activityDetails[activityId].rate_type === "mins"
 					? totalCost.toFixed(2)
-					: activityDetails[activityId].weekday.rate
+					: rate
 			}${
 				activityDetails[activityId].rate_type === "mins"
 					? ""

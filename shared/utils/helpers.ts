@@ -90,8 +90,8 @@ export const getTotalCost = async (invoice: Invoice) => {
 			if (activityDetail?.rate_type === "hr") {
 				totalCost += rate * activity.duration;
 			} else if (activityDetail?.rate_type === "km") {
-				totalCost += rate * parseInt(activity.distance, 10);
-			} else if (activityDetail?.rate_type === "minutes") {
+				totalCost += rate * Number(activity.distance);
+			} else if (activityDetail?.rate_type === "mins") {
 				totalCost += rate * (activity.duration / 60);
 			}
 		}

@@ -41,10 +41,10 @@ const Inputs = styled.div`
 	gap: 0.4rem;
 `;
 
-const HourlyText = styled.span`
-	line-height: 40px;
-	width: 4rem;
-`;
+// const HourlyText = styled.span`
+// 	line-height: 40px;
+// 	width: 4rem;
+// `;
 
 export default function ActivityList({
 	values,
@@ -174,8 +174,8 @@ export default function ActivityList({
 														</Control>
 													)}
 
-													<HourlyText>
-														{/* {(activity_value.duration ||
+													{/* <HourlyText>
+														{(activity_value.duration ||
 															activity_value.distance) &&
 															`$${(
 																activities[
@@ -183,7 +183,7 @@ export default function ActivityList({
 																].rate *
 																(activity_value.duration ||
 																	parseInt(activity_value.distance, 10))
-															).toFixed(2)} @ `} */}
+															).toFixed(2)} @ `}
 														$
 														{
 															getActivityDetails(
@@ -199,7 +199,7 @@ export default function ActivityList({
 															: getActivityDetails(
 																	activity_value.activity_ref.split("/")[1]
 															  )?.rate_type}
-													</HourlyText>
+													</HourlyText> */}
 												</>
 											)}
 
