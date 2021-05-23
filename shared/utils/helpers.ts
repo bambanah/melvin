@@ -76,7 +76,15 @@ export const getTotalCost = async (invoice: Invoice) => {
 
 		const activityDetail = activityDetails[activityId];
 
-		const rate = activityDetail?.weekday.rate;
+		let rate;
+		if (
+			activity.end_time &&
+			moment(activity.end_time, "HH:mmA").isAfter(moment("8:00PM", "HH:mmA"))
+		) {
+			rate = activityDetail?.weeknight.rate;
+		} else {
+			rate = activityDetail?.weekday.rate;
+		}
 
 		if (rate) {
 			if (activityDetail?.rate_type === "hr") {
