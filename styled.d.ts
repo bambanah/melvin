@@ -11,6 +11,7 @@ declare module "styled-components" {
 			link: string;
 			accent: string;
 			brand: string;
+			error: string;
 		};
 	}
 }

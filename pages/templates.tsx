@@ -1,7 +1,7 @@
 import Head from "next/head";
 import React from "react";
-import Layout from "../components/Layout";
-import Title from "../components/Title";
+import Layout from "../shared/components/Layout";
+import Title from "../shared/components/text/Title";
 
 const Templates = () => (
 	<Layout>

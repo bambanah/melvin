@@ -2,7 +2,7 @@ module.exports = {
 	root: true,
 	parser: "@typescript-eslint/parser",
 	parserOptions: {
-		project: "./tsconfig.eslint.json",
+		project: "./tsconfig.json",
 	},
 	rules: {
 		"no-console": ["warn", { allow: ["warn", "error"] }],
@@ -12,6 +12,7 @@ module.exports = {
 		"react/require-default-props": 0,
 		quotes: ["error", "double"],
 		"jsx-a11y/anchor-is-valid": 0,
+		"import/no-extraneous-dependencies": 0,
 	},
 	plugins: ["@typescript-eslint"],
 	extends: ["airbnb-typescript", "prettier"],

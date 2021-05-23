@@ -15,6 +15,12 @@ const GlobalStyle = createGlobalStyle`
     "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 	}
 
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
 	a {
 		color: ${(props) => props.theme.colors.link};
 		text-decoration: none;

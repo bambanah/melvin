@@ -4,16 +4,17 @@ import firebase from "firebase/app";
 import {
 	auth,
 	createInvoice,
+	getActivities,
 	getLastInvoiceDetails,
-} from "../shared/utils/firebase";
+} from "../../shared/utils/firebase";
 
-import { Invoice } from "../shared/types";
-import FieldInput from "./forms/FieldInput";
-import ActivityList from "./forms/ActivityList";
-import { getDuration } from "../shared/utils/helpers";
-import InvoiceValidationSchema from "../shared/utils/InvoiceValidationSchema";
-import Button from "./Button";
-import SaveAsTemplateButton from "./forms/SaveAsTemplateButton";
+import { Invoice } from "../../shared/types";
+import ActivityList from "./InvoiceActivityList";
+import { getDuration } from "../../shared/utils/helpers";
+import InvoiceValidationSchema from "../../schema/InvoiceValidationSchema";
+import Button from "../../shared/components/Button";
+import FieldInput from "./FieldInput";
+import SaveAsTemplateButton from "../templates/SaveAsTemplateButton";
 
 export default function CreateInvoice({
 	invoiceToLoad,
@@ -80,14 +81,14 @@ export default function CreateInvoice({
 			<form className="form" onSubmit={handleSubmit}>
 				<FieldInput
 					value="client_no"
-					labelText="Client Number"
+					labelText="Participant Number"
 					error={errors.client_no}
 					touched={touched.client_no}
 				/>
 
 				<FieldInput
 					value="client_name"
-					labelText="Client Name"
+					labelText="Participant Name"
 					error={errors.client_name}
 					touched={touched.client_name}
 				/>
@@ -134,16 +135,25 @@ export default function CreateInvoice({
 
 	const EnhancedForm = withFormik({
 		mapPropsToValues: () => lastInvoice,
-		handleSubmit: (values, actions) => {
+		handleSubmit: async (values, actions) => {
+			const activityDetails = await getActivities();
+
 			values.activities.forEach((activity, index) => {
 				if (activity.activity_ref === "") {
 					values.activities.splice(index, 1);
 				}
 
+				const rateType =
+					activityDetails[activity.activity_ref.split("/")[1]].rate_type;
+
+				if (rateType !== "hr") {
+					activity.start_time = "";
+					activity.end_time = "";
+				}
 				if (activity.start_time && activity.end_time) {
 					values.activities[index].duration = getDuration(
 						activity.start_time,
-						activity.end_time,
+						activity.end_time
 					);
 				}
 			});

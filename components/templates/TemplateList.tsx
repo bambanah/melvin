@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Button from "./Button";
-import { Invoice, TemplateObject } from "../shared/types";
-import { getTemplates } from "../shared/utils/firebase";
+import Button from "../../shared/components/Button";
+import { Invoice, TemplateObject } from "../../shared/types";
+import { getTemplates } from "../../shared/utils/firebase";
 
 const TemplateList = ({
 	setInvoice,

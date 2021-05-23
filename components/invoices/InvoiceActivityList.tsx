@@ -1,12 +1,12 @@
 import { Field, FieldArray, FormikErrors, FormikTouched } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import styled from "styled-components";
-import Button from "../Button";
-import Control from "../form/Control";
-import Text from "../Text";
+import Button from "../../shared/components/Button";
+import Text from "../../shared/components/text/Text";
 import { getActivities } from "../../shared/utils/firebase";
 import { ActivityObject, Invoice } from "../../shared/types";
 import TimePicker from "./TimePicker";
+import Control from "./Control";
 
 interface PropInterface {
 	values: Invoice;
@@ -41,10 +41,10 @@ const Inputs = styled.div`
 	gap: 0.4rem;
 `;
 
-const HourlyText = styled.span`
-	line-height: 40px;
-	width: 4rem;
-`;
+// const HourlyText = styled.span`
+// 	line-height: 40px;
+// 	width: 4rem;
+// `;
 
 export default function ActivityList({
 	values,
@@ -64,6 +64,12 @@ export default function ActivityList({
 			setLoaded(true);
 		});
 	}, []);
+
+	const getActivityDetails = (activity_ref: string) => {
+		const activityDetail = activities[activity_ref];
+
+		return activityDetail;
+	};
 
 	if (loaded) {
 		return (
@@ -111,15 +117,16 @@ export default function ActivityList({
 															>
 																{activity.description}
 															</option>
-														),
+														)
 													)}
 												</Field>
 											</div>
 
 											{activity_value.activity_ref.length > 0 && (
 												<>
-													{activities[activity_value.activity_ref.split("/")[1]]
-														.rate_type === "hr" && (
+													{getActivityDetails(
+														activity_value.activity_ref.split("/")[1]
+													)?.rate_type === "hr" && (
 														<Inputs>
 															<TimePicker
 																formValue={`activities.${index}.start_time`}
@@ -133,8 +140,9 @@ export default function ActivityList({
 														</Inputs>
 													)}
 
-													{activities[activity_value.activity_ref.split("/")[1]]
-														.rate_type === "km" && (
+													{getActivityDetails(
+														activity_value.activity_ref.split("/")[1]
+													)?.rate_type === "km" && (
 														<Inputs>
 															<Control className="control has-icons-right is-expanded">
 																<input
@@ -150,8 +158,9 @@ export default function ActivityList({
 														</Inputs>
 													)}
 
-													{activities[activity_value.activity_ref.split("/")[1]]
-														.rate_type === "minutes" && (
+													{getActivityDetails(
+														activity_value.activity_ref.split("/")[1]
+													)?.rate_type === "mins" && (
 														<Control className="control has-icons-right">
 															<input
 																className="input"
@@ -165,8 +174,8 @@ export default function ActivityList({
 														</Control>
 													)}
 
-													<HourlyText>
-														{/* {(activity_value.duration ||
+													{/* <HourlyText>
+														{(activity_value.duration ||
 															activity_value.distance) &&
 															`$${(
 																activities[
@@ -174,23 +183,23 @@ export default function ActivityList({
 																].rate *
 																(activity_value.duration ||
 																	parseInt(activity_value.distance, 10))
-															).toFixed(2)} @ `} */}
+															).toFixed(2)} @ `}
 														$
 														{
-															activities[
+															getActivityDetails(
 																activity_value.activity_ref.split("/")[1]
-															].rate
+															)?.weekday.rate
 														}
 														/
 														{activity_value.activity_ref.length > 0 &&
-														activities[
+														getActivityDetails(
 															activity_value.activity_ref.split("/")[1]
-														].rate_type === "minutes"
+														)?.rate_type === "minutes"
 															? "hr"
-															: activities[
+															: getActivityDetails(
 																	activity_value.activity_ref.split("/")[1]
-															  ].rate_type}
-													</HourlyText>
+															  )?.rate_type}
+													</HourlyText> */}
 												</>
 											)}
 
@@ -222,7 +231,7 @@ export default function ActivityList({
 
 												arrayHelpers.insert(
 													values.activities.length,
-													newActivity,
+													newActivity
 												);
 											}}
 										>
