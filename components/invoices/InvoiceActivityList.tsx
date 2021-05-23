@@ -20,25 +20,46 @@ interface PropInterface {
 const ActivityListContainer = styled.div`
 	display: flex;
 	flex-direction: column;
-	gap: 0.5rem;
+	gap: 1.5rem;
 	margin-bottom: 1rem;
 `;
 
 const ActivityRow = styled.div`
 	display: flex;
+	flex-wrap: wrap;
 	gap: 0.4rem;
+`;
 
-	input {
-		&:first-of-type {
-			width: 10rem;
-		}
-	}
+const DateField = styled(Field)`
+	width: 10rem;
 `;
 
 const Inputs = styled.div`
 	flex: 1 0 auto;
 	display: flex;
 	gap: 0.4rem;
+`;
+
+const TravelDetails = styled.div`
+	display: flex;
+	flex: 1 0 100%;
+	justify-content: center;
+	align-items: center;
+
+	input {
+		width: 3rem;
+		margin-left: 0.8rem;
+		/* padding: 0 0.2rem; */
+		height: 2rem;
+	}
+
+	p:last-of-type {
+		margin-left: 1rem;
+	}
+
+	span {
+		margin-left: 0.2rem;
+	}
 `;
 
 // const HourlyText = styled.span`
@@ -83,7 +104,7 @@ export default function ActivityList({
 								<ActivityListContainer>
 									{values.activities.map((activity_value, index) => (
 										<ActivityRow key={activity_value + index.toString()}>
-											<Field
+											<DateField
 												className={`input ${
 													getIn(touched, `activities.${index}.date`) &&
 													getIn(errors, `activities.${index}.date`) &&
@@ -211,6 +232,42 @@ export default function ActivityList({
 											>
 												X
 											</Button>
+											<TravelDetails>
+												<p>Distance:</p>
+												<Field
+													className={`input ${
+														getIn(
+															touched,
+															`activities.${index}.travel_distance`
+														) &&
+														getIn(
+															errors,
+															`activities.${index}.travel_distance`
+														) &&
+														"is-danger"
+													}`}
+													id={`activities.${index}.travel_distance`}
+													name={`activities.${index}.travel_distance`}
+												/>
+												<span> km</span>
+												<p>Duration:</p>
+												<Field
+													className={`input ${
+														getIn(
+															touched,
+															`activities.${index}.travel_duration`
+														) &&
+														getIn(
+															errors,
+															`activities.${index}.travel_duration`
+														) &&
+														"is-danger"
+													}`}
+													id={`activities.${index}.travel_duration`}
+													name={`activities.${index}.travel_duration`}
+												/>
+												<span>mins</span>
+											</TravelDetails>
 										</ActivityRow>
 									))}
 								</ActivityListContainer>
@@ -227,6 +284,8 @@ export default function ActivityList({
 													duration: "",
 													distance: "",
 													date: "",
+													travel_distance: "",
+													travel_duration: "",
 												};
 
 												arrayHelpers.insert(

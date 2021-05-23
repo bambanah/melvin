@@ -32,7 +32,7 @@ const generatePDF = (invoice: Invoice) => {
 
 	// Write activity table
 	getActivities().then((activityDetails: ActivityObject) => {
-		const activities: (string | CellDef)[][] = [];
+		let activities: string[][] = [];
 		let sumTotal = 0;
 
 		// Sort invoice based on activity
@@ -42,18 +42,8 @@ const generatePDF = (invoice: Invoice) => {
 			return 0;
 		});
 
-		let lastActivityId = "";
-		let currentActivity = ["", "", "", "", ""];
-
 		invoice.activities.forEach((activity) => {
 			const activityId = activity.activity_ref.split("/")[1];
-
-			const isNewActivity = lastActivityId !== activityId;
-
-			if (isNewActivity && lastActivityId !== "") {
-				activities.push(currentActivity);
-				currentActivity = ["", "", "", "", ""];
-			}
 
 			let totalCost = 0;
 			let countString = "";
@@ -111,30 +101,95 @@ const generatePDF = (invoice: Invoice) => {
 
 			sumTotal += totalCost;
 
-			currentActivity[0] += isNewActivity
-				? `${activityDetails[activityId].description}\n${itemCode}\n`
-				: "";
-			currentActivity[1] += `${activity.date}\n`;
-			currentActivity[2] += `${countString}\n`;
-			currentActivity[3] += `$${
-				activityDetails[activityId].rate_type === "mins"
-					? totalCost.toFixed(2)
-					: rate
-			}${
-				activityDetails[activityId].rate_type === "mins"
-					? ""
-					: `/${activityDetails[activityId].rate_type}`
-			}\n`;
-			currentActivity[4] += `$${totalCost.toFixed(2)}\n`;
+			const currentActivity = [];
 
-			lastActivityId = activityId;
+			currentActivity.push(
+				`${activityDetails[activityId].description}\n${itemCode}\n`
+			);
+			currentActivity.push(`${activity.date}\n`);
+			currentActivity.push(`${countString}\n`);
+			currentActivity.push(
+				`$${
+					activityDetails[activityId].rate_type === "mins"
+						? totalCost.toFixed(2)
+						: rate?.toFixed(2)
+				}${
+					activityDetails[activityId].rate_type === "mins"
+						? ""
+						: `/${activityDetails[activityId].rate_type}`
+				}\n`
+			);
+			currentActivity.push(`$${totalCost.toFixed(2)}\n`);
+
+			activities.push(currentActivity);
+
+			if (activity.travel_duration > 0 && rate) {
+				const providerTravel = [];
+
+				const travelTotal = (rate / 60) * activity.travel_duration;
+
+				providerTravel.push(`Provider Travel\n${itemCode}\n`);
+				providerTravel.push(`${activity.date}\n`);
+				providerTravel.push(`${activity.travel_duration} minutes\n`);
+				providerTravel.push(
+					`$${rate.toFixed(2)}${`/${activityDetails[activityId].rate_type}`}\n`
+				);
+				providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
+
+				activities.push(providerTravel);
+
+				sumTotal += travelTotal;
+			}
+
+			if (activity.travel_distance > 0) {
+				const providerTravel = [];
+
+				const travelTotal = 0.85 * activity.travel_distance;
+
+				providerTravel.push(
+					`Provider Travel - Non Labour Costs\n${itemCode}\n`
+				);
+				providerTravel.push(`${activity.date}\n`);
+				providerTravel.push(`${activity.travel_distance} km\n`);
+				providerTravel.push("$0.85/km\n");
+				providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
+
+				activities.push(providerTravel);
+
+				sumTotal += travelTotal;
+			}
 		});
 
-		// Push last activity
-		activities.push(currentActivity);
+		activities.sort((a, b) => {
+			if (a[0] > b[0]) return 1;
+			if (a[0] < b[0]) return -1;
 
+			return 0;
+		});
+
+		let lastIndex = 0;
+		activities.map((activity, index) => {
+			if (activity[0] === activities[lastIndex][0] && index !== 0) {
+				activity[0] = "";
+				activities[lastIndex][1] += `${activity[1]}`;
+				activities[lastIndex][2] += `${activity[2]}`;
+				activities[lastIndex][3] += `${activity[3]}`;
+				activities[lastIndex][4] += `${activity[4]}`;
+			} else {
+				lastIndex = index;
+			}
+
+			return activity;
+		});
+
+		console.log(activities);
+		activities = activities.filter((activity) => activity[0] !== "");
+
+		console.log(activities);
+
+		const values: (CellDef | string)[][] = activities;
 		// Bottom section
-		activities.push([
+		values.push([
 			{
 				content: "Total",
 				colSpan: 4,
@@ -146,11 +201,9 @@ const generatePDF = (invoice: Invoice) => {
 			},
 		]);
 
-		activities.push([
-			{ content: "", colSpan: 5, styles: { fillColor: "#fff" } },
-		]);
+		values.push([{ content: "", colSpan: 5, styles: { fillColor: "#fff" } }]);
 
-		activities.push([
+		values.push([
 			{
 				content:
 					"Phoebe Nicholas\nABN: 71 105 617 976\nBank: Up Bank\nBSB: 633 123\nAccount Number: 177 757 663",
@@ -177,7 +230,7 @@ const generatePDF = (invoice: Invoice) => {
 					"Total",
 				],
 			],
-			body: activities,
+			body: values,
 			startY: 45,
 			margin,
 			theme: "striped",

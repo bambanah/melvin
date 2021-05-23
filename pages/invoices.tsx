@@ -6,7 +6,6 @@ import ButtonGroup from "../shared/components/ButtonGroup";
 import CreateInvoice from "../components/invoices/CreateInvoice";
 import InvoiceList from "../components/invoices/InvoiceList";
 import Layout from "../shared/components/Layout";
-import TemplateList from "../components/templates/TemplateList";
 import Title from "../shared/components/text/Title";
 import { Invoice } from "../shared/types";
 
@@ -47,7 +46,6 @@ export default function Home() {
 						<Button primary onClick={() => setCreating(!creating)}>
 							Create Invoice
 						</Button>
-						<TemplateList setInvoice={setInvoice} />
 					</ButtonGroup>
 				)}
 			</CreateInvoiceSection>

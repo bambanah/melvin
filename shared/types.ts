@@ -16,6 +16,8 @@ export interface Invoice {
 		end_time?: string;
 		duration: number;
 		distance: string;
+		travel_duration: number;
+		travel_distance: number;
 	}[];
 }
 
