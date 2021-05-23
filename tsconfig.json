@@ -16,6 +16,6 @@
 		"noEmit": true,
 		"jsx": "preserve"
 	},
-	"include": ["**/*.ts", "**/*.tsx", ""],
+	"include": ["**/*.ts", "**/*.tsx", "**/*.js", ".eslintrc.js"],
 	"exclude": ["node_modules"]
 }

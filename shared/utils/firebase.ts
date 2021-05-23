@@ -28,6 +28,10 @@ if (!firebase.apps.length) {
 export const auth = firebase.auth();
 const firestore = firebase.firestore();
 
+//
+// --- Auth ---
+//
+
 export const getCurrentUser = () => auth.currentUser;
 
 export const isAuthenticated = () => auth.currentUser !== null;
@@ -51,6 +55,10 @@ export const signOut = async () => {
 		console.error(err.message);
 	}
 };
+
+//
+// --- Invoices ---
+//
 
 export const getInvoices = () =>
 	firestore
@@ -100,24 +108,6 @@ export const deleteInvoice = async (invoice_no: string) => {
 	});
 };
 
-export const getActivities = async () => {
-	const activities: ActivityObject = {};
-
-	await firestore
-		.collection("activities")
-		.get()
-		.then((querySnapshot) => {
-			querySnapshot.forEach((doc: firebase.firestore.DocumentData) => {
-				const activity: Activity = doc.data();
-				const { id } = doc;
-
-				activities[id] = activity;
-			});
-		});
-
-	return activities;
-};
-
 export const getLastInvoiceDetails = async () => {
 	let lastInvoice = {} as Invoice;
 
@@ -136,6 +126,10 @@ export const getLastInvoiceDetails = async () => {
 	return lastInvoice;
 };
 
+//
+// --- Templates ---
+//
+
 export const createTemplate = (template: Template) => {
 	template.date = firebase.firestore.Timestamp.now();
 
@@ -152,6 +146,7 @@ export const getTemplates = async () => {
 
 	await firestore
 		.collection("templates")
+		.where("owner", "==", auth.currentUser?.uid)
 		.get()
 		.then((querySnapshot) => {
 			querySnapshot.forEach((doc: firebase.firestore.DocumentData) => {
@@ -165,17 +160,65 @@ export const getTemplates = async () => {
 	return templates;
 };
 
-// export const deleteTemplate = async (template_no: string) => {
-// 	const invoiceQuery = firestore
-// 		.collection("invoices")
-// 		.where("invoice_no", "==", invoice_no)
-// 		.where("owner", "==", getCurrentUser()?.uid);
+//
+// --- Activities ---
+//
 
-// 	await invoiceQuery.get().then((querySnapshot) => {
-// 		querySnapshot.forEach((doc) => {
-// 			doc.ref.delete().catch((error) => {
-// 				console.error("Error removing document: ", error);
-// 			});
-// 		});
-// 	});
-// };
+export const createActivity = (activity: Activity) => {
+	activity.owner = auth.currentUser?.uid;
+
+	firestore
+		.collection("activities")
+		.add({ ...activity })
+		.then(() => {
+			toast.success("Activity created");
+		})
+		.catch((error) => {
+			console.error("Error writing document: ", error);
+			toast.error("Couldn't save activity - try again later");
+		});
+};
+
+export const streamActivities = (observer: any) =>
+	firestore
+		.collection("activities")
+		.where("owner", "==", auth.currentUser?.uid)
+		.orderBy("description", "desc")
+		.onSnapshot(observer);
+
+export const getActivities = async () => {
+	const activities: ActivityObject = {};
+
+	await firestore
+		.collection("activities")
+		.where("owner", "==", auth.currentUser?.uid)
+		.get()
+		.then((querySnapshot) => {
+			querySnapshot.forEach((doc: firebase.firestore.DocumentData) => {
+				const activity: Activity = doc.data();
+				const { id } = doc;
+
+				activities[id] = activity;
+			});
+		});
+
+	return activities;
+};
+
+export const deleteActivity = async (description: string) => {
+	const invoiceQuery = firestore
+		.collection("activities")
+		.where("description", "==", description)
+		.where("owner", "==", getCurrentUser()?.uid);
+
+	await invoiceQuery.get().then((querySnapshot) => {
+		querySnapshot.forEach((doc) => {
+			doc.ref
+				.delete()
+				.then(() => toast.error("Activity deleted"))
+				.catch((error) => {
+					console.error("Error removing document: ", error);
+				});
+		});
+	});
+};

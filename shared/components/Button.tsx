@@ -55,6 +55,7 @@ const Button = styled(({ primary, ...rest }) => <BlandButton {...rest} />)`
 	padding-left: 1em;
 	padding-right: 1em;
 	padding-top: calc(0.5em - 1px);
+	display: inline-block;
 
 	transition: all 0.05s ease;
 

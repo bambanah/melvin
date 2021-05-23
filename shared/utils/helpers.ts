@@ -1,8 +1,20 @@
 import firebase from "firebase/app";
+import { FormikErrors, FormikTouched, getIn } from "formik";
 import moment from "moment";
 import { toast } from "react-toastify";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+	faCheck,
+	faEdit,
+	faTimes,
+	faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import { Invoice, Template } from "../types";
 import { createTemplate, getActivities } from "./firebase";
+
+export const importIcons = () => {
+	library.add(faEdit, faTimes, faCheck, faTrash);
+};
 
 export const formatDate = (timestamp: firebase.firestore.Timestamp) => {
 	const date = timestamp.toDate();
@@ -62,13 +74,26 @@ export const getTotalCost = async (invoice: Invoice) => {
 	invoice.activities.forEach((activity) => {
 		const activityId = activity.activity_ref.split("/")[1];
 
-		if (activityDetails[activityId].rate_type === "hr") {
-			totalCost += activityDetails[activityId].rate * activity.duration;
-		} else if (activityDetails[activityId].rate_type === "km") {
-			totalCost +=
-				activityDetails[activityId].rate * parseInt(activity.distance, 10);
-		} else if (activityDetails[activityId].rate_type === "minutes") {
-			totalCost += activityDetails[activityId].rate * (activity.duration / 60);
+		const activityDetail = activityDetails[activityId];
+
+		let rate;
+		if (
+			activity.end_time &&
+			moment(activity.end_time, "HH:mmA").isAfter(moment("8:00PM", "HH:mmA"))
+		) {
+			rate = activityDetail?.weeknight.rate;
+		} else {
+			rate = activityDetail?.weekday.rate;
+		}
+
+		if (rate) {
+			if (activityDetail?.rate_type === "hr") {
+				totalCost += rate * activity.duration;
+			} else if (activityDetail?.rate_type === "km") {
+				totalCost += rate * Number(activity.distance);
+			} else if (activityDetail?.rate_type === "mins") {
+				totalCost += rate * (activity.duration / 60);
+			}
 		}
 	});
 
@@ -92,3 +117,9 @@ export const createTemplateFromInvoice = (invoice: Invoice) => {
 	createTemplate(template);
 	toast.info("Template saved!");
 };
+
+export const errorIn = (
+	errors: FormikErrors<any>,
+	touched: FormikTouched<any>,
+	value: string
+) => getIn(errors, value) !== undefined && getIn(touched, value);

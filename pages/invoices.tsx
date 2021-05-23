@@ -1,13 +1,13 @@
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import Button from "../components/Button";
-import ButtonGroup from "../components/ButtonGroup";
-import CreateInvoice from "../components/CreateInvoice";
-import InvoiceList from "../components/InvoiceList";
-import Layout from "../components/Layout";
-import TemplateList from "../components/TemplateList";
-import Title from "../components/Title";
+import Button from "../shared/components/Button";
+import ButtonGroup from "../shared/components/ButtonGroup";
+import CreateInvoice from "../components/invoices/CreateInvoice";
+import InvoiceList from "../components/invoices/InvoiceList";
+import Layout from "../shared/components/Layout";
+import TemplateList from "../components/templates/TemplateList";
+import Title from "../shared/components/text/Title";
 import { Invoice } from "../shared/types";
 
 const CreateInvoiceSection = styled.div`

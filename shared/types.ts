@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import firebase from "firebase/app";
 
 export interface Invoice {
@@ -26,9 +27,25 @@ export interface TemplateObject {
 }
 
 export interface Activity {
+	owner?: string;
 	description: string;
-	rate: number;
 	rate_type: string;
+	weekday: {
+		item_code: string;
+		rate: number;
+	};
+	weeknight: {
+		item_code: string;
+		rate?: number;
+	};
+	saturday: {
+		item_code: string;
+		rate?: number;
+	};
+	sunday: {
+		item_code: string;
+		rate?: number;
+	};
 }
 
 export interface ActivityObject {
