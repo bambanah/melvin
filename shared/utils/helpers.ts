@@ -27,7 +27,7 @@ export const formatDate = (timestamp: firebase.firestore.Timestamp) => {
 };
 
 export const stringToTimestamp = (timeValue: string) => {
-	const date = moment(timeValue, "HH:mmA").toDate();
+	const date = moment(timeValue, "HH:mm").toDate();
 	const timestamp = firebase.firestore.Timestamp.fromDate(date);
 
 	return timestamp;
@@ -35,14 +35,14 @@ export const stringToTimestamp = (timeValue: string) => {
 
 export const timestampToString = (timeValue: firebase.firestore.Timestamp) => {
 	const date = timeValue.toDate();
-	const timeString = moment(date).format("HH:mmA");
+	const timeString = moment(date).format("HH:mm");
 
 	return timeString;
 };
 
 export const getDuration = (startTime: string, endTime: string) => {
-	const startMoment = moment(startTime, "HH:mmA");
-	const endMoment = moment(endTime, "HH:mmA");
+	const startMoment = moment(startTime, "HH:mm");
+	const endMoment = moment(endTime, "HH:mm");
 
 	const duration = moment.duration(startMoment.diff(endMoment));
 	return Math.abs(duration.asHours());
@@ -79,7 +79,7 @@ export const getTotalCost = async (invoice: Invoice) => {
 		let rate;
 		if (
 			activity.end_time &&
-			moment(activity.end_time, "HH:mmA").isAfter(moment("8:00PM", "HH:mmA"))
+			moment(activity.end_time, "HH:mm").isAfter(moment("20:00", "HH:mm"))
 		) {
 			rate = activityDetail?.weeknight.rate;
 		} else {
@@ -132,7 +132,7 @@ export const getRate = async (activity: InvoiceActivity) => {
 		activity.end_time &&
 		activityDetail.weeknight.rate !== undefined &&
 		activityDetail.weeknight.rate !== 0 &&
-		moment(activity.end_time, "HH:mmA").isAfter(moment("8:00PM", "HH:mmA"))
+		moment(activity.end_time, "HH:mm").isAfter(moment("20:00", "HH:mm"))
 	) {
 		// Day is a weekday and it's after 8pm
 		rate = activityDetail.weeknight.rate;

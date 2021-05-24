@@ -30,86 +30,92 @@ const generatePDF = (invoice: Invoice) => {
 	});
 
 	// Write activity table
-	getActivities().then((activityDetails: ActivityObject) => {
+	getActivities().then(async (activityDetails: ActivityObject) => {
 		let activities: string[][] = [];
 		let sumTotal = 0;
 
-		invoice.activities.forEach(async (activity) => {
-			const activityId = activity.activity_ref.split("/")[1];
+		await Promise.all(
+			invoice.activities.map(async (activity) => {
+				const activityId = activity.activity_ref.split("/")[1];
 
-			let totalCost = 0;
-			let countString = "";
+				let totalCost = 0;
+				let countString = "";
 
-			const { rate, itemCode } = await getRate(activity);
+				await getRate(activity).then(({ rate, itemCode }) => {
+					if (rate) {
+						if (activityDetails[activityId].rate_type === "hr") {
+							totalCost = rate * activity.duration;
 
-			if (rate) {
-				if (activityDetails[activityId].rate_type === "hr") {
-					totalCost = rate * activity.duration;
+							const prettyDuration = getPrettyDuration(activity.duration);
 
-					const prettyDuration = getPrettyDuration(activity.duration);
+							countString = `${activity.start_time?.toLowerCase()}-${activity.end_time?.toLowerCase()} (${prettyDuration})`;
+						} else if (activityDetails[activityId].rate_type === "km") {
+							totalCost = rate * parseInt(activity.distance, 10);
 
-					countString = `${activity.start_time?.toLowerCase()}-${activity.end_time?.toLowerCase()} (${prettyDuration})`;
-				} else if (activityDetails[activityId].rate_type === "km") {
-					totalCost = rate * parseInt(activity.distance, 10);
+							countString = `${activity.distance} kilometres`;
+						}
+					}
 
-					countString = `${activity.distance} kilometres`;
-				}
-			}
+					sumTotal += totalCost;
 
-			sumTotal += totalCost;
+					const currentActivity = [];
 
-			const currentActivity = [];
+					currentActivity.push(
+						`${activityDetails[activityId].description}\n${itemCode}\n`
+					);
+					currentActivity.push(`${activity.date}\n`);
+					currentActivity.push(`${countString}\n`);
+					currentActivity.push(
+						`$${rate?.toFixed(
+							2
+						)}${`/${activityDetails[activityId].rate_type}`}\n`
+					);
+					currentActivity.push(`$${totalCost.toFixed(2)}\n`);
 
-			currentActivity.push(
-				`${activityDetails[activityId].description}\n${itemCode}\n`
-			);
-			currentActivity.push(`${activity.date}\n`);
-			currentActivity.push(`${countString}\n`);
-			currentActivity.push(
-				`$${rate?.toFixed(2)}${`/${activityDetails[activityId].rate_type}`}\n`
-			);
-			currentActivity.push(`$${totalCost.toFixed(2)}\n`);
+					activities.push(currentActivity);
 
-			activities.push(currentActivity);
+					// Provider Travel
+					if (activity.travel_duration > 0 && rate) {
+						const providerTravel = [];
 
-			// Provider Travel
-			if (activity.travel_duration > 0 && rate) {
-				const providerTravel = [];
+						const travelTotal = (rate / 60) * activity.travel_duration;
 
-				const travelTotal = (rate / 60) * activity.travel_duration;
+						providerTravel.push(`Provider Travel\n${itemCode}\n`);
+						providerTravel.push(`${activity.date}\n`);
+						providerTravel.push(`${activity.travel_duration} minutes\n`);
+						providerTravel.push(
+							`$${rate.toFixed(
+								2
+							)}${`/${activityDetails[activityId].rate_type}`}\n`
+						);
+						providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
 
-				providerTravel.push(`Provider Travel\n${itemCode}\n`);
-				providerTravel.push(`${activity.date}\n`);
-				providerTravel.push(`${activity.travel_duration} minutes\n`);
-				providerTravel.push(
-					`$${rate.toFixed(2)}${`/${activityDetails[activityId].rate_type}`}\n`
-				);
-				providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
+						activities.push(providerTravel);
 
-				activities.push(providerTravel);
+						sumTotal += travelTotal;
+					}
 
-				sumTotal += travelTotal;
-			}
+					// Provider Travel - Non Labour Costs
+					if (activity.travel_distance > 0) {
+						const providerTravel = [];
 
-			// Provider Travel - Non Labour Costs
-			if (activity.travel_distance > 0) {
-				const providerTravel = [];
+						const travelTotal = 0.85 * activity.travel_distance;
 
-				const travelTotal = 0.85 * activity.travel_distance;
+						providerTravel.push(
+							`Provider Travel - Non Labour Costs\n${itemCode}\n`
+						);
+						providerTravel.push(`${activity.date}\n`);
+						providerTravel.push(`${activity.travel_distance} km\n`);
+						providerTravel.push("$0.85/km\n");
+						providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
 
-				providerTravel.push(
-					`Provider Travel - Non Labour Costs\n${itemCode}\n`
-				);
-				providerTravel.push(`${activity.date}\n`);
-				providerTravel.push(`${activity.travel_distance} km\n`);
-				providerTravel.push("$0.85/km\n");
-				providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
+						activities.push(providerTravel);
 
-				activities.push(providerTravel);
-
-				sumTotal += travelTotal;
-			}
-		});
+						sumTotal += travelTotal;
+					}
+				});
+			})
+		);
 
 		// Sort activities based on description
 		activities.sort((a, b) => {

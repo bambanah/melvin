@@ -7,7 +7,7 @@ interface PropInterface {
 }
 
 const TimeInput = styled.input`
-	flex: 0 1 6.5rem;
+	width: 8rem;
 `;
 
 export default function TimePicker({
@@ -16,7 +16,6 @@ export default function TimePicker({
 }: PropInterface) {
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFieldValue(formValue, e.target.value);
-		console.log(e.target.value);
 	};
 
 	return (
