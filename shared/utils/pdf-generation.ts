@@ -1,9 +1,8 @@
 import jsPDF from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
-import moment from "moment";
 import { getActivities } from "./firebase";
 import { ActivityObject, Invoice } from "../types";
-import { formatDate, getPrettyDuration } from "./helpers";
+import { formatDate, getPrettyDuration, getRate } from "./helpers";
 
 const generatePDF = (invoice: Invoice) => {
 	const margin = 20;
@@ -35,51 +34,13 @@ const generatePDF = (invoice: Invoice) => {
 		let activities: string[][] = [];
 		let sumTotal = 0;
 
-		// Sort invoice based on activity
-		invoice.activities.sort((a, b) => {
-			if (a.activity_ref > b.activity_ref) return 1;
-			if (b.activity_ref > a.activity_ref) return -1;
-			return 0;
-		});
-
-		invoice.activities.forEach((activity) => {
+		invoice.activities.forEach(async (activity) => {
 			const activityId = activity.activity_ref.split("/")[1];
 
 			let totalCost = 0;
 			let countString = "";
 
-			let rate;
-			let itemCode;
-			if (
-				moment(activity.date, "DD/MM/YY").isoWeekday() === 6 &&
-				activityDetails[activityId].saturday.rate !== undefined &&
-				activityDetails[activityId].saturday.rate !== 0 &&
-				activityDetails[activityId].saturday.item_code.length > 0
-			) {
-				// Day is a saturday
-				rate = activityDetails[activityId].saturday.rate;
-				itemCode = activityDetails[activityId].saturday.item_code;
-			} else if (
-				moment(activity.date, "DD/MM/YY").isoWeekday() === 7 &&
-				activityDetails[activityId].sunday.rate !== undefined &&
-				activityDetails[activityId].sunday.rate !== 0 &&
-				activityDetails[activityId].sunday.item_code.length > 0
-			) {
-				// Day is a sunday
-				rate = activityDetails[activityId].sunday.rate;
-				itemCode = activityDetails[activityId].sunday.item_code;
-			} else if (
-				activity.end_time &&
-				moment(activity.end_time, "HH:mmA").isAfter(moment("8:00PM", "HH:mmA"))
-			) {
-				// Day is a weekday and it's after 8pm
-				rate = activityDetails[activityId].weeknight.rate;
-				itemCode = activityDetails[activityId].weeknight.item_code;
-			} else {
-				// Weekday before 8pm
-				rate = activityDetails[activityId].weekday.rate;
-				itemCode = activityDetails[activityId].weekday.item_code;
-			}
+			const { rate, itemCode } = await getRate(activity);
 
 			if (rate) {
 				if (activityDetails[activityId].rate_type === "hr") {
@@ -92,10 +53,6 @@ const generatePDF = (invoice: Invoice) => {
 					totalCost = rate * parseInt(activity.distance, 10);
 
 					countString = `${activity.distance} kilometres`;
-				} else if (activityDetails[activityId].rate_type === "mins") {
-					totalCost = rate * (activity.duration / 60);
-
-					countString = `${activity.duration} minutes`;
 				}
 			}
 
@@ -109,20 +66,13 @@ const generatePDF = (invoice: Invoice) => {
 			currentActivity.push(`${activity.date}\n`);
 			currentActivity.push(`${countString}\n`);
 			currentActivity.push(
-				`$${
-					activityDetails[activityId].rate_type === "mins"
-						? totalCost.toFixed(2)
-						: rate?.toFixed(2)
-				}${
-					activityDetails[activityId].rate_type === "mins"
-						? ""
-						: `/${activityDetails[activityId].rate_type}`
-				}\n`
+				`$${rate?.toFixed(2)}${`/${activityDetails[activityId].rate_type}`}\n`
 			);
 			currentActivity.push(`$${totalCost.toFixed(2)}\n`);
 
 			activities.push(currentActivity);
 
+			// Provider Travel
 			if (activity.travel_duration > 0 && rate) {
 				const providerTravel = [];
 
@@ -141,6 +91,7 @@ const generatePDF = (invoice: Invoice) => {
 				sumTotal += travelTotal;
 			}
 
+			// Provider Travel - Non Labour Costs
 			if (activity.travel_distance > 0) {
 				const providerTravel = [];
 
@@ -160,6 +111,7 @@ const generatePDF = (invoice: Invoice) => {
 			}
 		});
 
+		// Sort activities based on description
 		activities.sort((a, b) => {
 			if (a[0] > b[0]) return 1;
 			if (a[0] < b[0]) return -1;
@@ -167,6 +119,7 @@ const generatePDF = (invoice: Invoice) => {
 			return 0;
 		});
 
+		// Combine multiple of the same activitiy
 		let lastIndex = 0;
 		activities.map((activity, index) => {
 			if (activity[0] === activities[lastIndex][0] && index !== 0) {
@@ -182,11 +135,10 @@ const generatePDF = (invoice: Invoice) => {
 			return activity;
 		});
 
-		console.log(activities);
+		// Remove the leftover activities after they've been grouped together
 		activities = activities.filter((activity) => activity[0] !== "");
 
-		console.log(activities);
-
+		// Activities only allows strings - need to allow strings and CellDef
 		const values: (CellDef | string)[][] = activities;
 		// Bottom section
 		values.push([
@@ -201,6 +153,7 @@ const generatePDF = (invoice: Invoice) => {
 			},
 		]);
 
+		// Add gap between main section and footer
 		values.push([{ content: "", colSpan: 5, styles: { fillColor: "#fff" } }]);
 
 		values.push([

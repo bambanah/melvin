@@ -9,7 +9,7 @@ import {
 	faTimes,
 	faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import { Invoice, Template } from "../types";
+import { Invoice, InvoiceActivity, Template } from "../types";
 import { createTemplate, getActivities } from "./firebase";
 
 export const importIcons = () => {
@@ -91,8 +91,6 @@ export const getTotalCost = async (invoice: Invoice) => {
 				totalCost += rate * activity.duration;
 			} else if (activityDetail?.rate_type === "km") {
 				totalCost += rate * Number(activity.distance);
-			} else if (activityDetail?.rate_type === "mins") {
-				totalCost += rate * (activity.duration / 60);
 			}
 		}
 	});
@@ -102,6 +100,51 @@ export const getTotalCost = async (invoice: Invoice) => {
 
 export const getTotalString = (invoice: Invoice) =>
 	getTotalCost(invoice).then((cost) => `$${cost.toFixed(2)}`);
+
+export const getRate = async (activity: InvoiceActivity) => {
+	let rate;
+	let itemCode;
+
+	const activityDetails = await getActivities();
+	const activityId = activity.activity_ref.split("/")[1];
+
+	const activityDetail = activityDetails[activityId];
+
+	if (
+		moment(activity.date, "DD/MM/YY").isoWeekday() === 6 &&
+		activityDetail.saturday.rate !== undefined &&
+		activityDetail.saturday.rate !== 0 &&
+		activityDetail.saturday.item_code.length > 0
+	) {
+		// Day is a saturday
+		rate = activityDetail.saturday.rate;
+		itemCode = activityDetail.saturday.item_code;
+	} else if (
+		moment(activity.date, "DD/MM/YY").isoWeekday() === 7 &&
+		activityDetail.sunday.rate !== undefined &&
+		activityDetail.sunday.rate !== 0 &&
+		activityDetail.sunday.item_code.length > 0
+	) {
+		// Day is a sunday
+		rate = activityDetail.sunday.rate;
+		itemCode = activityDetail.sunday.item_code;
+	} else if (
+		activity.end_time &&
+		activityDetail.weeknight.rate !== undefined &&
+		activityDetail.weeknight.rate !== 0 &&
+		moment(activity.end_time, "HH:mmA").isAfter(moment("8:00PM", "HH:mmA"))
+	) {
+		// Day is a weekday and it's after 8pm
+		rate = activityDetail.weeknight.rate;
+		itemCode = activityDetail.weeknight.item_code;
+	} else {
+		// Weekday before 8pm
+		rate = activityDetail.weekday.rate;
+		itemCode = activityDetail.weekday.item_code;
+	}
+
+	return { rate, itemCode };
+};
 
 export const createTemplateFromInvoice = (invoice: Invoice) => {
 	invoice.activities.map((activity) => {

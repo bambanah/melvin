@@ -178,49 +178,6 @@ export default function ActivityList({
 															</Control>
 														</Inputs>
 													)}
-
-													{getActivityDetails(
-														activity_value.activity_ref.split("/")[1]
-													)?.rate_type === "mins" && (
-														<Control className="control has-icons-right">
-															<input
-																className="input"
-																value={values.activities[index].duration}
-																name={`activities.${index}.duration`}
-																onChange={handleChange}
-															/>
-															<span className="icon is-small is-right">
-																min
-															</span>
-														</Control>
-													)}
-
-													{/* <HourlyText>
-														{(activity_value.duration ||
-															activity_value.distance) &&
-															`$${(
-																activities[
-																	activity_value.activity_ref.split("/")[1]
-																].rate *
-																(activity_value.duration ||
-																	parseInt(activity_value.distance, 10))
-															).toFixed(2)} @ `}
-														$
-														{
-															getActivityDetails(
-																activity_value.activity_ref.split("/")[1]
-															)?.weekday.rate
-														}
-														/
-														{activity_value.activity_ref.length > 0 &&
-														getActivityDetails(
-															activity_value.activity_ref.split("/")[1]
-														)?.rate_type === "minutes"
-															? "hr"
-															: getActivityDetails(
-																	activity_value.activity_ref.split("/")[1]
-															  )?.rate_type}
-													</HourlyText> */}
 												</>
 											)}
 
