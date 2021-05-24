@@ -80,6 +80,9 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 				<Heading>General</Heading>
 				<Label htmlFor="description" required>
 					<span>Description</span>
+					<Subheading>
+						The official description from the Price Guide.
+					</Subheading>
 					<Input
 						type="text"
 						onChange={handleChange}
@@ -93,6 +96,7 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 
 				<Label htmlFor="rate_type" required>
 					<span>Rate Type</span>
+					<Subheading>This will almost always be per hour.</Subheading>
 					<Select
 						name="rate_type"
 						error={errorIn(errors, touched, "rate_type")}
@@ -100,9 +104,8 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 						<option value="" disabled>
 							Select...
 						</option>
-						<option value="hr">p/hour</option>
-						<option value="km">p/km</option>
-						<option value="mins">p/minute</option>
+						<option value="hr">per hour</option>
+						<option value="km">per km</option>
 					</Select>
 				</Label>
 			</InputGroup>
@@ -133,6 +136,7 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 							placeholder="Code"
 							error={errorIn(errors, touched, `${day}.item_code`)}
 						/>
+						<span style={{ marginRight: "-0.8rem" }}>$</span>
 						<Input
 							type="text"
 							onChange={(e) =>

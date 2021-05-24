@@ -9,16 +9,18 @@ export interface Invoice {
 	client_no: string;
 	bill_to: string;
 	date: firebase.firestore.Timestamp;
-	activities: {
-		activity_ref: string;
-		date: string;
-		start_time?: string;
-		end_time?: string;
-		duration: number;
-		distance: string;
-		travel_duration: number;
-		travel_distance: number;
-	}[];
+	activities: InvoiceActivity[];
+}
+
+export interface InvoiceActivity {
+	activity_ref: string;
+	date: string;
+	start_time?: string;
+	end_time?: string;
+	duration: number;
+	distance: string;
+	travel_duration: number;
+	travel_distance: number;
 }
 
 export interface Template extends Invoice {
