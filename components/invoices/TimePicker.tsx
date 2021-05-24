@@ -1,47 +1,33 @@
-import { Field } from "formik";
-import moment from "moment";
 import React from "react";
-import Control from "./Control";
+import styled from "styled-components";
 
 interface PropInterface {
 	formValue: string;
 	setFieldValue: Function;
 }
 
+const TimeInput = styled.input`
+	flex: 0 1 6.5rem;
+`;
+
 export default function TimePicker({
 	formValue,
 	setFieldValue,
 }: PropInterface) {
-	const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFieldValue(formValue, e.target.value);
+		console.log(e.target.value);
 	};
 
-	const timeFormat = "h:mmA";
-
-	const options = [];
-	let timeValue = moment("12:00AM", timeFormat);
-	const endTime = moment("11:59PM", timeFormat);
-
-	while (timeValue.isBefore(endTime)) {
-		options.push(
-			<option
-				key={timeValue.format(timeFormat)}
-				value={timeValue.format(timeFormat)}
-			>
-				{timeValue.format(timeFormat)}
-			</option>
-		);
-
-		timeValue = timeValue.add(5, "minutes");
-	}
-
 	return (
-		<Control className="control">
-			<div className="select">
-				<Field id={formValue} as="select" name={formValue} onChange={onChange}>
-					{options}
-				</Field>
-			</div>
-		</Control>
+		<>
+			<TimeInput
+				className="input"
+				id={formValue}
+				name={formValue}
+				onBlur={handleChange}
+				type="time"
+			/>
+		</>
 	);
 }

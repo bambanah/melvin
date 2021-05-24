@@ -26,7 +26,7 @@ function ActivityList() {
 	return (
 		<Table>
 			<tbody>
-				<tr>
+				<tr key="Header">
 					<th>Description</th>
 					<th>Weekday Rate</th>
 					<th>Weeknight Rate</th>
