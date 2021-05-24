@@ -1,3 +1,4 @@
+import { Field } from "formik";
 import React from "react";
 import styled from "styled-components";
 
@@ -6,7 +7,7 @@ interface PropInterface {
 	setFieldValue: Function;
 }
 
-const TimeInput = styled.input`
+const TimeInput = styled(Field)`
 	width: 8rem;
 `;
 

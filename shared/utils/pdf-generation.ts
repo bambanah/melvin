@@ -9,7 +9,7 @@ const generatePDF = (invoice: Invoice) => {
 
 	// eslint-disable-next-line new-cap
 	const doc = new jsPDF();
-	// doc.setFont("Inter-Regular", "normal");
+
 	doc.setFontSize(20);
 	doc.text("Tax Invoice", 150, margin);
 
