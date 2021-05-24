@@ -29,6 +29,8 @@ module.exports = {
 				},
 			},
 		],
+		"no-alert": 0,
+		"no-restricted-globals": 1,
 	},
 	plugins: ["@typescript-eslint"],
 	extends: ["airbnb-typescript", "prettier"],

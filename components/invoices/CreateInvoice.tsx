@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { getIn, withFormik, FormikProps } from "formik";
 import firebase from "firebase/app";
+import { FormikProps, getIn, withFormik } from "formik";
+import React, { useEffect, useState } from "react";
+import InvoiceValidationSchema from "../../schema/InvoiceValidationSchema";
+import Button from "../../shared/components/Button";
+import { Invoice } from "../../shared/types";
 import {
 	auth,
 	createInvoice,
 	getActivities,
+	getHighestInvoiceNumber,
 	getLastInvoiceDetails,
 } from "../../shared/utils/firebase";
-
-import { Invoice } from "../../shared/types";
-import ActivityList from "./InvoiceActivityList";
 import { getDuration } from "../../shared/utils/helpers";
-import InvoiceValidationSchema from "../../schema/InvoiceValidationSchema";
-import Button from "../../shared/components/Button";
-import FieldInput from "./FieldInput";
 import SaveAsTemplateButton from "../templates/SaveAsTemplateButton";
+import FieldInput from "./FieldInput";
+import ActivityList from "./InvoiceActivityList";
 
 export default function CreateInvoice({
 	invoiceToLoad,
@@ -33,10 +33,11 @@ export default function CreateInvoice({
 		return invoiceId.replace(/([0-9])+/, newNumber.toString());
 	};
 
-	useEffect(() => {
+	async function loadInvoiceDetails() {
 		if (invoiceToLoad) {
 			const invoice = { ...invoiceToLoad };
-			invoice.invoice_no = incrementInvoiceId(invoice.invoice_no);
+			const latestInvoiceNumber: string = await getHighestInvoiceNumber();
+			invoice.invoice_no = incrementInvoiceId(latestInvoiceNumber);
 			setLastInvoice(invoice);
 			setLoaded(true);
 		} else {
@@ -65,6 +66,10 @@ export default function CreateInvoice({
 				}
 			});
 		}
+	}
+
+	useEffect(() => {
+		loadInvoiceDetails();
 	}, []);
 
 	const Form = (props: FormikProps<Invoice>) => {

@@ -1,22 +1,38 @@
 import firebase from "firebase/app";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Invoice as InvoiceType } from "../../shared/types";
 import { deleteInvoice, streamInvoices } from "../../shared/utils/firebase";
 import { getTotalString } from "../../shared/utils/helpers";
 import generatePDF from "../../shared/utils/pdf-generation";
-import Button from "../../shared/components/Button";
+import Table from "../../shared/components/Table";
 
-const InvoiceRow = styled.div`
-	display: flex;
-	justify-content: space-between;
-	padding: 2rem;
-	border-bottom: 1px solid #5e5e5e;
+const InvoiceTable = styled(Table)``;
 
+const InvoiceRow = styled.tr`
 	&:hover {
 		background-color: #eee;
-		cursor: pointer;
 	}
+`;
+
+const Actions = styled.div`
+	display: flex;
+	justify-content: right;
+	align-items: center;
+	gap: 0.6rem;
+`;
+
+const Action = styled(FontAwesomeIcon)`
+	cursor: pointer;
+
+	&:hover {
+		color: #777;
+	}
+`;
+
+const TableCell = styled.td`
+	padding: 1rem 0.5rem;
 `;
 
 const Invoice = ({
@@ -33,26 +49,30 @@ const Invoice = ({
 	}, [invoice]);
 
 	return (
-		<InvoiceRow
-			onClick={() => {
-				setInvoice(invoice);
-			}}
-		>
-			<span>{invoice.invoice_no}</span>
-			<span>{invoice.client_name}</span>
-			<span>{invoice.client_no}</span>
+		<InvoiceRow>
+			<TableCell>{invoice.invoice_no}</TableCell>
+			<TableCell>{invoice.client_name}</TableCell>
+			<TableCell>{invoice.activities.length}</TableCell>
 
-			<Button onClick={() => generatePDF(invoice)}>Generate PDF</Button>
-			<span>{cost}</span>
-			<Button
-				className="has-background-danger has-text-white has-text-weight-bold"
-				onClick={() => {
-					deleteInvoice(invoice.invoice_no);
-				}}
-				type="button"
-			>
-				X
-			</Button>
+			<TableCell>{cost}</TableCell>
+			<TableCell>
+				<Actions>
+					<Action onClick={() => generatePDF(invoice)} icon="edit" size="lg" />
+					<Action onClick={() => setInvoice(invoice)} icon="copy" size="lg" />
+					<Action
+						onClick={() => generatePDF(invoice)}
+						icon="file-download"
+						size="lg"
+					/>
+					<Action
+						onClick={() => {
+							deleteInvoice(invoice.invoice_no);
+						}}
+						icon="times"
+						size="lg"
+					/>
+				</Actions>
+			</TableCell>
 		</InvoiceRow>
 	);
 };
@@ -82,14 +102,24 @@ export default function InvoiceList({
 	}, []);
 
 	return (
-		<div className="content">
-			{invoices.map((invoice: InvoiceType) => (
-				<Invoice
-					invoice={invoice}
-					key={invoice.invoice_no + invoice.client_no}
-					setInvoice={setInvoice}
-				/>
-			))}
-		</div>
+		<InvoiceTable>
+			<tbody>
+				<tr key="Header">
+					<th>Invoice No.</th>
+					<th>Name</th>
+					<th>No. Activities</th>
+					<th>Total</th>
+					{/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+					<th />
+				</tr>
+				{invoices.map((invoice: InvoiceType) => (
+					<Invoice
+						invoice={invoice}
+						key={invoice.invoice_no + invoice.client_no}
+						setInvoice={setInvoice}
+					/>
+				))}
+			</tbody>
+		</InvoiceTable>
 	);
 }
