@@ -26,7 +26,7 @@ function ActivityList() {
 	return (
 		<Table>
 			<tbody>
-				<tr key="Header">
+				<tr>
 					<th>Description</th>
 					<th>Weekday Rate</th>
 					<th>Weeknight Rate</th>
@@ -36,7 +36,7 @@ function ActivityList() {
 					<th />
 				</tr>
 				{activities.map((activity: ActivityType) => (
-					<Activity activity={activity} />
+					<Activity activity={activity} key={activity.description} />
 				))}
 			</tbody>
 		</Table>
