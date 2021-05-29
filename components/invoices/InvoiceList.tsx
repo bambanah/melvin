@@ -2,7 +2,7 @@ import firebase from "firebase/app";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Invoice as InvoiceType } from "../../shared/types";
+import { Invoice as InvoiceType, InvoiceObject } from "../../shared/types";
 import { deleteInvoice, streamInvoices } from "../../shared/utils/firebase";
 import { getTotalString } from "../../shared/utils/helpers";
 import generatePDF from "../../shared/utils/pdf-generation";
@@ -38,9 +38,15 @@ const TableCell = styled.td`
 const Invoice = ({
 	invoice,
 	setInvoice,
+	invoiceId,
 }: {
 	invoice: InvoiceType;
-	setInvoice: (invoice: InvoiceType) => void;
+	setInvoice: (
+		invoice: InvoiceType,
+		editing?: boolean,
+		invoiceId?: string
+	) => void;
+	invoiceId: string;
 }) => {
 	const [cost, setTotalCost] = useState<null | string>(null);
 
@@ -57,7 +63,11 @@ const Invoice = ({
 			<TableCell>{cost}</TableCell>
 			<TableCell>
 				<Actions>
-					<Action onClick={() => generatePDF(invoice)} icon="edit" size="lg" />
+					<Action
+						onClick={() => setInvoice(invoice, true, invoiceId)}
+						icon="edit"
+						size="lg"
+					/>
 					<Action onClick={() => setInvoice(invoice)} icon="copy" size="lg" />
 					<Action
 						onClick={() => generatePDF(invoice)}
@@ -80,18 +90,18 @@ const Invoice = ({
 export default function InvoiceList({
 	setInvoice,
 }: {
-	setInvoice: (invoice: InvoiceType) => void;
+	setInvoice: (invoice: InvoiceType, editing?: boolean) => void;
 }) {
-	const [invoices, setInvoices] = useState<InvoiceType[]>([]);
+	const [invoices, setInvoices] = useState<InvoiceObject>({});
 
 	useEffect(() => {
 		const unsubscribe = streamInvoices({
 			next: (querySnapshot: firebase.firestore.QuerySnapshot) => {
-				const updatedInvoices: InvoiceType[] = [];
+				const updatedInvoices: InvoiceObject = {};
 
 				querySnapshot.forEach((document: firebase.firestore.DocumentData) => {
 					const invoice: InvoiceType = document.data();
-					updatedInvoices.push(invoice);
+					updatedInvoices[document.id] = invoice;
 				});
 
 				setInvoices(updatedInvoices);
@@ -112,10 +122,11 @@ export default function InvoiceList({
 					{/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
 					<th />
 				</tr>
-				{invoices.map((invoice: InvoiceType) => (
+				{Object.keys(invoices).map((invoiceId: string) => (
 					<Invoice
-						invoice={invoice}
-						key={invoice.invoice_no + invoice.client_no}
+						invoice={invoices[invoiceId]}
+						invoiceId={invoiceId}
+						key={invoiceId}
 						setInvoice={setInvoice}
 					/>
 				))}

@@ -70,7 +70,7 @@ export const streamInvoices = (observer: any) =>
 	firestore
 		.collection("invoices")
 		.where("owner", "==", auth.currentUser?.uid)
-		.orderBy("date", "desc")
+		.orderBy("invoice_no", "desc")
 		.onSnapshot(observer);
 
 export const getSingleInvoice = (invoiceId: string) =>
@@ -84,6 +84,21 @@ export const createInvoice = (invoice: Invoice) => {
 		.add(invoice)
 		.then(() => {
 			toast.success("Invoice created");
+		})
+		.catch((error) => {
+			console.error("Error writing document: ", error);
+		});
+};
+
+export const updateInvoice = (invoiceId: string, invoice: Invoice) => {
+	invoice.date = firebase.firestore.Timestamp.now();
+
+	firestore
+		.collection("invoices")
+		.doc(invoiceId)
+		.update(invoice)
+		.then(() => {
+			toast.success("Invoice updated");
 		})
 		.catch((error) => {
 			console.error("Error writing document: ", error);

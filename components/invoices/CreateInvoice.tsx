@@ -3,6 +3,7 @@ import { FormikProps, getIn, withFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import InvoiceValidationSchema from "../../schema/InvoiceValidationSchema";
 import Button from "../../shared/components/Button";
+import Title from "../../shared/components/text/Title";
 import { Invoice } from "../../shared/types";
 import {
 	auth,
@@ -10,42 +11,59 @@ import {
 	getActivities,
 	getHighestInvoiceNumber,
 	getLastInvoiceDetails,
+	updateInvoice,
 } from "../../shared/utils/firebase";
 import { getDuration } from "../../shared/utils/helpers";
 import SaveAsTemplateButton from "../templates/SaveAsTemplateButton";
 import FieldInput from "./FieldInput";
 import ActivityList from "./InvoiceActivityList";
 
+interface Props {
+	invoiceToLoad: Invoice | null;
+	setCreating: (creating: boolean) => void;
+	editPrevious?: boolean;
+	invoiceId?: string;
+}
+
 export default function CreateInvoice({
 	invoiceToLoad,
 	setCreating,
-}: {
-	invoiceToLoad: Invoice | null;
-	setCreating: (creating: boolean) => void;
-}) {
+	editPrevious,
+	invoiceId,
+}: Props) {
 	const [lastInvoice, setLastInvoice] = useState({} as Invoice);
 	const [loaded, setLoaded] = useState(false);
 
-	const incrementInvoiceId = (invoiceId: string) => {
+	const incrementInvoiceNo = (invoiceNo: string) => {
 		const newNumber: number =
-			parseInt(invoiceId.replace(/([A-Za-z])+/g, ""), 10) + 1;
+			parseInt(invoiceNo.replace(/([A-Za-z])+/g, ""), 10) + 1;
 
-		return invoiceId.replace(/([0-9])+/, newNumber.toString());
+		return invoiceNo.replace(/([0-9])+/, newNumber.toString());
 	};
 
 	async function loadInvoiceDetails() {
 		if (invoiceToLoad) {
-			const invoice = { ...invoiceToLoad };
-			const latestInvoiceNumber: string = await getHighestInvoiceNumber();
-			invoice.invoice_no = incrementInvoiceId(latestInvoiceNumber);
-			setLastInvoice(invoice);
+			if (!editPrevious) {
+				// Copy invoice details to new invoice
+				const invoice = { ...invoiceToLoad };
+
+				const latestInvoiceNumber: string = await getHighestInvoiceNumber();
+				invoice.invoice_no = incrementInvoiceNo(latestInvoiceNumber);
+
+				setLastInvoice(invoice);
+			} else {
+				// Modify existing invoice
+
+				setLastInvoice(invoiceToLoad);
+			}
+
 			setLoaded(true);
 		} else {
 			getLastInvoiceDetails().then((lastInvoiceDetails: Invoice) => {
 				let invoice = lastInvoiceDetails;
 				if (auth.currentUser && invoice) {
 					if (invoice.invoice_no) {
-						invoice.invoice_no = incrementInvoiceId(invoice.invoice_no);
+						invoice.invoice_no = incrementInvoiceNo(invoice.invoice_no);
 						invoice.owner = auth.currentUser.uid;
 					} else {
 						invoice = {
@@ -84,6 +102,7 @@ export default function CreateInvoice({
 
 		return (
 			<form className="form" onSubmit={handleSubmit}>
+				<Title>{editPrevious ? "Update" : "Create"} Invoice</Title>
 				<FieldInput
 					value="client_no"
 					labelText="Participant Number"
@@ -124,7 +143,7 @@ export default function CreateInvoice({
 				<div className="field is-grouped">
 					<p className="control">
 						<Button primary type="submit">
-							Submit
+							{editPrevious ? "Update" : "Create"}
 						</Button>
 					</p>
 					<SaveAsTemplateButton values={values} />
@@ -163,7 +182,11 @@ export default function CreateInvoice({
 				}
 			});
 
-			createInvoice(values);
+			if (editPrevious && invoiceId) {
+				updateInvoice(invoiceId, values);
+			} else {
+				createInvoice(values);
+			}
 
 			actions.setSubmitting(false);
 			setCreating(false);
