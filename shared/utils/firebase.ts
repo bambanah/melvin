@@ -105,23 +105,16 @@ export const updateInvoice = (invoiceId: string, invoice: Invoice) => {
 		});
 };
 
-export const deleteInvoice = async (invoice_no: string) => {
+export const deleteInvoice = (invoiceId: string) => {
 	if (confirm("Are you sure you want to delete this invoice?")) {
-		const invoiceQuery = firestore
+		firestore
 			.collection("invoices")
-			.where("invoice_no", "==", invoice_no)
-			.where("owner", "==", getCurrentUser()?.uid);
-
-		await invoiceQuery.get().then((querySnapshot) => {
-			querySnapshot.forEach((doc) => {
-				doc.ref
-					.delete()
-					.then(() => toast.error("Invoice deleted"))
-					.catch((error) => {
-						console.error("Error removing document: ", error);
-					});
+			.doc(invoiceId)
+			.delete()
+			.then(() => toast.error("Invoice deleted"))
+			.catch((error) => {
+				console.error("Error removing document: ", error);
 			});
-		});
 	}
 };
 
