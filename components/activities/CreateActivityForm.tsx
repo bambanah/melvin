@@ -81,7 +81,8 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 				<Label htmlFor="description" required>
 					<span>Description</span>
 					<Subheading>
-						The official description from the Price Guide.
+						The official description from the{" "}
+						<a href="/price-guide-3-21.pdf">Price Guide</a>.
 					</Subheading>
 					<Input
 						type="text"
@@ -118,7 +119,7 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 				</Subheading>
 
 				{["weekday", "weeknight", "saturday", "sunday"].map((day) => (
-					<ActivityRow>
+					<ActivityRow key={day}>
 						<Label required={day === "weekday"}>
 							<span>
 								{day

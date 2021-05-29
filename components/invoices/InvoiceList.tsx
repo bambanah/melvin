@@ -76,7 +76,7 @@ const Invoice = ({
 					/>
 					<Action
 						onClick={() => {
-							deleteInvoice(invoice.invoice_no);
+							deleteInvoice(invoiceId);
 						}}
 						icon="times"
 						size="lg"
