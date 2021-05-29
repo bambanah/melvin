@@ -5,7 +5,9 @@ import { toast } from "react-toastify";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
 	faCheck,
+	faCopy,
 	faEdit,
+	faFileDownload,
 	faTimes,
 	faTrash,
 } from "@fortawesome/free-solid-svg-icons";
@@ -13,7 +15,7 @@ import { Invoice, InvoiceActivity, Template } from "../types";
 import { createTemplate, getActivities } from "./firebase";
 
 export const importIcons = () => {
-	library.add(faEdit, faTimes, faCheck, faTrash);
+	library.add(faEdit, faTimes, faCheck, faTrash, faCopy, faFileDownload);
 };
 
 export const formatDate = (timestamp: firebase.firestore.Timestamp) => {

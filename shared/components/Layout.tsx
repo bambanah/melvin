@@ -24,12 +24,16 @@ const Content = styled.div`
 	display: flex;
 	width: 95vw;
 	max-width: 1200px;
-	min-width: 700px;
+	/* min-width: 700px; */
 	/* 5rem for the header, then 2rem gap */
 	margin-top: 7rem;
 	height: 100%;
 	flex: 1 0 auto;
 	flex-direction: column;
+
+	@media screen and (max-width: 900px) {
+		width: inherit;
+	}
 `;
 
 const SpinnerContainer = styled.div`

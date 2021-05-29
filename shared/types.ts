@@ -12,6 +12,10 @@ export interface Invoice {
 	activities: InvoiceActivity[];
 }
 
+export interface InvoiceObject {
+	[id: string]: Invoice;
+}
+
 export interface InvoiceActivity {
 	activity_ref: string;
 	date: string;

@@ -70,7 +70,7 @@ export const streamInvoices = (observer: any) =>
 	firestore
 		.collection("invoices")
 		.where("owner", "==", auth.currentUser?.uid)
-		.orderBy("date", "desc")
+		.orderBy("invoice_no", "desc")
 		.onSnapshot(observer);
 
 export const getSingleInvoice = (invoiceId: string) =>
@@ -90,22 +90,39 @@ export const createInvoice = (invoice: Invoice) => {
 		});
 };
 
-export const deleteInvoice = async (invoice_no: string) => {
-	const invoiceQuery = firestore
-		.collection("invoices")
-		.where("invoice_no", "==", invoice_no)
-		.where("owner", "==", getCurrentUser()?.uid);
+export const updateInvoice = (invoiceId: string, invoice: Invoice) => {
+	invoice.date = firebase.firestore.Timestamp.now();
 
-	await invoiceQuery.get().then((querySnapshot) => {
-		querySnapshot.forEach((doc) => {
-			doc.ref
-				.delete()
-				.then(() => toast.error("Invoice deleted"))
-				.catch((error) => {
-					console.error("Error removing document: ", error);
-				});
+	firestore
+		.collection("invoices")
+		.doc(invoiceId)
+		.update(invoice)
+		.then(() => {
+			toast.success("Invoice updated");
+		})
+		.catch((error) => {
+			console.error("Error writing document: ", error);
 		});
-	});
+};
+
+export const deleteInvoice = async (invoice_no: string) => {
+	if (confirm("Are you sure you want to delete this invoice?")) {
+		const invoiceQuery = firestore
+			.collection("invoices")
+			.where("invoice_no", "==", invoice_no)
+			.where("owner", "==", getCurrentUser()?.uid);
+
+		await invoiceQuery.get().then((querySnapshot) => {
+			querySnapshot.forEach((doc) => {
+				doc.ref
+					.delete()
+					.then(() => toast.error("Invoice deleted"))
+					.catch((error) => {
+						console.error("Error removing document: ", error);
+					});
+			});
+		});
+	}
 };
 
 export const getLastInvoiceDetails = async () => {
@@ -124,6 +141,33 @@ export const getLastInvoiceDetails = async () => {
 		});
 
 	return lastInvoice;
+};
+
+export const getHighestInvoiceNumber = async () => {
+	const invoices: Invoice[] = [];
+
+	await firestore
+		.collection("invoices")
+		.where("owner", "==", auth.currentUser?.uid)
+		.orderBy("invoice_no", "desc")
+		.get()
+		.then((querySnapshot) => {
+			querySnapshot.forEach((doc: firebase.firestore.DocumentData) => {
+				const invoice: Invoice = doc.data();
+
+				invoices.push(invoice);
+			});
+		});
+
+	let invoiceNumbers = invoices.map((invoice) => invoice.invoice_no);
+	invoiceNumbers = invoiceNumbers.sort((a, b) =>
+		parseInt(a.replace(/([A-Za-z])+/g, ""), 10) <
+		parseInt(b.replace(/([A-Za-z])+/g, ""), 10)
+			? 1
+			: 0
+	);
+
+	return invoiceNumbers[0];
 };
 
 //
