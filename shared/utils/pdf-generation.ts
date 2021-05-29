@@ -1,16 +1,15 @@
 import jsPDF from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
-import moment from "moment";
 import { getActivities } from "./firebase";
 import { ActivityObject, Invoice } from "../types";
-import { formatDate, getPrettyDuration } from "./helpers";
+import { formatDate, getPrettyDuration, getRate } from "./helpers";
 
 const generatePDF = (invoice: Invoice) => {
 	const margin = 20;
 
 	// eslint-disable-next-line new-cap
 	const doc = new jsPDF();
-	// doc.setFont("Inter-Regular", "normal");
+
 	doc.setFontSize(20);
 	doc.text("Tax Invoice", 150, margin);
 
@@ -31,135 +30,94 @@ const generatePDF = (invoice: Invoice) => {
 	});
 
 	// Write activity table
-	getActivities().then((activityDetails: ActivityObject) => {
+	getActivities().then(async (activityDetails: ActivityObject) => {
 		let activities: string[][] = [];
 		let sumTotal = 0;
 
-		// Sort invoice based on activity
-		invoice.activities.sort((a, b) => {
-			if (a.activity_ref > b.activity_ref) return 1;
-			if (b.activity_ref > a.activity_ref) return -1;
-			return 0;
-		});
+		await Promise.all(
+			invoice.activities.map(async (activity) => {
+				const activityId = activity.activity_ref.split("/")[1];
 
-		invoice.activities.forEach((activity) => {
-			const activityId = activity.activity_ref.split("/")[1];
+				let totalCost = 0;
+				let countString = "";
 
-			let totalCost = 0;
-			let countString = "";
+				await getRate(activity).then(({ rate, itemCode }) => {
+					if (rate) {
+						if (activityDetails[activityId].rate_type === "hr") {
+							totalCost = rate * activity.duration;
 
-			let rate;
-			let itemCode;
-			if (
-				moment(activity.date, "DD/MM/YY").isoWeekday() === 6 &&
-				activityDetails[activityId].saturday.rate !== undefined &&
-				activityDetails[activityId].saturday.rate !== 0 &&
-				activityDetails[activityId].saturday.item_code.length > 0
-			) {
-				// Day is a saturday
-				rate = activityDetails[activityId].saturday.rate;
-				itemCode = activityDetails[activityId].saturday.item_code;
-			} else if (
-				moment(activity.date, "DD/MM/YY").isoWeekday() === 7 &&
-				activityDetails[activityId].sunday.rate !== undefined &&
-				activityDetails[activityId].sunday.rate !== 0 &&
-				activityDetails[activityId].sunday.item_code.length > 0
-			) {
-				// Day is a sunday
-				rate = activityDetails[activityId].sunday.rate;
-				itemCode = activityDetails[activityId].sunday.item_code;
-			} else if (
-				activity.end_time &&
-				moment(activity.end_time, "HH:mmA").isAfter(moment("8:00PM", "HH:mmA"))
-			) {
-				// Day is a weekday and it's after 8pm
-				rate = activityDetails[activityId].weeknight.rate;
-				itemCode = activityDetails[activityId].weeknight.item_code;
-			} else {
-				// Weekday before 8pm
-				rate = activityDetails[activityId].weekday.rate;
-				itemCode = activityDetails[activityId].weekday.item_code;
-			}
+							const prettyDuration = getPrettyDuration(activity.duration);
 
-			if (rate) {
-				if (activityDetails[activityId].rate_type === "hr") {
-					totalCost = rate * activity.duration;
+							countString = `${activity.start_time?.toLowerCase()}-${activity.end_time?.toLowerCase()} (${prettyDuration})`;
+						} else if (activityDetails[activityId].rate_type === "km") {
+							totalCost = rate * parseInt(activity.distance, 10);
 
-					const prettyDuration = getPrettyDuration(activity.duration);
+							countString = `${activity.distance} kilometres`;
+						}
+					}
 
-					countString = `${activity.start_time?.toLowerCase()}-${activity.end_time?.toLowerCase()} (${prettyDuration})`;
-				} else if (activityDetails[activityId].rate_type === "km") {
-					totalCost = rate * parseInt(activity.distance, 10);
+					sumTotal += totalCost;
 
-					countString = `${activity.distance} kilometres`;
-				} else if (activityDetails[activityId].rate_type === "mins") {
-					totalCost = rate * (activity.duration / 60);
+					const currentActivity = [];
 
-					countString = `${activity.duration} minutes`;
-				}
-			}
+					currentActivity.push(
+						`${activityDetails[activityId].description}\n${itemCode}\n`
+					);
+					currentActivity.push(`${activity.date}\n`);
+					currentActivity.push(`${countString}\n`);
+					currentActivity.push(
+						`$${rate?.toFixed(
+							2
+						)}${`/${activityDetails[activityId].rate_type}`}\n`
+					);
+					currentActivity.push(`$${totalCost.toFixed(2)}\n`);
 
-			sumTotal += totalCost;
+					activities.push(currentActivity);
 
-			const currentActivity = [];
+					// Provider Travel
+					if (activity.travel_duration > 0 && rate) {
+						const providerTravel = [];
 
-			currentActivity.push(
-				`${activityDetails[activityId].description}\n${itemCode}\n`
-			);
-			currentActivity.push(`${activity.date}\n`);
-			currentActivity.push(`${countString}\n`);
-			currentActivity.push(
-				`$${
-					activityDetails[activityId].rate_type === "mins"
-						? totalCost.toFixed(2)
-						: rate?.toFixed(2)
-				}${
-					activityDetails[activityId].rate_type === "mins"
-						? ""
-						: `/${activityDetails[activityId].rate_type}`
-				}\n`
-			);
-			currentActivity.push(`$${totalCost.toFixed(2)}\n`);
+						const travelTotal = (rate / 60) * activity.travel_duration;
 
-			activities.push(currentActivity);
+						providerTravel.push(`Provider Travel\n${itemCode}\n`);
+						providerTravel.push(`${activity.date}\n`);
+						providerTravel.push(`${activity.travel_duration} minutes\n`);
+						providerTravel.push(
+							`$${rate.toFixed(
+								2
+							)}${`/${activityDetails[activityId].rate_type}`}\n`
+						);
+						providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
 
-			if (activity.travel_duration > 0 && rate) {
-				const providerTravel = [];
+						activities.push(providerTravel);
 
-				const travelTotal = (rate / 60) * activity.travel_duration;
+						sumTotal += travelTotal;
+					}
 
-				providerTravel.push(`Provider Travel\n${itemCode}\n`);
-				providerTravel.push(`${activity.date}\n`);
-				providerTravel.push(`${activity.travel_duration} minutes\n`);
-				providerTravel.push(
-					`$${rate.toFixed(2)}${`/${activityDetails[activityId].rate_type}`}\n`
-				);
-				providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
+					// Provider Travel - Non Labour Costs
+					if (activity.travel_distance > 0) {
+						const providerTravel = [];
 
-				activities.push(providerTravel);
+						const travelTotal = 0.85 * activity.travel_distance;
 
-				sumTotal += travelTotal;
-			}
+						providerTravel.push(
+							`Provider Travel - Non Labour Costs\n${itemCode}\n`
+						);
+						providerTravel.push(`${activity.date}\n`);
+						providerTravel.push(`${activity.travel_distance} km\n`);
+						providerTravel.push("$0.85/km\n");
+						providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
 
-			if (activity.travel_distance > 0) {
-				const providerTravel = [];
+						activities.push(providerTravel);
 
-				const travelTotal = 0.85 * activity.travel_distance;
+						sumTotal += travelTotal;
+					}
+				});
+			})
+		);
 
-				providerTravel.push(
-					`Provider Travel - Non Labour Costs\n${itemCode}\n`
-				);
-				providerTravel.push(`${activity.date}\n`);
-				providerTravel.push(`${activity.travel_distance} km\n`);
-				providerTravel.push("$0.85/km\n");
-				providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
-
-				activities.push(providerTravel);
-
-				sumTotal += travelTotal;
-			}
-		});
-
+		// Sort activities based on description
 		activities.sort((a, b) => {
 			if (a[0] > b[0]) return 1;
 			if (a[0] < b[0]) return -1;
@@ -167,6 +125,7 @@ const generatePDF = (invoice: Invoice) => {
 			return 0;
 		});
 
+		// Combine multiple of the same activitiy
 		let lastIndex = 0;
 		activities.map((activity, index) => {
 			if (activity[0] === activities[lastIndex][0] && index !== 0) {
@@ -182,11 +141,10 @@ const generatePDF = (invoice: Invoice) => {
 			return activity;
 		});
 
-		console.log(activities);
+		// Remove the leftover activities after they've been grouped together
 		activities = activities.filter((activity) => activity[0] !== "");
 
-		console.log(activities);
-
+		// Activities only allows strings - need to allow strings and CellDef
 		const values: (CellDef | string)[][] = activities;
 		// Bottom section
 		values.push([
@@ -201,6 +159,7 @@ const generatePDF = (invoice: Invoice) => {
 			},
 		]);
 
+		// Add gap between main section and footer
 		values.push([{ content: "", colSpan: 5, styles: { fillColor: "#fff" } }]);
 
 		values.push([

@@ -27,6 +27,7 @@ const ActivityListContainer = styled.div`
 const ActivityRow = styled.div`
 	display: flex;
 	flex-wrap: wrap;
+	align-items: center;
 	gap: 0.4rem;
 `;
 
@@ -35,9 +36,16 @@ const DateField = styled(Field)`
 `;
 
 const Inputs = styled.div`
-	flex: 1 0 auto;
+	flex: 0 0 auto;
+	align-items: center;
 	display: flex;
 	gap: 0.4rem;
+
+	@media screen and (max-width: 900px) {
+		label {
+			display: none;
+		}
+	}
 `;
 
 const TravelDetails = styled.div`
@@ -62,10 +70,13 @@ const TravelDetails = styled.div`
 	}
 `;
 
-// const HourlyText = styled.span`
-// 	line-height: 40px;
-// 	width: 4rem;
-// `;
+const ActivitySelect = styled.div`
+	flex: 1 1 25%;
+
+	select {
+		width: 100%;
+	}
+`;
 
 export default function ActivityList({
 	values,
@@ -115,7 +126,7 @@ export default function ActivityList({
 												placeholder="DD-MM-YYYY"
 											/>
 
-											<div
+											<ActivitySelect
 												className={`select ${
 													getIn(touched, `activities.${index}.activity_ref`) &&
 													getIn(errors, `activities.${index}.activity_ref`) &&
@@ -141,7 +152,7 @@ export default function ActivityList({
 														)
 													)}
 												</Field>
-											</div>
+											</ActivitySelect>
 
 											{activity_value.activity_ref.length > 0 && (
 												<>
@@ -149,11 +160,17 @@ export default function ActivityList({
 														activity_value.activity_ref.split("/")[1]
 													)?.rate_type === "hr" && (
 														<Inputs>
+															<label htmlFor={`activities.${index}.start_time`}>
+																Start:
+															</label>
 															<TimePicker
 																formValue={`activities.${index}.start_time`}
 																setFieldValue={setFieldValue}
 															/>
 
+															<label htmlFor={`activities.${index}.end_time`}>
+																End:
+															</label>
 															<TimePicker
 																formValue={`activities.${index}.end_time`}
 																setFieldValue={setFieldValue}
@@ -178,49 +195,6 @@ export default function ActivityList({
 															</Control>
 														</Inputs>
 													)}
-
-													{getActivityDetails(
-														activity_value.activity_ref.split("/")[1]
-													)?.rate_type === "mins" && (
-														<Control className="control has-icons-right">
-															<input
-																className="input"
-																value={values.activities[index].duration}
-																name={`activities.${index}.duration`}
-																onChange={handleChange}
-															/>
-															<span className="icon is-small is-right">
-																min
-															</span>
-														</Control>
-													)}
-
-													{/* <HourlyText>
-														{(activity_value.duration ||
-															activity_value.distance) &&
-															`$${(
-																activities[
-																	activity_value.activity_ref.split("/")[1]
-																].rate *
-																(activity_value.duration ||
-																	parseInt(activity_value.distance, 10))
-															).toFixed(2)} @ `}
-														$
-														{
-															getActivityDetails(
-																activity_value.activity_ref.split("/")[1]
-															)?.weekday.rate
-														}
-														/
-														{activity_value.activity_ref.length > 0 &&
-														getActivityDetails(
-															activity_value.activity_ref.split("/")[1]
-														)?.rate_type === "minutes"
-															? "hr"
-															: getActivityDetails(
-																	activity_value.activity_ref.split("/")[1]
-															  )?.rate_type}
-													</HourlyText> */}
 												</>
 											)}
 

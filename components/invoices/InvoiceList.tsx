@@ -1,30 +1,52 @@
 import firebase from "firebase/app";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Invoice as InvoiceType } from "../../shared/types";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Invoice as InvoiceType, InvoiceObject } from "../../shared/types";
 import { deleteInvoice, streamInvoices } from "../../shared/utils/firebase";
 import { getTotalString } from "../../shared/utils/helpers";
 import generatePDF from "../../shared/utils/pdf-generation";
-import Button from "../../shared/components/Button";
+import Table from "../../shared/components/Table";
 
-const InvoiceRow = styled.div`
-	display: flex;
-	justify-content: space-between;
-	padding: 2rem;
-	border-bottom: 1px solid #5e5e5e;
+const InvoiceTable = styled(Table)``;
 
+const InvoiceRow = styled.tr`
 	&:hover {
 		background-color: #eee;
-		cursor: pointer;
 	}
+`;
+
+const Actions = styled.div`
+	display: flex;
+	justify-content: right;
+	align-items: center;
+	gap: 0.6rem;
+`;
+
+const Action = styled(FontAwesomeIcon)`
+	cursor: pointer;
+
+	&:hover {
+		color: #777;
+	}
+`;
+
+const TableCell = styled.td`
+	padding: 1rem 0.5rem;
 `;
 
 const Invoice = ({
 	invoice,
 	setInvoice,
+	invoiceId,
 }: {
 	invoice: InvoiceType;
-	setInvoice: (invoice: InvoiceType) => void;
+	setInvoice: (
+		invoice: InvoiceType,
+		editing?: boolean,
+		invoiceId?: string
+	) => void;
+	invoiceId: string;
 }) => {
 	const [cost, setTotalCost] = useState<null | string>(null);
 
@@ -33,26 +55,34 @@ const Invoice = ({
 	}, [invoice]);
 
 	return (
-		<InvoiceRow
-			onClick={() => {
-				setInvoice(invoice);
-			}}
-		>
-			<span>{invoice.invoice_no}</span>
-			<span>{invoice.client_name}</span>
-			<span>{invoice.client_no}</span>
+		<InvoiceRow>
+			<TableCell>{invoice.invoice_no}</TableCell>
+			<TableCell>{invoice.client_name}</TableCell>
+			<TableCell>{invoice.activities.length}</TableCell>
 
-			<Button onClick={() => generatePDF(invoice)}>Generate PDF</Button>
-			<span>{cost}</span>
-			<Button
-				className="has-background-danger has-text-white has-text-weight-bold"
-				onClick={() => {
-					deleteInvoice(invoice.invoice_no);
-				}}
-				type="button"
-			>
-				X
-			</Button>
+			<TableCell>{cost}</TableCell>
+			<TableCell>
+				<Actions>
+					<Action
+						onClick={() => setInvoice(invoice, true, invoiceId)}
+						icon="edit"
+						size="lg"
+					/>
+					<Action onClick={() => setInvoice(invoice)} icon="copy" size="lg" />
+					<Action
+						onClick={() => generatePDF(invoice)}
+						icon="file-download"
+						size="lg"
+					/>
+					<Action
+						onClick={() => {
+							deleteInvoice(invoice.invoice_no);
+						}}
+						icon="times"
+						size="lg"
+					/>
+				</Actions>
+			</TableCell>
 		</InvoiceRow>
 	);
 };
@@ -60,18 +90,18 @@ const Invoice = ({
 export default function InvoiceList({
 	setInvoice,
 }: {
-	setInvoice: (invoice: InvoiceType) => void;
+	setInvoice: (invoice: InvoiceType, editing?: boolean) => void;
 }) {
-	const [invoices, setInvoices] = useState<InvoiceType[]>([]);
+	const [invoices, setInvoices] = useState<InvoiceObject>({});
 
 	useEffect(() => {
 		const unsubscribe = streamInvoices({
 			next: (querySnapshot: firebase.firestore.QuerySnapshot) => {
-				const updatedInvoices: InvoiceType[] = [];
+				const updatedInvoices: InvoiceObject = {};
 
 				querySnapshot.forEach((document: firebase.firestore.DocumentData) => {
 					const invoice: InvoiceType = document.data();
-					updatedInvoices.push(invoice);
+					updatedInvoices[document.id] = invoice;
 				});
 
 				setInvoices(updatedInvoices);
@@ -82,14 +112,25 @@ export default function InvoiceList({
 	}, []);
 
 	return (
-		<div className="content">
-			{invoices.map((invoice: InvoiceType) => (
-				<Invoice
-					invoice={invoice}
-					key={invoice.invoice_no + invoice.client_no}
-					setInvoice={setInvoice}
-				/>
-			))}
-		</div>
+		<InvoiceTable>
+			<tbody>
+				<tr key="Header">
+					<th>Invoice No.</th>
+					<th>Name</th>
+					<th>No. Activities</th>
+					<th>Total</th>
+					{/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+					<th />
+				</tr>
+				{Object.keys(invoices).map((invoiceId: string) => (
+					<Invoice
+						invoice={invoices[invoiceId]}
+						invoiceId={invoiceId}
+						key={invoiceId}
+						setInvoice={setInvoice}
+					/>
+				))}
+			</tbody>
+		</InvoiceTable>
 	);
 }

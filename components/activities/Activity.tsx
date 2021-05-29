@@ -57,7 +57,7 @@ const Activity = ({ activity }: Props) => {
 	}
 
 	return (
-		<Row>
+		<Row key={activity.description}>
 			<td>
 				{editing ? (
 					<LocalInput id="description" value={activityState?.description} />
