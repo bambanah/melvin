@@ -216,6 +216,19 @@ export const createActivity = (activity: Activity) => {
 		});
 };
 
+export const updateActivity = (activityId: string, activity: Activity) => {
+	firestore
+		.collection("activities")
+		.doc(activityId)
+		.update(activity)
+		.then(() => {
+			toast.success("Activity updated");
+		})
+		.catch((error) => {
+			console.error("Error writing document: ", error);
+		});
+};
+
 export const streamActivities = (observer: any) =>
 	firestore
 		.collection("activities")

@@ -1,7 +1,8 @@
-import { FormikProps, withFormik } from "formik";
+import { FormikProps, getIn, withFormik } from "formik";
 import React from "react";
 import styled from "styled-components";
 import Activity from "../../models/Activity";
+import { Activity as ActivityType } from "../../shared/types";
 import ActivityValidationSchema from "../../schema/ActivityValidationSchema";
 import { errorIn } from "../../shared/utils/helpers";
 import Button from "../../shared/components/Button";
@@ -11,10 +12,12 @@ import Input from "../../shared/components/forms/Input";
 import Label from "../../shared/components/forms/Label";
 import Select from "../../shared/components/forms/Select";
 import Subheading from "../../shared/components/text/Subheading";
-import { createActivity } from "../../shared/utils/firebase";
+import { createActivity, updateActivity } from "../../shared/utils/firebase";
 
 interface Props {
 	setCreating: (creating: boolean) => void;
+	activityToLoad?: ActivityType;
+	activityId?: string;
 }
 
 const InputGroup = styled.div`
@@ -56,16 +59,11 @@ const Heading = styled.h2`
 	font-weight: bold;
 `;
 
-const parseAndHandleChange = (
-	value: string,
-	setFieldValue: (id: string, parsed: number) => void,
-	id: string
-) => {
-	const parsed = Number(value);
-	setFieldValue(id, parsed);
-};
-
-const CreateActivityForm = ({ setCreating }: Props) => {
+const CreateActivityForm = ({
+	setCreating,
+	activityToLoad,
+	activityId,
+}: Props) => {
 	const BaseActivityForm = ({
 		values,
 		touched,
@@ -73,8 +71,7 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 		handleChange,
 		handleBlur,
 		handleSubmit,
-		setFieldValue,
-	}: FormikProps<Activity>) => (
+	}: FormikProps<ActivityType>) => (
 		<Form onSubmit={handleSubmit} flexDirection="column">
 			<InputGroup>
 				<Heading>General</Heading>
@@ -134,22 +131,18 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 							onBlur={handleBlur}
 							name={`${day}.item_code`}
 							id={`${day}.item_code`}
+							value={getIn(values, `${day}.item_code`)}
 							placeholder="Code"
 							error={errorIn(errors, touched, `${day}.item_code`)}
 						/>
 						<span style={{ marginRight: "-0.8rem" }}>$</span>
 						<Input
 							type="text"
-							onChange={(e) =>
-								parseAndHandleChange(
-									e.target.value,
-									setFieldValue,
-									`${day}.rate`
-								)
-							}
+							onChange={handleChange}
 							onBlur={handleBlur}
 							name={`${day}.rate`}
 							id={`${day}.rate`}
+							value={getIn(values, `${day}.rate`)}
 							placeholder="Rate"
 							error={errorIn(errors, touched, `${day}.rate`)}
 						/>
@@ -159,7 +152,7 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 
 			<ButtonGroup>
 				<Button type="submit" primary>
-					Create
+					{activityToLoad ? "Update" : "Create"}
 				</Button>
 				<Button type="button" onClick={() => setCreating(false)}>
 					Cancel
@@ -169,9 +162,19 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 	);
 
 	const FormikForm = withFormik({
-		mapPropsToValues: () => new Activity() as Activity,
+		mapPropsToValues: () => {
+			if (activityToLoad) {
+				return activityToLoad;
+			}
+
+			return new Activity() as ActivityType;
+		},
 		handleSubmit: (values, { setSubmitting }) => {
-			createActivity(values);
+			if (activityToLoad && activityId) {
+				updateActivity(activityId, values);
+			} else {
+				createActivity(values);
+			}
 
 			setSubmitting(false);
 			setCreating(false);
