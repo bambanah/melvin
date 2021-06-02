@@ -6,16 +6,11 @@ import Activity from "./Activity";
 import Table from "../../shared/components/Table";
 
 interface Props {
-	setCreating: (creating: boolean) => void;
 	setActivityId: (activityId: string | undefined) => void;
 	setActivityToLoad: (activity: ActivityType) => void;
 }
 
-function ActivityList({
-	setCreating,
-	setActivityId,
-	setActivityToLoad,
-}: Props) {
+function ActivityList({ setActivityId, setActivityToLoad }: Props) {
 	const [activities, setActivities] = useState<ActivityObject>({});
 
 	useEffect(() => {
@@ -49,7 +44,6 @@ function ActivityList({
 					<Activity
 						activity={activities[activityId]}
 						key={activityId}
-						setCreating={setCreating}
 						activityId={activityId}
 						setActivityId={setActivityId}
 						setActivityToLoad={setActivityToLoad}

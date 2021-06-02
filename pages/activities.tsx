@@ -27,12 +27,23 @@ function Activities() {
 		setLoading(false);
 	}, []);
 
+	useEffect(() => {
+		if (activityToLoad) setCreating(true);
+	}, [activityToLoad]);
+
+	useEffect(() => {
+		if (!creating) {
+			setActivityToLoad(undefined);
+			setActivityId(undefined);
+		}
+	}, [creating]);
+
 	if (!loading) {
 		return (
 			<Layout>
 				{creating && (
 					<CreateActivityContainer>
-						<Title>New Activity</Title>
+						<Title>{activityToLoad ? "Update" : "New"} Activity</Title>
 						<CreateActivityForm
 							setCreating={setCreating}
 							activityToLoad={activityToLoad}
@@ -48,7 +59,6 @@ function Activities() {
 				)}
 
 				<ActivityList
-					setCreating={setCreating}
 					setActivityToLoad={setActivityToLoad}
 					setActivityId={setActivityId}
 				/>

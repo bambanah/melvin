@@ -1,4 +1,4 @@
-import { FormikProps, withFormik } from "formik";
+import { FormikProps, getIn, withFormik } from "formik";
 import React from "react";
 import styled from "styled-components";
 import Activity from "../../models/Activity";
@@ -59,15 +59,6 @@ const Heading = styled.h2`
 	font-weight: bold;
 `;
 
-const parseAndHandleChange = (
-	value: string,
-	setFieldValue: (id: string, parsed: number) => void,
-	id: string
-) => {
-	const parsed = Number(value);
-	setFieldValue(id, parsed);
-};
-
 const CreateActivityForm = ({
 	setCreating,
 	activityToLoad,
@@ -80,7 +71,6 @@ const CreateActivityForm = ({
 		handleChange,
 		handleBlur,
 		handleSubmit,
-		setFieldValue,
 	}: FormikProps<ActivityType>) => (
 		<Form onSubmit={handleSubmit} flexDirection="column">
 			<InputGroup>
@@ -141,22 +131,18 @@ const CreateActivityForm = ({
 							onBlur={handleBlur}
 							name={`${day}.item_code`}
 							id={`${day}.item_code`}
+							value={getIn(values, `${day}.item_code`)}
 							placeholder="Code"
 							error={errorIn(errors, touched, `${day}.item_code`)}
 						/>
 						<span style={{ marginRight: "-0.8rem" }}>$</span>
 						<Input
 							type="text"
-							onChange={(e) =>
-								parseAndHandleChange(
-									e.target.value,
-									setFieldValue,
-									`${day}.rate`
-								)
-							}
+							onChange={handleChange}
 							onBlur={handleBlur}
 							name={`${day}.rate`}
 							id={`${day}.rate`}
+							value={getIn(values, `${day}.rate`)}
 							placeholder="Rate"
 							error={errorIn(errors, touched, `${day}.rate`)}
 						/>
@@ -166,7 +152,7 @@ const CreateActivityForm = ({
 
 			<ButtonGroup>
 				<Button type="submit" primary>
-					Create
+					{activityToLoad ? "Update" : "Create"}
 				</Button>
 				<Button type="button" onClick={() => setCreating(false)}>
 					Cancel

@@ -8,7 +8,6 @@ import { deleteActivity } from "../../shared/utils/firebase";
 
 interface Props {
 	activity: ActivityType;
-	setCreating: (creating: boolean) => void;
 	activityId?: string;
 	setActivityId: (activityId: string | undefined) => void;
 	setActivityToLoad: (activity: ActivityType) => void;
@@ -35,7 +34,6 @@ const Action = styled(FontAwesomeIcon)`
 
 const Activity = ({
 	activity,
-	setCreating,
 	activityId,
 	setActivityId,
 	setActivityToLoad,
@@ -76,7 +74,6 @@ const Activity = ({
 					<Action
 						icon="edit"
 						onClick={() => {
-							setCreating(true);
 							setActivityId(activityId);
 							setActivityToLoad(activity);
 						}}
