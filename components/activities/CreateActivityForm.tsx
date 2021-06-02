@@ -2,6 +2,7 @@ import { FormikProps, withFormik } from "formik";
 import React from "react";
 import styled from "styled-components";
 import Activity from "../../models/Activity";
+import { Activity as ActivityType } from "../../shared/types";
 import ActivityValidationSchema from "../../schema/ActivityValidationSchema";
 import { errorIn } from "../../shared/utils/helpers";
 import Button from "../../shared/components/Button";
@@ -11,10 +12,12 @@ import Input from "../../shared/components/forms/Input";
 import Label from "../../shared/components/forms/Label";
 import Select from "../../shared/components/forms/Select";
 import Subheading from "../../shared/components/text/Subheading";
-import { createActivity } from "../../shared/utils/firebase";
+import { createActivity, updateActivity } from "../../shared/utils/firebase";
 
 interface Props {
 	setCreating: (creating: boolean) => void;
+	activityToLoad?: ActivityType;
+	activityId?: string;
 }
 
 const InputGroup = styled.div`
@@ -65,7 +68,11 @@ const parseAndHandleChange = (
 	setFieldValue(id, parsed);
 };
 
-const CreateActivityForm = ({ setCreating }: Props) => {
+const CreateActivityForm = ({
+	setCreating,
+	activityToLoad,
+	activityId,
+}: Props) => {
 	const BaseActivityForm = ({
 		values,
 		touched,
@@ -74,7 +81,7 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 		handleBlur,
 		handleSubmit,
 		setFieldValue,
-	}: FormikProps<Activity>) => (
+	}: FormikProps<ActivityType>) => (
 		<Form onSubmit={handleSubmit} flexDirection="column">
 			<InputGroup>
 				<Heading>General</Heading>
@@ -169,9 +176,19 @@ const CreateActivityForm = ({ setCreating }: Props) => {
 	);
 
 	const FormikForm = withFormik({
-		mapPropsToValues: () => new Activity() as Activity,
+		mapPropsToValues: () => {
+			if (activityToLoad) {
+				return activityToLoad;
+			}
+
+			return new Activity() as ActivityType;
+		},
 		handleSubmit: (values, { setSubmitting }) => {
-			createActivity(values);
+			if (activityToLoad && activityId) {
+				updateActivity(activityId, values);
+			} else {
+				createActivity(values);
+			}
 
 			setSubmitting(false);
 			setCreating(false);

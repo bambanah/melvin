@@ -1,20 +1,30 @@
 import React, { useEffect, useState } from "react";
 import firebase from "firebase/app";
-import { Activity as ActivityType } from "../../shared/types";
+import { Activity as ActivityType, ActivityObject } from "../../shared/types";
 import { streamActivities } from "../../shared/utils/firebase";
 import Activity from "./Activity";
 import Table from "../../shared/components/Table";
 
-function ActivityList() {
-	const [activities, setActivities] = useState<ActivityType[]>([]);
+interface Props {
+	setCreating: (creating: boolean) => void;
+	setActivityId: (activityId: string | undefined) => void;
+	setActivityToLoad: (activity: ActivityType) => void;
+}
+
+function ActivityList({
+	setCreating,
+	setActivityId,
+	setActivityToLoad,
+}: Props) {
+	const [activities, setActivities] = useState<ActivityObject>({});
 
 	useEffect(() => {
 		const unsubscribe = streamActivities({
 			next: (querySnapshot: firebase.firestore.QuerySnapshot) => {
-				const fetchedActivities: ActivityType[] = [];
+				const fetchedActivities: ActivityObject = {};
 				querySnapshot.forEach((document: firebase.firestore.DocumentData) => {
 					const activity: ActivityType = document.data();
-					fetchedActivities.push(activity);
+					fetchedActivities[document.id] = activity;
 				});
 				setActivities(fetchedActivities);
 			},
@@ -35,8 +45,15 @@ function ActivityList() {
 					{/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
 					<th />
 				</tr>
-				{activities.map((activity: ActivityType) => (
-					<Activity activity={activity} key={activity.description} />
+				{Object.keys(activities).map((activityId: string) => (
+					<Activity
+						activity={activities[activityId]}
+						key={activityId}
+						setCreating={setCreating}
+						activityId={activityId}
+						setActivityId={setActivityId}
+						setActivityToLoad={setActivityToLoad}
+					/>
 				))}
 			</tbody>
 		</Table>

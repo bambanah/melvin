@@ -5,6 +5,7 @@ import ActivityList from "../components/activities/ActivityList";
 import Layout from "../shared/components/Layout";
 import Title from "../shared/components/text/Title";
 import CreateActivityForm from "../components/activities/CreateActivityForm";
+import { Activity } from "../shared/types";
 
 const CreateActivityContainer = styled.div`
 	margin-bottom: 2rem;
@@ -18,6 +19,9 @@ const CreateActivityContainer = styled.div`
 function Activities() {
 	const [loading, setLoading] = useState(true);
 	const [creating, setCreating] = useState(false);
+	const [activityToLoad, setActivityToLoad] =
+		useState<Activity | undefined>(undefined);
+	const [activityId, setActivityId] = useState<string | undefined>(undefined);
 
 	useEffect(() => {
 		setLoading(false);
@@ -29,7 +33,11 @@ function Activities() {
 				{creating && (
 					<CreateActivityContainer>
 						<Title>New Activity</Title>
-						<CreateActivityForm setCreating={setCreating} />
+						<CreateActivityForm
+							setCreating={setCreating}
+							activityToLoad={activityToLoad}
+							activityId={activityId}
+						/>
 					</CreateActivityContainer>
 				)}
 
@@ -39,7 +47,11 @@ function Activities() {
 					<Button onClick={() => setCreating(true)}>Create New</Button>
 				)}
 
-				<ActivityList />
+				<ActivityList
+					setCreating={setCreating}
+					setActivityToLoad={setActivityToLoad}
+					setActivityId={setActivityId}
+				/>
 			</Layout>
 		);
 	}

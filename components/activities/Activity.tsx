@@ -1,14 +1,17 @@
 /* eslint-disable no-alert */
 /* eslint-disable no-restricted-globals */
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
-import Input from "../../shared/components/forms/Input";
 import { Activity as ActivityType } from "../../shared/types";
 import { deleteActivity } from "../../shared/utils/firebase";
 
 interface Props {
 	activity: ActivityType;
+	setCreating: (creating: boolean) => void;
+	activityId?: string;
+	setActivityId: (activityId: string | undefined) => void;
+	setActivityToLoad: (activity: ActivityType) => void;
 }
 
 const Row = styled.tr`
@@ -30,90 +33,54 @@ const Action = styled(FontAwesomeIcon)`
 	}
 `;
 
-const LocalInput = styled(Input)``;
-
-const Activity = ({ activity }: Props) => {
-	const [editing, setEditing] = useState(false);
-	const [activityState, setActivityState] = useState<ActivityType | null>(null);
-
-	const saveActivity = () => {
-		setEditing(false);
-	};
-
+const Activity = ({
+	activity,
+	setCreating,
+	activityId,
+	setActivityId,
+	setActivityToLoad,
+}: Props) => {
 	function deleteThisActivity() {
 		if (confirm("Are you sure you want to delete?")) {
 			deleteActivity(activity.description);
 		}
 	}
 
-	function startEditing() {
-		setActivityState(activity);
-		setEditing(true);
-	}
-
-	function stopEditing() {
-		setActivityState(null);
-		setEditing(false);
-	}
-
 	return (
 		<Row key={activity.description}>
 			<td>
-				{editing ? (
-					<LocalInput id="description" value={activityState?.description} />
-				) : (
-					<span>{activity.description}</span>
-				)}
+				<span>{activity.description}</span>
 			</td>
 			<td>
-				{editing ? (
-					<LocalInput id="weekday.rate" value={activityState?.weekday.rate} />
-				) : (
-					<span>
-						<strong>${activity.weekday.rate}</strong>/{activity.rate_type}
-					</span>
-				)}
+				<span>
+					<strong>${activity.weekday.rate}</strong>/{activity.rate_type}
+				</span>
 			</td>
 			<td>
-				{editing ? (
-					<LocalInput
-						id="weeknight.rate"
-						value={activityState?.weeknight.rate}
-					/>
-				) : (
-					<span>
-						<strong>${activity.weeknight.rate}</strong>/{activity.rate_type}
-					</span>
-				)}
+				<span>
+					<strong>${activity.weeknight.rate}</strong>/{activity.rate_type}
+				</span>
 			</td>
 			<td>
-				{editing ? (
-					<LocalInput id="saturday.rate" value={activityState?.saturday.rate} />
-				) : (
-					<span>
-						<strong>${activity.saturday.rate}</strong>/{activity.rate_type}
-					</span>
-				)}
+				<span>
+					<strong>${activity.saturday.rate}</strong>/{activity.rate_type}
+				</span>
 			</td>
 			<td>
-				{editing ? (
-					<LocalInput id="sunday.rate" value={activityState?.sunday.rate} />
-				) : (
-					<span>
-						<strong>${activity.sunday.rate}</strong>/{activity.rate_type}
-					</span>
-				)}
+				<span>
+					<strong>${activity.sunday.rate}</strong>/{activity.rate_type}
+				</span>
 			</td>
 			<td>
 				<ActionContainer>
-					{editing ? (
-						<>
-							<Action icon="check" onClick={() => saveActivity()} />
-							<Action icon="times" onClick={() => stopEditing()} />
-						</>
-					) : (
-						<Action icon="edit" onClick={() => startEditing()} />
-					)}
+					<Action
+						icon="edit"
+						onClick={() => {
+							setCreating(true);
+							setActivityId(activityId);
+							setActivityToLoad(activity);
+						}}
+					/>
 					<Action icon="trash" onClick={() => deleteThisActivity()} />
 				</ActionContainer>
 			</td>
