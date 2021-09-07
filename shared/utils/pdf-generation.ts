@@ -46,7 +46,7 @@ const generatePDF = (invoice: Invoice) => {
 				let countString = "";
 
 				await getRate(activity).then(({ rate, itemCode }) => {
-					rate = parseInt(rate, 10);
+					// rate = parseInt(rate, 10);
 					if (rate) {
 						if (activityDetails[activityId].rate_type === "hr") {
 							totalCost = rate * activity.duration;
