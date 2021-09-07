@@ -75,6 +75,7 @@ const generatePDF = (invoice: Invoice) => {
 							2
 						)}${`/${activityDetails[activityId].rate_type}`}\n`
 					);
+
 					currentActivity.push(`$${totalCost.toFixed(2)}\n`);
 
 					activities.push(currentActivity);
