@@ -3,3 +3,4 @@ node_modules
 .eslintcache
 .vscode/
 .next
+yarn-error.log
