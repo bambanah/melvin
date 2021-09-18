@@ -649,6 +649,18 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/context-base/-/context-base-0.14.0.tgz#c67fc20a4d891447ca1a855d7d70fa79a3533001"
   integrity sha512-sDOAZcYwynHFTbLo6n8kIbLiVF3a3BLkrmehJUyEbT9F+Smbi47kLGS2gG2g0fjBLR/Lr1InPD7kXL7FaTqEkw==
 
+"@prisma/client@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@prisma/client/-/client-3.0.2.tgz#f04d9b252f3d0c6918df43ad228eac27d03f6db1"
+  integrity sha512-6SrDYY2Yr5AmYpVB3XAXFqfzxKMdDTemXR7FmfXthnxWhQHoBwRLNZ3B3GyI/MmWa5tr+kaaGDJjp1LU0vuYvQ==
+  dependencies:
+    "@prisma/engines-version" "2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db"
+
+"@prisma/engines-version@2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db":
+  version "2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db"
+  resolved "https://registry.yarnpkg.com/@prisma/engines-version/-/engines-version-2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db.tgz#c45323e420f47dd950b22c873bdcf38f75e65779"
+  integrity sha512-iArSApZZImVmT9oC/rGOjzvpG2AOqlIeqYcVnop9poA3FxD4zfVPbNPH9DTgOWhc06OkBHujJZeAcsNddVabIQ==
+
 "@prisma/engines@2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db":
   version "2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db"
   resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db.tgz#b6cf70bc05dd2a62168a16f3ea58a1b011074621"
