@@ -1,8 +1,10 @@
 import jsPDF from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
 import { getActivities } from "./firebase";
-import { ActivityObject, Invoice } from "../types";
+import { ActivityObject } from "../types";
 import { formatDate, getPrettyDuration, getRate } from "./helpers";
+import { Activity, Invoice } from ".prisma/client";
+import prisma from "./prisma";
 
 const generatePDF = (invoice: Invoice) => {
 	const margin = 20;
@@ -34,7 +36,7 @@ const generatePDF = (invoice: Invoice) => {
 	});
 
 	// Write activity table
-	getActivities().then(async (activityDetails: ActivityObject) => {
+	getActivities().then(async (activityDetails: Activity) => {
 		let activities: string[][] = [];
 		let sumTotal = 0;
 

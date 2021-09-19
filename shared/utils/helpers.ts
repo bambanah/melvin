@@ -16,9 +16,7 @@ export const importIcons = () => {
 	library.add(faEdit, faTimes, faCheck, faTrash, faCopy, faFileDownload);
 };
 
-export const formatDate = (timestamp: firebase.firestore.Timestamp) => {
-	const date = timestamp.toDate();
-
+export const formatDate = (date: Date) => {
 	const YYYY = date.getFullYear();
 	const MM = `0${date.getMonth() + 1}`.slice(-2);
 	const DD = `0${date.getDate()}`.slice(-2);

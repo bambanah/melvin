@@ -48,6 +48,7 @@ model User {
 
   supportItems SupportItem[]
   invoices     Invoice[]
+  Client       Client[]
 }
 
 model VerificationToken {
@@ -66,6 +67,9 @@ model Client {
   number    String
 
   invoices Invoice[]
+
+  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId String
 }
 
 model Invoice {
@@ -78,11 +82,11 @@ model Invoice {
   client   Client @relation(fields: [clientId], references: [id])
   clientId String
 
-  items Activity[]
+  items     Activity[]
+  templates Template[]
 
-  owner    User       @relation(fields: [ownerId], references: [id])
-  ownerId  String
-  Template Template[]
+  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId String
 }
 
 model Activity {
