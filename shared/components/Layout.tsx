@@ -1,4 +1,5 @@
 import { useSession } from "next-auth/react";
+import Router from "next/router";
 import React from "react";
 import styled from "styled-components";
 import Navbar from "./Navbar";
@@ -36,6 +37,7 @@ const Layout: React.FC<Props> = ({ children }) => {
 	const { data: session } = useSession();
 
 	if (!session) {
+		Router.push("/login")
 		return <div>You need to be authenticated to see this page</div>;
 	}
 

@@ -2,6 +2,7 @@ import { FormikProps, getIn, withFormik } from "formik";
 import React from "react";
 import styled from "styled-components";
 import axios from "axios";
+import { toast } from "react-toastify";
 import ActivityValidationSchema from "../../schema/ActivityValidationSchema";
 import { errorIn } from "../../shared/utils/helpers";
 import Button from "../../shared/components/Button";
@@ -162,8 +163,8 @@ const CreateSupportItemForm = ({ setCreating }: Props) => {
 				weekdayRate: "",
 			} as Partial<SupportItem>),
 		handleSubmit: (values, { setSubmitting }) => {
-			axios.post("/api/activities", values).then((response) => {
-				console.log(response);
+			axios.post("/api/support-items", values).then(() => {
+				toast.success("Support Item Created")
 			});
 
 			setSubmitting(false);
