@@ -2,9 +2,9 @@ import Head from "next/head";
 import React from "react";
 import { ToastContainer } from "react-toastify";
 import { ThemeProvider } from "styled-components";
+import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import GlobalStyle from "../shared/GlobalStyle";
-import { AuthProvider } from "../shared/hooks/useAuth";
 
 import "react-toastify/dist/ReactToastify.css";
 import "bulma/css/bulma.css";
@@ -28,7 +28,7 @@ importIcons();
 
 function App({ Component, pageProps }: AppProps) {
 	return (
-		<AuthProvider>
+		<SessionProvider session={pageProps.session}>
 			<ThemeProvider theme={theme}>
 				<Head>
 					<title>NDIS Invoice Generator</title>
@@ -37,7 +37,7 @@ function App({ Component, pageProps }: AppProps) {
 				<Component {...pageProps} />
 				<ToastContainer />
 			</ThemeProvider>
-		</AuthProvider>
+		</SessionProvider>
 	);
 }
 

@@ -1,32 +1,42 @@
-import React, { useEffect, useState } from "react";
-import firebase from "firebase/app";
-import { Activity as ActivityType, ActivityObject } from "../../shared/types";
-import { streamActivities } from "../../shared/utils/firebase";
-import Activity from "./Activity";
+import { ItemData } from "@prisma/client";
+import React from "react";
+import useSWR from "swr";
 import Table from "../../shared/components/Table";
+import Activity from "./Activity";
 
-interface Props {
-	setActivityId: (activityId: string | undefined) => void;
-	setActivityToLoad: (activity: ActivityType) => void;
-}
+const getSupportItems = async () => {
+	const response = await fetch("/api/activities");
 
-function ActivityList({ setActivityId, setActivityToLoad }: Props) {
-	const [activities, setActivities] = useState<ActivityObject>({});
+	return (await response.json()) as ItemData[];
+};
 
-	useEffect(() => {
-		const unsubscribe = streamActivities({
-			next: (querySnapshot: firebase.firestore.QuerySnapshot) => {
-				const fetchedActivities: ActivityObject = {};
-				querySnapshot.forEach((document: firebase.firestore.DocumentData) => {
-					const activity: ActivityType = document.data();
-					fetchedActivities[document.id] = activity;
-				});
-				setActivities(fetchedActivities);
-			},
-			error: (err: Error) => console.error(err.message),
-		});
-		return unsubscribe;
-	}, []);
+function ActivityList() {
+	// const [supportItems, setActivities] = useState<ActivityObject>({});
+	const { data: supportItems, error } = useSWR(
+		"/api/activities",
+		getSupportItems
+	);
+
+	// useEffect(() => {
+	// 	const unsubscribe = streamActivities({
+	// 		next: (querySnapshot: firebase.firestore.QuerySnapshot) => {
+	// 			const fetchedActivities: ActivityObject = {};
+	// 			querySnapshot.forEach((document: firebase.firestore.DocumentData) => {
+	// 				const activity: ActivityType = document.data();
+	// 				fetchedActivities[document.id] = activity;
+	// 			});
+	// 			setActivities(fetchedActivities);
+	// 		},
+	// 		error: (err: Error) => console.error(err.message),
+	// 	});
+	// 	return unsubscribe;
+	// }, []);
+
+	if (error) {
+		console.error(error);
+		return <div>Error loading</div>;
+	}
+	if (!supportItems) return <div>loading...</div>;
 
 	return (
 		<Table>
@@ -40,14 +50,8 @@ function ActivityList({ setActivityId, setActivityToLoad }: Props) {
 					{/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
 					<th />
 				</tr>
-				{Object.keys(activities).map((activityId: string) => (
-					<Activity
-						activity={activities[activityId]}
-						key={activityId}
-						activityId={activityId}
-						setActivityId={setActivityId}
-						setActivityToLoad={setActivityToLoad}
-					/>
+				{supportItems.map((supportItem) => (
+					<Activity activity={supportItem} key={supportItem.id} />
 				))}
 			</tbody>
 		</Table>

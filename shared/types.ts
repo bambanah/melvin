@@ -12,10 +12,6 @@ export interface Invoice {
 	activities: InvoiceActivity[];
 }
 
-export interface InvoiceObject {
-	[id: string]: Invoice;
-}
-
 export interface InvoiceActivity {
 	activity_ref: string;
 	date: string;
@@ -29,9 +25,6 @@ export interface InvoiceActivity {
 
 export interface Template extends Invoice {
 	template_name: string;
-}
-export interface TemplateObject {
-	[id: string]: Template;
 }
 
 export interface Activity {
@@ -54,8 +47,4 @@ export interface Activity {
 		item_code: string;
 		rate?: number;
 	};
-}
-
-export interface ActivityObject {
-	[id: string]: Activity;
 }

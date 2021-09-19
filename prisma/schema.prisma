@@ -9,9 +9,53 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  @unique
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  oauth_token_secret String?
+  oauth_token        String?
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model User {
-  id      String   @id @default(cuid())
-  created DateTime @default(now())
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+
+  account  Account?
+  sessions Session[]
+
+  ItemData SupportItem[]
+  Invoice  Invoice[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 model Client {
@@ -25,27 +69,76 @@ model Client {
 }
 
 model Invoice {
-  id         String   @id @default(cuid())
-  created    DateTime @default(now())
-  owner      String // Refers to a user
-  invoice_no String
-  bill_to    String
-  date       DateTime
+  id        String   @id @default(cuid())
+  created   DateTime @default(now())
+  invoiceNo String
+  billTo    String
+  date      DateTime
 
-  client     Client     @relation(fields: [clientId], references: [id])
-  clientId   String
-  activities Activity[]
+  client   Client @relation(fields: [clientId], references: [id])
+  clientId String
+
+  items Activity[]
+
+  owner    User       @relation(fields: [ownerId], references: [id])
+  ownerId  String
+  Template Template[]
 }
 
 model Activity {
   id      String   @id @default(cuid())
   created DateTime @default(now())
 
-  invoice   Invoice? @relation(fields: [invoiceId], references: [id])
-  invoiceId String?
+  date            DateTime
+  startTime       DateTime
+  endTime         DateTime
+  itemDuration    Int
+  transitDuration Int?
+  transitDistance Int?
+
+  invoices  Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId String
+
+  supportItem   SupportItem @relation(fields: [supportItemId], references: [id])
+  supportItemId String
+}
+
+enum RateType {
+  KM
+  HOUR
+}
+
+model SupportItem {
+  id      String   @id @default(cuid())
+  created DateTime @default(now())
+
+  description String
+  rateType    RateType
+
+  weekdayCode String
+  weekdayRate String
+
+  weeknightCode String?
+  weeknightRate String?
+
+  saturdayCode String?
+  saturdayRate String?
+
+  sundayCode String?
+  sundayRate String?
+
+  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId String
+
+  activities Activity[]
 }
 
 model Template {
   id      String   @id @default(cuid())
   created DateTime @default(now())
+
+  templateName String
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId String
 }

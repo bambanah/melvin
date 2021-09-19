@@ -8,6 +8,7 @@
 		"@fortawesome/free-regular-svg-icons": "^5.15.3",
 		"@fortawesome/free-solid-svg-icons": "^5.15.3",
 		"@fortawesome/react-fontawesome": "^0.1.14",
+		"@next-auth/prisma-adapter": "^0.5.2-next.10",
 		"@prisma/client": "^3.0.2",
 		"@testing-library/jest-dom": "^5.12.0",
 		"@testing-library/react": "^11.2.7",
@@ -17,11 +18,11 @@
 		"firebase": "^8.6.1",
 		"formik": "^2.2.7",
 		"graphql": "^15.5.3",
-		"graphql-request": "^3.5.0",
 		"jspdf": "^2.3.0",
 		"jspdf-autotable": "^3.5.13",
 		"moment": "^2.29.1",
 		"next": "10.2.1",
+		"next-auth": "^4.0.0-beta.2",
 		"nookies": "^2.5.2",
 		"react": "latest",
 		"react-dom": "latest",
@@ -29,6 +30,7 @@
 		"react-toastify": "^7.0.4",
 		"sass": "^1.32.13",
 		"styled-components": "^5.3.0",
+		"swr": "^1.0.1",
 		"typescript": "^4.2.4",
 		"web-vitals": "^1.1.2",
 		"yup": "^0.32.9"
@@ -37,7 +39,8 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "eslint . --fix"
+		"lint": "eslint . --fix",
+		"generate": "prisma generate"
 	},
 	"eslintConfig": {
 		"extends": [

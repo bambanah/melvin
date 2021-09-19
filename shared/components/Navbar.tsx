@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import Image from "next/image";
-import { useAuth } from "../hooks/useAuth";
+import { useSession } from "next-auth/react";
 import { signOut } from "../utils/firebase";
 import Button from "./Button";
 import NavLink from "../../components/NavLink";
@@ -66,7 +66,7 @@ const NavAuth = styled.div`
 `;
 
 const Navbar = () => {
-	const { user } = useAuth();
+	const session = useSession();
 
 	return (
 		<Header>
@@ -90,7 +90,9 @@ const Navbar = () => {
 				</NavLinks>
 
 				<NavAuth>
-					{user && <span className="mr-2 mt-2">{user.email}</span>}
+					{session.data?.user && (
+						<span className="mr-2 mt-2">{session.data?.user.email}</span>
+					)}
 					<Button onClick={() => signOut()}>Log Out</Button>
 				</NavAuth>
 			</NavContent>

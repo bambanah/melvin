@@ -3,14 +3,15 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import styled from "styled-components";
-import { Activity as ActivityType } from "../../shared/types";
+import { ItemData } from ".prisma/client";
+// import { Activity as ActivityType } from "../../shared/types";
 import { deleteActivity } from "../../shared/utils/firebase";
 
 interface Props {
-	activity: ActivityType;
-	activityId?: string;
-	setActivityId: (activityId: string | undefined) => void;
-	setActivityToLoad: (activity: ActivityType) => void;
+	activity: ItemData;
+	// activityId?: string;
+	// setActivityId: (activityId: string | undefined) => void;
+	// setActivityToLoad: (activity: ActivityType) => void;
 }
 
 const Row = styled.tr`
@@ -32,12 +33,7 @@ const Action = styled(FontAwesomeIcon)`
 	}
 `;
 
-const Activity = ({
-	activity,
-	activityId,
-	setActivityId,
-	setActivityToLoad,
-}: Props) => {
+const Activity = ({ activity }: Props) => {
 	function deleteThisActivity() {
 		if (confirm("Are you sure you want to delete?")) {
 			deleteActivity(activity.description);
@@ -51,22 +47,22 @@ const Activity = ({
 			</td>
 			<td>
 				<span>
-					<strong>${activity.weekday.rate}</strong>/{activity.rate_type}
+					<strong>${activity.weekdayRate}</strong>/{activity.rateType}
 				</span>
 			</td>
 			<td>
 				<span>
-					<strong>${activity.weeknight.rate}</strong>/{activity.rate_type}
+					<strong>${activity.weeknightRate}</strong>/{activity.rateType}
 				</span>
 			</td>
 			<td>
 				<span>
-					<strong>${activity.saturday.rate}</strong>/{activity.rate_type}
+					<strong>${activity.saturdayRate}</strong>/{activity.rateType}
 				</span>
 			</td>
 			<td>
 				<span>
-					<strong>${activity.sunday.rate}</strong>/{activity.rate_type}
+					<strong>${activity.sundayRate}</strong>/{activity.rateType}
 				</span>
 			</td>
 			<td>
@@ -74,8 +70,9 @@ const Activity = ({
 					<Action
 						icon="edit"
 						onClick={() => {
-							setActivityId(activityId);
-							setActivityToLoad(activity);
+							// setActivityId(activityId);
+							// setActivityToLoad(activity);
+							console.log("edit");
 						}}
 					/>
 					<Action icon="trash" onClick={() => deleteThisActivity()} />
