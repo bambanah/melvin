@@ -3,12 +3,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import styled from "styled-components";
-import { ItemData } from ".prisma/client";
-// import { Activity as ActivityType } from "../../shared/types";
-import { deleteActivity } from "../../shared/utils/firebase";
+import { SupportItem } from ".prisma/client";
 
 interface Props {
-	activity: ItemData;
+	supportItem: SupportItem;
 	// activityId?: string;
 	// setActivityId: (activityId: string | undefined) => void;
 	// setActivityToLoad: (activity: ActivityType) => void;
@@ -33,36 +31,34 @@ const Action = styled(FontAwesomeIcon)`
 	}
 `;
 
-const Activity = ({ activity }: Props) => {
+const Activity = ({ supportItem }: Props) => {
 	function deleteThisActivity() {
-		if (confirm("Are you sure you want to delete?")) {
-			deleteActivity(activity.description);
-		}
+		console.log("deleted");
 	}
 
 	return (
-		<Row key={activity.description}>
+		<Row key={supportItem.description}>
 			<td>
-				<span>{activity.description}</span>
+				<span>{supportItem.description}</span>
 			</td>
 			<td>
 				<span>
-					<strong>${activity.weekdayRate}</strong>/{activity.rateType}
+					<strong>${supportItem.weekdayRate}</strong>/{supportItem.rateType}
 				</span>
 			</td>
 			<td>
 				<span>
-					<strong>${activity.weeknightRate}</strong>/{activity.rateType}
+					<strong>${supportItem.weeknightRate}</strong>/{supportItem.rateType}
 				</span>
 			</td>
 			<td>
 				<span>
-					<strong>${activity.saturdayRate}</strong>/{activity.rateType}
+					<strong>${supportItem.saturdayRate}</strong>/{supportItem.rateType}
 				</span>
 			</td>
 			<td>
 				<span>
-					<strong>${activity.sundayRate}</strong>/{activity.rateType}
+					<strong>${supportItem.sundayRate}</strong>/{supportItem.rateType}
 				</span>
 			</td>
 			<td>
@@ -70,8 +66,6 @@ const Activity = ({ activity }: Props) => {
 					<Action
 						icon="edit"
 						onClick={() => {
-							// setActivityId(activityId);
-							// setActivityToLoad(activity);
 							console.log("edit");
 						}}
 					/>

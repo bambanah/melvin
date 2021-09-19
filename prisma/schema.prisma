@@ -46,8 +46,8 @@ model User {
   account  Account?
   sessions Session[]
 
-  ItemData SupportItem[]
-  Invoice  Invoice[]
+  supportItems SupportItem[]
+  invoices     Invoice[]
 }
 
 model VerificationToken {

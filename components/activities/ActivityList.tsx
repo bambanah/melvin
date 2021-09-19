@@ -1,16 +1,16 @@
-import { ItemData } from "@prisma/client";
+import { SupportItem } from "@prisma/client";
 import React from "react";
 import useSWR from "swr";
 import Table from "../../shared/components/Table";
-import Activity from "./Activity";
+import Activity from "./SupportItem";
 
 const getSupportItems = async () => {
 	const response = await fetch("/api/activities");
 
-	return (await response.json()) as ItemData[];
+	return (await response.json()) as SupportItem[];
 };
 
-function ActivityList() {
+function SupportItemList() {
 	// const [supportItems, setActivities] = useState<ActivityObject>({});
 	const { data: supportItems, error } = useSWR(
 		"/api/activities",
@@ -51,11 +51,11 @@ function ActivityList() {
 					<th />
 				</tr>
 				{supportItems.map((supportItem) => (
-					<Activity activity={supportItem} key={supportItem.id} />
+					<Activity supportItem={supportItem} key={supportItem.id} />
 				))}
 			</tbody>
 		</Table>
 	);
 }
 
-export default ActivityList;
+export default SupportItemList;

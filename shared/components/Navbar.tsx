@@ -1,8 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import Image from "next/image";
-import { useSession } from "next-auth/react";
-import { signOut } from "../utils/firebase";
+import { signOut, useSession } from "next-auth/react";
 import Button from "./Button";
 import NavLink from "../../components/NavLink";
 
@@ -86,7 +85,7 @@ const Navbar = () => {
 				<NavLinks>
 					<NavLink href="/invoices">Invoices</NavLink>
 					{/* <NavLink href="/templates">Templates</NavLink> */}
-					<NavLink href="/activities">Activities</NavLink>
+					<NavLink href="/support-items">Support Items</NavLink>
 				</NavLinks>
 
 				<NavAuth>
