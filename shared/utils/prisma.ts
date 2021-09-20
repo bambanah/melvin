@@ -20,3 +20,22 @@ if (process.env.NODE_ENV === "production") {
 	prisma = global.prisma;
 }
 export default prisma;
+
+export const getLastInvoiceDetails = async () => {
+	const invoice = await prisma.invoice.findFirst({
+		orderBy: {
+			created: "desc",
+		},
+		include: {
+			activities: true,
+		},
+	});
+
+	return invoice;
+};
+
+export const getHighestInvoiceNumber = async () => {
+	const highest = 10;
+
+	return highest;
+};

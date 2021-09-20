@@ -1,6 +1,6 @@
 import firebase from "firebase/app";
 import { FormikErrors, FormikTouched, getIn } from "formik";
-import moment from "moment";
+import moment, { Moment } from "moment";
 // import { toast } from "react-toastify";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -11,6 +11,7 @@ import {
 	faTimes,
 	faTrash,
 } from "@fortawesome/free-solid-svg-icons";
+import prisma from "./prisma";
 
 export const importIcons = () => {
 	library.add(faEdit, faTimes, faCheck, faTrash, faCopy, faFileDownload);
@@ -64,37 +65,76 @@ export const getPrettyDuration = (hours: number) => {
 	return durationString;
 };
 
-// export const getTotalCost = async (invoice: Invoice) => {
-// 	let totalCost = 0;
+export const decideRate = (
+	date: Moment,
+	endTime: Date
+): "weekday" | "weeknight" | "saturday" | "sunday" => {
+	if (date.day() === 0) {
+		return "sunday";
+	}
+	if (date.day() === 6) {
+		return "saturday";
+	}
+	if (moment(endTime, "HH:mm").isAfter(moment("20:00", "HH:mm"))) {
+		return "weeknight";
+	}
 
-// 	const activityDetails = await getActivities();
+	return "weekday";
+};
 
-// 	invoice.activities.forEach((activity) => {
-// 		const activityId = activity.activity_ref.split("/")[1];
+export const getTotalCost = async (invoiceId: string) => {
+	let totalCost = 0;
 
-// 		const activityDetail = activityDetails[activityId];
+	const invoice = await prisma.invoice.findFirst({
+		where: {
+			id: invoiceId,
+		},
+		include: {
+			activities: {
+				include: {
+					supportItem: true,
+				},
+			},
+		},
+	});
 
-// 		let rate;
-// 		if (
-// 			activity.end_time &&
-// 			moment(activity.end_time, "HH:mm").isAfter(moment("20:00", "HH:mm"))
-// 		) {
-// 			rate = activityDetail?.weeknight.rate;
-// 		} else {
-// 			rate = activityDetail?.weekday.rate;
-// 		}
+	if (!invoice) return null;
 
-// 		if (rate) {
-// 			if (activityDetail?.rate_type === "hr") {
-// 				totalCost += rate * activity.duration;
-// 			} else if (activityDetail?.rate_type === "km") {
-// 				totalCost += rate * Number(activity.distance);
-// 			}
-// 		}
-// 	});
+	invoice.activities.forEach((activity) => {
+		const { supportItem } = activity;
 
-// 	return totalCost;
-// };
+		const rateType = decideRate(moment(activity.date), activity.endTime);
+
+		let rate;
+		switch (rateType) {
+			case "sunday":
+				rate = supportItem.sundayRate;
+				break;
+
+			case "weeknight":
+				rate = supportItem.weeknightRate;
+				break;
+
+			case "saturday":
+				rate = supportItem.saturdayRate;
+				break;
+
+			default:
+				rate = supportItem.weekdayRate;
+				break;
+		}
+
+		if (rate) {
+			if (supportItem.rateType === "HOUR") {
+				totalCost += rate.toNumber() * activity.itemDuration;
+			} else if (supportItem.rateType === "KM") {
+				totalCost += rate.toNumber() * Number(activity.itemDistance);
+			}
+		}
+	});
+
+	return totalCost;
+};
 
 // export const getTotalString = (invoice: Invoice) =>
 // 	getTotalCost(invoice).then((cost) => `$${cost.toFixed(2)}`);

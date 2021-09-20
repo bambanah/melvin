@@ -1,103 +1,94 @@
 import { Invoice } from "@prisma/client";
-import prisma from "@Shared/utils/prisma";
-import firebase from "firebase/app";
 import { FormikProps, getIn, withFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import InvoiceValidationSchema from "../../schema/InvoiceValidationSchema";
 import Button from "../../shared/components/Button";
 import Title from "../../shared/components/text/Title";
-import { getDuration } from "../../shared/utils/helpers";
 import SaveAsTemplateButton from "../templates/SaveAsTemplateButton";
 import FieldInput from "./FieldInput";
 import ActivityList from "./InvoiceActivityList";
 
 interface Props {
-	invoiceToLoad: Invoice | null;
+	// invoiceToLoad: Invoice | null;
 	setCreating: (creating: boolean) => void;
 	editPrevious?: boolean;
-	invoiceId?: string;
+	// invoiceId?: string;
 }
 
 export default function CreateInvoice({
-	invoiceToLoad,
+	// invoiceToLoad,
 	setCreating,
 	editPrevious,
-	invoiceId,
-}: Props) {
-	const [lastInvoice, setLastInvoice] = useState({} as Invoice);
-	const [loaded, setLoaded] = useState(false);
+}: // invoiceId,
+Props) {
+	// const [lastInvoice, setLastInvoice] = useState({} as Invoice);
+	// const [loaded, setLoaded] = useState(false);
 
-	const incrementInvoiceNo = (invoiceNo: string) => {
-		const newNumber: number =
-			parseInt(invoiceNo.replace(/([A-Za-z])+/g, ""), 10) + 1;
+	// const incrementInvoiceNo = (invoiceNo: string) => {
+	// 	const newNumber: number =
+	// 		parseInt(invoiceNo.replace(/([A-Za-z])+/g, ""), 10) + 1;
 
-		return invoiceNo.replace(/([0-9])+/, newNumber.toString());
-	};
+	// 	return invoiceNo.replace(/([0-9])+/, newNumber.toString());
+	// };
 
-	async function loadInvoiceDetails() {
-		if (invoiceToLoad) {
-			if (!editPrevious) {
-				// Copy invoice details to new invoice
-				const invoice = { ...invoiceToLoad };
+	// async function loadInvoiceDetails() {
+	// 	if (invoiceToLoad) {
+	// 		if (!editPrevious) {
+	// 			// Copy invoice details to new invoice
+	// 			const invoice = { ...invoiceToLoad };
 
-				const highestInvoiceNo = (
-					await prisma.invoice.findFirst({
-						orderBy: {
-							invoiceNo: "desc",
-						},
-					})
-				)?.invoiceNo;
+	// 			const highestInvoiceNo = (
+	// 				await prisma.invoice.findFirst({
+	// 					orderBy: {
+	// 						invoiceNo: "desc",
+	// 					},
+	// 				})
+	// 			)?.invoiceNo;
 
-				if (highestInvoiceNo !== undefined)
-					invoice.invoiceNo = incrementInvoiceNo(highestInvoiceNo);
+	// 			if (highestInvoiceNo !== undefined)
+	// 				invoice.invoiceNo = incrementInvoiceNo(highestInvoiceNo);
 
-				setLastInvoice(invoice);
-			} else {
-				// Modify existing invoice
+	// 			setLastInvoice(invoice);
+	// 		} else {
+	// 			// Modify existing invoice
 
-				setLastInvoice(invoiceToLoad);
-			}
+	// 			setLastInvoice(invoiceToLoad);
+	// 		}
 
-			setLoaded(true);
-		} else {
-			await prisma.invoice
-				.findFirst({
-					orderBy: {
-						created: "desc",
-					},
-				})
-				.then((latestInvoice) => {
-					if (!latestInvoice) return;
+	// 		setLoaded(true);
+	// 	} else {
+	// 		await getLastInvoiceDetails()
+	// 			.then((invoice) => {
+	// 				if (!invoice) return;
 
-					let invoice = lastInvoiceDetails;
-					if (auth.currentUser && invoice) {
-						if (invoice.invoice_no) {
-							invoice.invoice_no = incrementInvoiceNo(invoice.invoice_no);
-							invoice.owner = auth.currentUser.uid;
-						} else {
-							invoice = {
-								owner: auth.currentUser?.uid,
-								client_no: "",
-								client_name: "",
-								bill_to: "",
-								invoice_no: "",
-								activities: [],
-								date: firebase.firestore.Timestamp.fromDate(new Date()),
-							};
-						}
+	// 				if (auth.currentUser && invoice) {
+	// 					if (invoice.invoice_no) {
+	// 						invoice.invoice_no = incrementInvoiceNo(invoice.invoice_no);
+	// 						invoice.owner = auth.currentUser.uid;
+	// 					} else {
+	// 						invoice = {
+	// 							owner: auth.currentUser?.uid,
+	// 							client_no: "",
+	// 							client_name: "",
+	// 							bill_to: "",
+	// 							invoice_no: "",
+	// 							activities: [],
+	// 							date: firebase.firestore.Timestamp.fromDate(new Date()),
+	// 						};
+	// 					}
 
-						setLastInvoice(invoice);
-						setLoaded(true);
-					} else {
-						console.warn("Not logged in.");
-					}
-				});
-		}
-	}
+	// 					setLastInvoice(invoice);
+	// 					setLoaded(true);
+	// 				} else {
+	// 					console.warn("Not logged in.");
+	// 				}
+	// 			});
+	// 	}
+	// }
 
-	useEffect(() => {
-		loadInvoiceDetails();
-	}, []);
+	// useEffect(() => {
+	// 	loadInvoiceDetails();
+	// }, []);
 
 	const Form = (props: FormikProps<Invoice>) => {
 		const {
@@ -140,14 +131,14 @@ export default function CreateInvoice({
 					touched={touched.invoiceNo}
 				/>
 
-				{/* <ActivityList
+				<ActivityList
 					values={values}
 					errors={errors}
 					touched={touched}
 					getIn={getIn}
 					setFieldValue={setFieldValue}
 					handleChange={handleChange}
-				/> */}
+				/>
 
 				<div className="field is-grouped">
 					<p className="control">
@@ -167,7 +158,7 @@ export default function CreateInvoice({
 	};
 
 	const EnhancedForm = withFormik({
-		mapPropsToValues: () => lastInvoice,
+		mapPropsToValues: () => ({} as Invoice),
 		handleSubmit: async (values, actions) => {
 			// const activityDetails = await getActivities();
 
@@ -197,9 +188,10 @@ export default function CreateInvoice({
 			// 	createInvoice(values);
 			// }
 
-			// actions.setSubmitting(false);
-			// setCreating(false);
+			console.log(values);
 			console.log("Submitting");
+			actions.setSubmitting(false);
+			setCreating(false);
 		},
 
 		validationSchema: InvoiceValidationSchema,
@@ -207,8 +199,5 @@ export default function CreateInvoice({
 		displayName: "BasicForm",
 	})(Form);
 
-	if (loaded) {
-		return <EnhancedForm />;
-	}
-	return <div>Loading Previous Invoice...</div>;
+	return <EnhancedForm />;
 }

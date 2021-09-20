@@ -48,7 +48,7 @@ model User {
 
   supportItems SupportItem[]
   invoices     Invoice[]
-  Client       Client[]
+  clients      Client[]
 }
 
 model VerificationToken {
@@ -82,8 +82,8 @@ model Invoice {
   client   Client @relation(fields: [clientId], references: [id])
   clientId String
 
-  items     Activity[]
-  templates Template[]
+  activities Activity[]
+  templates  Template[]
 
   owner   User   @relation(fields: [ownerId], references: [id])
   ownerId String
@@ -97,6 +97,7 @@ model Activity {
   startTime       DateTime
   endTime         DateTime
   itemDuration    Int
+  itemDistance    Int?
   transitDuration Int?
   transitDistance Int?
 
@@ -120,16 +121,16 @@ model SupportItem {
   rateType    RateType
 
   weekdayCode String
-  weekdayRate String
+  weekdayRate Decimal
 
   weeknightCode String?
-  weeknightRate String?
+  weeknightRate Decimal?
 
   saturdayCode String?
-  saturdayRate String?
+  saturdayRate Decimal?
 
   sundayCode String?
-  sundayRate String?
+  sundayRate Decimal?
 
   owner   User   @relation(fields: [ownerId], references: [id])
   ownerId String
