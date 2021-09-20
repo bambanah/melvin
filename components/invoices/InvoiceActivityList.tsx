@@ -1,12 +1,11 @@
+import { Activity, Invoice } from "@prisma/client";
 import { Field, FieldArray, FormikErrors, FormikTouched } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import styled from "styled-components";
 import Button from "../../shared/components/Button";
 import Text from "../../shared/components/text/Text";
-import { getActivities } from "../../shared/utils/firebase";
-import { ActivityObject, Invoice } from "../../shared/types";
-import TimePicker from "./TimePicker";
 import Control from "./Control";
+import TimePicker from "./TimePicker";
 
 interface PropInterface {
 	values: Invoice;
@@ -90,7 +89,7 @@ export default function ActivityList({
 	const [loaded, setLoaded] = useState(false);
 
 	useEffect(() => {
-		getActivities().then((activityObject: ActivityObject) => {
+		getActivities().then((activityObject: Activity) => {
 			setActivities(activityObject);
 
 			setLoaded(true);

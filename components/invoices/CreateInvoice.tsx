@@ -140,14 +140,14 @@ export default function CreateInvoice({
 					touched={touched.invoiceNo}
 				/>
 
-				<ActivityList
+				{/* <ActivityList
 					values={values}
 					errors={errors}
 					touched={touched}
 					getIn={getIn}
 					setFieldValue={setFieldValue}
 					handleChange={handleChange}
-				/>
+				/> */}
 
 				<div className="field is-grouped">
 					<p className="control">
