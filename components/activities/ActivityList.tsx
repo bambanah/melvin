@@ -17,21 +17,6 @@ function SupportItemList() {
 		getSupportItems
 	);
 
-	// useEffect(() => {
-	// 	const unsubscribe = streamActivities({
-	// 		next: (querySnapshot: firebase.firestore.QuerySnapshot) => {
-	// 			const fetchedActivities: ActivityObject = {};
-	// 			querySnapshot.forEach((document: firebase.firestore.DocumentData) => {
-	// 				const activity: ActivityType = document.data();
-	// 				fetchedActivities[document.id] = activity;
-	// 			});
-	// 			setActivities(fetchedActivities);
-	// 		},
-	// 		error: (err: Error) => console.error(err.message),
-	// 	});
-	// 	return unsubscribe;
-	// }, []);
-
 	if (error) {
 		console.error(error);
 		return <div>Error loading</div>;

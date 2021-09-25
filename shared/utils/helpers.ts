@@ -12,6 +12,7 @@ import {
 	faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import prisma from "./prisma";
+import { Invoice } from "@prisma/client";
 
 export const importIcons = () => {
 	library.add(faEdit, faTimes, faCheck, faTrash, faCopy, faFileDownload);
@@ -98,7 +99,7 @@ export const getTotalCost = async (invoiceId: string) => {
 		},
 	});
 
-	if (!invoice) return null;
+	if (!invoice) return 0;
 
 	invoice.activities.forEach((activity) => {
 		const { supportItem } = activity;
@@ -136,8 +137,8 @@ export const getTotalCost = async (invoiceId: string) => {
 	return totalCost;
 };
 
-// export const getTotalString = (invoice: Invoice) =>
-// 	getTotalCost(invoice).then((cost) => `$${cost.toFixed(2)}`);
+export const getTotalString = (invoiceId: string) =>
+	getTotalCost(invoiceId).then((cost) => `$${cost.toFixed(2)}`);
 
 // export const getRate = async (activity: InvoiceActivity) => {
 // 	let rate;

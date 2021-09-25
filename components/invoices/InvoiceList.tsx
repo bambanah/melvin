@@ -2,11 +2,11 @@ import firebase from "firebase/app";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Invoice as InvoiceType, InvoiceObject } from "../../shared/types";
-import { deleteInvoice, streamInvoices } from "../../shared/utils/firebase";
 import { getTotalString } from "../../shared/utils/helpers";
 import generatePDF from "../../shared/utils/pdf-generation";
 import Table from "../../shared/components/Table";
+import { Invoice } from ".prisma/client";
+import useSWR from "swr";
 
 const InvoiceTable = styled(Table)``;
 
@@ -35,17 +35,13 @@ const TableCell = styled.td`
 	padding: 1rem 0.5rem;
 `;
 
-const Invoice = ({
+const SingleInvoice = ({
 	invoice,
 	setInvoice,
 	invoiceId,
 }: {
-	invoice: InvoiceType;
-	setInvoice: (
-		invoice: InvoiceType,
-		editing?: boolean,
-		invoiceId?: string
-	) => void;
+	invoice: Invoice;
+	setInvoice: (invoice: Invoice, editing?: boolean, invoiceId?: string) => void;
 	invoiceId: string;
 }) => {
 	const [cost, setTotalCost] = useState<null | string>(null);
@@ -56,8 +52,8 @@ const Invoice = ({
 
 	return (
 		<InvoiceRow>
-			<TableCell>{invoice.invoice_no}</TableCell>
-			<TableCell>{invoice.client_name}</TableCell>
+			<TableCell>{invoice.invoiceNo}</TableCell>
+			<TableCell>{invoice.clientId}</TableCell>
 			<TableCell>{invoice.activities.length}</TableCell>
 
 			<TableCell>{cost}</TableCell>
@@ -87,29 +83,24 @@ const Invoice = ({
 	);
 };
 
+const getInvoices = async () => {
+	const response = await fetch("/api/invoices");
+
+	return (await response.json()) as Invoice[];
+};
+
 export default function InvoiceList({
 	setInvoice,
 }: {
-	setInvoice: (invoice: InvoiceType, editing?: boolean) => void;
+	setInvoice: (invoice: Invoice, editing?: boolean) => void;
 }) {
-	const [invoices, setInvoices] = useState<InvoiceObject>({});
+	const { data: invoices, error } = useSWR("/api/activities", getInvoices);
 
-	useEffect(() => {
-		const unsubscribe = streamInvoices({
-			next: (querySnapshot: firebase.firestore.QuerySnapshot) => {
-				const updatedInvoices: InvoiceObject = {};
-
-				querySnapshot.forEach((document: firebase.firestore.DocumentData) => {
-					const invoice: InvoiceType = document.data();
-					updatedInvoices[document.id] = invoice;
-				});
-
-				setInvoices(updatedInvoices);
-			},
-			error: () => console.error("Couldn't get invoices."),
-		});
-		return unsubscribe;
-	}, []);
+	if (error) {
+		console.error(error);
+		return <div>Error loading</div>;
+	}
+	if (!invoices) return <div>loading...</div>;
 
 	return (
 		<InvoiceTable>
@@ -122,11 +113,11 @@ export default function InvoiceList({
 					{/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
 					<th />
 				</tr>
-				{Object.keys(invoices).map((invoiceId: string) => (
-					<Invoice
-						invoice={invoices[invoiceId]}
-						invoiceId={invoiceId}
-						key={invoiceId}
+				{invoices.map((invoice) => (
+					<SingleInvoice
+						invoice={invoice}
+						invoiceId={invoice.id}
+						key={invoice.id}
 						setInvoice={setInvoice}
 					/>
 				))}
