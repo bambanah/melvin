@@ -1,6 +1,6 @@
 import firebase from "firebase/app";
 import { FormikErrors, FormikTouched, getIn } from "formik";
-import moment, { Moment } from "moment";
+import moment from "moment";
 // import { toast } from "react-toastify";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -12,7 +12,6 @@ import {
 	faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import prisma from "./prisma";
-import { Invoice } from "@prisma/client";
 
 export const importIcons = () => {
 	library.add(faEdit, faTimes, faCheck, faTrash, faCopy, faFileDownload);
@@ -66,21 +65,45 @@ export const getPrettyDuration = (hours: number) => {
 	return durationString;
 };
 
-export const decideRate = (
-	date: Moment,
-	endTime: Date
-): "weekday" | "weeknight" | "saturday" | "sunday" => {
-	if (date.day() === 0) {
-		return "sunday";
+export const getRate = async (
+	activityId: string
+): Promise<[code: string, rate: number]> => {
+	const activity = await prisma.activity.findFirst({
+		where: {
+			id: activityId,
+		},
+		include: {
+			supportItem: true,
+		},
+	});
+
+	if (!activity || !activity.supportItem) return ["", 0];
+
+	const { supportItem } = activity;
+
+	if (
+		moment(activity.date).day() === 0 &&
+		supportItem.sundayCode &&
+		supportItem.sundayRate
+	) {
+		return [supportItem.sundayCode, supportItem.sundayRate.toNumber()];
 	}
-	if (date.day() === 6) {
-		return "saturday";
+	if (
+		moment(activity.date).day() === 6 &&
+		supportItem.saturdayCode &&
+		supportItem.saturdayRate
+	) {
+		return [supportItem.saturdayCode, supportItem.saturdayRate.toNumber()];
 	}
-	if (moment(endTime, "HH:mm").isAfter(moment("20:00", "HH:mm"))) {
-		return "weeknight";
+	if (
+		moment(activity.endTime, "HH:mm").isAfter(moment("20:00", "HH:mm")) &&
+		supportItem.weeknightCode &&
+		supportItem.weeknightRate
+	) {
+		return [supportItem.weeknightCode, supportItem.weeknightRate.toNumber()];
 	}
 
-	return "weekday";
+	return [supportItem.weekdayCode, supportItem.weekdayRate.toNumber()];
 };
 
 export const getTotalCost = async (invoiceId: string) => {
@@ -93,7 +116,11 @@ export const getTotalCost = async (invoiceId: string) => {
 		include: {
 			activities: {
 				include: {
-					supportItem: true,
+					supportItem: {
+						select: {
+							rateType: true,
+						},
+					},
 				},
 			},
 		},
@@ -101,35 +128,16 @@ export const getTotalCost = async (invoiceId: string) => {
 
 	if (!invoice) return 0;
 
-	invoice.activities.forEach((activity) => {
+	invoice.activities.forEach(async (activity) => {
 		const { supportItem } = activity;
 
-		const rateType = decideRate(moment(activity.date), activity.endTime);
-
-		let rate;
-		switch (rateType) {
-			case "sunday":
-				rate = supportItem.sundayRate;
-				break;
-
-			case "weeknight":
-				rate = supportItem.weeknightRate;
-				break;
-
-			case "saturday":
-				rate = supportItem.saturdayRate;
-				break;
-
-			default:
-				rate = supportItem.weekdayRate;
-				break;
-		}
+		const [, rate] = await getRate(activity.id);
 
 		if (rate) {
 			if (supportItem.rateType === "HOUR") {
-				totalCost += rate.toNumber() * activity.itemDuration;
+				totalCost += rate * activity.itemDuration;
 			} else if (supportItem.rateType === "KM") {
-				totalCost += rate.toNumber() * Number(activity.itemDistance);
+				totalCost += rate * Number(activity.itemDistance);
 			}
 		}
 	});
@@ -139,51 +147,6 @@ export const getTotalCost = async (invoiceId: string) => {
 
 export const getTotalString = (invoiceId: string) =>
 	getTotalCost(invoiceId).then((cost) => `$${cost.toFixed(2)}`);
-
-// export const getRate = async (activity: InvoiceActivity) => {
-// 	let rate;
-// 	let itemCode;
-
-// 	const activityDetails = await getActivities();
-// 	const activityId = activity.activity_ref.split("/")[1];
-
-// 	const activityDetail = activityDetails[activityId];
-
-// 	if (
-// 		moment(activity.date, "DD/MM/YY").isoWeekday() === 6 &&
-// 		activityDetail.saturday.rate !== undefined &&
-// 		activityDetail.saturday.rate !== 0 &&
-// 		activityDetail.saturday.item_code.length > 0
-// 	) {
-// 		// Day is a saturday
-// 		rate = activityDetail.saturday.rate;
-// 		itemCode = activityDetail.saturday.item_code;
-// 	} else if (
-// 		moment(activity.date, "DD/MM/YY").isoWeekday() === 7 &&
-// 		activityDetail.sunday.rate !== undefined &&
-// 		activityDetail.sunday.rate !== 0 &&
-// 		activityDetail.sunday.item_code.length > 0
-// 	) {
-// 		// Day is a sunday
-// 		rate = activityDetail.sunday.rate;
-// 		itemCode = activityDetail.sunday.item_code;
-// 	} else if (
-// 		activity.end_time &&
-// 		activityDetail.weeknight.rate !== undefined &&
-// 		activityDetail.weeknight.rate !== 0 &&
-// 		moment(activity.end_time, "HH:mm").isAfter(moment("20:00", "HH:mm"))
-// 	) {
-// 		// Day is a weekday and it's after 8pm
-// 		rate = activityDetail.weeknight.rate;
-// 		itemCode = activityDetail.weeknight.item_code;
-// 	} else {
-// 		// Weekday before 8pm
-// 		rate = activityDetail.weekday.rate;
-// 		itemCode = activityDetail.weekday.item_code;
-// 	}
-
-// 	return { rate, itemCode };
-// };
 
 // export const createTemplateFromInvoice = (invoice: Invoice) => {
 // 	invoice.activities.map((activity) => {

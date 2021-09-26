@@ -1,12 +1,12 @@
-import firebase from "firebase/app";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getTotalString } from "../../shared/utils/helpers";
-import generatePDF from "../../shared/utils/pdf-generation";
-import Table from "../../shared/components/Table";
-import { Invoice } from ".prisma/client";
 import useSWR from "swr";
+import axios from "axios";
+import jsPDF from "jspdf";
+import { getTotalString } from "../../shared/utils/helpers";
+import Table from "../../shared/components/Table";
+import { Activity, Invoice } from ".prisma/client";
 
 const InvoiceTable = styled(Table)``;
 
@@ -35,19 +35,42 @@ const TableCell = styled.td`
 	padding: 1rem 0.5rem;
 `;
 
+const getInvoices = async () => {
+	const response = await fetch("/api/invoices");
+
+	return (await response.json()) as Invoice[];
+};
+
+const deleteInvoice = async (invoiceId: string) => {
+	await axios.delete(`http://localhost:3000/${invoiceId}`).then((res) => {
+		console.log(res.data);
+	});
+};
+
+const generatePDF = async (invoiceId: string) => {
+	await axios.get(`http://localhost:3000/${invoiceId}`).then((res) => {
+		console.log(res.data);
+		const pdf: jsPDF = res.data;
+
+		pdf.save();
+	});
+};
+
 const SingleInvoice = ({
 	invoice,
 	setInvoice,
 	invoiceId,
 }: {
-	invoice: Invoice;
+	invoice: Invoice & {
+		activities: Activity[];
+	};
 	setInvoice: (invoice: Invoice, editing?: boolean, invoiceId?: string) => void;
 	invoiceId: string;
 }) => {
 	const [cost, setTotalCost] = useState<null | string>(null);
 
 	useEffect(() => {
-		getTotalString(invoice).then((costString) => setTotalCost(costString));
+		getTotalString(invoice.id).then((costString) => setTotalCost(costString));
 	}, [invoice]);
 
 	return (
@@ -66,7 +89,7 @@ const SingleInvoice = ({
 					/>
 					<Action onClick={() => setInvoice(invoice)} icon="copy" size="lg" />
 					<Action
-						onClick={() => generatePDF(invoice)}
+						onClick={() => generatePDF(invoice.id)}
 						icon="file-download"
 						size="lg"
 					/>
@@ -81,12 +104,6 @@ const SingleInvoice = ({
 			</TableCell>
 		</InvoiceRow>
 	);
-};
-
-const getInvoices = async () => {
-	const response = await fetch("/api/invoices");
-
-	return (await response.json()) as Invoice[];
 };
 
 export default function InvoiceList({

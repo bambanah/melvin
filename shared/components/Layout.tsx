@@ -33,21 +33,12 @@ const Content = styled.div`
 	}
 `;
 
-const Layout: React.FC<Props> = ({ children }) => {
-	const { data: session } = useSession();
+const Layout: React.FC<Props> = ({ children }) => (
+	<Container>
+		<Navbar />
 
-	if (!session) {
-		Router.push("/login")
-		return <div>You need to be authenticated to see this page</div>;
-	}
-
-	return (
-		<Container>
-			<Navbar />
-
-			<Content>{children}</Content>
-		</Container>
-	);
-};
+		<Content>{children}</Content>
+	</Container>
+);
 
 export default Layout;
