@@ -31,7 +31,9 @@ module.exports = {
 		],
 		"no-alert": 0,
 		"no-restricted-globals": 1,
+		"react-hooks/rules-of-hooks": "error",
+		"react-hooks/exhaustive-deps": "warn",
 	},
 	plugins: ["@typescript-eslint"],
-	extends: ["airbnb-typescript", "prettier"],
+	extends: ["airbnb-typescript", "prettier", "plugin:react-hooks/recommended"],
 };

@@ -1,5 +1,3 @@
-import { useSession } from "next-auth/react";
-import Router from "next/router";
 import React from "react";
 import styled from "styled-components";
 import Navbar from "./Navbar";

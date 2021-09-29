@@ -3,6 +3,7 @@ import React from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { RateType, SupportItem } from "@prisma/client";
 import ActivityValidationSchema from "../../schema/ActivityValidationSchema";
 import { errorIn } from "../../shared/utils/helpers";
 import Button from "../../shared/components/Button";
@@ -12,7 +13,6 @@ import Input from "../../shared/components/forms/Input";
 import Label from "../../shared/components/forms/Label";
 import Select from "../../shared/components/forms/Select";
 import Subheading from "../../shared/components/text/Subheading";
-import { RateType, SupportItem } from ".prisma/client";
 
 interface Props {
 	setCreating: (creating: boolean) => void;
@@ -164,7 +164,7 @@ const CreateSupportItemForm = ({ setCreating }: Props) => {
 			} as Partial<SupportItem>),
 		handleSubmit: (values, { setSubmitting }) => {
 			axios.post("/api/support-items", values).then(() => {
-				toast.success("Support Item Created")
+				toast.success("Support Item Created");
 			});
 
 			setSubmitting(false);

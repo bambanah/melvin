@@ -6,6 +6,7 @@ import {
 	LiteralUnion,
 	signIn,
 } from "next-auth/react";
+import { useRouter } from "next/router";
 import React from "react";
 import Button from "../shared/components/Button";
 
@@ -17,12 +18,25 @@ export default function Login({
 		ClientSafeProvider
 	>;
 }) {
+	const router = useRouter();
+
+	let callbackUrl: string;
+	if (router.query.callbackUrl) {
+		callbackUrl =
+			typeof router.query.callbackUrl === "string"
+				? router.query.callbackUrl
+				: router.query.callbackUrl[0];
+	}
+
 	return (
 		<div className="section">
 			<div className="container">
 				<h1 className="title">Login</h1>
 				{Object.values(providers).map((provider) => (
-					<Button onClick={signIn(provider.id)} key={provider.id}>
+					<Button
+						onClick={() => signIn(provider.id, { callbackUrl })}
+						key={provider.id}
+					>
 						Login with {provider.name}
 					</Button>
 				))}

@@ -1,15 +1,14 @@
+import "bulma/css/bulma.css";
+import { SessionProvider } from "next-auth/react";
 import Head from "next/head";
 import React from "react";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from "styled-components";
-import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import GlobalStyle from "../shared/GlobalStyle";
-
-import "react-toastify/dist/ReactToastify.css";
-import "bulma/css/bulma.css";
-import "../styles/font-imports.scss";
 import { importIcons } from "../shared/utils/helpers";
+import "../styles/font-imports.scss";
 
 const theme = {
 	colors: {
@@ -26,15 +25,20 @@ const theme = {
 // Import Fontawesome Icons
 importIcons();
 
-function App({ Component, pageProps }: AppProps) {
+function App({
+	Component,
+	pageProps,
+}: AppProps & { Component: { auth: boolean } }) {
 	return (
 		<SessionProvider session={pageProps.session}>
 			<ThemeProvider theme={theme}>
 				<Head>
-					<title>NDIS Invoice Generator</title>
+					<title>NDIS Invoice Manager</title>
 				</Head>
 				<GlobalStyle />
+
 				<Component {...pageProps} />
+
 				<ToastContainer />
 			</ThemeProvider>
 		</SessionProvider>

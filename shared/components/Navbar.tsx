@@ -84,7 +84,7 @@ const Navbar = () => {
 
 				<NavLinks>
 					<NavLink href="/invoices">Invoices</NavLink>
-					{/* <NavLink href="/templates">Templates</NavLink> */}
+					<NavLink href="/templates">Templates</NavLink>
 					<NavLink href="/support-items">Support Items</NavLink>
 				</NavLinks>
 

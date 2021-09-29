@@ -1,15 +1,13 @@
+import { Invoice } from "@prisma/client";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { GetServerSideProps } from "next";
-import { getSession } from "next-auth/react";
-import prisma from "@Shared/utils/prisma";
-import Button from "../shared/components/Button";
 import CreateInvoice from "../components/invoices/CreateInvoice";
 import InvoiceList from "../components/invoices/InvoiceList";
+import Button from "../shared/components/Button";
 import Layout from "../shared/components/Layout";
 import Title from "../shared/components/text/Title";
-import { Invoice } from ".prisma/client";
 
 const CreateInvoiceSection = styled.div`
 	background-color: #f1f1f1;
@@ -23,10 +21,13 @@ const Content = styled.div`
 	padding: 0 1em;
 `;
 
-export default function Invoices({ invoices }: { invoices: Invoice[] }) {
+export default function Invoices() {
+	const { status } = useSession({
+		required: true,
+	});
+
 	const [creating, setCreating] = useState(false);
 	const [invoice, setInvoice] = useState<Invoice | null>(null);
-	const [invoiceId, setInvoiceId] = useState<string | undefined>(undefined);
 	const [isEditing, setIsEditing] = useState(false);
 
 	// Set creating whenever an invoice is added
@@ -39,18 +40,16 @@ export default function Invoices({ invoices }: { invoices: Invoice[] }) {
 		if (!creating) {
 			setInvoice(null);
 			setIsEditing(false);
-			setInvoiceId(undefined);
 		}
 	}, [creating]);
 
-	function loadInvoice(
-		invoiceToLoad: Invoice,
-		editing: boolean = false,
-		invoiceToLoadId: string | undefined = undefined
-	) {
+	function loadInvoice(invoiceToLoad: Invoice, editing: boolean = false) {
 		setIsEditing(editing);
-		setInvoiceId(invoiceToLoadId);
 		setInvoice(invoiceToLoad);
+	}
+
+	if (status === "loading") {
+		return <div>Loading...</div>;
 	}
 
 	return (
@@ -60,12 +59,7 @@ export default function Invoices({ invoices }: { invoices: Invoice[] }) {
 			</Head>
 			{creating && (
 				<CreateInvoiceSection className={`section ${creating && "expanded"}`}>
-					<CreateInvoice
-						invoiceToLoad={invoice}
-						setCreating={setCreating}
-						editPrevious={isEditing}
-						invoiceId={invoiceId}
-					/>
+					<CreateInvoice setCreating={setCreating} editPrevious={isEditing} />
 				</CreateInvoiceSection>
 			)}
 
@@ -81,24 +75,3 @@ export default function Invoices({ invoices }: { invoices: Invoice[] }) {
 		</Layout>
 	);
 }
-
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-	const session = await getSession({ req });
-
-	if (!session) {
-		return {
-			redirect: {
-				permanent: false,
-				destination: "/login",
-			},
-		};
-	}
-
-	const invoices = await prisma.invoice.findMany();
-
-	return {
-		props: {
-			invoices,
-		},
-	};
-};

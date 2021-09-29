@@ -54,7 +54,6 @@ const generatePDF = async (invoiceId: string) => {
 		invoice.activities.map(async (activity) => {
 			if (!activity || !activity.supportItem) return;
 
-			//
 			const [itemCode, rate] = await getRate(activity.id);
 
 			let countString = "";

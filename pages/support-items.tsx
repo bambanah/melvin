@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import SupportItemList from "../components/activities/ActivityList";
 import CreateSupportItemForm from "../components/activities/CreateActivityForm";
@@ -16,35 +17,34 @@ const CreateActivityContainer = styled.div`
 `;
 
 function SupportItems() {
-	const [loading, setLoading] = useState(true);
+	const { status } = useSession({
+		required: true,
+	});
+
 	const [creating, setCreating] = useState(false);
 
-	useEffect(() => {
-		setLoading(false);
-	}, []);
-
-	if (!loading) {
-		return (
-			<Layout>
-				{creating && (
-					<CreateActivityContainer>
-						<Title>New Activity</Title>
-						<CreateSupportItemForm setCreating={setCreating} />
-					</CreateActivityContainer>
-				)}
-
-				<Title>Activities</Title>
-
-				{!creating && (
-					<Button onClick={() => setCreating(true)}>Create New</Button>
-				)}
-
-				<SupportItemList />
-			</Layout>
-		);
+	if (status === "loading") {
+		return <div>Loading...</div>;
 	}
 
-	return <div>Loading...</div>;
+	return (
+		<Layout>
+			{creating && (
+				<CreateActivityContainer>
+					<Title>New Activity</Title>
+					<CreateSupportItemForm setCreating={setCreating} />
+				</CreateActivityContainer>
+			)}
+
+			<Title>Activities</Title>
+
+			{!creating && (
+				<Button onClick={() => setCreating(true)}>Create New</Button>
+			)}
+
+			<SupportItemList />
+		</Layout>
+	);
 }
 
 export default SupportItems;

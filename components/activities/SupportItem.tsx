@@ -3,7 +3,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import styled from "styled-components";
-import { SupportItem } from ".prisma/client";
+import { SupportItem } from "@prisma/client";
 
 interface Props {
 	supportItem: SupportItem;

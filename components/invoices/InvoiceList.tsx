@@ -4,9 +4,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useSWR from "swr";
 import axios from "axios";
 import jsPDF from "jspdf";
+import { Activity, Invoice } from "@prisma/client";
 import { getTotalString } from "../../shared/utils/helpers";
 import Table from "../../shared/components/Table";
-import { Activity, Invoice } from ".prisma/client";
 
 const InvoiceTable = styled(Table)``;
 
@@ -127,8 +127,7 @@ export default function InvoiceList({
 					<th>Name</th>
 					<th>No. Activities</th>
 					<th>Total</th>
-					{/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-					<th />
+					<th> </th>
 				</tr>
 				{invoices.map((invoice) => (
 					<SingleInvoice
