@@ -103,16 +103,21 @@ const generatePDF = (invoice: Invoice) => {
 
 					// Provider Travel - Non Labour Costs
 					if (activity.travel_distance > 0) {
+						const isGroup =
+							activityDetails[activityId].description ===
+							"Group Activities - Standard";
 						const providerTravel = [];
 
-						const travelTotal = 0.85 * activity.travel_distance;
+						const travelRate = isGroup ? 0.43 : 0.85;
+						const travelTotal = travelRate * activity.travel_distance;
+						const travelCode = isGroup ? "04_799_0136_6_1" : itemCode;
 
 						providerTravel.push(
-							`Provider Travel - Non Labour Costs\n${itemCode}\n`
+							`Provider Travel - Non Labour Costs\n${travelCode}\n`
 						);
 						providerTravel.push(`${activity.date}\n`);
 						providerTravel.push(`${activity.travel_distance} km\n`);
-						providerTravel.push("$0.85/km\n");
+						providerTravel.push(`$${travelRate.toFixed(2)}/km\n`);
 						providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
 
 						activities.push(providerTravel);
