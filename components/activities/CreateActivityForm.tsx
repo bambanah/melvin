@@ -71,6 +71,7 @@ const CreateActivityForm = ({
 		handleChange,
 		handleBlur,
 		handleSubmit,
+		setFieldValue
 	}: FormikProps<ActivityType>) => (
 		<Form onSubmit={handleSubmit} flexDirection="column">
 			<InputGroup>
@@ -138,7 +139,12 @@ const CreateActivityForm = ({
 						<span style={{ marginRight: "-0.8rem" }}>$</span>
 						<Input
 							type="text"
-							onChange={handleChange}
+							onChange={(e) => {
+								e.preventDefault();
+								const { value } = e.target;
+
+								setFieldValue(`${day}.rate`, parseFloat(value));
+							}}
 							onBlur={handleBlur}
 							name={`${day}.rate`}
 							id={`${day}.rate`}
