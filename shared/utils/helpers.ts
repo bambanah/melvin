@@ -12,7 +12,7 @@ import {
 	faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { Invoice, InvoiceActivity, Template } from "../types";
-import { createTemplate, getActivities } from "./firebase";
+import { auth, createTemplate, firestore, getActivities } from "./firebase";
 
 export const importIcons = () => {
 	library.add(faEdit, faTimes, faCheck, faTrash, faCopy, faFileDownload);
@@ -154,6 +154,28 @@ export const getTotalCost = async (invoice: Invoice) => {
 
 export const getTotalString = (invoice: Invoice) =>
 	getTotalCost(invoice).then((cost) => `$${cost.toFixed(2)}`);
+
+export const getTotalIncomeForYear = async (year: number) => {
+	const fromDate = new Date(year, 7, 1);
+	const toDate = new Date(year + 1, 6, 30);
+
+	const querySnapshot = await firestore
+		.collection("invoices")
+		.where("owner", "==", auth.currentUser?.uid)
+		.where("date", ">=", firebase.firestore.Timestamp.fromDate(fromDate))
+		.where("date", "<=", firebase.firestore.Timestamp.fromDate(toDate))
+		.get();
+
+	const arrayOfTotals = await Promise.all(querySnapshot.docs.map(async (doc) => {
+		const invoice = doc.data() as Invoice;
+
+		const totalCost = await getTotalCost(invoice);
+
+		return totalCost;
+	}));
+
+	return arrayOfTotals.reduce((a,b) => a + b);
+};
 
 export const createTemplateFromInvoice = (invoice: Invoice) => {
 	invoice.activities.map((activity) => {
