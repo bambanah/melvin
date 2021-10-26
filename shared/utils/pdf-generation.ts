@@ -20,8 +20,12 @@ const generatePDF = (invoice: Invoice) => {
 	// Write details at top of page
 	const invoiceDetails = [
 		`Invoice Date: ${date}`,
-		`Participant Name: ${invoice.client_name}`,
-		`Participant Number: ${invoice.client_no}`,
+		`Participant Name${invoice.client_name.includes("&") ? "s" : ""}: ${
+			invoice.client_name
+		}`,
+		`Participant Number${invoice.client_no.includes("&") ? "s" : ""}: ${
+			invoice.client_no
+		}`,
 		`Bill To: ${invoice.bill_to}`,
 		`Invoice Number: ${invoice.invoice_no}`,
 	];
@@ -42,6 +46,7 @@ const generatePDF = (invoice: Invoice) => {
 				let countString = "";
 
 				await getRate(activity).then(({ rate, itemCode }) => {
+					// rate = parseInt(rate, 10);
 					if (rate) {
 						if (activityDetails[activityId].rate_type === "hr") {
 							totalCost = rate * activity.duration;
@@ -70,6 +75,7 @@ const generatePDF = (invoice: Invoice) => {
 							2
 						)}${`/${activityDetails[activityId].rate_type}`}\n`
 					);
+
 					currentActivity.push(`$${totalCost.toFixed(2)}\n`);
 
 					activities.push(currentActivity);
