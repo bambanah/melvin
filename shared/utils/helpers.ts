@@ -68,41 +68,6 @@ export const getPrettyDuration = (hours: number) => {
 	return durationString;
 };
 
-export const getTotalCost = async (invoice: Invoice) => {
-	let totalCost = 0;
-
-	const activityDetails = await getActivities();
-
-	invoice.activities.forEach((activity) => {
-		const activityId = activity.activity_ref.split("/")[1];
-
-		const activityDetail = activityDetails[activityId];
-
-		let rate;
-		if (
-			activity.end_time &&
-			moment(activity.end_time, "HH:mm").isAfter(moment("20:00", "HH:mm"))
-		) {
-			rate = activityDetail?.weeknight.rate;
-		} else {
-			rate = activityDetail?.weekday.rate;
-		}
-
-		if (rate) {
-			if (activityDetail?.rate_type === "hr") {
-				totalCost += rate * activity.duration;
-			} else if (activityDetail?.rate_type === "km") {
-				totalCost += rate * Number(activity.distance);
-			}
-		}
-	});
-
-	return totalCost;
-};
-
-export const getTotalString = (invoice: Invoice) =>
-	getTotalCost(invoice).then((cost) => `$${cost.toFixed(2)}`);
-
 export const getRate = async (activity: InvoiceActivity) => {
 	let rate;
 	let itemCode;
@@ -147,6 +112,48 @@ export const getRate = async (activity: InvoiceActivity) => {
 
 	return { rate, itemCode };
 };
+
+export const getTotalCost = async (invoice: Invoice) => {
+	let totalCost = 0;
+
+	const activityDetails = await getActivities();
+
+	await Promise.all(
+		invoice.activities.map(async (activity) => {
+			const activityId = activity.activity_ref.split("/")[1];
+
+			const { rate } = await getRate(activity);
+
+			if (rate) {
+				if (activityDetails[activityId].rate_type === "hr") {
+					totalCost += rate * activity.duration;
+				} else if (activityDetails[activityId].rate_type === "km") {
+					totalCost += rate * parseInt(activity.distance, 10);
+				}
+			}
+
+			// Provider Travel
+			if (activity.travel_duration > 0 && rate) {
+				totalCost += (rate / 60) * activity.travel_duration;
+			}
+
+			// Provider Travel - Non Labour Costs
+			if (activity.travel_distance > 0) {
+				const isGroup =
+					activityDetails[activityId].description ===
+					"Group Activities - Standard";
+
+				const travelRate = isGroup ? 0.43 : 0.85;
+				totalCost += travelRate * activity.travel_distance;
+			}
+		})
+	);
+
+	return totalCost;
+};
+
+export const getTotalString = (invoice: Invoice) =>
+	getTotalCost(invoice).then((cost) => `$${cost.toFixed(2)}`);
 
 export const createTemplateFromInvoice = (invoice: Invoice) => {
 	invoice.activities.map((activity) => {
