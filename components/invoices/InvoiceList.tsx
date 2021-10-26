@@ -2,6 +2,7 @@ import firebase from "firebase/app";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import moment from "moment";
 import { Invoice as InvoiceType, InvoiceObject } from "../../shared/types";
 import { deleteInvoice, streamInvoices } from "../../shared/utils/firebase";
 import { getTotalString } from "../../shared/utils/helpers";
@@ -57,6 +58,7 @@ const Invoice = ({
 	return (
 		<InvoiceRow>
 			<TableCell>{invoice.invoice_no}</TableCell>
+			<TableCell>{moment(invoice.date.toDate()).format("DD-MM-yyyy")}</TableCell>
 			<TableCell>{invoice.client_name}</TableCell>
 			<TableCell>{invoice.activities.length}</TableCell>
 
@@ -116,6 +118,7 @@ export default function InvoiceList({
 			<tbody>
 				<tr key="Header">
 					<th>Invoice No.</th>
+					<th>Date</th>
 					<th>Name</th>
 					<th>No. Activities</th>
 					<th>Total</th>
