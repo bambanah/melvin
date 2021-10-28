@@ -37,23 +37,18 @@ export const getCurrentUser = () => auth.currentUser;
 export const isAuthenticated = () => auth.currentUser !== null;
 
 export const signIn = async () => {
-	try {
-		await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+	await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-		const provider = new firebase.auth.GoogleAuthProvider();
-		return await auth.signInWithPopup(provider);
-	} catch (err) {
+	const provider = new firebase.auth.GoogleAuthProvider();
+	return auth.signInWithPopup(provider).catch((err) => {
 		console.error(err.message);
-		return null;
-	}
+	});
 };
 
-export const signOut = async () => {
-	try {
-		await auth.signOut();
-	} catch (err) {
+export const signOut = () => {
+	auth.signOut().catch((err) => {
 		console.error(err.message);
-	}
+	});
 };
 
 //

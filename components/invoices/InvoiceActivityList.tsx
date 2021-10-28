@@ -2,7 +2,6 @@ import { Field, FieldArray, FormikErrors, FormikTouched } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import styled from "styled-components";
 import Button from "../../shared/components/Button";
-import Text from "../../shared/components/text/Text";
 import { getActivities } from "../../shared/utils/firebase";
 import { ActivityObject, Invoice } from "../../shared/types";
 import TimePicker from "./TimePicker";
@@ -111,7 +110,7 @@ export default function ActivityList({
 					<>
 						{values.activities && (
 							<>
-								<Text className="label">Activities</Text>
+								<p className="label">Activities</p>
 								<ActivityListContainer>
 									{values.activities.map((activity_value, index) => (
 										<ActivityRow key={activity_value + index.toString()}>
