@@ -1,31 +1,33 @@
 {
-	"compilerOptions": {
-		"target": "es5",
-		"lib": ["dom", "dom.iterable", "esnext"],
-		"allowJs": true,
-		"skipLibCheck": true,
-		"esModuleInterop": true,
-		"allowSyntheticDefaultImports": true,
-		"strict": true,
-		"forceConsistentCasingInFileNames": true,
-		"noFallthroughCasesInSwitch": true,
-		"module": "esnext",
-		"moduleResolution": "node",
-		"resolveJsonModule": true,
-		"isolatedModules": true,
-		"noEmit": true,
-		"jsx": "preserve",
-		"baseUrl": ".",
-		"paths": {
-			"@Components/*": ["components/*"],
-			"@Pages/*": ["pages/*"],
-			"@Hooks/*": ["shared/hooks/*"],
-			"@Shared/*": ["shared/*"],
-			"@Styles/*": ["styles/*"],
-			"@Utils/*": ["shared/utils/*"],
-			"@Schema/*": ["schema/*"]
-		}
-	},
-	"include": ["**/*.ts", "**/*.tsx", "**/*.js", ".eslintrc.js"],
-	"exclude": ["node_modules"]
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "incremental": true
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    ".eslintrc.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

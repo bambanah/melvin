@@ -110,7 +110,7 @@ export default function ActivityList({
 					<>
 						{values.activities && (
 							<>
-								<Text className="label">Activities</Text>
+								<p className="label">Activities</p>
 								<ActivityListContainer>
 									{values.activities.map((activity_value, index) => (
 										<ActivityRow key={activity_value + index.toString()}>

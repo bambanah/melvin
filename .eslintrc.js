@@ -4,13 +4,16 @@ module.exports = {
 	parserOptions: {
 		project: "./tsconfig.json",
 	},
+	plugins: ["@typescript-eslint", "jsx-a11y", "import", "react"],
+	extends: ["airbnb-typescript", "prettier"],
 	rules: {
+		"quote-props": ["error", "consistent-as-needed"],
 		"no-console": ["warn", { allow: ["warn", "error"] }],
 		"no-param-reassign": ["error", { props: false }],
 		"react/jsx-props-no-spreading": 0,
 		"react/prop-types": 0,
 		"react/require-default-props": 0,
-		quotes: ["error", "double"],
+		"quotes": ["error", "double"],
 		"jsx-a11y/anchor-is-valid": 0,
 		"import/no-extraneous-dependencies": 0,
 		"jsx-a11y/label-has-associated-control": [
@@ -34,6 +37,4 @@ module.exports = {
 		"react-hooks/rules-of-hooks": "error",
 		"react-hooks/exhaustive-deps": "warn",
 	},
-	plugins: ["@typescript-eslint"],
-	extends: ["airbnb-typescript", "prettier", "plugin:react-hooks/recommended"],
 };

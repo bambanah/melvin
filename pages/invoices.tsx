@@ -70,6 +70,7 @@ export default function Invoices() {
 						Create New Invoice
 					</Button>
 				)}
+
 				<InvoiceList setInvoice={loadInvoice} />
 			</Content>
 		</Layout>

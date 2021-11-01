@@ -124,6 +124,7 @@ export default function InvoiceList({
 			<tbody>
 				<tr key="Header">
 					<th>Invoice No.</th>
+					<th>Date</th>
 					<th>Name</th>
 					<th>No. Activities</th>
 					<th>Total</th>
