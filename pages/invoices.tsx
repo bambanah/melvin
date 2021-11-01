@@ -7,7 +7,6 @@ import InvoiceList from "../components/invoices/InvoiceList";
 import Layout from "../shared/components/Layout";
 import Title from "../shared/components/text/Title";
 import { Invoice } from "../shared/types";
-import { getTotalIncomeForYear } from "../shared/utils/helpers";
 
 const CreateInvoiceSection = styled.div`
 	background-color: #f1f1f1;
@@ -40,12 +39,6 @@ export default function Home() {
 			setInvoiceId(undefined);
 		}
 	}, [creating]);
-
-	useEffect(() => {
-		getTotalIncomeForYear(2020).then((total) => {
-			setYearlyTotal(total);
-		});
-	}, []);
 
 	function loadInvoice(
 		invoiceToLoad: Invoice,
