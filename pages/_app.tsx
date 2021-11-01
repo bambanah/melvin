@@ -7,7 +7,6 @@ import GlobalStyle from "../shared/GlobalStyle";
 import { AuthProvider } from "../shared/hooks/useAuth";
 
 import "react-toastify/dist/ReactToastify.css";
-import "bulma/css/bulma.css";
 import "../styles/font-imports.scss";
 import { importIcons } from "../shared/utils/helpers";
 

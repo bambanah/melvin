@@ -26,7 +26,6 @@ export default function Home() {
 	const [invoice, setInvoice] = useState<Invoice | null>(null);
 	const [invoiceId, setInvoiceId] = useState<string | undefined>(undefined);
 	const [isEditing, setIsEditing] = useState(false);
-	const [yearlyTotal, setYearlyTotal] = useState(0);
 
 	// Set creating whenever an invoice is added
 	useEffect(() => {
@@ -80,15 +79,6 @@ export default function Home() {
 					<Button primary onClick={() => setCreating(!creating)}>
 						Create New Invoice
 					</Button>
-				)}
-
-				{yearlyTotal && (
-					<div>
-						<p>
-							Total income for 2020/21 financial year: $
-							{yearlyTotal}
-						</p>
-					</div>
 				)}
 
 				<InvoiceList setInvoice={loadInvoice} />
