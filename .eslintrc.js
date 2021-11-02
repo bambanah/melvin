@@ -4,7 +4,7 @@ module.exports = {
 	parserOptions: {
 		project: "./tsconfig.json",
 	},
-	plugins: ["@typescript-eslint", "jsx-a11y", "import", "react"],
+	plugins: ["@typescript-eslint", "jsx-a11y", "import", "react", "react-hooks"],
 	extends: ["airbnb-typescript", "prettier"],
 	rules: {
 		"quote-props": ["error", "consistent-as-needed"],

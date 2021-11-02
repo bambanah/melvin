@@ -38,7 +38,6 @@ export default function Invoices() {
 	// When creation is cancelled, wipe the loaded invoice
 	useEffect(() => {
 		if (!creating) {
-			setInvoice(null);
 			setIsEditing(false);
 		}
 	}, [creating]);

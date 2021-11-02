@@ -1,4 +1,3 @@
-import "bulma/css/bulma.css";
 import { SessionProvider } from "next-auth/react";
 import Head from "next/head";
 import React from "react";
