@@ -1,13 +1,6 @@
 /* eslint-disable import/no-mutable-exports */
 import {
-	Activity,
-	Client,
-	Invoice,
-	Prisma,
 	PrismaClient,
-	SupportItem,
-	Template,
-	User,
 } from "@prisma/client";
 
 declare global {

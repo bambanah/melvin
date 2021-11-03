@@ -36,7 +36,7 @@ const TableCell = styled.td`
 `;
 
 const getInvoices = async () => {
-	const response = await fetch("/api/invoices");
+	const response = await fetch("/api/invoice");
 
 	return (await response.json()) as Invoice[];
 };
@@ -77,7 +77,7 @@ const SingleInvoice = ({
 		<InvoiceRow>
 			<TableCell>{invoice.invoiceNo}</TableCell>
 			<TableCell>{invoice.clientId}</TableCell>
-			<TableCell>{invoice.activities.length}</TableCell>
+			<TableCell>{invoice.activities?.length ?? 2}</TableCell>
 
 			<TableCell>{cost}</TableCell>
 			<TableCell>
@@ -111,7 +111,7 @@ export default function InvoiceList({
 }: {
 	setInvoice: (invoice: Invoice, editing?: boolean) => void;
 }) {
-	const { data: invoices, error } = useSWR("/api/activities", getInvoices);
+	const { data: invoices, error } = useSWR("/api/invoice", getInvoices);
 
 	if (error) {
 		console.error(error);
