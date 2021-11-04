@@ -1,7 +1,6 @@
 import firebase from "firebase/app";
 import { FormikErrors, FormikTouched, getIn } from "formik";
 import moment from "moment";
-// import { toast } from "react-toastify";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
 	faCheck,
@@ -107,7 +106,7 @@ export const getRate = async (
 };
 
 export const getTotalCost = async (invoiceId: string) => {
-	let totalCost = 10;
+	let totalCost = invoiceId.length;
 
 	return totalCost;
 

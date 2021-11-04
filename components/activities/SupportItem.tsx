@@ -4,12 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import styled from "styled-components";
 import { SupportItem } from "@prisma/client";
+import { toast } from "react-toastify";
 
 interface Props {
 	supportItem: SupportItem;
-	// activityId?: string;
-	// setActivityId: (activityId: string | undefined) => void;
-	// setActivityToLoad: (activity: ActivityType) => void;
 }
 
 const Row = styled.tr`
@@ -33,7 +31,7 @@ const Action = styled(FontAwesomeIcon)`
 
 const Activity = ({ supportItem }: Props) => {
 	function deleteThisActivity() {
-		console.log("deleted");
+		toast.success("Deleted Support Item");
 	}
 
 	return (
@@ -63,12 +61,7 @@ const Activity = ({ supportItem }: Props) => {
 			</td>
 			<td>
 				<ActionContainer>
-					<Action
-						icon="edit"
-						onClick={() => {
-							console.log("edit");
-						}}
-					/>
+					<Action icon="edit" onClick={() => {}} />
 					<Action icon="trash" onClick={() => deleteThisActivity()} />
 				</ActionContainer>
 			</td>
