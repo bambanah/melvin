@@ -6,7 +6,7 @@ import {
 	getRate,
 	getTotalCost,
 } from "./helpers";
-import { RateType } from ".prisma/client";
+import { RateType } from "@prisma/client";
 import prisma from "./prisma";
 
 const generatePDF = async (invoiceId: string) => {

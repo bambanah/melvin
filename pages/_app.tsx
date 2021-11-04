@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from "styled-components";
 import type { AppProps } from "next/app";
 import GlobalStyle from "../shared/GlobalStyle";
-import { importIcons } from "../shared/utils/helpers";
+import { importIcons } from "@Utils/helpers";
 import "../styles/font-imports.scss";
 
 const theme = {

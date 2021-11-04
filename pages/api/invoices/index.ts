@@ -1,4 +1,4 @@
-import prisma from "@Shared/utils/prisma";
+import prisma from "@Utils/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {

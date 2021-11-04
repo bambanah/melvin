@@ -1,8 +1,8 @@
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import styled from "styled-components";
-import SupportItemList from "../components/activities/ActivityList";
-import CreateSupportItemForm from "../components/activities/CreateActivityForm";
+import SupportItemList from "@Components/activities/SupportItemList";
+import CreateSupportItemForm from "@Components/activities/CreateActivityForm";
 import Button from "@Components/Button";
 import Layout from "@Components/Layout";
 import Title from "@Components/text/Title";

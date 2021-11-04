@@ -1,4 +1,4 @@
-import { Client } from ".prisma/client";
+import { Client } from "@prisma/client";
 import Layout from "@Components/Layout";
 import { useSession } from "next-auth/react";
 import React from "react";
