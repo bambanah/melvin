@@ -11,7 +11,6 @@ import {
 	faTimes,
 	faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import prisma from "./prisma";
 
 export const importIcons = () => {
 	library.add(faEdit, faTimes, faCheck, faTrash, faCopy, faFileDownload);
@@ -108,7 +107,7 @@ export const getRate = async (
 };
 
 export const getTotalCost = async (invoiceId: string) => {
-	let totalCost = 0;
+	let totalCost = 10;
 
 	return totalCost;
 

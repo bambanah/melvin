@@ -5,7 +5,7 @@ import Table from "../../shared/components/Table";
 import Activity from "./SupportItem";
 
 const getSupportItems = async () => {
-	const response = await fetch("/api/support-item");
+	const response = await fetch("/api/support-items");
 
 	return (await response.json()) as SupportItem[];
 };
@@ -13,7 +13,7 @@ const getSupportItems = async () => {
 function SupportItemList() {
 	// const [supportItems, setActivities] = useState<ActivityObject>({});
 	const { data: supportItems, error } = useSWR(
-		"/api/support-item",
+		"/api/support-items",
 		getSupportItems
 	);
 

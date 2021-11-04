@@ -27,25 +27,6 @@ export default function Invoices() {
 	});
 
 	const [creating, setCreating] = useState(false);
-	const [invoice, setInvoice] = useState<Invoice | null>(null);
-	const [isEditing, setIsEditing] = useState(false);
-
-	// Set creating whenever an invoice is added
-	useEffect(() => {
-		if (invoice) setCreating(true);
-	}, [invoice]);
-
-	// When creation is cancelled, wipe the loaded invoice
-	useEffect(() => {
-		if (!creating) {
-			setIsEditing(false);
-		}
-	}, [creating]);
-
-	function loadInvoice(invoiceToLoad: Invoice, editing: boolean = false) {
-		setIsEditing(editing);
-		setInvoice(invoiceToLoad);
-	}
 
 	if (status === "loading") {
 		return <div>Loading...</div>;
@@ -58,7 +39,7 @@ export default function Invoices() {
 			</Head>
 			{creating && (
 				<CreateInvoiceSection className={`section ${creating && "expanded"}`}>
-					<CreateInvoice setCreating={setCreating} editPrevious={isEditing} />
+					<CreateInvoice setCreating={setCreating} />
 				</CreateInvoiceSection>
 			)}
 
@@ -70,7 +51,7 @@ export default function Invoices() {
 					</Button>
 				)}
 
-				<InvoiceList setInvoice={loadInvoice} />
+				<InvoiceList />
 			</Content>
 		</Layout>
 	);

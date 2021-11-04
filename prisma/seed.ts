@@ -8,21 +8,25 @@ async function main() {
 
 	if (!user) throw new Error("Must create a user first");
 
-	const client = await prisma.client.upsert({
-		where: { id: "John" },
-		create: {
-			firstName: "John",
-			lastName: "Smith",
-			number: "123456789",
-			ownerId: user.id,
-		},
-		update: {},
+	let client = await prisma.client.findFirst({
+		where: { ownerId: user.id, firstName: "John", lastName: "Smith" },
 	});
+	if (!client) {
+		client = await prisma.client.upsert({
+			where: { id: "John" },
+			create: {
+				firstName: "John",
+				lastName: "Smith",
+				number: "123456789",
+				ownerId: user.id,
+			},
+			update: {},
+		});
+	}
 
 	let supportItem = await prisma.supportItem.findFirst({
-		where: { ownerId: client.id },
+		where: { ownerId: user.id, description: "Access Community, Social And Rec Activities - Standard" },
 	});
-
 	if (!supportItem) {
 		supportItem = await prisma.supportItem.create({
 			data: {
@@ -37,14 +41,13 @@ async function main() {
 				sundayCode: "04_106_0125_6_1",
 				sundayRate: 100.16,
 				ownerId: user.id,
-			}
+			},
 		});
 	}
 
 	let invoice = await prisma.invoice.findFirst({
-		where: { ownerId: client.id },
+		where: { ownerId: user.id, invoiceNo: "Test1" },
 	});
-
 	if (!invoice) {
 		invoice = await prisma.invoice.create({
 			data: {
@@ -60,10 +63,22 @@ async function main() {
 							startTime: new Date(),
 							endTime: new Date(),
 							itemDuration: 2,
-							supportItemId: supportItem.id
-						}
-					]
-				}
+							supportItemId: supportItem.id,
+						},
+					],
+				},
+			},
+		});
+	}
+
+	let template = await prisma.template.findFirst({
+		where: { invoiceId: invoice.id, templateName: "Test Template" }
+	});
+	if (!template) {
+		template = await prisma.template.create({
+			data: {
+				templateName: "Test Template",
+				invoiceId: invoice.id,
 			}
 		})
 	}

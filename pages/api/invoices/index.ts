@@ -3,7 +3,10 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
 	if (req.method === "GET") {
-		const invoices = await prisma.invoice.findMany();
+		const invoices = await prisma.invoice.findMany({include: {
+			client: true,
+			activities: true
+		}});
 
 		return res.status(200).json(invoices);
 	}

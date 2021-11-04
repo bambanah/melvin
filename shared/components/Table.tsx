@@ -4,7 +4,11 @@ import styled from "styled-components";
 const StyledTable = styled.table`
 	margin-top: 2rem;
 	width: 100%;
-	border: 0px;
+	border-collapse: collapse;
+
+	th, td {
+		text-align: left;
+	}
 `;
 
 const Table: React.FC = ({ children }) => <StyledTable>{children}</StyledTable>;
