@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
 import Button from "./Button";
-import NavLink from "../../components/NavLink";
+import NavLink from "@Components/NavLink";
 
 const Header = styled.header`
 	position: fixed;

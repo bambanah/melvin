@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import SupportItemList from "../components/activities/ActivityList";
 import CreateSupportItemForm from "../components/activities/CreateActivityForm";
-import Button from "../shared/components/Button";
-import Layout from "../shared/components/Layout";
-import Title from "../shared/components/text/Title";
+import Button from "@Components/Button";
+import Layout from "@Components/Layout";
+import Title from "@Components/text/Title";
 
 const CreateActivityContainer = styled.div`
 	margin-bottom: 2rem;

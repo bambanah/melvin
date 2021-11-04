@@ -1,7 +1,7 @@
 import React, {  } from "react";
 import useSWR from "swr";
 import { Activity, Client, Invoice } from "@prisma/client";
-import Table from "../../shared/components/Table";
+import Table from "@Components/Table";
 import SingleInvoice from "./SingleInvoice";
 
 const getInvoices = async () => {

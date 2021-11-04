@@ -6,13 +6,13 @@ import { toast } from "react-toastify";
 import { RateType, SupportItem } from "@prisma/client";
 import ActivityValidationSchema from "../../schema/ActivityValidationSchema";
 import { errorIn } from "../../shared/utils/helpers";
-import Button from "../../shared/components/Button";
-import ButtonGroup from "../../shared/components/ButtonGroup";
-import Form from "../../shared/components/forms/Form";
-import Input from "../../shared/components/forms/Input";
-import Label from "../../shared/components/forms/Label";
-import Select from "../../shared/components/forms/Select";
-import Subheading from "../../shared/components/text/Subheading";
+import Button from "@Components/Button";
+import ButtonGroup from "@Components/ButtonGroup";
+import Form from "../forms/Form";
+import Input from "../forms/Input";
+import Label from "../forms/Label";
+import Select from "../forms/Select";
+import Subheading from "@Components/text/Subheading";
 
 interface Props {
 	setCreating: (creating: boolean) => void;
@@ -156,12 +156,12 @@ const CreateSupportItemForm = ({ setCreating }: Props) => {
 	const FormikForm = withFormik({
 		mapPropsToValues: () =>
 			({
-				description: "" as string,
-				rateType: RateType.HOUR,
+			description: "" as string,
+			rateType: RateType.HOUR,
 
-				weekdayCode: "",
-				weekdayRate: "",
-			} as Partial<SupportItem>),
+			weekdayCode: "",
+			weekdayRate: "",
+		} as unknown as Partial<SupportItem>),
 		handleSubmit: (values, { setSubmitting }) => {
 			axios.post("/api/support-items", values).then(() => {
 				toast.success("Support Item Created");

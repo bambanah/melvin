@@ -2,8 +2,7 @@ import { Activity, Invoice } from "@prisma/client";
 import { Field, FieldArray, FormikErrors, FormikTouched } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import styled from "styled-components";
-import Button from "../../shared/components/Button";
-import Text from "../../shared/components/text/Text";
+import Button from "@Components/Button";
 import Control from "./Control";
 import TimePicker from "./TimePicker";
 

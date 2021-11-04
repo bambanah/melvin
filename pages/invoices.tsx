@@ -1,13 +1,12 @@
-import { Invoice } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import CreateInvoice from "../components/invoices/CreateInvoice";
-import InvoiceList from "../components/invoices/InvoiceList";
-import Button from "../shared/components/Button";
-import Layout from "../shared/components/Layout";
-import Title from "../shared/components/text/Title";
+import CreateInvoice from "@Components/invoices/CreateInvoice";
+import InvoiceList from "@Components/invoices/InvoiceList";
+import Button from "@Components/Button";
+import Layout from "@Components/Layout";
+import Title from "@Components/text/Title";
 
 const CreateInvoiceSection = styled.div`
 	background-color: #f1f1f1;

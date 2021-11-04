@@ -1,5 +1,5 @@
 import { Activity, Client, Invoice } from "@prisma/client";
-import { getTotalString } from "@Shared/utils/helpers";
+import { getTotalString } from "@Utils/helpers";
 import axios from "axios";
 import moment from "moment";
 import React, {

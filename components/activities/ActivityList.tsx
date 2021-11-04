@@ -1,7 +1,7 @@
 import { SupportItem } from "@prisma/client";
 import React from "react";
 import useSWR from "swr";
-import Table from "../../shared/components/Table";
+import Table from "@Components/Table";
 import Activity from "./SupportItem";
 
 const getSupportItems = async () => {

@@ -2,9 +2,8 @@ import { Invoice } from "@prisma/client";
 import { FormikProps, getIn, withFormik } from "formik";
 import React from "react";
 import InvoiceValidationSchema from "../../schema/InvoiceValidationSchema";
-import Button from "../../shared/components/Button";
-import Title from "../../shared/components/text/Title";
-import SaveAsTemplateButton from "../templates/SaveAsTemplateButton";
+import Button from "@Components/Button";
+import Title from "@Components/text/Title";
 import FieldInput from "./FieldInput";
 import ActivityList from "./InvoiceActivityList";
 
@@ -146,7 +145,6 @@ Props) {
 							{editPrevious ? "Update" : "Create"}
 						</Button>
 					</p>
-					<SaveAsTemplateButton values={values} />
 					<p className="control">
 						<Button type="button" onClick={() => setCreating(false)}>
 							Cancel
