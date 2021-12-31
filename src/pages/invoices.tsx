@@ -2,11 +2,11 @@ import { useSession } from "next-auth/react";
 import Head from "next/head";
 import React, { useState } from "react";
 import styled from "styled-components";
-import CreateInvoice from "src/organisms/CreateInvoice";
-import InvoiceList from "src/organisms/InvoiceList";
-import Button from "src/atoms/Button";
-import Layout from "src/layouts/common/Layout";
-import Title from "src/atoms/Title";
+import CreateInvoice from "@organisms/CreateInvoice";
+import InvoiceList from "@organisms/InvoiceList";
+import Button from "@atoms/Button";
+import Layout from "@layouts/common/Layout";
+import Title from "@atoms/Title";
 
 const CreateInvoiceSection = styled.div`
 	background-color: #f1f1f1;

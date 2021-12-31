@@ -41,7 +41,8 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "eslint . --fix",
-		"generate": "prisma generate"
+		"generate": "prisma generate",
+		"seed": "ts-node prisma/seed.ts"
 	},
 	"eslintConfig": {
 		"extends": [

@@ -1,11 +1,11 @@
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import styled from "styled-components";
-import SupportItemList from "src/organisms/SupportItemList";
-import CreateSupportItemForm from "src/organisms/CreateActivityForm";
-import Button from "src/atoms/Button";
-import Layout from "src/layouts/common/Layout";
-import Title from "src/atoms/Title";
+import SupportItemList from "@organisms/SupportItemList";
+import CreateSupportItemForm from "@organisms/CreateActivityForm";
+import Button from "@atoms/Button";
+import Layout from "@layouts/common/Layout";
+import Title from "@atoms/Title";
 
 const CreateActivityContainer = styled.div`
 	margin-bottom: 2rem;

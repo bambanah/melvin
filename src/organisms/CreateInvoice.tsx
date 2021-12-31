@@ -1,4 +1,4 @@
-import Button from "src/atoms/Button";
+import Button from "@atoms/Button";
 import React from "react";
 
 const CreateInvoice = ({

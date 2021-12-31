@@ -1,5 +1,5 @@
 import { Client } from "@prisma/client";
-import Layout from "src/layouts/common/Layout";
+import Layout from "@layouts/common/Layout";
 import { useSession } from "next-auth/react";
 import React from "react";
 import useSWR from "swr";

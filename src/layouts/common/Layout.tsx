@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import Navbar from "../../organisms/Navbar";
+import Navbar from "@organisms/Navbar";
 
 interface Props {
 	children: React.ReactNode;

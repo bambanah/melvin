@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import Image from "next/image";
+import NextImage from "next/image";
 import { signOut, useSession } from "next-auth/react";
-import Button from "../atoms/Button";
-import NavLink from "src/molecules/NavLink";
+import Button from "@atoms/Button";
+import NavLink from "@molecules/NavLink";
 
 const Header = styled.header`
 	position: fixed;
@@ -72,7 +72,7 @@ const Navbar = () => {
 			<NavContent>
 				<NavLogo>
 					<a href="/">
-						<Image
+						<NextImage
 							src="/ndis-logo.png"
 							alt="NDIS Logo"
 							width={70}

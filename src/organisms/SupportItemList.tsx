@@ -1,8 +1,8 @@
 import { SupportItem } from "@prisma/client";
 import React from "react";
 import useSWR from "swr";
-import Table from "src/molecules/Table";
-import Activity from "../molecules/SupportItem";
+import Table from "@molecules/Table";
+import Activity from "@molecules/SupportItem";
 
 const getSupportItems = async () => {
 	const response = await fetch("/api/support-items");

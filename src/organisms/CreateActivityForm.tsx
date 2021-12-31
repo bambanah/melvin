@@ -4,15 +4,15 @@ import styled from "styled-components";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { RateType, SupportItem } from "@prisma/client";
-import ActivityValidationSchema from "../schema/ActivityValidationSchema";
-import { errorIn } from "../utils/helpers";
-import Button from "src/atoms/Button";
-import ButtonGroup from "src/molecules/ButtonGroup";
-import Form from "../atoms/Form";
-import Input from "../atoms/Input";
-import Label from "../atoms/Label";
-import Select from "../atoms/Select";
-import Subheading from "src/atoms/Subheading";
+import ActivityValidationSchema from "@schema/ActivityValidationSchema";
+import { errorIn } from "@utils/helpers";
+import Button from "@atoms/Button";
+import ButtonGroup from "@molecules/ButtonGroup";
+import Form from "@atoms/Form";
+import Input from "@atoms/Input";
+import Label from "@atoms/Label";
+import Select from "@atoms/Select";
+import Subheading from "@atoms/Subheading";
 
 interface Props {
 	setCreating: (creating: boolean) => void;

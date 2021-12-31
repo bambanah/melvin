@@ -1,12 +1,12 @@
 import { Activity, Client, Invoice } from "@prisma/client";
-import { getTotalString } from "src/utils/helpers";
+import { getTotalString } from "@utils/helpers";
 import axios from "axios";
 import moment from "moment";
 import React, {
 	useEffect, useState
 } from "react";
 import { toast } from "react-toastify";
-import { Action, Actions, InvoiceRow, TableCell } from "./styles";
+import * as Styles from "./styles";
 
 const deleteInvoice = async (invoiceId: string) => {
 	await axios.delete(`http://localhost:3000/${invoiceId}`).then(() => {
@@ -33,34 +33,34 @@ const SingleInvoice = ({
 	}, [invoice]);
 
 	return (
-		<InvoiceRow>
-			<TableCell>{invoice.invoiceNo}</TableCell>
-			<TableCell>{moment(invoice.date).format("DD-MM-yyyy")}</TableCell>
-			<TableCell>
+		<Styles.InvoiceRow>
+			<Styles.TableCell>{invoice.invoiceNo}</Styles.TableCell>
+			<Styles.TableCell>{moment(invoice.date).format("DD-MM-yyyy")}</Styles.TableCell>
+			<Styles.TableCell>
 				{invoice.client?.firstName ?? "Unknown"} {invoice.client?.lastName ?? "Name"}
-			</TableCell>
-			<TableCell>{invoice.activities?.length ?? 2}</TableCell>
+			</Styles.TableCell>
+			<Styles.TableCell>{invoice.activities?.length ?? 2}</Styles.TableCell>
 
-			<TableCell>{cost}</TableCell>
-			<TableCell>
-				<Actions>
-					<Action onClick={() => {}} icon="edit" size="lg" />
-					<Action onClick={() => {}} icon="copy" size="lg" />
-					<Action
+			<Styles.TableCell>{cost}</Styles.TableCell>
+			<Styles.TableCell>
+				<Styles.Actions>
+					<Styles.Action onClick={() => {}} icon="edit" size="lg" />
+					<Styles.Action onClick={() => {}} icon="copy" size="lg" />
+					<Styles.Action
 						onClick={() => generatePdf(invoice.id)}
 						icon="file-download"
 						size="lg"
 					/>
-					<Action
+					<Styles.Action
 						onClick={() => {
 							deleteInvoice(invoice.id);
 						}}
 						icon="times"
 						size="lg"
 					/>
-				</Actions>
-			</TableCell>
-		</InvoiceRow>
+				</Styles.Actions>
+			</Styles.TableCell>
+		</Styles.InvoiceRow>
 	);
 };
 

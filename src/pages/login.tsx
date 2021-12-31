@@ -8,7 +8,7 @@ import {
 } from "next-auth/react";
 import { useRouter } from "next/router";
 import React from "react";
-import Button from "src/atoms/Button";
+import Button from "@atoms/Button";
 
 export default function Login({
 	providers,

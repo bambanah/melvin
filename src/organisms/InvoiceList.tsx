@@ -1,8 +1,8 @@
 import React, {  } from "react";
 import useSWR from "swr";
 import { Activity, Client, Invoice } from "@prisma/client";
-import Table from "src/molecules/Table";
-import SingleInvoice from "../molecules/SingleInvoice";
+import Table from "@molecules/Table";
+import SingleInvoice from "@molecules/SingleInvoice";
 
 const getInvoices = async () => {
 	const response = await fetch("/api/invoices");

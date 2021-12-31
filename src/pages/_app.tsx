@@ -5,9 +5,9 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from "styled-components";
 import type { AppProps } from "next/app";
-import GlobalStyle from "../styles/GlobalStyle";
-import { importIcons } from "src/utils/helpers";
-import "../styles/font-imports.scss";
+import GlobalStyle from "@styles/GlobalStyle";
+import { importIcons } from "@utils/helpers";
+import "@styles/font-imports.scss";
 
 const theme = {
 	colors: {

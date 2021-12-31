@@ -29,6 +29,7 @@
       "@layouts/*": ["src/layouts/*"],
       "@hooks/*": ["src/hooks/*"],
       "@utils/*": ["src/utils/*"],
+      "@schema/*": ["src/schema/*"],
       "@styles/*": ["src/styles/*"]
     },
   },
