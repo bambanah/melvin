@@ -22,11 +22,14 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@Components/*": ["components/*"],
-      "@Pages/*": ["pages/*"],
-      "@Hooks/*": ["shared/hooks/*"],
-      "@Utils/*": ["shared/utils/*"],
-      "@Styles/*": ["styles/*"]
+      "@pages/*": ["src/pages/*"],
+      "@atoms/*": ["src/atoms/*"],
+      "@molecules/*": ["src/molecules/*"],
+      "@organisms/*": ["src/organisms/*"],
+      "@layouts/*": ["src/layouts/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@utils/*": ["src/utils/*"],
+      "@styles/*": ["src/styles/*"]
     },
   },
   "include": [
