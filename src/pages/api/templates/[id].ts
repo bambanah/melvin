@@ -1,4 +1,4 @@
-import prisma from "@Shared/utils/prisma";
+import prisma from "@utils/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 
@@ -7,7 +7,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 	const templateId = typeof id === "string" ? id : id[0];
 
 	if (req.method === "GET") {
-		const template = await prisma.template.findFirst({
+		const template = await prisma.template.findUnique({
 			where: {
 				id: templateId,
 			},

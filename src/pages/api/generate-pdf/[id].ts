@@ -1,4 +1,4 @@
-import generatePDF from "@Shared/utils/pdf-generation";
+import generatePDF from "@utils/pdf-generation";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 

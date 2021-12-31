@@ -1,4 +1,4 @@
-import prisma from "@Shared/utils/prisma";
+import prisma from "@utils/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 

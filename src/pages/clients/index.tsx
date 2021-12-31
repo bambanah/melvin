@@ -3,8 +3,9 @@ import Layout from "@layouts/common/Layout";
 import { useSession } from "next-auth/react";
 import React from "react";
 import useSWR from "swr";
+import ClientPage from "@layouts/clients/ClientPage";
 
-const getInvoices = async () => {
+const getClients = async () => {
 	const response = await fetch("/api/clients");
 
 	return (await response.json()) as Client[];
@@ -15,7 +16,7 @@ const Clients = () => {
 		required: true,
 	});
 
-	const { data: clients, error } = useSWR("/api/invoices", getInvoices);
+	const { data: clients, error } = useSWR("/api/clients", getClients);
 
 	if (error) {
 		console.error(error);
@@ -27,13 +28,7 @@ const Clients = () => {
 
 	return (
 		<Layout>
-			<ul>
-				{clients?.map((client) => (
-					<li>
-						{client.firstName} {client.lastName}
-					</li>
-				))}
-			</ul>
+			<ClientPage clients={clients} />
 		</Layout>
 	);
 };
