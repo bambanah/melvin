@@ -11,9 +11,7 @@ const ClientPage: React.FC<ClientProps> = ({ clients }) => {
 		<Styles.ClientList>
 			{clients?.map((client) => (
 				<Styles.Client href={`/clients/${client.id}`}>
-					<a>
-						{client.firstName} {client.lastName}
-					</a>
+					<a>{client.name}</a>
 				</Styles.Client>
 			))}
 		</Styles.ClientList>

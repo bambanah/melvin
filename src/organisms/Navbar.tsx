@@ -83,9 +83,9 @@ const Navbar = () => {
 				</NavLogo>
 
 				<NavLinks>
+					<NavLink href="/">Home</NavLink>
 					<NavLink href="/invoices">Invoices</NavLink>
-					<NavLink href="/templates">Templates</NavLink>
-					<NavLink href="/support-items">Support Items</NavLink>
+					<NavLink href="/activities">Activities</NavLink>
 					<NavLink href="/clients">Clients</NavLink>
 				</NavLinks>
 

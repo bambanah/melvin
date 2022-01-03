@@ -1,13 +1,13 @@
 import styled from "styled-components";
 
 interface Props {
-	flexDirection: "row" | "column";
+	flexDirection?: "row" | "column";
 }
 
 const Form = styled.form<Props>`
 	display: flex;
 	flex-wrap: wrap;
-	flex-direction: ${(props) => props.flexDirection};
+	flex-direction: ${(props) => props.flexDirection || "row"};
 	gap: 2rem;
 `;
 

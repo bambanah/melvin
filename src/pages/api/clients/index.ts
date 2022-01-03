@@ -1,5 +1,6 @@
 import prisma from "@utils/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
+import { getSession } from "next-auth/react";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
 	if (req.method === "GET") {
@@ -9,7 +10,22 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 
 	if (req.method === "POST") {
-		const client = await prisma.client.create(req.body);
+		const session = await getSession({ req });
+		if (!session || !session.user?.email)
+			return res.status(401).send("Must be signed in to update this resource.");
+
+		const user = await prisma.user.findUnique({
+			where: {
+				email: session.user?.email,
+			},
+		});
+		if (!user) {
+			return res.status(401).send("Can't find signed in user.");
+		}
+
+		req.body.ownerId ??= user?.id;
+
+		const client = await prisma.client.create({ data: req.body });
 
 		return res.status(201).json(client);
 	}

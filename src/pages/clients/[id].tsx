@@ -12,7 +12,7 @@ const Client: React.FC<ClientProps> = ({ client }) => {
 	return (
 		<Layout>
 			<div>This is a client</div>
-			{client && client.firstName}
+			{client && client.name}
 		</Layout>
 	);
 };

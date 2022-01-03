@@ -9,14 +9,13 @@ async function main() {
 	if (!user) throw new Error("Must create a user first");
 
 	let client = await prisma.client.findFirst({
-		where: { ownerId: user.id, firstName: "John", lastName: "Smith" },
+		where: { ownerId: user.id, name: "John Smith" },
 	});
 	if (!client) {
 		client = await prisma.client.upsert({
 			where: { id: "John" },
 			create: {
-				firstName: "John",
-				lastName: "Smith",
+				name: "John Smith",
 				number: "123456789",
 				ownerId: user.id,
 			},
@@ -25,7 +24,10 @@ async function main() {
 	}
 
 	let supportItem = await prisma.supportItem.findFirst({
-		where: { ownerId: user.id, description: "Access Community, Social And Rec Activities - Standard" },
+		where: {
+			ownerId: user.id,
+			description: "Access Community, Social And Rec Activities - Standard",
+		},
 	});
 	if (!supportItem) {
 		supportItem = await prisma.supportItem.create({
@@ -72,15 +74,15 @@ async function main() {
 	}
 
 	let template = await prisma.template.findFirst({
-		where: { invoiceId: invoice.id, templateName: "Test Template" }
+		where: { invoiceId: invoice.id, templateName: "Test Template" },
 	});
 	if (!template) {
 		template = await prisma.template.create({
 			data: {
 				templateName: "Test Template",
 				invoiceId: invoice.id,
-			}
-		})
+			},
+		});
 	}
 }
 
