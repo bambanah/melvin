@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
 import { getActivities } from "./firebase";
 import { ActivityObject, Invoice } from "../types";
-import { formatDate, getPrettyDuration, getRate } from "./helpers";
+import { formatDate, getPrettyDuration, getRate, roundToTwo } from "./helpers";
 
 const generatePDF = (invoice: Invoice) => {
 	const margin = 20;
@@ -49,13 +49,13 @@ const generatePDF = (invoice: Invoice) => {
 					// rate = parseInt(rate, 10);
 					if (rate) {
 						if (activityDetails[activityId].rate_type === "hr") {
-							totalCost = rate * activity.duration;
+							totalCost = roundToTwo(rate * activity.duration);
 
 							const prettyDuration = getPrettyDuration(activity.duration);
 
 							countString = `${activity.start_time?.toLowerCase()}-${activity.end_time?.toLowerCase()} (${prettyDuration})`;
 						} else if (activityDetails[activityId].rate_type === "km") {
-							totalCost = rate * parseInt(activity.distance, 10);
+							totalCost = roundToTwo(rate * parseInt(activity.distance, 10));
 
 							countString = `${activity.distance} kilometres`;
 						}
@@ -71,9 +71,7 @@ const generatePDF = (invoice: Invoice) => {
 					currentActivity.push(`${activity.date}\n`);
 					currentActivity.push(`${countString}\n`);
 					currentActivity.push(
-						`$${rate?.toFixed(
-							2
-						)}${`/${activityDetails[activityId].rate_type}`}\n`
+						`$${rate}${`/${activityDetails[activityId].rate_type}`}\n`
 					);
 
 					currentActivity.push(`$${totalCost.toFixed(2)}\n`);
@@ -84,15 +82,13 @@ const generatePDF = (invoice: Invoice) => {
 					if (activity.travel_duration > 0 && rate) {
 						const providerTravel = [];
 
-						const travelTotal = (rate / 60) * activity.travel_duration;
+						const travelTotal = roundToTwo((rate / 60) * activity.travel_duration);
 
 						providerTravel.push(`Provider Travel\n${itemCode}\n`);
 						providerTravel.push(`${activity.date}\n`);
 						providerTravel.push(`${activity.travel_duration} minutes\n`);
 						providerTravel.push(
-							`$${rate.toFixed(
-								2
-							)}${`/${activityDetails[activityId].rate_type}`}\n`
+							`$${rate}${`/${activityDetails[activityId].rate_type}`}\n`
 						);
 						providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
 
@@ -109,7 +105,7 @@ const generatePDF = (invoice: Invoice) => {
 						const providerTravel = [];
 
 						const travelRate = isGroup ? 0.43 : 0.85;
-						const travelTotal = travelRate * activity.travel_distance;
+						const travelTotal = roundToTwo(travelRate * activity.travel_distance);
 						const travelCode = isGroup ? "04_799_0136_6_1" : itemCode;
 
 						providerTravel.push(
@@ -117,12 +113,12 @@ const generatePDF = (invoice: Invoice) => {
 						);
 						providerTravel.push(`${activity.date}\n`);
 						providerTravel.push(`${activity.travel_distance} km\n`);
-						providerTravel.push(`$${travelRate.toFixed(2)}/km\n`);
+						providerTravel.push(`$${travelRate}/km\n`);
 						providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
 
 						activities.push(providerTravel);
 
-						sumTotal += travelTotal;
+						sumTotal = roundToTwo(sumTotal + travelTotal);
 					}
 				});
 			})
@@ -165,7 +161,7 @@ const generatePDF = (invoice: Invoice) => {
 				styles: { fontStyle: "bold", halign: "right" },
 			},
 			{
-				content: `$${sumTotal.toFixed(2)}`,
+				content: `$${roundToTwo(sumTotal).toFixed(2)}`,
 				styles: { fontStyle: "bold" },
 			},
 		]);

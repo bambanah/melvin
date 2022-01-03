@@ -197,3 +197,7 @@ export const errorIn = (
 	touched: FormikTouched<any>,
 	value: string
 ) => getIn(errors, value) !== undefined && getIn(touched, value);
+
+export function roundToTwo(num: number) {
+	return Math.round((num + Number.EPSILON) * 100) / 100
+}
