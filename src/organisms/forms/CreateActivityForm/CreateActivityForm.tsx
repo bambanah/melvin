@@ -23,93 +23,97 @@ const CreateActivityForm = () => {
 			props;
 
 		return (
-			<Form onSubmit={handleSubmit} flexDirection="column">
-				<Styles.InputGroup>
-					<Styles.Heading>General</Styles.Heading>
-					<Label htmlFor="description" required>
-						<span>Description</span>
+			<Styles.CreateActivityContainer>
+				<Form onSubmit={handleSubmit} flexDirection="column">
+					<Styles.InputGroup>
+						<Styles.Heading>General</Styles.Heading>
+						<Label htmlFor="description" required>
+							<span>Description</span>
+							<Subheading>
+								The official description from the{" "}
+								<a href="/price-guide-3-21.pdf">Price Guide</a>
+							</Subheading>
+							<Input
+								type="text"
+								onChange={handleChange}
+								onBlur={handleBlur}
+								value={values.description}
+								name="description"
+								id="description"
+								error={errorIn(errors, touched, "description")}
+							/>
+						</Label>
+
+						<Label htmlFor="rateType" required>
+							<span>Rate Type</span>
+							<Subheading>This will almost always be per hour</Subheading>
+							<Select
+								name="rateType"
+								error={errorIn(errors, touched, "rateType")}
+							>
+								<option value="" disabled>
+									Select...
+								</option>
+								<option value="HOUR">per hour</option>
+								<option value="KM">per km</option>
+							</Select>
+						</Label>
+					</Styles.InputGroup>
+
+					<Styles.ActivityRates>
+						<Styles.Heading>Rates</Styles.Heading>
 						<Subheading>
-							The official description from the{" "}
-							<a href="/price-guide-3-21.pdf">Price Guide</a>
+							Only the weekday rate is required. <br />
+							The rest will use the weekday rate as the default if not provided.
 						</Subheading>
-						<Input
-							type="text"
-							onChange={handleChange}
-							onBlur={handleBlur}
-							value={values.description}
-							name="description"
-							id="description"
-							error={errorIn(errors, touched, "description")}
-						/>
-					</Label>
 
-					<Label htmlFor="rateType" required>
-						<span>Rate Type</span>
-						<Subheading>This will almost always be per hour</Subheading>
-						<Select
-							name="rateType"
-							error={errorIn(errors, touched, "rateType")}
-						>
-							<option value="" disabled>
-								Select...
-							</option>
-							<option value="HOUR">per hour</option>
-							<option value="KM">per km</option>
-						</Select>
-					</Label>
-				</Styles.InputGroup>
+						{["weekday", "weeknight", "saturday", "sunday"].map((day) => (
+							<Styles.ActivityRow key={day}>
+								<Label required={day === "weekday"}>
+									<span>
+										{day
+											.split("_")
+											.map(
+												(word) => word.charAt(0).toUpperCase() + word.slice(1)
+											)
+											.join(" ")}
+									</span>
+								</Label>
+								<Input
+									type="text"
+									onChange={handleChange}
+									onBlur={handleBlur}
+									name={`${day}Code`}
+									id={`${day}Code`}
+									value={getIn(values, `${day}Code`)}
+									placeholder="Code"
+									error={errorIn(errors, touched, `${day}Code`)}
+								/>
+								<span style={{ marginRight: "-0.8rem" }}>$</span>
+								<Input
+									type="text"
+									onChange={handleChange}
+									onBlur={handleBlur}
+									name={`${day}Rate`}
+									id={`${day}Rate`}
+									value={getIn(values, `${day}Rate`)}
+									placeholder="Rate"
+									error={errorIn(errors, touched, `${day}Rate`)}
+								/>
+							</Styles.ActivityRow>
+						))}
+					</Styles.ActivityRates>
 
-				<Styles.ActivityRates>
-					<Styles.Heading>Rates</Styles.Heading>
-					<Subheading>
-						Only the weekday rate is required. <br />
-						The rest will use the weekday rate as the default if not provided.
-					</Subheading>
-
-					{["weekday", "weeknight", "saturday", "sunday"].map((day) => (
-						<Styles.ActivityRow key={day}>
-							<Label required={day === "weekday"}>
-								<span>
-									{day
-										.split("_")
-										.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-										.join(" ")}
-								</span>
-							</Label>
-							<Input
-								type="text"
-								onChange={handleChange}
-								onBlur={handleBlur}
-								name={`${day}Code`}
-								id={`${day}Code`}
-								value={getIn(values, `${day}Code`)}
-								placeholder="Code"
-								error={errorIn(errors, touched, `${day}Code`)}
-							/>
-							<span style={{ marginRight: "-0.8rem" }}>$</span>
-							<Input
-								type="text"
-								onChange={handleChange}
-								onBlur={handleBlur}
-								name={`${day}Rate`}
-								id={`${day}Rate`}
-								value={getIn(values, `${day}Rate`)}
-								placeholder="Rate"
-								error={errorIn(errors, touched, `${day}Rate`)}
-							/>
-						</Styles.ActivityRow>
-					))}
-				</Styles.ActivityRates>
-
-				<ButtonGroup>
-					<Button type="submit" primary>
-						Create
-					</Button>
-					<Button type="button" onClick={() => router.push("/activities")}>
-						Cancel
-					</Button>
-				</ButtonGroup>
-			</Form>
+					<ButtonGroup>
+						<Button type="submit" primary>
+							Create
+						</Button>
+						<Button type="button" onClick={() => router.push("/activities")}>
+							Cancel
+						</Button>
+					</ButtonGroup>
+				</Form>
+			</Styles.CreateActivityContainer>
 		);
 	};
 

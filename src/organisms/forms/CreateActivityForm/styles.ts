@@ -1,5 +1,13 @@
 import styled from "styled-components";
 
+export const CreateActivityContainer = styled.div`
+	margin-bottom: 2rem;
+	padding: 3rem;
+	border-radius: 4px;
+	max-width: 700px;
+	align-self: center;
+`;
+
 export const InputGroup = styled.div`
 	display: flex;
 	gap: 1rem;

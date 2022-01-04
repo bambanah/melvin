@@ -9,7 +9,7 @@ interface ClientProps {
 const ClientPage: React.FC<ClientProps> = ({ clients }) => {
 	return (
 		<Styles.ClientList>
-			{clients?.map((client) => (
+			{clients.map((client) => (
 				<Styles.Client href={`/clients/${client.id}`}>
 					<a>{client.name}</a>
 				</Styles.Client>
