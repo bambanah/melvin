@@ -2,21 +2,19 @@ import { Activity, Client, Invoice } from "@prisma/client";
 import { getTotalString } from "@utils/helpers";
 import axios from "axios";
 import moment from "moment";
-import React, {
-	useEffect, useState
-} from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import * as Styles from "./styles";
 
 const deleteInvoice = async (invoiceId: string) => {
 	await axios.delete(`http://localhost:3000/${invoiceId}`).then(() => {
-		toast.success("Invoice deleted")
+		toast.success("Invoice deleted");
 	});
 };
 
 const generatePdf = async (invoiceId: string) => {
 	return invoiceId;
-}
+};
 
 const SingleInvoice = ({
 	invoice,
@@ -35,9 +33,11 @@ const SingleInvoice = ({
 	return (
 		<Styles.InvoiceRow>
 			<Styles.TableCell>{invoice.invoiceNo}</Styles.TableCell>
-			<Styles.TableCell>{moment(invoice.date).format("DD-MM-yyyy")}</Styles.TableCell>
 			<Styles.TableCell>
-				{invoice.client?.firstName ?? "Unknown"} {invoice.client?.lastName ?? "Name"}
+				{moment(invoice.date).format("DD-MM-yyyy")}
+			</Styles.TableCell>
+			<Styles.TableCell>
+				{invoice.client?.name ?? "Unknown Name"}
 			</Styles.TableCell>
 			<Styles.TableCell>{invoice.activities?.length ?? 2}</Styles.TableCell>
 

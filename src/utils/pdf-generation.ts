@@ -39,7 +39,7 @@ const generatePDF = async (invoiceId: string) => {
 	// Write details at top of page
 	const invoiceDetails = [
 		`Invoice Date: ${date}`,
-		`Participant Name: ${invoice.client.firstName} ${invoice.client.lastName}`,
+		`Participant Name: ${invoice.client.name}`,
 		`Participant Number: ${invoice.client.number}`,
 		`Bill To: ${invoice.billTo}`,
 		`Invoice Number: ${invoice.invoiceNo}`,
