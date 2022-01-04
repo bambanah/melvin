@@ -7,6 +7,9 @@
       "dom.iterable",
       "esnext"
     ],
+    "types": [
+      "cypress"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -22,16 +25,34 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@pages/*": ["src/pages/*"],
-      "@atoms/*": ["src/atoms/*"],
-      "@molecules/*": ["src/molecules/*"],
-      "@organisms/*": ["src/organisms/*"],
-      "@layouts/*": ["src/layouts/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@utils/*": ["src/utils/*"],
-      "@schema/*": ["src/schema/*"],
-      "@styles/*": ["src/styles/*"]
-    },
+      "@pages/*": [
+        "src/pages/*"
+      ],
+      "@atoms/*": [
+        "src/atoms/*"
+      ],
+      "@molecules/*": [
+        "src/molecules/*"
+      ],
+      "@organisms/*": [
+        "src/organisms/*"
+      ],
+      "@layouts/*": [
+        "src/layouts/*"
+      ],
+      "@hooks/*": [
+        "src/hooks/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@schema/*": [
+        "src/schema/*"
+      ],
+      "@styles/*": [
+        "src/styles/*"
+      ]
+    }
   },
   "include": [
     "**/*.ts",

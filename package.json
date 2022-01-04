@@ -2,46 +2,16 @@
 	"name": "client",
 	"version": "0.1.0",
 	"private": true,
-	"dependencies": {
-		"@fortawesome/fontawesome-svg-core": "^1.2.36",
-		"@fortawesome/free-brands-svg-icons": "^5.15.4",
-		"@fortawesome/free-regular-svg-icons": "^5.15.4",
-		"@fortawesome/free-solid-svg-icons": "^5.15.4",
-		"@fortawesome/react-fontawesome": "^0.1.16",
-		"@next-auth/prisma-adapter": "^1.0.1",
-		"@prisma/client": "^3.7.0",
-		"axios": "^0.24.0",
-		"firebase": "^8.6.1",
-		"formik": "^2.2.9",
-		"jspdf": "^2.5.0",
-		"jspdf-autotable": "^3.5.23",
-		"moment": "^2.29.1",
-		"next": "^12.0.7",
-		"next-auth": "4.0.6",
-		"react": "^17.0.2",
-		"react-dom": "^17.0.2",
-		"react-spinners": "^0.11.0",
-		"react-toastify": "^8.1.0",
-		"safe-json-stringify": "^1.2.0",
-		"sass": "^1.45.1",
-		"styled-components": "^5.3.3",
-		"swr": "^1.1.1",
-		"web-vitals": "^2.1.2",
-		"yup": "^0.32.11"
-	},
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
 		"lint": "eslint . --fix",
-		"generate": "prisma generate",
-		"seed": "ts-node prisma/seed.ts"
-	},
-	"eslintConfig": {
-		"extends": [
-			"react-app",
-			"react-app/jest"
-		]
+		"seed": "ts-node prisma/seed.ts",
+		"cypress:open": "cypress open",
+		"cypress:headless": "cypress run",
+		"e2e": "start-server-and-test start http://localhost:3000 cypress:open",
+		"e2e:headless": "start-server-and-test start http://localhost:3000 cypress:headless"
 	},
 	"browserslist": {
 		"production": [
@@ -55,6 +25,36 @@
 			"last 1 safari version"
 		]
 	},
+	"prisma": {
+		"seed": "ts-node prisma/seed.ts"
+	},
+	"dependencies": {
+		"@fortawesome/fontawesome-svg-core": "^1.2.36",
+		"@fortawesome/free-brands-svg-icons": "^5.15.4",
+		"@fortawesome/free-regular-svg-icons": "^5.15.4",
+		"@fortawesome/free-solid-svg-icons": "^5.15.4",
+		"@fortawesome/react-fontawesome": "^0.1.16",
+		"@next-auth/prisma-adapter": "^1.0.1",
+		"@prisma/client": "^3.7.0",
+		"axios": "^0.24.0",
+		"formik": "^2.2.9",
+		"jspdf": "^2.5.0",
+		"jspdf-autotable": "^3.5.23",
+		"moment": "^2.29.1",
+		"next": "^12.0.7",
+		"next-auth": "4.0.6",
+		"react": "^17.0.2",
+		"react-dom": "^17.0.2",
+		"react-spinners": "^0.11.0",
+		"react-toastify": "^8.1.0",
+		"safe-json-stringify": "^1.2.0",
+		"sass": "^1.45.1",
+		"sharp": "^0.29.3",
+		"styled-components": "^5.3.3",
+		"swr": "^1.1.1",
+		"web-vitals": "^2.1.2",
+		"yup": "^0.32.11"
+	},
 	"devDependencies": {
 		"@types/jest": "^27.0.3",
 		"@types/node": "^17.0.4",
@@ -65,6 +65,7 @@
 		"@types/yup": "^0.29.13",
 		"@typescript-eslint/eslint-plugin": "^5.8.0",
 		"@typescript-eslint/parser": "^5.8.0",
+		"cypress": "^9.2.0",
 		"eslint": "^8.5.0",
 		"eslint-config-airbnb-typescript": "^16.1.0",
 		"eslint-config-prettier": "^8.3.0",
@@ -74,10 +75,8 @@
 		"eslint-plugin-react-hooks": "^4.3.0",
 		"prettier": "^2.5.1",
 		"prisma": "^3.7.0",
+		"start-server-and-test": "^1.14.0",
 		"ts-node": "^10.4.0",
 		"typescript": "^4.5.4"
-	},
-	"prisma": {
-		"seed": "ts-node prisma/seed.ts"
 	}
 }

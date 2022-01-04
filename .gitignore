@@ -4,3 +4,5 @@ node_modules
 .vscode/
 .next
 yarn-error.log
+cypress/screenshots
+cypress/videos
