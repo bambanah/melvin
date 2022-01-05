@@ -1,4 +1,5 @@
 import Button from "@atoms/Button";
+import ErrorMessage from "@atoms/ErrorMessage";
 import Form from "@atoms/Form";
 import Input from "@atoms/Input";
 import Label from "@atoms/Label";
@@ -27,44 +28,46 @@ const CreateActivityForm = () => {
 				<Form onSubmit={handleSubmit} flexDirection="column">
 					<Styles.InputGroup>
 						<Styles.Heading>General</Styles.Heading>
-						<Label htmlFor="description" required>
-							<span>Description</span>
-							<Subheading>
-								The official description from the{" "}
-								<a href="/price-guide-3-21.pdf">Price Guide</a>
-							</Subheading>
-							<Input
-								type="text"
-								onChange={handleChange}
-								onBlur={handleBlur}
-								value={values.description}
-								name="description"
-								id="description"
-								error={errorIn(errors, touched, "description")}
-							/>
-						</Label>
+						<Styles.InputRow>
+							<Label htmlFor="description" required>
+								<span>Description</span>
+								<Subheading>
+									The official description from the{" "}
+									<a href="/price-guide-3-21.pdf">Price Guide</a>
+								</Subheading>
+								<Input
+									type="text"
+									onChange={handleChange}
+									onBlur={handleBlur}
+									value={values.description}
+									name="description"
+									id="description"
+									error={errorIn(errors, touched, "description")}
+								/>
+							</Label>
 
-						<Label htmlFor="rateType" required>
-							<span>Rate Type</span>
-							<Subheading>This will almost always be per hour</Subheading>
-							<Select
-								name="rateType"
-								error={errorIn(errors, touched, "rateType")}
-							>
-								<option value="" disabled>
-									Select...
-								</option>
-								<option value="HOUR">per hour</option>
-								<option value="KM">per km</option>
-							</Select>
-						</Label>
+							<Label htmlFor="rateType" required>
+								<span>Rate Type</span>
+								<Subheading>This will almost always be per hour</Subheading>
+								<Select
+									name="rateType"
+									error={errorIn(errors, touched, "rateType")}
+								>
+									<option value="" disabled>
+										Select...
+									</option>
+									<option value="HOUR">per hour</option>
+									<option value="KM">per km</option>
+								</Select>
+							</Label>
+						</Styles.InputRow>
 					</Styles.InputGroup>
 
-					<Styles.ActivityRates>
+					<Styles.InputGroup>
 						<Styles.Heading>Rates</Styles.Heading>
 						<Subheading>
-							Only the weekday rate is required. <br />
-							The rest will use the weekday rate as the default if not provided.
+							Only the weekday information is required, and will be used in the
+							event of another rate not being entered
 						</Subheading>
 
 						{["weekday", "weeknight", "saturday", "sunday"].map((day) => (
@@ -79,30 +82,43 @@ const CreateActivityForm = () => {
 											.join(" ")}
 									</span>
 								</Label>
-								<Input
-									type="text"
-									onChange={handleChange}
-									onBlur={handleBlur}
-									name={`${day}Code`}
-									id={`${day}Code`}
-									value={getIn(values, `${day}Code`)}
-									placeholder="Code"
-									error={errorIn(errors, touched, `${day}Code`)}
-								/>
+								<Styles.InputContainer>
+									<Input
+										type="text"
+										onChange={handleChange}
+										onBlur={handleBlur}
+										name={`${day}Code`}
+										id={`${day}Code`}
+										value={getIn(values, `${day}Code`)}
+										placeholder="Code"
+										error={errorIn(errors, touched, `${day}Code`)}
+									/>
+									<ErrorMessage
+										error={getIn(errors, `${day}Code`)}
+										touched={getIn(touched, `${day}Code`)}
+									/>
+								</Styles.InputContainer>
+
 								<span style={{ marginRight: "-0.8rem" }}>$</span>
-								<Input
-									type="text"
-									onChange={handleChange}
-									onBlur={handleBlur}
-									name={`${day}Rate`}
-									id={`${day}Rate`}
-									value={getIn(values, `${day}Rate`)}
-									placeholder="Rate"
-									error={errorIn(errors, touched, `${day}Rate`)}
-								/>
+								<Styles.InputContainer>
+									<Input
+										type="text"
+										onChange={handleChange}
+										onBlur={handleBlur}
+										name={`${day}Rate`}
+										id={`${day}Rate`}
+										value={getIn(values, `${day}Rate`)}
+										placeholder="Rate"
+										error={errorIn(errors, touched, `${day}Rate`)}
+									/>
+									<ErrorMessage
+										error={getIn(errors, `${day}Rate`)}
+										touched={getIn(touched, `${day}Rate`)}
+									/>
+								</Styles.InputContainer>
 							</Styles.ActivityRow>
 						))}
-					</Styles.ActivityRates>
+					</Styles.InputGroup>
 
 					<ButtonGroup>
 						<Button type="submit" primary>
@@ -144,7 +160,7 @@ const CreateActivityForm = () => {
 			setSubmitting(false);
 		},
 		validationSchema: ActivityValidationSchema,
-		validateOnChange: true,
+		validateOnChange: false,
 		validateOnMount: false,
 		validateOnBlur: true,
 		displayName: "Activity Form",

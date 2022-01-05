@@ -25,7 +25,7 @@ const Navbar = () => {
 				</Styles.NavLogo>
 
 				<Styles.NavLinks>
-					<NavLink href="/">Home</NavLink>
+					<NavLink href="/">Dashboard</NavLink>
 					<NavLink href="/invoices">Invoices</NavLink>
 					<NavLink href="/activities">Activities</NavLink>
 					<NavLink href="/clients">Clients</NavLink>

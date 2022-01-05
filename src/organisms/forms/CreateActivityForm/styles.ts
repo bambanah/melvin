@@ -4,26 +4,21 @@ export const CreateActivityContainer = styled.div`
 	margin-bottom: 2rem;
 	padding: 3rem;
 	border-radius: 4px;
-	max-width: 700px;
+	max-width: 800px;
 	align-self: center;
 `;
 
 export const InputGroup = styled.div`
-	display: flex;
-	gap: 1rem;
-	flex-wrap: wrap;
-	flex: 1 0 100%;
-`;
-
-export const ActivityRates = styled.div`
-	display: flex;
 	flex: 1 1 auto;
+
+	display: flex;
 	flex-direction: column;
 	gap: 1rem;
+`;
 
-	h2 {
-		flex: 1 0 auto;
-	}
+export const InputRow = styled.div`
+	display: flex;
+	gap: 1rem;
 `;
 
 export const ActivityRow = styled.div`
@@ -32,17 +27,24 @@ export const ActivityRow = styled.div`
 	gap: 1rem;
 	align-items: center;
 
-	label {
-		flex: 1 1 20%;
-	}
-
 	input {
 		flex: 1 1 auto;
+	}
+
+	&:not(:first-of-type) {
+		margin-top: 0.8rem;
 	}
 `;
 
 export const Heading = styled.h2`
-	flex: 1 1 100%;
+	flex: 0 0 100%;
 	font-size: 1.3rem;
 	font-weight: bold;
+	margin: 0;
+`;
+
+export const InputContainer = styled.div`
+	p {
+		position: absolute;
+	}
 `;

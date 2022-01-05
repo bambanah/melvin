@@ -153,4 +153,4 @@ export const errorIn = (
 	errors: FormikErrors<any>,
 	touched: FormikTouched<any>,
 	value: string
-) => getIn(errors, value) !== undefined && getIn(touched, value);
+): boolean => getIn(errors, value) !== undefined && getIn(touched, value);
