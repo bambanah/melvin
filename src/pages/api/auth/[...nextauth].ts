@@ -5,6 +5,13 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 export default NextAuth({
 	adapter: PrismaAdapter(prisma),
+	callbacks: {
+		session: async ({ session, user }) => {
+			session.user.id = user.id;
+
+			return Promise.resolve(session);
+		},
+	},
 	providers: [
 		GoogleProvider({
 			clientId: process.env.GOOGLE_ID || "",

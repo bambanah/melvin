@@ -1,6 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import Navbar from "@organisms/Navbar";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import Loading from "@atoms/Loading";
 
 interface Props {
 	children: React.ReactNode;
@@ -31,12 +34,26 @@ const Content = styled.div`
 	}
 `;
 
-const Layout: React.FC<Props> = ({ children }) => (
-	<Container>
-		<Navbar />
+const Layout: React.FC<Props> = ({ children }) => {
+	const session = useSession();
+	const router = useRouter();
 
-		<Content>{children}</Content>
-	</Container>
-);
+	console.log(session);
+	if (session.status === "loading") {
+		return <Loading />;
+	}
+
+	if (session.status === "unauthenticated") {
+		router.push("/login");
+	}
+
+	return (
+		<Container>
+			<Navbar />
+
+			<Content>{children}</Content>
+		</Container>
+	);
+};
 
 export default Layout;

@@ -3,7 +3,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import styled from "styled-components";
-import { SupportItem } from "@prisma/client";
+import { RateType, SupportItem } from "@prisma/client";
 import { toast } from "react-toastify";
 
 interface Props {
@@ -34,29 +34,35 @@ const Activity = ({ supportItem }: Props) => {
 		toast.success("Deleted Support Item");
 	}
 
+	let rateTypeDisplay: { [index: string]: string } = {};
+	rateTypeDisplay[RateType.HOUR] = "hr";
+	rateTypeDisplay[RateType.KM] = "km";
+
+	const rateType = supportItem.rateType === RateType.HOUR ? "hr" : "km";
+
 	return (
-		<Row key={supportItem.description}>
+		<Row key={supportItem.id}>
 			<td>
 				<span>{supportItem.description}</span>
 			</td>
 			<td>
 				<span>
-					<strong>${supportItem.weekdayRate}</strong>/{supportItem.rateType}
+					<strong>${supportItem.weekdayRate}</strong>/{rateType}
 				</span>
 			</td>
 			<td>
 				<span>
-					<strong>${supportItem.weeknightRate}</strong>/{supportItem.rateType}
+					<strong>${supportItem.weeknightRate}</strong>/{rateType}
 				</span>
 			</td>
 			<td>
 				<span>
-					<strong>${supportItem.saturdayRate}</strong>/{supportItem.rateType}
+					<strong>${supportItem.saturdayRate}</strong>/{rateType}
 				</span>
 			</td>
 			<td>
 				<span>
-					<strong>${supportItem.sundayRate}</strong>/{supportItem.rateType}
+					<strong>${supportItem.sundayRate}</strong>/{rateType}
 				</span>
 			</td>
 			<td>

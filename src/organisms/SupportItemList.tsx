@@ -11,7 +11,6 @@ const getSupportItems = async () => {
 };
 
 function SupportItemList() {
-	// const [supportItems, setActivities] = useState<ActivityObject>({});
 	const { data: supportItems, error } = useSWR(
 		"/api/support-items",
 		getSupportItems

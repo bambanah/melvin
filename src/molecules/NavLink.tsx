@@ -32,7 +32,10 @@ const Link = ({ href, children }: Props) => {
 
 	return (
 		<NextLink href={href}>
-			<StyledLink active={router.pathname === href} data-cy="nav-item">
+			<StyledLink
+				active={"/" + router.pathname.split("/")[1] === href}
+				data-cy="nav-item"
+			>
 				{children}
 			</StyledLink>
 		</NextLink>

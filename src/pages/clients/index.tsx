@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import React from "react";
 import useSWR from "swr";
 import ClientPage from "@layouts/clients/ClientPage";
-import NavLink from "@molecules/NavLink";
+import Link from "next/link";
 
 const getClients = async () => {
 	const response = await fetch("/api/clients");
@@ -29,7 +29,7 @@ const Clients = () => {
 
 	return (
 		<Layout>
-			<NavLink href="/clients/create">Create</NavLink>
+			<Link href="/clients/create">Create</Link>
 			<ClientPage clients={clients} />
 		</Layout>
 	);

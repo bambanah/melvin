@@ -24,10 +24,7 @@ const theme = {
 // Import Fontawesome Icons
 importIcons();
 
-function App({
-	Component,
-	pageProps,
-}: AppProps & { Component: { auth: boolean } }) {
+function App({ Component, pageProps }: AppProps) {
 	return (
 		<SessionProvider session={pageProps.session}>
 			<ThemeProvider theme={theme}>

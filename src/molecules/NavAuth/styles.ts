@@ -12,7 +12,7 @@ export const AuthDropdown = styled.div`
 		margin-right: 0.3rem;
 	}
 
-	&:focus {
+	&:focus-within {
 		div:last-of-type {
 			display: flex;
 		}
