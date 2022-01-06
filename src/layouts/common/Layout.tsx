@@ -38,7 +38,6 @@ const Layout: React.FC<Props> = ({ children }) => {
 	const session = useSession();
 	const router = useRouter();
 
-	console.log(session);
 	if (session.status === "loading") {
 		return <Loading />;
 	}

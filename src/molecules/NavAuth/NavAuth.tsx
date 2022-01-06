@@ -18,7 +18,6 @@ const NavAuth: React.FC<NavAuthProps> = ({ user }) => {
 				{user && <span>{user.email}</span>}
 				<button
 					onClick={() => {
-						console.log("Sign out");
 						signOut();
 					}}
 				>
