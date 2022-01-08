@@ -10,6 +10,11 @@ interface Props {
 
 const Row = styled.tr`
 	cursor: pointer;
+	border-top: 1px solid
+		${({ theme }) =>
+			theme.type === "light"
+				? lighten(0.5, theme.colors.fg)
+				: shade(0.5, theme.colors.fg)};
 
 	&:hover {
 		background-color: ${({ theme }) =>
