@@ -6,8 +6,10 @@ const StyledTable = styled.table`
 	width: 100%;
 	border-collapse: collapse;
 
-	th, td {
+	th,
+	td {
 		text-align: left;
+		padding: 1.5rem 0.8rem;
 	}
 `;
 

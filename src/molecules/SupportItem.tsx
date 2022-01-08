@@ -1,5 +1,6 @@
 import { RateType, SupportItem } from "@prisma/client";
 import Link from "next/link";
+import { lighten, shade } from "polished";
 import React from "react";
 import styled from "styled-components";
 
@@ -10,8 +11,11 @@ interface Props {
 const Row = styled.tr`
 	cursor: pointer;
 
-	td {
-		padding: 0.8rem 0;
+	&:hover {
+		background-color: ${({ theme }) =>
+			theme.type === "light"
+				? shade(0.2, theme.colors.bg)
+				: lighten(0.2, theme.colors.bg)};
 	}
 `;
 
@@ -34,19 +38,31 @@ const Activity = ({ supportItem }: Props) => {
 					</span>
 				</td>
 				<td>
-					<span>
-						<strong>${supportItem.weeknightRate}</strong>/{rateType}
-					</span>
+					{supportItem.weeknightRate ? (
+						<span>
+							<strong>${supportItem.weeknightRate}</strong>/{rateType}
+						</span>
+					) : (
+						<span>N/A</span>
+					)}
 				</td>
 				<td>
-					<span>
-						<strong>${supportItem.saturdayRate}</strong>/{rateType}
-					</span>
+					{supportItem.saturdayRate ? (
+						<span>
+							<strong>${supportItem.saturdayRate}</strong>/{rateType}
+						</span>
+					) : (
+						<span>N/A</span>
+					)}
 				</td>
 				<td>
-					<span>
-						<strong>${supportItem.sundayRate}</strong>/{rateType}
-					</span>
+					{supportItem.sundayRate ? (
+						<span>
+							<strong>${supportItem.sundayRate}</strong>/{rateType}
+						</span>
+					) : (
+						<span>N/A</span>
+					)}
 				</td>
 			</Row>
 		</Link>

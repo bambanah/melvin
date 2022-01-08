@@ -3,7 +3,7 @@ import * as yup from "yup";
 const itemCodeRegex = /^[0-9]{2}_[0-9]{3}_[0-9]{4}_[0-9]{1}_[0-9]{1}$/;
 
 const ActivityValidationSchema = yup.object().shape({
-	description: yup.string().min(5, "Too short").required("Required"),
+	description: yup.string().required("Required"),
 	rateType: yup.string().required("Required"),
 	weekdayCode: yup
 		.string()
