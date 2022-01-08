@@ -7,7 +7,7 @@ export const light: DefaultTheme = {
 		bg: "#fefbfd",
 		link: "#2374ab",
 		brand: "#af4d98",
-		error: "#ff6961",
+		error: "#fa342a",
 	},
 };
 

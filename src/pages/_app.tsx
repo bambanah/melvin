@@ -13,8 +13,8 @@ importFontAwesomeIcons();
 
 function App({ Component, pageProps }: AppProps) {
 	return (
-		<AppContextProvider>
-			<SessionProvider session={pageProps.session}>
+		<SessionProvider session={pageProps.session}>
+			<AppContextProvider>
 				<Head>
 					<title>Melvin</title>
 					<link rel="shortcut icon" type="image/png" href="/melvin.png" />
@@ -23,8 +23,8 @@ function App({ Component, pageProps }: AppProps) {
 				<Component {...pageProps} />
 
 				<ToastContainer />
-			</SessionProvider>
-		</AppContextProvider>
+			</AppContextProvider>
+		</SessionProvider>
 	);
 }
 

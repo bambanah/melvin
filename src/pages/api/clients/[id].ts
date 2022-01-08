@@ -18,7 +18,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 		return res.status(200).json(client);
 	}
 
-	if (req.method === "PATCH") {
+	if (req.method === "POST") {
 		const session = await getSession({ req });
 		if (!session)
 			return res.status(401).send("Must be signed in to update this resource.");
