@@ -19,14 +19,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 		return res.status(200).json(supportItem);
 	}
 
-	if (req.method === "PATCH") {
+	if (req.method === "POST") {
 		// Update support item here
 		const session = await getSession({ req });
 		if (!session)
 			return res.status(401).send("Must be signed in to update this resource.");
 
 		const newSupportItem = await prisma.supportItem.update({
-			data: req.body.data,
+			data: req.body,
 			where: {
 				id: req.body.id,
 			},

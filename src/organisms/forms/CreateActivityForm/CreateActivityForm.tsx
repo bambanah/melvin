@@ -17,7 +17,15 @@ import { toast } from "react-toastify";
 import { mutate } from "swr";
 import * as Styles from "./styles";
 
-const CreateActivityForm = () => {
+interface CreateActivityProps {
+	initialValues?: Partial<SupportItem>;
+	returnFunction?: Function;
+}
+
+const CreateActivityForm: React.FC<CreateActivityProps> = ({
+	initialValues,
+	returnFunction,
+}) => {
 	const router = useRouter();
 
 	const BaseForm = (props: FormikProps<Partial<SupportItem>>) => {
@@ -129,9 +137,18 @@ const CreateActivityForm = () => {
 
 					<ButtonGroup>
 						<Button type="submit" primary>
-							Create
+							{initialValues ? "Update" : "Create"}
 						</Button>
-						<Button type="button" onClick={() => router.push("/activities")}>
+						<Button
+							type="button"
+							onClick={() => {
+								if (returnFunction) {
+									returnFunction();
+								} else {
+									router.push("/activities");
+								}
+							}}
+						>
 							Cancel
 						</Button>
 					</ButtonGroup>
@@ -142,6 +159,7 @@ const CreateActivityForm = () => {
 
 	const FormikForm = withFormik({
 		mapPropsToValues: () =>
+			initialValues ??
 			({
 				description: "" as string,
 				rateType: RateType.HOUR,
@@ -164,13 +182,28 @@ const CreateActivityForm = () => {
 			values.saturdayRate = values.saturdayRate || null;
 			values.sundayRate = values.sundayRate || null;
 
-			axios.post("/api/support-items", values).then(() => {
-				toast.success("Support Item Created");
-				router.push("/activities");
-			});
+			if (initialValues) {
+				axios
+					.post(`/api/support-items/${initialValues.id}`, values)
+					.then(() => {
+						toast.success("Support Item Created");
+						setSubmitting(false);
+						mutate(`/api/support-items/${initialValues.id}`);
 
-			setSubmitting(false);
-			mutate("/api/support-items");
+						if (returnFunction) {
+							returnFunction();
+						} else {
+							router.push("/activities");
+						}
+					});
+			} else {
+				axios.post("/api/support-items", values).then(() => {
+					toast.success("Support Item Created");
+					setSubmitting(false);
+					mutate("/api/support-items");
+					router.push("/activities");
+				});
+			}
 		},
 		validationSchema: ActivityValidationSchema,
 		validateOnChange: false,

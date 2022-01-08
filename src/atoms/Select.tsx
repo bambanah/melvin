@@ -13,7 +13,6 @@ const SelectContainer = styled.div<SelectProps>`
 		${(props) =>
 			props.error ? props.theme.colors.error : props.theme.colors.fg};
 	outline: none;
-	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
 
 	width: 100%;
 	min-width: 15ch;
@@ -24,6 +23,14 @@ const SelectContainer = styled.div<SelectProps>`
 	grid-template-areas: "select";
 	align-items: center;
 
+	&:focus-within {
+		border: 1px solid
+			${(props) => (props.error ? props.theme.colors.error : "#6e6e6e")};
+
+		border-color: ${({ theme }) => theme.colors.brand};
+		box-shadow: 0px 0px 10px ${({ theme }) => theme.colors.brand}88;
+	}
+
 	select {
 		appearance: none;
 		background-color: transparent;
@@ -33,17 +40,13 @@ const SelectContainer = styled.div<SelectProps>`
 		grid-area: select;
 		padding: 0.8rem 1.6rem;
 		cursor: pointer;
+		border-radius: 0.3rem;
 		color: ${({ theme }) => theme.colors.fg};
 
 		option {
 			color: ${({ theme }) => theme.colors.fg};
 			background-color: ${({ theme }) => theme.colors.bg};
 		}
-	}
-
-	&:focus {
-		border: 1px solid
-			${(props) => (props.error ? props.theme.colors.error : "#6e6e6e")};
 	}
 
 	&::after {
