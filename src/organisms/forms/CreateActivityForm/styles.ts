@@ -32,7 +32,7 @@ export const ActivityRow = styled.div`
 	}
 
 	&:not(:first-of-type) {
-		margin-top: 0.8rem;
+		margin-top: 1.1rem;
 	}
 `;
 

@@ -14,6 +14,7 @@ import { FormikProps, getIn, withFormik } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
 import { toast } from "react-toastify";
+import { mutate } from "swr";
 import * as Styles from "./styles";
 
 const CreateActivityForm = () => {
@@ -43,6 +44,11 @@ const CreateActivityForm = () => {
 									name="description"
 									id="description"
 									error={errorIn(errors, touched, "description")}
+									placeholder="Description"
+								/>
+								<ErrorMessage
+									error={getIn(errors, "description")}
+									touched={getIn(touched, "description")}
 								/>
 							</Label>
 
@@ -90,7 +96,7 @@ const CreateActivityForm = () => {
 										name={`${day}Code`}
 										id={`${day}Code`}
 										value={getIn(values, `${day}Code`)}
-										placeholder="Code"
+										placeholder="XX_XXX_XXXX_X_X"
 										error={errorIn(errors, touched, `${day}Code`)}
 									/>
 									<ErrorMessage
@@ -99,6 +105,7 @@ const CreateActivityForm = () => {
 									/>
 								</Styles.InputContainer>
 
+								{/* TODO: Display this prefix in the input itself */}
 								<span style={{ marginRight: "-0.8rem" }}>$</span>
 								<Styles.InputContainer>
 									<Input
@@ -152,12 +159,18 @@ const CreateActivityForm = () => {
 				sundayRate: "",
 			} as unknown as Partial<SupportItem>),
 		handleSubmit: (values, { setSubmitting }) => {
+			// TODO: Find a proper solution when I'm not so sleepy
+			values.weeknightRate = values.weeknightRate || null;
+			values.saturdayRate = values.saturdayRate || null;
+			values.sundayRate = values.sundayRate || null;
+
 			axios.post("/api/support-items", values).then(() => {
 				toast.success("Support Item Created");
 				router.push("/activities");
 			});
 
 			setSubmitting(false);
+			mutate("/api/support-items");
 		},
 		validationSchema: ActivityValidationSchema,
 		validateOnChange: false,
