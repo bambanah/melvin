@@ -10,7 +10,19 @@ export const Header = styled.header`
 	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
 `;
 
-export const NavContent = styled.div`
+export const Brand = styled.a`
+	flex: 0 0 auto;
+	font-size: 2.2rem;
+	font-weight: bold;
+	font-family: "Patua One";
+	color: ${({ theme }) => theme.colors.brand};
+
+	&:hover {
+		color: ${({ theme }) => theme.colors.brand};
+	}
+`;
+
+export const Content = styled.div`
 	height: 5rem;
 	width: 100%;
 	padding: 0 2rem;
@@ -25,19 +37,7 @@ export const NavContent = styled.div`
 	justify-content: space-evenly;
 `;
 
-export const NavLogo = styled.div`
-	flex: 0 0 12rem;
-	display: flex;
-	align-items: center;
-
-	a:last-of-type {
-		margin-left: 1rem;
-		font-family: "Roboto Mono";
-		font-size: 0.8rem;
-	}
-`;
-
-export const NavLinks = styled.div`
+export const Links = styled.div`
 	display: flex;
 	flex: 1 0 auto;
 	align-items: center;

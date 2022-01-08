@@ -7,15 +7,18 @@ import { ThemeProvider } from "styled-components";
 import type { AppProps } from "next/app";
 import GlobalStyle from "@styles/GlobalStyle";
 import { importIcons } from "@utils/helpers";
+
+// TODO: Use webfontimport
 import "@styles/font-imports.scss";
 
+// TODO: Extract this to its own file
 const themes = {
 	dark: {
 		colors: {
 			bg: "#202C39",
 			fg: "#FEFBFD",
-			link: "#3273dc",
-			brand: "#F29559",
+			link: "#4dccbd",
+			brand: "#ff8484",
 			error: "#ff6961",
 		},
 	},
@@ -23,8 +26,8 @@ const themes = {
 		colors: {
 			bg: "#fefbfd",
 			fg: "#283845",
-			link: "#3273dc",
-			brand: "#F29559",
+			link: "#2374ab",
+			brand: "#ff8484",
 			error: "#ff6961",
 		},
 	},
@@ -38,7 +41,8 @@ function App({ Component, pageProps }: AppProps) {
 		<SessionProvider session={pageProps.session}>
 			<ThemeProvider theme={themes.dark}>
 				<Head>
-					<title>NDIS Invoice Manager</title>
+					<title>Melvin</title>
+					<link rel="shortcut icon" type="image/png" href="/melvin.png" />
 				</Head>
 				<GlobalStyle />
 

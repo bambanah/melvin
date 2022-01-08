@@ -3,6 +3,7 @@ import CreateInvoiceForm from "@organisms/forms/CreateInvoiceForm/CreateInvoiceF
 import { Client, SupportItem } from "@prisma/client";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
+import Head from "next/head";
 import React from "react";
 import safeJsonStringify from "safe-json-stringify";
 
@@ -14,6 +15,9 @@ interface ClientProps {
 const CreateClient = ({ clients, supportItems }: ClientProps) => {
 	return (
 		<Layout>
+			<Head>
+				<title>Invoices - Melvin</title>
+			</Head>
 			<CreateInvoiceForm clients={clients} supportItems={supportItems} />
 		</Layout>
 	);

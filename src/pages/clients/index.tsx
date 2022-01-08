@@ -5,6 +5,7 @@ import React from "react";
 import useSWR from "swr";
 import ClientPage from "@layouts/clients/ClientList";
 import Link from "next/link";
+import Head from "next/head";
 
 const getClients = async () => {
 	const response = await fetch("/api/clients");
@@ -29,6 +30,9 @@ const Clients = () => {
 
 	return (
 		<Layout>
+			<Head>
+				<title>Clients - Melvin</title>
+			</Head>
 			<Link href="/clients/create">Create</Link>
 			<ClientPage clients={clients} />
 		</Layout>

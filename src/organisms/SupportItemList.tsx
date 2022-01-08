@@ -31,8 +31,6 @@ function SupportItemList() {
 					<th>Weeknight Rate</th>
 					<th>Saturday Rate</th>
 					<th>Sunday Rate</th>
-					{/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-					<th />
 				</tr>
 				{supportItems.map((supportItem) => (
 					<Activity supportItem={supportItem} key={supportItem.id} />

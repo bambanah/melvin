@@ -23,6 +23,8 @@ const StyledLink = styled.a<StyleProps>`
 	border-bottom: 2px solid transparent;
 
 	&:hover {
+		color: ${({ active, theme }) =>
+			active ? theme.colors.brand : theme.colors.fg};
 		border-bottom-color: ${(props) => props.theme.colors.brand};
 	}
 `;

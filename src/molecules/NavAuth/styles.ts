@@ -61,8 +61,10 @@ export const Profile = styled.div`
 	height: 2rem;
 
 	border-radius: 100%;
-	background-color: #b19cd9;
-	color: #000;
+	background-color: ${({ theme }) => theme.colors.brand};
+	font-size: 1.3rem;
+	font-weight: bold;
+	color: #fff;
 
 	cursor: pointer;
 `;

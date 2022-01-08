@@ -2,6 +2,7 @@ import ClientPage from "@layouts/clients/ClientPage";
 import Layout from "@layouts/common/Layout";
 import { Client } from "@prisma/client";
 import { GetServerSideProps } from "next";
+import Head from "next/head";
 import React from "react";
 import safeJsonStringify from "safe-json-stringify";
 
@@ -12,6 +13,9 @@ interface ClientProps {
 const ClientView: React.FC<ClientProps> = ({ client }) => {
 	return (
 		<Layout>
+			<Head>
+				<title>{client.name} - Melvin</title>
+			</Head>
 			<ClientPage client={client} />
 		</Layout>
 	);

@@ -1,4 +1,4 @@
-import React, {  } from "react";
+import React from "react";
 import useSWR from "swr";
 import { Activity, Client, Invoice } from "@prisma/client";
 import Table from "@molecules/Table";
@@ -31,7 +31,6 @@ export default function InvoiceList() {
 					<th>Name</th>
 					<th>No. Activities</th>
 					<th>Total</th>
-					<th> </th>
 				</tr>
 				{invoices.map((invoice) => (
 					<SingleInvoice invoice={invoice} key={invoice.id} />

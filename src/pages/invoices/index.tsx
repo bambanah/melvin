@@ -18,7 +18,7 @@ export default function Invoices() {
 	return (
 		<Layout>
 			<Head>
-				<title>Invoices</title>
+				<title>Invoices - Melvin</title>
 			</Head>
 
 			<Title>Invoices</Title>
