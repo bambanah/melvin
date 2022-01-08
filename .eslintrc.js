@@ -1,10 +1,14 @@
 module.exports = {
+	env: {
+		browser: true,
+		es2021: true
+	},
 	root: true,
 	parser: "@typescript-eslint/parser",
 	parserOptions: {
 		project: "./tsconfig.json",
 	},
-	plugins: ["@typescript-eslint", "jsx-a11y", "import", "react"],
+	plugins: ["@typescript-eslint", "jsx-a11y", "import", "react", "react-hooks"],
 	extends: ["airbnb-typescript", "prettier"],
 	rules: {
 		"quote-props": ["error", "consistent-as-needed"],
@@ -34,5 +38,7 @@ module.exports = {
 		],
 		"no-alert": 0,
 		"no-restricted-globals": 1,
+		"react-hooks/rules-of-hooks": "error",
+		"react-hooks/exhaustive-deps": "warn",
 	},
 };

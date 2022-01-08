@@ -1,33 +1,42 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "preserve",
-    "incremental": true
-  },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    ".eslintrc.js"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+	"compilerOptions": {
+		"target": "esnext",
+		"module": "commonjs",
+		"lib": ["dom", "dom.iterable", "esnext"],
+		"types": ["cypress"],
+		"allowJs": true,
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"strict": true,
+		"forceConsistentCasingInFileNames": true,
+		"noFallthroughCasesInSwitch": true,
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"noEmit": true,
+		"jsx": "preserve",
+		"incremental": true,
+		"baseUrl": ".",
+		"paths": {
+			"@pages/*": ["src/pages/*"],
+			"@atoms/*": ["src/atoms/*"],
+			"@molecules/*": ["src/molecules/*"],
+			"@organisms/*": ["src/organisms/*"],
+			"@layouts/*": ["src/layouts/*"],
+			"@hooks/*": ["src/hooks/*"],
+			"@utils/*": ["src/utils/*"],
+			"@schema/*": ["src/schema/*"],
+			"@styles/*": ["src/styles/*"],
+			"@context/*": ["src/context/*"]
+		}
+	},
+	"include": [
+		"**/*.ts",
+		"**/*.tsx",
+		"**/*.js",
+		".eslintrc.js",
+		"prisma/seed.ts"
+	],
+	"exclude": ["node_modules"]
 }
