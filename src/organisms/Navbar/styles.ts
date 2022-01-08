@@ -6,11 +6,11 @@ export const Header = styled.header`
 	width: 100vw;
 	box-sizing: border-box;
 	z-index: 100;
-	/* background-color: ${({ theme }) => theme.colors.bg}; */
 	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
 `;
 
-export const Brand = styled.a`
+export const Brand = styled.span`
+	user-select: none;
 	flex: 0 0 auto;
 	font-size: 2.2rem;
 	font-weight: bold;

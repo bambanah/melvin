@@ -44,6 +44,7 @@ const Layout: React.FC<Props> = ({ children }) => {
 
 	if (session.status === "unauthenticated") {
 		router.push("/login");
+		return null;
 	}
 
 	return (

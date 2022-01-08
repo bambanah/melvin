@@ -14,7 +14,9 @@ const Navbar = () => {
 		<Styles.Header>
 			<Styles.Content>
 				<Link href="/">
-					<Styles.Brand>melvin</Styles.Brand>
+					<a>
+						<Styles.Brand>melvin</Styles.Brand>
+					</a>
 				</Link>
 
 				<Styles.Links>
