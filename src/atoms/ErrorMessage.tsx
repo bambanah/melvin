@@ -7,7 +7,7 @@ interface ErrorProps {
 }
 
 const StyledMessage = styled.p`
-	color: #f51a1a;
+	color: ${({ theme }) => theme.colors.error};
 	font-size: 0.8rem;
 	margin-top: 0.2rem;
 	margin-bottom: 0;

@@ -1,8 +1,6 @@
-import Link from "next/link";
 import styled from "styled-components";
 
-export const ClientList = styled.div`
+export const ClientPage = styled.div`
 	display: flex;
+	flex-direction: column;
 `;
-
-export const Client = styled(Link)``;

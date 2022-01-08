@@ -46,10 +46,10 @@ const Button = styled(({ primary, ...rest }) => <BlandButton {...rest} />)`
 	font-family: "Inter";
 	font-size: 1rem;
 	height: 2.5em;
-	background-color: white;
+	background-color: ${(props) => props.theme.colors.bg};
 	border: 1px solid #dbdbdb;
 	border-radius: 4px;
-	color: #363636;
+	color: ${(props) => props.theme.colors.fg};
 	cursor: pointer;
 	padding-bottom: calc(0.5em - 1px);
 	padding-left: 1em;
@@ -60,7 +60,7 @@ const Button = styled(({ primary, ...rest }) => <BlandButton {...rest} />)`
 	transition: all 0.05s ease;
 
 	&:hover {
-		background-color: #f0f0f0;
+		background-color: ${(props) => props.theme.colors.bg};
 		border-color: #cbcbcb;
 	}
 

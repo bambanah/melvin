@@ -3,7 +3,7 @@ import Layout from "@layouts/common/Layout";
 import { useSession } from "next-auth/react";
 import React from "react";
 import useSWR from "swr";
-import ClientPage from "@layouts/clients/ClientPage";
+import ClientPage from "@layouts/clients/ClientList";
 import Link from "next/link";
 
 const getClients = async () => {

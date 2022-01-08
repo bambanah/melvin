@@ -6,7 +6,7 @@ export const Header = styled.header`
 	width: 100vw;
 	box-sizing: border-box;
 	z-index: 100;
-	background-color: white;
+	background-color: ${({ theme }) => theme.colors.bg};
 	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
 `;
 

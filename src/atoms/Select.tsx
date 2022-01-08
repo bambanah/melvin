@@ -21,6 +21,8 @@ const SelectContainer = styled.div<SelectProps>`
 	display: grid;
 	grid-template-areas: "select";
 	align-items: center;
+	background-color: ${({ theme }) => theme.colors.fg};
+	color: ${({ theme }) => theme.colors.bg};
 
 	select {
 		appearance: none;
@@ -31,6 +33,15 @@ const SelectContainer = styled.div<SelectProps>`
 		grid-area: select;
 		padding: 0.5rem 0.8rem;
 		cursor: pointer;
+
+		option {
+			color: ${({ theme }) => theme.colors.bg};
+			background-color: ${({ theme }) => theme.colors.fg};
+
+			&:hover {
+				color: blue;
+			}
+		}
 	}
 
 	&:focus {
@@ -42,7 +53,7 @@ const SelectContainer = styled.div<SelectProps>`
 		content: "";
 		width: 0.8em;
 		height: 0.5em;
-		background-color: #777;
+		background-color: ${({ theme }) => theme.colors.bg};
 		clip-path: polygon(100% 0%, 0 0%, 50% 100%);
 		grid-area: select;
 		justify-self: end;

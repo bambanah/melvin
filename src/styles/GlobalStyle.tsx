@@ -1,6 +1,7 @@
+import { shade } from "polished";
 import { createGlobalStyle } from "styled-components";
 
-const GlobalStyle = createGlobalStyle`	
+const GlobalStyle = createGlobalStyle`
 	html,
 	body {
 		margin: 0;
@@ -8,6 +9,9 @@ const GlobalStyle = createGlobalStyle`
 			"Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
+
+		background-color: ${({ theme }) => theme.colors.bg};
+		color: ${({ theme }) => theme.colors.fg};
 	}
 
 	* {
@@ -27,7 +31,7 @@ const GlobalStyle = createGlobalStyle`
 		cursor:pointer;
 
 		&:hover {
-			color: #363636;
+			color: ${(props) => shade(0.15, props.theme.colors.fg)};
 		}
 	}
 `;

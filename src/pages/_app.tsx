@@ -9,15 +9,24 @@ import GlobalStyle from "@styles/GlobalStyle";
 import { importIcons } from "@utils/helpers";
 import "@styles/font-imports.scss";
 
-const theme = {
-	colors: {
-		fg: "#363636",
-		bg: "#f5f5f5",
-		link: "#3273dc",
-		brand: "#6B2875",
-		error: "#ff6961",
-		accent:
-			"linear-gradient(24deg, rgba(126,249,145,1) 0%, rgba(120,199,254,1) 100%)",
+const themes = {
+	dark: {
+		colors: {
+			bg: "#202C39",
+			fg: "#FEFBFD",
+			link: "#3273dc",
+			brand: "#F29559",
+			error: "#ff6961",
+		},
+	},
+	light: {
+		colors: {
+			bg: "#fefbfd",
+			fg: "#283845",
+			link: "#3273dc",
+			brand: "#F29559",
+			error: "#ff6961",
+		},
 	},
 };
 
@@ -27,7 +36,7 @@ importIcons();
 function App({ Component, pageProps }: AppProps) {
 	return (
 		<SessionProvider session={pageProps.session}>
-			<ThemeProvider theme={theme}>
+			<ThemeProvider theme={themes.dark}>
 				<Head>
 					<title>NDIS Invoice Manager</title>
 				</Head>

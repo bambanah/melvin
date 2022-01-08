@@ -5,6 +5,7 @@ import React from "react";
 import styled from "styled-components";
 import { RateType, SupportItem } from "@prisma/client";
 import { toast } from "react-toastify";
+import { shade } from "polished";
 
 interface Props {
 	supportItem: SupportItem;
@@ -25,7 +26,7 @@ const Action = styled(FontAwesomeIcon)`
 	cursor: pointer;
 
 	&:hover {
-		color: #777;
+		color: ${({ theme }) => shade(0.2, theme.colors.fg)};
 	}
 `;
 

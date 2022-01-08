@@ -1,3 +1,4 @@
+import { shade } from "polished";
 import styled from "styled-components";
 
 export const AuthDropdown = styled.div`
@@ -24,16 +25,16 @@ export const DropdownContent = styled.div`
 	margin-top: 2.5rem;
 	min-width: 5rem;
 	border-radius: 5px;
-	border: 1px solid #ddd;
+	background-color: ${({ theme }) => theme.colors.bg};
+	border: 1px solid ${({ theme }) => shade(0.2, theme.colors.bg)};
 
-	background-color: white;
 	padding: 1rem;
 
 	display: none;
 	flex-direction: column;
 	gap: 1.5rem;
 
-	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+	box-shadow: 0px 0px 13px rgba(0, 0, 0, 0.3);
 
 	button {
 		cursor: pointer;

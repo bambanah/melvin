@@ -1,20 +1,31 @@
+import Button from "@atoms/Button";
 import { Client } from "@prisma/client";
-import React from "react";
+import React, { useState } from "react";
 import * as Styles from "./styles";
 
 interface ClientProps {
-	clients: Client[];
+	client: Client;
 }
 
-const ClientPage: React.FC<ClientProps> = ({ clients }) => {
+const ClientPage: React.FC<ClientProps> = ({ client }) => {
+	const [editing, setEditing] = useState(false);
+
 	return (
-		<Styles.ClientList>
-			{clients.map((client) => (
-				<Styles.Client href={`/clients/${client.id}`}>
-					<a>{client.name}</a>
-				</Styles.Client>
-			))}
-		</Styles.ClientList>
+		<Styles.ClientPage>
+			<h1>{client.name}</h1>
+
+			<Button onClick={() => setEditing(true)}>Edit</Button>
+
+			{editing ? (
+				<p>Editing</p>
+			) : (
+				<>
+					<p>Client Number: {client.number}</p>
+					<p>Bill To: {client.billTo ?? "Not Set"}</p>
+					<p>Invoice Prefix: {client.invoicePrefix ?? "Not Set"}</p>
+				</>
+			)}
+		</Styles.ClientPage>
 	);
 };
 
