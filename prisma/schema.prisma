@@ -58,10 +58,12 @@ model VerificationToken {
 }
 
 model Client {
-  id      String   @id @default(cuid())
-  created DateTime @default(now())
-  name    String
-  number  String
+  id            String   @id @default(cuid())
+  created       DateTime @default(now())
+  name          String
+  number        String
+  billTo        String?
+  invoicePrefix String?
 
   invoices Invoice[]
 

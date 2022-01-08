@@ -18,6 +18,8 @@ async function main() {
 				name: "John Smith",
 				number: "123456789",
 				ownerId: user.id,
+				billTo: "HELP Enterprises",
+				invoicePrefix: "JS",
 			},
 			update: {},
 		});

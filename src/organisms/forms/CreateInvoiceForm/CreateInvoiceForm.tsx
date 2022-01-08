@@ -9,15 +9,25 @@ import { Client, Invoice, SupportItem } from "@prisma/client";
 import InvoiceValidationSchema from "@schema/InvoiceValidationSchema";
 import { errorIn } from "@utils/helpers";
 import axios from "axios";
-import { FormikProps, withFormik } from "formik";
+import { FieldArray, FormikProps, withFormik } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
 import { toast } from "react-toastify";
+import * as Styles from "./styles";
 
 interface CreateInvoiceFormProps {
 	clients: Client[];
 	supportItems: SupportItem[];
 }
+
+type FormValues = Partial<Invoice> & {
+	activities: {
+		itemDistance: string;
+		itemDuration: string;
+		transitDistance: string;
+		transitDuration: string;
+	}[];
+};
 
 const CreateInvoiceForm = ({
 	clients,
@@ -25,19 +35,26 @@ const CreateInvoiceForm = ({
 }: CreateInvoiceFormProps) => {
 	const router = useRouter();
 
-	const BaseForm = (props: FormikProps<Partial<Invoice>>) => {
+	const BaseForm = (props: FormikProps<FormValues>) => {
 		const { values, touched, errors, handleChange, handleBlur, handleSubmit } =
 			props;
 
 		return (
 			<Form onSubmit={handleSubmit} flexDirection="column">
 				<Title>Create New Invoice</Title>
+
 				<Label htmlFor="clientId" required>
 					<span>Client</span>
 					<Select
 						id="clientId"
 						name="clientId"
 						error={errorIn(errors, touched, "clientId")}
+						onChange={() => {
+							if (values.clientId) {
+								values.billTo =
+									clients.find((c) => c.id === values.clientId)?.billTo ?? "";
+							}
+						}}
 					>
 						<option value="" disabled key="select">
 							Select...
@@ -49,6 +66,7 @@ const CreateInvoiceForm = ({
 						))}
 					</Select>
 				</Label>
+
 				<Label htmlFor="invoiceNo" required>
 					<span>Invoice Number</span>
 					<Subheading>
@@ -64,6 +82,7 @@ const CreateInvoiceForm = ({
 						error={errorIn(errors, touched, "invoiceNo")}
 					/>
 				</Label>
+
 				<Label htmlFor="billTo" required>
 					<span>Bill To</span>
 					<Subheading>Will usually be HELP Enterprises</Subheading>
@@ -91,6 +110,70 @@ const CreateInvoiceForm = ({
 						</option>
 					))}
 				</Select>
+
+				<FieldArray
+					name="activities"
+					render={(arrayHelpers) => (
+						<Styles.ActivityContainer>
+							{values.activities && values.activities.length > 0 ? (
+								<div>
+									{values.activities.map((activity, index) => (
+										<div key={index}>
+											<Label
+												htmlFor={`activities.${index}.itemDuration`}
+												required
+											>
+												<span>Duration</span>
+												<Input
+													type="text"
+													onChange={handleChange}
+													onBlur={handleBlur}
+													value={values.activities[index].itemDuration}
+													name={`activities.${index}.itemDuration`}
+													id={`activities.${index}.itemDuration`}
+													error={errorIn(
+														errors,
+														touched,
+														`activities.${index}.itemDuration`
+													)}
+												/>
+											</Label>
+
+											<Label
+												htmlFor={`activities.${index}.transitDistance`}
+												required
+											>
+												<span>Start Time</span>
+												<Input
+													type="text"
+													onChange={handleChange}
+													onBlur={handleBlur}
+													value={values.activities[index].transitDistance}
+													name={`activities.${index}.transitDistance`}
+													id={`activities.${index}.transitDistance`}
+													error={errorIn(
+														errors,
+														touched,
+														`activities.${index}.transitDistance`
+													)}
+												/>
+											</Label>
+										</div>
+									))}
+
+									<button type="button" onClick={() => arrayHelpers.push("")}>
+										+
+									</button>
+								</div>
+							) : (
+								<button type="button" onClick={() => arrayHelpers.push("")}>
+									+
+								</button>
+							)}
+						</Styles.ActivityContainer>
+					)}
+				/>
+
 				<Button type="submit">Create</Button>
 				{errors && <span>{JSON.stringify(errors)}</span>}
 				{values && <span>{JSON.stringify(values)}</span>}
@@ -105,7 +188,8 @@ const CreateInvoiceForm = ({
 				clientId: "",
 				supportItemId: "",
 				billTo: "",
-			} as Partial<Invoice>),
+				activities: [],
+			} as FormValues),
 		handleSubmit: (values, { setSubmitting }) => {
 			axios.post("/api/invoices", values).then(() => {
 				toast.success("Invoice Created");
