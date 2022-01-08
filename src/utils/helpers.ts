@@ -1,18 +1,5 @@
 import { FormikErrors, FormikTouched, getIn } from "formik";
 import moment from "moment";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import {
-	faCheck,
-	faCopy,
-	faEdit,
-	faFileDownload,
-	faTimes,
-	faTrash,
-} from "@fortawesome/free-solid-svg-icons";
-
-export const importIcons = () => {
-	library.add(faEdit, faTimes, faCheck, faTrash, faCopy, faFileDownload);
-};
 
 export const formatDate = (date: Date) => {
 	const YYYY = date.getFullYear();

@@ -3,7 +3,7 @@ import "styled-components";
 // and extend them!
 declare module "styled-components" {
 	export interface DefaultTheme {
-		borderRadius?: string;
+		type: "light" | "dark";
 
 		colors: {
 			fg: string;

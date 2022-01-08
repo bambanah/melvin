@@ -3,7 +3,7 @@ import React from "react";
 import SupportItemList from "@organisms/SupportItemList";
 import Layout from "@layouts/common/Layout";
 import Title from "@atoms/Title";
-import NavLink from "@molecules/NavLink";
+import Link from "next/link";
 
 function SupportItems() {
 	const { status } = useSession({
@@ -18,7 +18,9 @@ function SupportItems() {
 		<Layout>
 			<Title>Activities</Title>
 
-			<NavLink href="/activities/create">Create New</NavLink>
+			<Link href="/activities/create">
+				<a>Create New Activity</a>
+			</Link>
 
 			<SupportItemList />
 		</Layout>

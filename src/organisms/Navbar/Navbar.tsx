@@ -1,5 +1,6 @@
 import NavAuth from "@molecules/NavAuth";
 import NavLink from "@molecules/NavLink";
+import ThemeSwitch from "@atoms/ThemeSwitch";
 import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -23,7 +24,10 @@ const Navbar = () => {
 					<NavLink href="/clients">Clients</NavLink>
 				</Styles.Links>
 
-				<NavAuth user={session.data?.user as User} />
+				<Styles.Right>
+					<ThemeSwitch />
+					<NavAuth user={session.data?.user as User} />
+				</Styles.Right>
 			</Styles.Content>
 		</Styles.Header>
 	);

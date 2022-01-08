@@ -6,7 +6,7 @@ export const Header = styled.header`
 	width: 100vw;
 	box-sizing: border-box;
 	z-index: 100;
-	background-color: ${({ theme }) => theme.colors.bg};
+	/* background-color: ${({ theme }) => theme.colors.bg}; */
 	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
 `;
 
@@ -42,4 +42,9 @@ export const Links = styled.div`
 	flex: 1 0 auto;
 	align-items: center;
 	justify-content: center;
+`;
+
+export const Right = styled.div`
+	display: flex;
+	gap: 1rem;
 `;

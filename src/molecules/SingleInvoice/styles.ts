@@ -1,9 +1,15 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { darken, lighten } from "polished";
 import styled from "styled-components";
 
 export const InvoiceRow = styled.tr`
+	cursor: pointer;
+
 	&:hover {
-		background-color: #eee;
+		background-color: ${({ theme }) =>
+			theme.type === "light"
+				? darken(0.1, theme.colors.bg)
+				: lighten(0.1, theme.colors.bg)};
 	}
 `;
 
