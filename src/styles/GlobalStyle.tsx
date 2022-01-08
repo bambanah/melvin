@@ -12,14 +12,13 @@ const GlobalStyle = createGlobalStyle`
 
 		color: ${({ theme }) => theme.colors.fg};
 		background-color: ${({ theme }) => theme.colors.bg};
-
-		transition: color 0.3s ease;
-		transition: background-color 0.3s ease;
 	}
 
 	* {
 		font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
     "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+		transition: color 0.3s ease;
+		transition: background-color 0.3s ease;
 	}
 
 	*,

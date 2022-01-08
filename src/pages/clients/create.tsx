@@ -1,5 +1,5 @@
 import Layout from "@layouts/common/Layout";
-import CreateClientForm from "@organisms/forms/CreateClientForm";
+import ClientForm from "@organisms/forms/ClientForm";
 import Head from "next/head";
 import React from "react";
 
@@ -9,7 +9,7 @@ const CreateClient = () => {
 			<Head>
 				<title>Create Invoice - Melvin</title>
 			</Head>
-			<CreateClientForm />
+			<ClientForm />
 		</Layout>
 	);
 };

@@ -5,20 +5,22 @@ interface InputProps {
 }
 
 const Input = styled.input<InputProps>`
-	padding: 0.5rem 0.8rem;
-	border-radius: 3px;
-	border: 1px solid transparent;
+	color: ${({ theme }) => theme.colors.fg};
+	background-color: ${({ theme }) => theme.colors.bg};
+
+	padding: 0.8rem 1.6rem;
+	border-radius: 0.3rem;
+	border: 0.01rem solid transparent;
 	outline: none;
-	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
 
 	border-color: ${(props) =>
-		props.error ? props.theme.colors.error : "transparent"};
+		props.error ? props.theme.colors.error : props.theme.colors.fg};
 
 	&:focus {
 		border: 1px solid #6e6e6e;
 
-		border-color: ${(props) =>
-			props.error ? props.theme.colors.error : "transparent"};
+		border-color: ${({ theme }) => theme.colors.brand};
+		box-shadow: 0px 0px 10px ${({ theme }) => theme.colors.brand}88;
 	}
 `;
 

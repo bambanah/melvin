@@ -7,18 +7,24 @@ interface ErrorProps {
 }
 
 const StyledMessage = styled.p`
+	transition: height 0.2s ease;
 	color: ${({ theme }) => theme.colors.error};
 	font-size: 0.8rem;
 	margin-top: 0.2rem;
 	margin-bottom: 0;
+	height: 0;
+
+	&.show {
+		height: 1rem;
+	}
 `;
 
 const ErrorMessage = ({ error, touched }: ErrorProps) => {
-	if (error && touched) {
-		return <StyledMessage>{error}</StyledMessage>;
-	}
-
-	return null;
+	return (
+		<StyledMessage className={error && touched ? "show" : ""}>
+			{error}
+		</StyledMessage>
+	);
 };
 
 export default ErrorMessage;
