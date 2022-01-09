@@ -8,28 +8,35 @@ export const Container = styled.div<ContainerProps>`
 	display: flex;
 	align-items: center;
 	overflow: hidden;
-	padding: 0 0.5rem;
+	padding: 0 0.8rem;
 
 	color: ${({ theme }) => theme.colors.fg};
 	background-color: ${({ theme }) => theme.colors.bg};
 
 	border: 0.01rem solid
-		${(props) =>
-			props.error ? props.theme.colors.error : props.theme.colors.fg};
+		${({ error, theme }) => {
+			if (error) {
+				return theme.colors.error;
+			}
+
+			return theme.colors.fg + "88";
+		}};
 	border-radius: 0.3rem;
 
 	&:focus-within {
 		border-color: ${({ theme }) => theme.colors.link};
-		box-shadow: 0px 0px 10px ${({ theme }) => theme.colors.link}88;
+		box-shadow: rgba(0, 0, 0, 0.075) 0px 0.1rem 0.1rem inset,
+			${({ theme }) => theme.colors.link}88 0px 0px 0.8rem;
 	}
 
 	input {
+		flex-grow: 1;
 		color: ${({ theme }) => theme.colors.fg};
 		background-color: ${({ theme }) => theme.colors.bg};
 
 		border: none;
 		outline: none;
-		padding: 0.75rem 1.4rem;
+		padding: 0.85rem 1.4rem;
 		padding-left: 0.2rem;
 	}
 `;

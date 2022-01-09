@@ -34,7 +34,7 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 				</p>
 
 				<Styles.Separator>
-					<span>or</span>
+					<span>OR</span>
 				</Styles.Separator>
 
 				{Object.values(providers).map((provider) => (

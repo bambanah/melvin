@@ -121,7 +121,7 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 										name={`${day}Rate`}
 										id={`${day}Rate`}
 										value={getIn(values, `${day}Rate`)}
-										placeholder="Rate"
+										placeholder=""
 										error={errorIn(errors, touched, `${day}Rate`)}
 										prefix="$"
 										suffix={values.rateType === RateType.HOUR ? "/hr" : "/km"}

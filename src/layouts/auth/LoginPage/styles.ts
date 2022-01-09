@@ -1,4 +1,4 @@
-import { lighten, shade } from "polished";
+import { lighten } from "polished";
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -14,16 +14,15 @@ export const Modal = styled.div`
 	flex-direction: column;
 	justify-content: stretch;
 	align-items: center;
-	gap: 1rem;
-	min-width: 20rem;
+	gap: 1.9rem;
+	min-width: 26rem;
 
 	padding: 3rem;
 	background-color: ${({ theme }) =>
-		theme.type === "light"
-			? shade(0.2, theme.colors.bg)
-			: lighten(0.1, theme.colors.bg)};
+		theme.type === "dark" ? lighten(0.1, theme.colors.bg) : "#fff"};
 
-	border-radius: 20px;
+	border-radius: 5px;
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
 
 	button {
 		width: 100%;
@@ -43,12 +42,13 @@ export const Separator = styled.div`
 	align-items: center;
 	justify-content: center;
 	flex-wrap: nowrap;
-	gap: 1.5rem;
+	gap: 1.1rem;
+	font-size: 0.8rem;
 
 	width: 100%;
 	margin: 1.1rem 0px;
 
-	color: ${({ theme }) => shade(0.2, theme.colors.fg)};
+	color: ${({ theme }) => theme.colors.fg};
 
 	&::before,
 	&::after {
@@ -57,6 +57,6 @@ export const Separator = styled.div`
 
 		content: "";
 
-		border-top: 0.1rem solid ${({ theme }) => shade(0.2, theme.colors.fg)};
+		border-top: 0.1rem solid ${({ theme }) => theme.colors.fg}88;
 	}
 `;
