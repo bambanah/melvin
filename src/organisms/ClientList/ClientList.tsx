@@ -23,9 +23,6 @@ const ClientList = () => {
 	return (
 		<Styles.Container>
 			<CardContainer>
-				<Card href="/clients/create" create>
-					<span>+</span>
-				</Card>
 				{clients.map((client) => (
 					<Card href={`/clients/${client.id}`}>
 						<h1>{client.name}</h1>
@@ -36,6 +33,9 @@ const ClientList = () => {
 						</div>
 					</Card>
 				))}
+				<Card href="/clients/create" create>
+					<span>+</span>
+				</Card>
 			</CardContainer>
 		</Styles.Container>
 	);

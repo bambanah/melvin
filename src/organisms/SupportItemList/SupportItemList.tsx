@@ -27,9 +27,6 @@ function SupportItemList() {
 	return (
 		<Styles.Container>
 			<CardContainer>
-				<Card href="/activities/create" create>
-					<span>+</span>
-				</Card>
 				{supportItems.map((supportItem) => (
 					<Card href={`/activities/${supportItem.id}`}>
 						<h1>
@@ -43,6 +40,9 @@ function SupportItemList() {
 						</div>
 					</Card>
 				))}
+				<Card href="/activities/create" create>
+					<span>+</span>
+				</Card>
 			</CardContainer>
 		</Styles.Container>
 	);

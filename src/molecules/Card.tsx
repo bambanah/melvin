@@ -7,11 +7,11 @@ const StyledCard = styled.div`
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	width: 23rem;
-	height: 13rem;
+	width: 23em;
+	height: 13em;
 	gap: 0.8rem;
 	cursor: pointer;
-	padding: 2rem 4rem;
+	padding: 2em 4em;
 
 	background-color: ${({ theme }) =>
 		theme.type === "dark" ? lighten(0.05, theme.colors.bg) : theme.colors.bg};
@@ -20,6 +20,10 @@ const StyledCard = styled.div`
 	border-radius: 1rem;
 	transition: box-shadow 0.15s ease;
 	transition: transform 0.15s ease;
+
+	@media only screen and (max-width: 1600px) {
+		font-size: 14px;
+	}
 
 	&.create {
 		justify-content: center;
@@ -30,7 +34,7 @@ const StyledCard = styled.div`
 		background-color: ${({ theme }) => lighten(0.05, theme.colors.brand)};
 
 		span {
-			font-size: 5rem;
+			font-size: 5em;
 		}
 	}
 
@@ -49,7 +53,7 @@ const StyledCard = styled.div`
 	}
 
 	h1 {
-		font-size: 1.7rem;
+		font-size: 1.7em;
 		transition: color 0.15s ease;
 	}
 
