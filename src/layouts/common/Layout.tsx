@@ -24,7 +24,7 @@ const Content = styled.div`
 	display: flex;
 	width: 95vw;
 	max-width: 1200px;
-	margin-top: 7rem;
+	margin-top: 5rem;
 	height: 100%;
 	flex: 1 0 auto;
 	flex-direction: column;
