@@ -1,6 +1,6 @@
 import Card from "@molecules/Card";
+import CardContainer from "@molecules/CardContainer";
 import { Client } from "@prisma/client";
-import Link from "next/link";
 import React from "react";
 import useSWR from "swr";
 import * as Styles from "./styles";
@@ -22,25 +22,21 @@ const ClientList = () => {
 
 	return (
 		<Styles.Container>
-			<Styles.ClientList>
-				<Link href="/clients/create">
-					<Card className="create">
-						<span>+</span>
-					</Card>
-				</Link>
+			<CardContainer>
+				<Card href="/clients/create" create>
+					<span>+</span>
+				</Card>
 				{clients.map((client) => (
-					<Link href={`/clients/${client.id}`}>
-						<Card>
-							<h1>{client.name}</h1>
-							<div>
-								<p>{client.number}</p>
-								<p>{client.billTo ?? "N/A"}</p>
-								<p>{client.invoicePrefix?.concat("-XXX") ?? "N/A"}</p>
-							</div>
-						</Card>
-					</Link>
+					<Card href={`/clients/${client.id}`}>
+						<h1>{client.name}</h1>
+						<div>
+							<p>{client.number}</p>
+							<p>{client.billTo ?? "N/A"}</p>
+							<p>{client.invoicePrefix?.concat("-XXX") ?? "N/A"}</p>
+						</div>
+					</Card>
 				))}
-			</Styles.ClientList>
+			</CardContainer>
 		</Styles.Container>
 	);
 };

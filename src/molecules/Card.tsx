@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { lighten } from "polished";
+import { FC } from "react";
 import styled from "styled-components";
 
-const Card = styled.div`
+const StyledCard = styled.div`
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -55,5 +57,22 @@ const Card = styled.div`
 		color: ${({ theme }) => theme.colors.fg}99;
 	}
 `;
+
+interface CardProps {
+	href?: string;
+	create?: boolean;
+}
+
+const Card: FC<CardProps> = ({ href, children, create }) => {
+	if (href) {
+		return (
+			<Link href={href}>
+				<StyledCard className={create ? "create" : ""}>{children}</StyledCard>
+			</Link>
+		);
+	}
+
+	return <StyledCard className={create ? "create" : ""}>{children}</StyledCard>;
+};
 
 export default Card;

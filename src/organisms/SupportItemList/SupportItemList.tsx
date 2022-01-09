@@ -1,4 +1,6 @@
+import Loading from "@atoms/Loading";
 import Card from "@molecules/Card";
+import CardContainer from "@molecules/CardContainer";
 import { SupportItem } from "@prisma/client";
 import Link from "next/link";
 import React from "react";
@@ -21,13 +23,13 @@ function SupportItemList() {
 		console.error(error);
 		return <div>Error loading</div>;
 	}
-	if (!supportItems) return <div>loading...</div>;
+	if (!supportItems) return <Loading />;
 
 	return (
 		<Styles.Container>
-			<Styles.SupportItemList>
+			<CardContainer>
 				<Link href="/activities/create">
-					<Card className="create">
+					<Card create>
 						<span>+</span>
 					</Card>
 				</Link>
@@ -46,7 +48,7 @@ function SupportItemList() {
 						</Card>
 					</Link>
 				))}
-			</Styles.SupportItemList>
+			</CardContainer>
 		</Styles.Container>
 	);
 }
