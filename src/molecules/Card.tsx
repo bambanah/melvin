@@ -21,10 +21,6 @@ const StyledCard = styled.div`
 	transition: box-shadow 0.15s ease;
 	transition: transform 0.15s ease;
 
-	@media only screen and (max-width: 1600px) {
-		font-size: 14px;
-	}
-
 	&.create {
 		justify-content: center;
 		align-items: center;
