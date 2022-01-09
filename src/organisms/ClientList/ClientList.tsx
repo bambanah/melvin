@@ -32,9 +32,11 @@ const ClientList = () => {
 					<Link href={`/clients/${client.id}`}>
 						<Card>
 							<h1>{client.name}</h1>
-							<p>{client.number}</p>
-							<p>{client.billTo ?? "N/A"}</p>
-							<p>{client.invoicePrefix?.concat("-XXX") ?? "N/A"}</p>
+							<div>
+								<p>{client.number}</p>
+								<p>{client.billTo ?? "N/A"}</p>
+								<p>{client.invoicePrefix?.concat("-XXX") ?? "N/A"}</p>
+							</div>
 						</Card>
 					</Link>
 				))}

@@ -10,7 +10,7 @@ export const Container = styled.div`
 	height: 100%;
 `;
 
-export const ClientList = styled.div`
+export const SupportItemList = styled.div`
 	flex: 1;
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(23rem, auto));

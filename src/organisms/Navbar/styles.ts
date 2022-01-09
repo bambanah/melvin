@@ -7,6 +7,7 @@ export const Header = styled.header`
 	box-sizing: border-box;
 	z-index: 100;
 	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+	background-color: ${({ theme }) => theme.colors.bg};
 `;
 
 export const Brand = styled.span`

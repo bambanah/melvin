@@ -4,11 +4,15 @@ import styled from "styled-components";
 const Card = styled.div`
 	display: flex;
 	flex-direction: column;
+	justify-content: space-between;
 	width: 23rem;
+	height: 13rem;
 	gap: 0.8rem;
 	cursor: pointer;
-	padding: 2rem 5rem;
+	padding: 2rem 4rem;
 
+	background-color: ${({ theme }) =>
+		theme.type === "dark" ? lighten(0.05, theme.colors.bg) : theme.colors.bg};
 	box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.8);
 
 	border-radius: 1rem;
@@ -19,10 +23,9 @@ const Card = styled.div`
 		justify-content: center;
 		align-items: center;
 
-		background-color: ${({ theme }) => lighten(0.05, theme.colors.brand)};
-
 		color: ${({ theme }) =>
 			theme.type === "dark" ? theme.colors.bg : theme.colors.fg};
+		background-color: ${({ theme }) => lighten(0.05, theme.colors.brand)};
 
 		span {
 			font-size: 5rem;
@@ -30,7 +33,7 @@ const Card = styled.div`
 	}
 
 	&:hover {
-		transform: scale(1.02);
+		transform: scale(1.05);
 		box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.8);
 
 		h1 {
@@ -44,7 +47,7 @@ const Card = styled.div`
 	}
 
 	h1 {
-		font-size: 1.5rem;
+		font-size: 1.7rem;
 		transition: color 0.15s ease;
 	}
 
