@@ -10,7 +10,7 @@ const Label = styled.label<LabelProps>`
 	flex: 1 0 auto;
 	gap: 0.4rem;
 
-	span::after {
+	& > span::after {
 		color: red;
 		content: ${(props) => `"${props.required ? " *" : " "}"`};
 	}

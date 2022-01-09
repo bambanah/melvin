@@ -1,6 +1,6 @@
 import Button from "@atoms/Button";
 import Form from "@atoms/Form";
-import Input from "@atoms/Input";
+import Input from "@atoms/Input/Input";
 import Label from "@atoms/Label";
 import Select from "@atoms/Select";
 import Subheading from "@atoms/Subheading";

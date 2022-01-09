@@ -16,6 +16,7 @@ const NavAuth: React.FC<NavAuthProps> = ({ user }) => {
 			</Styles.Profile>
 			<Styles.DropdownContent>
 				{user && <span>{user.email}</span>}
+				<a href="/price-guide-3-21.pdf">Price Guide</a>
 				<button
 					onClick={() => {
 						signOut();

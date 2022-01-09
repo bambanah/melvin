@@ -1,7 +1,7 @@
 import Button from "@atoms/Button";
 import ErrorMessage from "@atoms/ErrorMessage";
 import Form from "@atoms/Form";
-import Input from "@atoms/Input";
+import Input from "@atoms/Input/Input";
 import Label from "@atoms/Label";
 import Select from "@atoms/Select";
 import Subheading from "@atoms/Subheading";
@@ -113,8 +113,6 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 									/>
 								</Styles.InputContainer>
 
-								{/* TODO: Display this prefix in the input itself */}
-								<span style={{ marginRight: "-0.8rem" }}>$</span>
 								<Styles.InputContainer>
 									<Input
 										type="text"
@@ -125,6 +123,8 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 										value={getIn(values, `${day}Rate`)}
 										placeholder="Rate"
 										error={errorIn(errors, touched, `${day}Rate`)}
+										prefix="$"
+										suffix={values.rateType === RateType.HOUR ? "/hr" : "/km"}
 									/>
 									<ErrorMessage
 										error={getIn(errors, `${day}Rate`)}
@@ -159,25 +159,25 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 
 	const FormikForm = withFormik({
 		mapPropsToValues: () =>
-			initialValues ??
 			({
-				description: "" as string,
-				rateType: RateType.HOUR,
+				description: initialValues?.description ?? ("" as string),
+				rateType: initialValues?.rateType ?? RateType.HOUR,
 
-				weekdayCode: "",
-				weekdayRate: "",
+				weekdayCode: initialValues?.weekdayCode ?? "",
+				weekdayRate: initialValues?.weekdayRate ?? "",
 
-				weeknightCode: "",
-				weeknightRate: "",
+				weeknightCode: initialValues?.weeknightCode ?? "",
+				weeknightRate: initialValues?.weeknightRate ?? "",
 
-				saturdayCode: "",
-				saturdayRate: "",
+				saturdayCode: initialValues?.saturdayCode ?? "",
+				saturdayRate: initialValues?.saturdayRate ?? "",
 
-				sundayCode: "",
-				sundayRate: "",
-			} as unknown as Partial<SupportItem>),
+				sundayCode: initialValues?.sundayCode ?? "",
+				sundayRate: initialValues?.sundayRate ?? "",
+			} as Partial<SupportItem>),
 		handleSubmit: (values, { setSubmitting }) => {
 			// TODO: Find a proper solution when I'm not so sleepy
+
 			values.weeknightRate = values.weeknightRate || null;
 			values.saturdayRate = values.saturdayRate || null;
 			values.sundayRate = values.sundayRate || null;

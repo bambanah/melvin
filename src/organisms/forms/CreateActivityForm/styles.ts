@@ -1,15 +1,15 @@
 import styled from "styled-components";
 
 export const CreateActivityContainer = styled.div`
+	width: 600px;
 	margin-bottom: 2rem;
 	padding: 3rem;
 	border-radius: 4px;
-	max-width: 800px;
 	align-self: center;
 `;
 
 export const InputGroup = styled.div`
-	flex: 1 1 auto;
+	flex: 0 1 auto;
 
 	display: flex;
 	flex-direction: column;

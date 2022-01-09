@@ -1,5 +1,6 @@
 /* eslint-disable react/button-has-type */
-import React, { FunctionComponent } from "react";
+import { shade } from "polished";
+import React, { FC } from "react";
 import styled from "styled-components";
 
 interface ButtonProps extends React.HTMLProps<HTMLButtonElement> {
@@ -13,7 +14,7 @@ const defaultProps: ButtonProps = {
 	disabled: false,
 };
 
-const BlandButton: FunctionComponent<ButtonProps> = ({
+const BlandButton: FC<ButtonProps> = ({
 	children,
 	onClick,
 	disabled,
@@ -43,42 +44,30 @@ const BlandButton: FunctionComponent<ButtonProps> = ({
 BlandButton.defaultProps = defaultProps;
 
 const Button = styled(({ primary, ...rest }) => <BlandButton {...rest} />)`
-	font-family: "Inter";
-	font-size: 1rem;
-	height: 2.5em;
-	background-color: ${(props) => props.theme.colors.bg};
-	border: 1px solid #dbdbdb;
-	border-radius: 4px;
-	color: ${(props) => props.theme.colors.fg};
-	cursor: pointer;
-	padding-bottom: calc(0.5em - 1px);
-	padding-left: 1em;
-	padding-right: 1em;
-	padding-top: calc(0.5em - 1px);
 	display: inline-block;
 
-	transition: all 0.05s ease;
+	font-family: "Inter";
+	font-size: 1rem;
+
+	color: ${(props) => props.theme.colors.fg};
+	background-color: ${({ theme, primary }) =>
+		primary ? theme.colors.brand : theme.colors.bg};
+
+	border: 1px solid
+		${({ theme, primary }) => (primary ? "transparent" : theme.colors.fg)};
+	border-radius: 0.2em;
+
+	cursor: pointer;
+	padding: 0.8em 2em;
+
+	transition: all 0.01s ease;
 
 	&:hover {
-		background-color: ${(props) => props.theme.colors.bg};
-		border-color: #cbcbcb;
+		background-color: ${({ primary, theme }) =>
+			primary ? shade(0.2, theme.colors.brand) : theme.colors.fg};
+		color: ${({ primary, theme }) =>
+			primary ? theme.colors.fg : theme.colors.bg};
 	}
-
-	${(props) => {
-		if (props.primary) {
-			return `
-				background-color: #00d1b2;
-				border-color: transparent;
-				color: #fff;
-
-				&:hover {
-					background-color: #00c4a7;
-				}
-			`;
-		}
-
-		return null;
-	}}
 `;
 
 export default Button;

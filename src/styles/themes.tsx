@@ -6,7 +6,7 @@ export const light: DefaultTheme = {
 		fg: "#283845",
 		bg: "#fefbfd",
 		link: "#2374ab",
-		brand: "#af4d98",
+		brand: "#FF7070",
 		error: "#fa342a",
 	},
 };
@@ -17,7 +17,7 @@ export const dark: DefaultTheme = {
 		fg: "#FEFBFD",
 		bg: "#202C39",
 		link: "#4dccbd",
-		brand: "#ff8484",
+		brand: "#FF7070",
 		error: "#ff6961",
 	},
 };
