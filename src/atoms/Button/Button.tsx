@@ -39,6 +39,20 @@ const Button = styled.button<ButtonProps>`
 					}
 			  `}
 
+	${({ disabled, theme }) =>
+		!disabled &&
+		css`
+			&.danger {
+				border: none;
+				background-color: ${theme.colors.error}dd;
+
+				&:hover {
+					color: ${theme.colors.fg};
+					background-color: ${theme.colors.error}99;
+				}
+			}
+		`}
+
 	${({ primary, disabled, theme }) =>
 		primary &&
 		css`

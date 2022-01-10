@@ -2,7 +2,8 @@ import { Field } from "formik";
 import styled from "styled-components";
 
 export const TimeInput = styled(Field)`
-	padding: 0.85rem 1.4rem;
+	font-size: 1rem;
+	padding: 0.6em;
 	color: ${({ theme }) => theme.colors.fg};
 	background-color: ${({ theme }) => theme.colors.bg};
 	outline: none;

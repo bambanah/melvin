@@ -7,7 +7,7 @@ export const light: DefaultTheme = {
 		bg: "#fefbfd",
 		link: "#2374ab",
 		brand: "#FF7070",
-		error: "#fa342a",
+		error: "#ff574e",
 	},
 };
 
@@ -15,7 +15,7 @@ export const dark: DefaultTheme = {
 	type: "dark",
 	colors: {
 		fg: "#FEFBFD",
-		bg: "#202C39",
+		bg: "#161E27",
 		link: "#4dccbd",
 		brand: "#FF7070",
 		error: "#ff6961",

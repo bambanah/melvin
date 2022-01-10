@@ -24,6 +24,7 @@ const Select = ({
 	return (
 		<ReactSelect
 			name={name}
+			className="react-select"
 			value={
 				options ? options.find((option) => option.value === field.value) : null
 			}

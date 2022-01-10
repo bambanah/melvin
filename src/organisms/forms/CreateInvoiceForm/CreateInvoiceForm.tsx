@@ -18,6 +18,8 @@ import * as Styles from "./styles";
 import { CodeBlock, dracula } from "react-code-blocks";
 import ButtonGroup from "@molecules/ButtonGroup";
 import Subheading from "@atoms/Subheading";
+import moment from "moment";
+import { mutate } from "swr";
 
 interface CreateInvoiceFormProps {
 	clients: Client[];
@@ -28,7 +30,6 @@ type FormActivity = {
 	date: string;
 	startTime: string;
 	endTime: string;
-	itemDuration: string;
 	itemDistance?: string;
 	transitDuration?: string;
 	transitDistance?: string;
@@ -49,7 +50,6 @@ const CreateInvoiceForm = ({
 		startTime: "",
 		endTime: "",
 		itemDistance: "",
-		itemDuration: "",
 		transitDistance: "",
 		transitDuration: "",
 	};
@@ -91,9 +91,7 @@ const CreateInvoiceForm = ({
 							className={`highlightable${
 								!values.clientId ? " highlighted" : ""
 							}`}
-							required
 						>
-							<span>Client</span>
 							<Subheading>Who will this invoice be for?</Subheading>
 							<Select
 								name="clientId"
@@ -166,50 +164,102 @@ const CreateInvoiceForm = ({
 											<>
 												{values.activities.map((activity, index) => (
 													<Styles.Activity key={index}>
-														<Select
-															name={`activities.${index}.supportItemId`}
-															error={errorIn(
-																errors,
-																touched,
-																`activities.${index}.supportItemId`
-															)}
-															options={supportItems.map((supportItem) => ({
-																value: supportItem.id,
-																label: supportItem.description,
-															}))}
-														/>
-														<DatePickerField
-															name={`activities.${index}.startDate`}
-														/>
-														<Label
-															htmlFor={`activities.${index}.itemDuration`}
-															required
-														>
-															<span>Duration</span>
-															<Input
-																type="text"
-																onChange={handleChange}
-																onBlur={handleBlur}
-																value={values.activities[index].itemDuration}
-																name={`activities.${index}.itemDuration`}
-																id={`activities.${index}.itemDuration`}
-																error={errorIn(
-																	errors,
-																	touched,
-																	`activities.${index}.itemDuration`
-																)}
-															/>
-														</Label>
+														<Styles.ActivityRow>
+															<Label>
+																<h3>Activity {index + 1}</h3>
+																<Select
+																	name={`activities.${index}.supportItemId`}
+																	error={errorIn(
+																		errors,
+																		touched,
+																		`activities.${index}.supportItemId`
+																	)}
+																	options={supportItems.map((supportItem) => ({
+																		value: supportItem.id,
+																		label: supportItem.description,
+																	}))}
+																/>
+															</Label>
+															<Label className="delete-button">
+																{" "}
+																<Button
+																	type="button"
+																	className="danger"
+																	onClick={() => arrayHelpers.remove(index)}
+																>
+																	X
+																</Button>
+															</Label>
+														</Styles.ActivityRow>
 
-														<Label
-															htmlFor={`activities.${index}.transitDistance`}
-															required
-														>
-															<span>Start Time</span>
-															<TimePicker
-																name={`activities.${index}.startTime`}
-															/>
-														</Label>
+														<Styles.ActivityRow>
+															<Label required>
+																<span>Date</span>
+																<DatePickerField
+																	name={`activities.${index}.date`}
+																/>
+															</Label>
+
+															<Label required>
+																<span>Start Time</span>
+																<TimePicker
+																	name={`activities.${index}.startTime`}
+																/>
+															</Label>
+
+															<Label required>
+																<span>End Time</span>
+																<TimePicker
+																	name={`activities.${index}.endTime`}
+																/>
+															</Label>
+														</Styles.ActivityRow>
+
+														<Styles.ActivityRow>
+															<Label
+																htmlFor={`activities.${index}.transitDistance`}
+															>
+																<span>Transit Distance</span>
+																<Input
+																	type="text"
+																	onChange={handleChange}
+																	onBlur={handleBlur}
+																	value={
+																		values.activities[index].transitDistance
+																	}
+																	name={`activities.${index}.transitDistance`}
+																	id={`activities.${index}.transitDistance`}
+																	error={errorIn(
+																		errors,
+																		touched,
+																		`activities.${index}.transitDistance`
+																	)}
+																	suffix="km"
+																/>
+															</Label>
+
+															<Label
+																htmlFor={`activities.${index}.transitDuration`}
+															>
+																<span>Transit Duration</span>
+																<Input
+																	type="text"
+																	onChange={handleChange}
+																	onBlur={handleBlur}
+																	value={
+																		values.activities[index].transitDuration
+																	}
+																	name={`activities.${index}.transitDuration`}
+																	id={`activities.${index}.transitDuration`}
+																	error={errorIn(
+																		errors,
+																		touched,
+																		`activities.${index}.transitDuration`
+																	)}
+																	suffix="minutes"
+																/>
+															</Label>
+														</Styles.ActivityRow>
 													</Styles.Activity>
 												))}
 
@@ -278,16 +328,35 @@ const CreateInvoiceForm = ({
 			({
 				invoiceNo: "",
 				clientId: "",
-				supportItemId: "",
 				billTo: "",
 				activities: [],
 			} as FormValues),
 		handleSubmit: (values, { setSubmitting }) => {
-			axios.post("/api/invoices", values).then(() => {
+			console.log(values.activities[0].startTime);
+			const data = {
+				invoice: {
+					invoiceNo: values.invoiceNo,
+					clientId: values.clientId,
+					billTo: values.billTo,
+					date: new Date(),
+				},
+				activities: values.activities.map((activity) => ({
+					...activity,
+					itemDuration: 7, // TODO: Update
+					itemDistance: null, // TODO: Update
+					transitDistance: parseInt(activity.transitDistance ?? ""),
+					transitDuration: parseInt(activity.transitDuration ?? ""),
+					startTime: moment(activity.startTime, "HH:mm").toDate(),
+					endTime: moment(activity.endTime, "HH:mm").toDate(),
+				})),
+			};
+
+			axios.post("/api/invoices", data).then(() => {
 				toast.success("Invoice Created");
 			});
 
 			setSubmitting(false);
+			mutate("/api/invoices");
 			router.push("/invoices");
 		},
 		validationSchema: InvoiceValidationSchema,

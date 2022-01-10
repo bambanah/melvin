@@ -10,8 +10,9 @@ const InvoiceValidationSchema = yup.object().shape({
 			date: yup.string().required("Required"),
 			startTime: yup.string().required("Required"),
 			endTime: yup.string().required("Required"),
+			itemDistance: yup.string(),
 			transitDistance: yup.string(),
-			itemDuration: yup.string().required("Required"),
+			transitDuration: yup.string(),
 		})
 	),
 });
