@@ -1,5 +1,5 @@
 import { FormikErrors, FormikTouched, getIn } from "formik";
-import moment from "moment";
+import dayjs from "dayjs";
 
 export const formatDate = (date: Date) => {
 	const YYYY = date.getFullYear();
@@ -9,28 +9,31 @@ export const formatDate = (date: Date) => {
 	return `${DD}/${MM}/${YYYY}`;
 };
 
-export const getDuration = (startTime: string, endTime: string) => {
-	const startMoment = moment(startTime, "HH:mm");
-	const endMoment = moment(endTime, "HH:mm");
+export const getDuration = (startTime: string, endTime: string): number => {
+	const startDate = dayjs("1970-01-01T" + startTime, "YYYY-MM-DDTHH:mm");
+	const endDate = dayjs("1970-01-01T" + endTime, "YYYY-MM-DDTHH:mm");
 
-	const duration = moment.duration(startMoment.diff(endMoment));
-	return Math.abs(duration.asHours());
+	const diffInMinutes = Math.abs(startDate.diff(endDate, "minutes"));
+	const diffInHours = diffInMinutes / 60;
+
+	return Math.round(diffInHours * 1000) / 1000;
 };
 
-export const getPrettyDuration = (hours: number) => {
-	const duration = moment.duration(hours, "hours");
+export const getPrettyDuration = (duration: number) => {
+	const hourItem = dayjs()
+		.set("hours", duration)
+		.set("minutes", (duration % 1) * 60);
 
 	let durationString = "";
 
-	if (duration.hours() > 0)
-		durationString += `${duration.hours()} hour${
-			duration.hours() === 1 ? "" : "s"
-		}`;
+	const hours = hourItem.get("hours");
+	const minutes = hourItem.get("minutes");
+	if (hours > 0) durationString += `${hours} hour${hours === 1 ? "" : "s"}`;
 
-	if (duration.minutes() > 0)
+	if (minutes > 0)
 		durationString = `${
 			durationString.length > 0 ? `${durationString}, ` : ""
-		}${duration.minutes()} mins`;
+		}${minutes} min${minutes === 1 ? "" : "s"}`;
 
 	return durationString;
 };

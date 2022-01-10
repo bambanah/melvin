@@ -13,5 +13,4 @@ describe("Authentication", () => {
 	});
 });
 
-// Workaround for isolatedModules
 export {};

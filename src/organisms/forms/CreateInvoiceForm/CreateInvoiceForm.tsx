@@ -8,17 +8,15 @@ import TimePicker from "@atoms/invoices/TimeInput";
 import Title from "@atoms/Title";
 import { Client, Invoice, SupportItem } from "@prisma/client";
 import InvoiceValidationSchema from "@schema/InvoiceValidationSchema";
-import { errorIn } from "@utils/helpers";
+import { errorIn, getDuration } from "@utils/helpers";
 import axios from "axios";
 import { FieldArray, FormikProps, withFormik } from "formik";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import * as Styles from "./styles";
-import { CodeBlock, dracula } from "react-code-blocks";
 import ButtonGroup from "@molecules/ButtonGroup";
 import Subheading from "@atoms/Subheading";
-import moment from "moment";
 import { mutate } from "swr";
 
 interface CreateInvoiceFormProps {
@@ -303,21 +301,6 @@ const CreateInvoiceForm = ({
 							)}
 						</>
 					)}
-
-					<Styles.Debug>
-						<CodeBlock
-							text={JSON.stringify(values, null, 2)}
-							language="json"
-							showLineNumbers={true}
-							theme={dracula}
-						/>
-						<CodeBlock
-							text={JSON.stringify(errors, null, 2)}
-							language="json"
-							showLineNumbers={true}
-							theme={dracula}
-						/>
-					</Styles.Debug>
 				</Form>
 			</Styles.Container>
 		);
@@ -332,7 +315,6 @@ const CreateInvoiceForm = ({
 				activities: [],
 			} as FormValues),
 		handleSubmit: (values, { setSubmitting }) => {
-			console.log(values.activities[0].startTime);
 			const data = {
 				invoice: {
 					invoiceNo: values.invoiceNo,
@@ -342,12 +324,12 @@ const CreateInvoiceForm = ({
 				},
 				activities: values.activities.map((activity) => ({
 					...activity,
-					itemDuration: 7, // TODO: Update
-					itemDistance: null, // TODO: Update
-					transitDistance: parseInt(activity.transitDistance ?? ""),
-					transitDuration: parseInt(activity.transitDuration ?? ""),
-					startTime: moment(activity.startTime, "HH:mm").toDate(),
-					endTime: moment(activity.endTime, "HH:mm").toDate(),
+					itemDuration: getDuration(activity.startTime, activity.endTime),
+					itemDistance: Number(activity.itemDistance) || null,
+					transitDistance: Number(activity.transitDistance) || null,
+					transitDuration: Number(activity.transitDistance) || null,
+					startTime: new Date("1970-01-01T" + activity.startTime + "Z"),
+					endTime: new Date("1970-01-01T" + activity.endTime + "Z"),
 				})),
 			};
 
