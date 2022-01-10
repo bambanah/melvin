@@ -5,6 +5,7 @@ const ButtonGroup = styled.div`
 	flex-direction: row;
 	gap: 1.5rem;
 	justify-content: center;
+	align-items: center;
 `;
 
 export default ButtonGroup;

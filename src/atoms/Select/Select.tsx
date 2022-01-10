@@ -36,6 +36,10 @@ const Select = ({
 				control: (styles) => ({
 					...styles,
 					borderColor: error ? theme.colors.error : styles.borderColor,
+					cursor: "pointer",
+				}),
+				option: (styles) => ({
+					...styles,
 				}),
 			}}
 			theme={(selectTheme) => ({

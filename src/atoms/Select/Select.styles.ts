@@ -1,4 +1,3 @@
-import Select from "react-select";
 import styled from "styled-components";
 
 interface SelectProps {
@@ -57,27 +56,5 @@ export const SelectContainer = styled.div<SelectProps>`
 		grid-area: select;
 		justify-self: end;
 		margin-right: 0.5rem;
-	}
-`;
-
-export const ReactSelect = styled(Select)`
-	color: ${({ theme }) => theme.colors.fg};
-
-	.react-select__menu {
-		background-color: ${({ theme }) => theme.colors.bg};
-	}
-
-	.react-select__option {
-		&:hover {
-			background-color: red;
-		}
-
-		&:target {
-			background-color: pink;
-			color: red;
-		}
-	}
-	.Select__indicator Select__dropdown-indicator {
-		border-color: transparent transparent red;
 	}
 `;

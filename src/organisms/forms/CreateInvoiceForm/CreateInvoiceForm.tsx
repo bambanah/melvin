@@ -166,9 +166,6 @@ const CreateInvoiceForm = ({
 											<>
 												{values.activities.map((activity, index) => (
 													<Styles.Activity key={index}>
-														<DatePickerField
-															name={`activities.${index}.startDate`}
-														/>
 														<Select
 															name={`activities.${index}.supportItemId`}
 															error={errorIn(
@@ -180,6 +177,9 @@ const CreateInvoiceForm = ({
 																value: supportItem.id,
 																label: supportItem.description,
 															}))}
+														/>
+														<DatePickerField
+															name={`activities.${index}.startDate`}
 														/>
 														<Label
 															htmlFor={`activities.${index}.itemDuration`}
