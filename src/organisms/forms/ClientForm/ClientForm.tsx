@@ -5,6 +5,7 @@ import Input from "@atoms/Input/Input";
 import Label from "@atoms/Label";
 import Subheading from "@atoms/Subheading";
 import Title from "@atoms/Title";
+import ButtonGroup from "@molecules/ButtonGroup";
 import { Client } from "@prisma/client";
 import ClientValidationSchema from "@schema/ClientValidationSchema";
 import { errorIn } from "@utils/helpers";
@@ -99,9 +100,19 @@ const ClientForm = () => {
 						/>
 					</Label>
 
-					<Button type="submit" primary>
-						Create
-					</Button>
+					<ButtonGroup>
+						<Button type="submit" primary>
+							Create
+						</Button>
+						<Button
+							type="button"
+							onClick={() => {
+								router.push("/activities");
+							}}
+						>
+							Cancel
+						</Button>
+					</ButtonGroup>
 				</Form>
 			</Styles.ClientContainer>
 		);

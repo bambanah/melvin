@@ -25,6 +25,7 @@ const ThemeSwitch = () => {
 						size={size}
 						speed={(index + 1) * 50}
 						className={theme}
+						key={x * y * size}
 					/>
 				))}
 			</Styles.Stars>

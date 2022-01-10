@@ -3,7 +3,7 @@ import ErrorMessage from "@atoms/ErrorMessage";
 import Form from "@atoms/Form";
 import Input from "@atoms/Input/Input";
 import Label from "@atoms/Label";
-import Select from "@atoms/Select";
+import Select from "@atoms/Select/Select";
 import Subheading from "@atoms/Subheading";
 import ButtonGroup from "@molecules/ButtonGroup";
 import { RateType, SupportItem } from "@prisma/client";
@@ -66,13 +66,11 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 								<Select
 									name="rateType"
 									error={errorIn(errors, touched, "rateType")}
-								>
-									<option value="" disabled>
-										Select...
-									</option>
-									<option value="HOUR">per hour</option>
-									<option value="KM">per km</option>
-								</Select>
+									options={[
+										{ label: "per hour", value: "HOUR" },
+										{ label: "per km", value: "KM" },
+									]}
+								/>
 							</Label>
 						</Styles.InputRow>
 					</Styles.InputGroup>
