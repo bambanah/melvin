@@ -3,10 +3,12 @@ node_modules
 .eslintcache
 .vscode/
 .next
-yarn-error.log
+
+#Cypress
 cypress/screenshots
 cypress/videos
 
+# Yarn
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -14,3 +16,4 @@ cypress/videos
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+yarn-error.log
