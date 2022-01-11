@@ -8,7 +8,12 @@ import React from "react";
 import safeJsonStringify from "safe-json-stringify";
 
 interface ClientProps {
-	clients: Client[];
+	clients: (Client & {
+		invoices: {
+			invoiceNo: string;
+			billTo: string;
+		}[];
+	})[];
 	supportItems: SupportItem[];
 }
 
@@ -36,6 +41,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 	const clients = await prisma.client.findMany({
 		where: {
 			ownerId: session?.user.id,
+		},
+		include: {
+			invoices: {
+				select: {
+					invoiceNo: true,
+					billTo: true,
+				},
+			},
 		},
 	});
 

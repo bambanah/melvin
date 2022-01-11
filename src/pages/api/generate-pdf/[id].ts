@@ -1,4 +1,3 @@
-import generatePDF from "@utils/pdf-generation";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 
@@ -10,9 +9,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 	if (req.method === "GET") {
 		const { id } = req.query;
 
-		const invoiceId = typeof id === "string" ? id : id[0];
+		return res.status(501).send("Not implemented");
 
-		const pdf = await generatePDF(invoiceId);
+		const pdf = String(id);
 
 		if (!pdf) return res.status(404).send("Can't find invoice with that ID");
 

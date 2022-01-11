@@ -1,8 +1,8 @@
 {
 	"compilerOptions": {
-		"target": "esnext",
+		"target": "es2019",
 		"module": "commonjs",
-		"lib": ["dom", "dom.iterable", "esnext"],
+		"lib": ["dom", "dom.iterable", "es2019"],
 		"types": ["cypress"],
 		"allowJs": true,
 		"skipLibCheck": true,

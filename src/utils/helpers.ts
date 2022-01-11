@@ -38,106 +38,62 @@ export const getPrettyDuration = (duration: number) => {
 	return durationString;
 };
 
+export const getHighestInvoiceNo = (
+	invoiceNumbers: string[]
+): string | null => {
+	if (!invoiceNumbers.length) {
+		return null;
+	}
+
+	const getNumber = (invoiceNo: string): number | null => {
+		const matches = invoiceNo.match(/\d+$/);
+
+		return matches ? Number(matches[0]) : null;
+	};
+
+	const highest = invoiceNumbers.reduce((prev, current) => {
+		if (getNumber(current) === null) return prev;
+
+		return (getNumber(prev) || 0) > (getNumber(current) || 0) ? prev : current;
+	});
+
+	return getNumber(highest) ? highest : null;
+};
+
+export const getNextInvoiceNo = (
+	previousInvoiceNumbers?: string[],
+	clientInvoicePrefix?: string | null
+): string => {
+	if (!previousInvoiceNumbers?.length && !clientInvoicePrefix) return "";
+
+	const latestInvoiceNo = previousInvoiceNumbers?.length
+		? getHighestInvoiceNo(previousInvoiceNumbers)
+		: null;
+
+	const invoicePrefix =
+		clientInvoicePrefix ?? latestInvoiceNo?.replace(/\d+$/, "") ?? "";
+
+	const matches = latestInvoiceNo?.match(/\d+$/);
+
+	return `${invoicePrefix.replace(/-+$/, "")}-${
+		matches ? parseInt(matches[0]) + 1 : 1
+	}`;
+};
+
 export const getRate = async (
 	activityId: string
 ): Promise<[code: string, rate: number]> => {
 	return [activityId, 1];
-	// const activity = await prisma.activity.findFirst({
-	// 	where: {
-	// 		id: activityId,
-	// 	},
-	// 	include: {
-	// 		supportItem: true,
-	// 	},
-	// });
-
-	// if (!activity || !activity.supportItem) return ["", 0];
-
-	// const { supportItem } = activity;
-
-	// if (
-	// 	moment(activity.date).day() === 0 &&
-	// 	supportItem.sundayCode &&
-	// 	supportItem.sundayRate
-	// ) {
-	// 	return [supportItem.sundayCode, supportItem.sundayRate.toNumber()];
-	// }
-	// if (
-	// 	moment(activity.date).day() === 6 &&
-	// 	supportItem.saturdayCode &&
-	// 	supportItem.saturdayRate
-	// ) {
-	// 	return [supportItem.saturdayCode, supportItem.saturdayRate.toNumber()];
-	// }
-	// if (
-	// 	moment(activity.endTime, "HH:mm").isAfter(moment("20:00", "HH:mm")) &&
-	// 	supportItem.weeknightCode &&
-	// 	supportItem.weeknightRate
-	// ) {
-	// 	return [supportItem.weeknightCode, supportItem.weeknightRate.toNumber()];
-	// }
-
-	// return [supportItem.weekdayCode, supportItem.weekdayRate.toNumber()];
 };
 
 export const getTotalCost = async (invoiceId: string) => {
 	let totalCost = invoiceId.length;
 
 	return totalCost;
-
-	// const invoice = await prisma.invoice.findFirst({
-	// 	where: {
-	// 		id: invoiceId,
-	// 	},
-	// 	include: {
-	// 		activities: {
-	// 			include: {
-	// 				supportItem: {
-	// 					select: {
-	// 						rateType: true,
-	// 					},
-	// 				},
-	// 			},
-	// 		},
-	// 	},
-	// });
-
-	// if (!invoice) return 0;
-
-	// invoice.activities.forEach(async (activity) => {
-	// 	const { supportItem } = activity;
-
-	// 	const [, rate] = await getRate(activity.id);
-
-	// 	if (rate) {
-	// 		if (supportItem.rateType === "HOUR") {
-	// 			totalCost += rate * activity.itemDuration;
-	// 		} else if (supportItem.rateType === "KM") {
-	// 			totalCost += rate * Number(activity.itemDistance);
-	// 		}
-	// 	}
-	// });
-
-	// return totalCost;
 };
 
 export const getTotalString = (invoiceId: string) =>
 	getTotalCost(invoiceId).then((cost) => `$${cost.toFixed(2)}`);
-
-// export const createTemplateFromInvoice = (invoice: Invoice) => {
-// 	invoice.activities.map((activity) => {
-// 		activity.date = "";
-// 		return activity;
-// 	});
-
-// 	const template: Template = {
-// 		...invoice,
-// 		template_name: invoice.client_name,
-// 	};
-
-// 	createTemplate(template);
-// 	toast.info("Template saved!");
-// };
 
 export const errorIn = (
 	errors: FormikErrors<any>,

@@ -95,7 +95,6 @@ model Activity {
   date            DateTime
   startTime       DateTime
   endTime         DateTime
-  itemDuration    Int
   itemDistance    Int?
   transitDuration Int?
   transitDistance Int?

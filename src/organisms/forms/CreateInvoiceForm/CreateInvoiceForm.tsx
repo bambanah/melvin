@@ -8,7 +8,12 @@ import TimePicker from "@atoms/invoices/TimeInput";
 import Title from "@atoms/Title";
 import { Client, Invoice, SupportItem } from "@prisma/client";
 import InvoiceValidationSchema from "@schema/InvoiceValidationSchema";
-import { errorIn, getDuration } from "@utils/helpers";
+import {
+	errorIn,
+	getDuration,
+	getHighestInvoiceNo,
+	getNextInvoiceNo,
+} from "@utils/helpers";
 import axios from "axios";
 import { FieldArray, FormikProps, withFormik } from "formik";
 import { useRouter } from "next/router";
@@ -20,7 +25,12 @@ import Subheading from "@atoms/Subheading";
 import { mutate } from "swr";
 
 interface CreateInvoiceFormProps {
-	clients: Client[];
+	clients: (Client & {
+		invoices?: {
+			invoiceNo: string;
+			billTo: string;
+		}[];
+	})[];
 	supportItems: SupportItem[];
 }
 
@@ -57,27 +67,50 @@ const CreateInvoiceForm = ({
 			props;
 
 		const [invoiceNoConfirmed, confirmInvoiceNo] = useState(false);
+		const [billToSource, setBillToSource] = useState<
+			"previous invoice" | "client information" | null
+		>(null);
 
 		useEffect(() => {
 			if (values.clientId) {
-				values.billTo =
-					clients.find((c) => c.id === values.clientId)?.billTo ?? "";
+				const client = clients.find((c) => c.id === values.clientId);
 
-				const invoicePrefix = clients.find(
-					(c) => c.id === values.clientId
-				)?.invoicePrefix;
+				if (!client) return;
 
-				if (invoicePrefix) {
-					const invoiceNo = values.invoiceNo?.split("-").at(-1);
-					if (invoiceNo) {
-						values.invoiceNo = invoicePrefix + "-" + invoiceNo;
-					} else {
-						values.invoiceNo = invoicePrefix + "-";
-					}
+				const highestInvoiceNo = getHighestInvoiceNo(
+					client.invoices?.map((i) => i.invoiceNo) ?? []
+				);
+
+				if (client.billTo) {
+					setBillToSource("client information");
+					values.billTo = client.billTo;
+				} else if (
+					client.invoices?.find((i) => i.invoiceNo === highestInvoiceNo)?.billTo
+				) {
+					setBillToSource("previous invoice");
+					values.billTo = client.invoices?.find(
+						(i) => i.invoiceNo === highestInvoiceNo
+					)?.billTo;
+				} else {
+					setBillToSource(null);
+					values.billTo = "";
 				}
+
+				values.invoiceNo = getNextInvoiceNo(
+					client.invoices?.map((i) => i.invoiceNo),
+					client?.invoicePrefix
+				);
 			}
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [values.clientId]);
+
+		const getPreviousInvoiceNo = () => {
+			const client = clients.find((c) => c.id === values.clientId);
+
+			return client?.invoices?.length
+				? getHighestInvoiceNo(client?.invoices?.map((i) => i.invoiceNo))
+				: "";
+		};
 
 		return (
 			<Styles.Container>
@@ -110,7 +143,11 @@ const CreateInvoiceForm = ({
 						>
 							<Label htmlFor="invoiceNo" required>
 								<span>Invoice Number</span>
-								<Subheading>Previous invoice number was Gawne26</Subheading>
+								<Subheading>
+									{getPreviousInvoiceNo()
+										? `Previous invoice number was ${getPreviousInvoiceNo()}`
+										: "This is the first invoice"}
+								</Subheading>
 								<Input
 									type="text"
 									onChange={handleChange}
@@ -124,7 +161,13 @@ const CreateInvoiceForm = ({
 
 							<Label htmlFor="billTo" required>
 								<span>Bill To</span>
-								<Subheading>Loaded from client information</Subheading>
+								{billToSource ? (
+									<Subheading>
+										Loaded from <b>{billToSource}</b>
+									</Subheading>
+								) : (
+									<Subheading></Subheading>
+								)}
 								<Input
 									type="text"
 									onChange={handleChange}
@@ -333,13 +376,18 @@ const CreateInvoiceForm = ({
 				})),
 			};
 
-			axios.post("/api/invoices", data).then(() => {
-				toast.success("Invoice Created");
-			});
-
-			setSubmitting(false);
-			mutate("/api/invoices");
-			router.push("/invoices");
+			axios
+				.post("/api/invoices", data)
+				.then(() => {
+					toast.success("Invoice Created");
+					setSubmitting(false);
+					mutate("/api/invoices");
+					router.push("/invoices");
+				})
+				.catch((error) => {
+					console.error(error);
+					toast.error("An unknown error occured");
+				});
 		},
 		validationSchema: InvoiceValidationSchema,
 		validateOnChange: true,
