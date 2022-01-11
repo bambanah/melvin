@@ -6,6 +6,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import useSWR from "swr";
 import * as Styles from "./InvoiceList.styles";
+import PdfDocument from "@molecules/PdfDocument";
 
 const getInvoices = async () => {
 	const response = await fetch("/api/invoices");
@@ -43,7 +44,7 @@ export default function InvoiceList() {
 						}
 					>
 						<Styles.Expander>
-							<FontAwesomeIcon icon={["fas", "chevron-right"]} />
+							<FontAwesomeIcon icon={["fas", "chevron-right"]} size="2x" />
 						</Styles.Expander>
 						<Styles.Column>
 							<h2>{invoice.invoiceNo}</h2>
@@ -58,7 +59,7 @@ export default function InvoiceList() {
 						</Styles.Column>
 					</Styles.Invoice>
 					<Styles.PdfPreview>
-						<span>This is a pdf</span>
+						<PdfDocument invoiceNo={invoice.id} />
 					</Styles.PdfPreview>
 				</Styles.InvoiceContainer>
 			))}

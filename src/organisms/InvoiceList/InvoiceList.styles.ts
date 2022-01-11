@@ -7,22 +7,25 @@ export const Container = styled.div`
 	flex-direction: column;
 	align-items: center;
 	gap: 2rem;
+	padding: 3em 0;
 `;
 
 export const InvoiceContainer = styled.div`
 	min-width: 30em;
 	width: 60%;
-	transition: all 0.35s ease;
-	box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.8);
+	transition: all 0.25s ease 0.3s;
+	box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.8);
 	border-radius: 0.8rem;
 	overflow: hidden;
 
-	svg {
+	.fa-chevron-right {
 		transition: transform 0.2s ease;
 	}
 
 	&.expanded {
 		width: 100%;
+
+		transition-delay: 0s;
 
 		& > div:first-of-type {
 			&:hover {
@@ -31,10 +34,12 @@ export const InvoiceContainer = styled.div`
 		}
 
 		& > div:last-of-type {
-			min-height: 30em;
+			height: 50vw;
+			max-height: 40em;
+			transition-delay: 0.35s;
 		}
 
-		svg {
+		.fa-chevron-right {
 			transform: rotate(90deg);
 		}
 	}
@@ -81,14 +86,11 @@ export const Column = styled.div`
 `;
 
 export const PdfPreview = styled.div`
-	background-color: ${({ theme }) => theme.colors.fg};
-	color: ${({ theme }) => theme.colors.bg};
 	height: 0;
 	min-height: 0;
 	width: 100%;
-	z-index: 1000;
 
 	overflow: hidden;
 
-	transition: all 0.35s ease;
+	transition: all 0.25s ease 0s;
 `;

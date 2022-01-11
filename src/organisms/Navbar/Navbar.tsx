@@ -13,7 +13,7 @@ const Navbar = () => {
 	return (
 		<Styles.Header>
 			<Styles.Content>
-				<Link href="/invoices">
+				<Link href="/">
 					<a>
 						<Styles.Brand>melvin</Styles.Brand>
 					</a>
