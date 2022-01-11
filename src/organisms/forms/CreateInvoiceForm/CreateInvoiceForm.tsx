@@ -355,7 +355,7 @@ const CreateInvoiceForm = ({
 				invoiceNo: "",
 				clientId: "",
 				billTo: "",
-				activities: [],
+				activities: [emptyActivity],
 			} as FormValues),
 		handleSubmit: (values, { setSubmitting }) => {
 			const data = {
