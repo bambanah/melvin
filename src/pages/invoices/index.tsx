@@ -1,9 +1,7 @@
-import Title from "@atoms/Title";
 import Layout from "@layouts/common/Layout";
 import InvoiceList from "@organisms/InvoiceList";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
-import Link from "next/link";
 import React from "react";
 
 export default function Invoices() {
@@ -20,9 +18,6 @@ export default function Invoices() {
 			<Head>
 				<title>Invoices - Melvin</title>
 			</Head>
-
-			<Title>Invoices</Title>
-			<Link href="/invoices/create">Create New Invoice</Link>
 
 			<InvoiceList />
 		</Layout>
