@@ -6,3 +6,11 @@ node_modules
 yarn-error.log
 cypress/screenshots
 cypress/videos
+
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
