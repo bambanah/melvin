@@ -23,6 +23,7 @@ import * as Styles from "./styles";
 import ButtonGroup from "@molecules/ButtonGroup";
 import Subheading from "@atoms/Subheading";
 import { mutate } from "swr";
+import Head from "next/head";
 
 interface CreateInvoiceFormProps {
 	clients: (Client & {
@@ -114,6 +115,9 @@ const CreateInvoiceForm = ({
 
 		return (
 			<Styles.Container>
+				<Head>
+					<title>Create Invoice - Melvin</title>
+				</Head>
 				<Title>Create New Invoice</Title>
 				<Form onSubmit={handleSubmit} flexDirection="column">
 					<Styles.ClientSelect>

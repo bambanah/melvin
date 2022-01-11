@@ -13,14 +13,14 @@ const Navbar = () => {
 	return (
 		<Styles.Header>
 			<Styles.Content>
-				<Link href="/">
+				<Link href="/invoices">
 					<a>
 						<Styles.Brand>melvin</Styles.Brand>
 					</a>
 				</Link>
 
 				<Styles.Links>
-					<NavLink href="/">Dashboard</NavLink>
+					{/* <NavLink href="/">Dashboard</NavLink> */}
 					<NavLink href="/invoices">Invoices</NavLink>
 					<NavLink href="/activities">Activities</NavLink>
 					<NavLink href="/clients">Clients</NavLink>
