@@ -3,7 +3,6 @@ node_modules
 .eslintcache
 .vscode/
 .next
-tsconfig.tsbuildinfo
 
 #Cypress
 cypress/screenshots

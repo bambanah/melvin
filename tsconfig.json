@@ -36,7 +36,7 @@
 		"target": "es2018",
 		"tsBuildInfoFile": ".next/cache/.tsbuildinfo"
 	},
-	"exclude": ["node_modules", "cypress"],
+	"exclude": ["node_modules"],
 	"include": [
 		"**/*.ts",
 		"**/*.tsx",
