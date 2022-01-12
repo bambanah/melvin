@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import React from "react";
-import SupportItemList from "@organisms/SupportItemList/SupportItemList";
+import SupportItemList from "@organisms/SupportItemList";
 import Layout from "@layouts/common/Layout";
 
 function SupportItems() {

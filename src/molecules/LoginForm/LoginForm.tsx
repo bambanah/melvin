@@ -1,5 +1,5 @@
 import Button from "@atoms/Button";
-import Input from "@atoms/Input/Input";
+import Input from "@atoms/Input";
 import React from "react";
 import * as Styles from "./styles";
 

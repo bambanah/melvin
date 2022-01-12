@@ -1,5 +1,5 @@
 import Layout from "@layouts/common/Layout";
-import CreateInvoiceForm from "@organisms/forms/CreateInvoiceForm/CreateInvoiceForm";
+import CreateInvoiceForm from "@organisms/forms/CreateInvoiceForm";
 import { Client, SupportItem } from "@prisma/client";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
