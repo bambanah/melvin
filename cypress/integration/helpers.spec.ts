@@ -70,5 +70,3 @@ describe("Helpers", () => {
 		expect(getNextInvoiceNo([], "")).to.equal("");
 	});
 });
-
-export {};

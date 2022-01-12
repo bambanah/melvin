@@ -6,7 +6,7 @@ import { lighten, shade } from "polished";
 
 interface SelectProps {
 	error?: boolean;
-	handleChange?: Function;
+	handleChange?: () => void;
 	options: { value: string; label: string }[];
 	name: string;
 }

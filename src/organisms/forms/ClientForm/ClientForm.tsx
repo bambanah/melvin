@@ -68,7 +68,7 @@ const ClientForm = () => {
 							type="text"
 							onChange={handleChange}
 							onBlur={handleBlur}
-							value={values.billTo!}
+							value={values.billTo ?? ""}
 							name="billTo"
 							id="billTo"
 							error={errorIn(errors, touched, "billTo")}
@@ -88,7 +88,7 @@ const ClientForm = () => {
 							type="text"
 							onChange={handleChange}
 							onBlur={handleBlur}
-							value={values.invoicePrefix!}
+							value={values.invoicePrefix ?? ""}
 							name="invoicePrefix"
 							id="invoicePrefix"
 							error={errorIn(errors, touched, "invoicePrefix")}

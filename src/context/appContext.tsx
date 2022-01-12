@@ -13,7 +13,7 @@ interface AppContextState {
 }
 
 const AppContext = createContext<AppContextState>({
-	theme: ["light", () => {}],
+	theme: ["light", () => undefined],
 });
 
 export const AppContextProvider: React.FC = ({ children }) => {
@@ -23,7 +23,7 @@ export const AppContextProvider: React.FC = ({ children }) => {
 		initialTheme = localStorage.getItem("theme") ?? "light";
 	}
 
-	let [theme, setTheme] = useState(initialTheme);
+	const [theme, setTheme] = useState(initialTheme);
 
 	useEffect(() => {
 		if (theme !== localStorage.getItem("theme")) {

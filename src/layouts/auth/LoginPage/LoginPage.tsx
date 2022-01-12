@@ -30,7 +30,7 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 				<LoginForm />
 
 				<p>
-					Don't have an account? <a>Sign up</a>
+					Don&#39;t have an account? <a>Sign up</a>
 				</p>
 
 				<Styles.Separator>

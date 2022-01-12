@@ -39,7 +39,7 @@ const ActivityPage = () => {
 			</Head>
 			{editing ? (
 				<>
-					<h1>Modifying "{supportItem.description}"</h1>
+					<h1>Modifying &quot;{supportItem.description}&quot;</h1>
 					<CreateActivityForm
 						initialValues={supportItem}
 						returnFunction={() => setEditing(false)}

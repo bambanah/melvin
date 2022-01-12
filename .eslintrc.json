@@ -1,0 +1,32 @@
+{
+	"root": true,
+	"parser": "@typescript-eslint/parser",
+	"env": {
+		"browser": true,
+		"es2021": true
+	},
+	"extends": [
+		"next/core-web-vitals",
+		"plugin:@typescript-eslint/recommended",
+		"prettier"
+	],
+	"plugins": ["testing-library", "jsx-a11y", "import"],
+	"rules": {
+		"quote-props": ["error", "consistent-as-needed"],
+		"@typescript-eslint/no-empty-interface": "warn",
+		"@typescript-eslint/ban-types": "warn",
+		"import/no-anonymous-default-export": "off"
+	},
+	"overrides": [
+		// Only uses Testing Library lint rules in test files
+		{
+			"parser": "",
+			"files": ["cypress/**/*.[jt]s?(x)"],
+			"extends": ["plugin:cypress/recommended"],
+			"plugins": ["cypress"],
+			"parserOptions": {
+				"project": "cypress/tsconfig.json"
+			}
+		}
+	]
+}

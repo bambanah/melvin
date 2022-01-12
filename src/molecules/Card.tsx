@@ -67,7 +67,9 @@ const Card: FC<CardProps> = ({ href, children, create }) => {
 	if (href) {
 		return (
 			<Link href={href}>
-				<StyledCard className={create ? "create" : ""}>{children}</StyledCard>
+				<a>
+					<StyledCard className={create ? "create" : ""}>{children}</StyledCard>
+				</a>
 			</Link>
 		);
 	}

@@ -24,7 +24,7 @@ const ClientList = () => {
 		<Styles.Container>
 			<CardContainer>
 				{clients.map((client) => (
-					<Card href={`/clients/${client.id}`}>
+					<Card href={`/clients/${client.id}`} key={client.id}>
 						<h1>{client.name}</h1>
 						<div>
 							<p>{client.number}</p>

@@ -28,7 +28,7 @@ function SupportItemList() {
 		<Styles.Container>
 			<CardContainer>
 				{supportItems.map((supportItem) => (
-					<Card href={`/activities/${supportItem.id}`}>
+					<Card href={`/activities/${supportItem.id}`} key={supportItem.id}>
 						<h1>
 							{supportItem.description.length > 25
 								? supportItem.description.slice(0, 25) + "..."

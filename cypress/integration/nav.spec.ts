@@ -12,5 +12,3 @@ describe("Authentication", () => {
 		cy.get("h1").contains("Login");
 	});
 });
-
-export {};

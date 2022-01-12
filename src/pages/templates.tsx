@@ -38,7 +38,7 @@ const Templates = () => {
 			) : (
 				<ul>
 					{templates.map((template) => (
-						<li>{template.templateName}</li>
+						<li key={template.id}>{template.templateName}</li>
 					))}
 				</ul>
 			)}

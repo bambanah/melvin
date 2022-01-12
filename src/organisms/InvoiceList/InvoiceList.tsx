@@ -37,6 +37,7 @@ export default function InvoiceList() {
 			{invoices.map((invoice, index) => (
 				<Styles.InvoiceContainer
 					className={expandedInvoice === index ? "expanded" : ""}
+					key={invoice.id}
 				>
 					<Styles.Invoice
 						onClick={() =>
