@@ -1,17 +1,10 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# Check tsconfig standards
-yarn check-types ||
-	(
-		printf '\n🤡😂❌🤡 Failed Type check 🤡😂❌🤡\n'
-		false
-	)
+npx lint-staged
 
 yarn build ||
 	(
 		printf '\n❌👷🔨❌ Better call Bob ❌👷🔨❌\n'
 		false
 	)
-
-npx lint-staged
