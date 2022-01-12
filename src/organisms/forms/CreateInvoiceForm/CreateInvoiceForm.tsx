@@ -2,28 +2,23 @@ import Button from "@atoms/Button";
 import DatePickerField from "@atoms/DatePickerField";
 import Form from "@atoms/Form";
 import Input from "@atoms/Input";
+import TimePicker from "@atoms/invoices/TimeInput";
 import Label from "@atoms/Label";
 import Select from "@atoms/Select";
-import TimePicker from "@atoms/invoices/TimeInput";
+import Subheading from "@atoms/Subheading";
 import Title from "@atoms/Title";
+import ButtonGroup from "@molecules/ButtonGroup";
 import { Client, Invoice, SupportItem } from "@prisma/client";
 import InvoiceValidationSchema from "@schema/InvoiceValidationSchema";
-import {
-	errorIn,
-	getDuration,
-	getHighestInvoiceNo,
-	getNextInvoiceNo,
-} from "@utils/helpers";
+import { errorIn, getHighestInvoiceNo, getNextInvoiceNo } from "@utils/helpers";
 import axios from "axios";
 import { FieldArray, FormikProps, withFormik } from "formik";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import * as Styles from "./styles";
-import ButtonGroup from "@molecules/ButtonGroup";
-import Subheading from "@atoms/Subheading";
 import { mutate } from "swr";
-import Head from "next/head";
+import * as Styles from "./styles";
 
 interface CreateInvoiceFormProps {
 	clients: (Client & {
@@ -371,7 +366,6 @@ const CreateInvoiceForm = ({
 				},
 				activities: values.activities.map((activity) => ({
 					...activity,
-					itemDuration: getDuration(activity.startTime, activity.endTime),
 					itemDistance: Number(activity.itemDistance) || null,
 					transitDistance: Number(activity.transitDistance) || null,
 					transitDuration: Number(activity.transitDistance) || null,
