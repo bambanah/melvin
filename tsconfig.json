@@ -33,7 +33,8 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"target": "es2018"
+		"target": "es2018",
+		"tsBuildInfoFile": ".next/cache/.tsbuildinfo"
 	},
 	"exclude": ["node_modules", "cypress"],
 	"include": [
