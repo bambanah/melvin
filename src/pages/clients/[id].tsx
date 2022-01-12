@@ -1,6 +1,7 @@
 import ClientPage from "@layouts/clients/ClientPage";
 import Layout from "@layouts/common/Layout";
 import { Client } from "@prisma/client";
+import prisma from "@utils/prisma";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import React from "react";
