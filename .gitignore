@@ -4,10 +4,6 @@ node_modules
 .vscode/
 .next
 
-#Cypress
-cypress/screenshots
-cypress/videos
-
 # Yarn
 .pnp.*
 .yarn/*

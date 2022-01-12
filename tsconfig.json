@@ -42,6 +42,7 @@
 		"**/*.tsx",
 		"**/*.js",
 		".eslintrc.js",
-		"prisma/seed.ts"
+		"prisma/seed.ts",
+		"jest.setup.ts"
 	]
 }
