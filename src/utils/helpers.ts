@@ -87,7 +87,7 @@ export const getRate = async (
 };
 
 export const getTotalCost = async (invoiceId: string) => {
-	let totalCost = invoiceId.length;
+	const totalCost = invoiceId.length;
 
 	return totalCost;
 };
@@ -96,7 +96,7 @@ export const getTotalString = (invoiceId: string) =>
 	getTotalCost(invoiceId).then((cost) => `$${cost.toFixed(2)}`);
 
 export const errorIn = (
-	errors: FormikErrors<any>,
-	touched: FormikTouched<any>,
+	errors: FormikErrors<unknown>,
+	touched: FormikTouched<unknown>,
 	value: string
 ): boolean => getIn(errors, value) !== undefined && getIn(touched, value);

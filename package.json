@@ -14,7 +14,12 @@
 		"cypress:open": "cypress open",
 		"cypress:headless": "cypress run",
 		"e2e": "start-server-and-test start http://localhost:3000 cypress:open",
-		"e2e:headless": "start-server-and-test start http://localhost:3000 cypress:headless"
+		"e2e:headless": "start-server-and-test start http://localhost:3000 cypress:headless",
+		"check-types": "tsc --pretty --noEmit",
+		"check-format": "prettier --check src",
+		"format": "prettier --write src",
+		"test-all": "check-format && lint && check-types && build",
+		"prepare": "husky install"
 	},
 	"browserslist": {
 		"production": [
@@ -86,7 +91,8 @@
 		"prisma": "^3.8.0",
 		"start-server-and-test": "^1.14.0",
 		"ts-node": "^10.4.0",
-		"typescript": "^4.5.4"
+		"typescript": "^4.5.4",
+		"husky": "^7.0.0"
 	},
 	"packageManager": "yarn@3.1.1"
 }

@@ -19,7 +19,7 @@ import * as Styles from "./styles";
 
 interface CreateActivityProps {
 	initialValues?: Partial<SupportItem>;
-	returnFunction?: Function;
+	returnFunction?: () => void;
 }
 
 const CreateActivityForm: React.FC<CreateActivityProps> = ({
