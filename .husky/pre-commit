@@ -1,20 +1,6 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# Check Prettier standards
-yarn check-format ||
-	(
-		printf '\n🤢🤮🤢🤮 Its F**KING RAW 🤢🤮🤢🤮\n'
-		false
-	)
-
-# Check ESLint Standards
-yarn lint ||
-	(
-		printf '\n😤🏀👋😤 Get that weak s**t out of here 😤🏀👋😤\n'
-		false
-	)
-
 # Check tsconfig standards
 yarn check-types ||
 	(
@@ -27,3 +13,5 @@ yarn build ||
 		printf '\n❌👷🔨❌ Better call Bob ❌👷🔨❌\n'
 		false
 	)
+
+npx lint-staged

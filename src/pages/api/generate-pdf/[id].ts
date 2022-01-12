@@ -7,7 +7,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
 	// Handle GET request
 	if (req.method === "GET") {
-
 		return res.status(501).send("Not implemented");
 	}
 
