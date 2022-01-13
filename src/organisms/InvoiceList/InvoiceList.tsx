@@ -9,6 +9,8 @@ import * as Styles from "./InvoiceList.styles";
 import PdfDocument from "@molecules/PdfDocument";
 import { toast } from "react-toastify";
 import Button from "@atoms/Button";
+import axios from "axios";
+import { saveAs } from "file-saver";
 
 const getInvoices = async () => {
 	const response = await fetch("/api/invoices");
@@ -17,6 +19,24 @@ const getInvoices = async () => {
 		activities: Activity[];
 		client: Client;
 	})[];
+};
+
+const savePdf = (invoiceId: string) => {
+	axios
+		.get(`/api/invoices/generate-pdf?invoiceId=${invoiceId}`)
+		.then((res) => {
+			const pdf = Buffer.from(res.data, "base64");
+			const blob = new Blob([pdf], { type: "application/pdf" });
+
+			const matches = res.headers["content-disposition"].match(/\"(.*?)\"/);
+			const fileName = matches ? matches[0] : "generated.pdf";
+
+			saveAs(blob, fileName);
+		})
+		.catch((err) => {
+			console.error(err);
+			toast.error("An unknown error occured");
+		});
 };
 
 export default function InvoiceList() {
@@ -70,10 +90,7 @@ export default function InvoiceList() {
 						</div>
 
 						<Styles.Actions>
-							<a
-								download
-								href={`/api/invoices/generate-pdf?invoiceId=${invoice.id}`}
-							>
+							<a onClick={() => savePdf(invoice.id)}>
 								<FontAwesomeIcon icon={["fas", "download"]} size="lg" />
 							</a>
 							<Styles.OptionsMenu tabIndex={0}>

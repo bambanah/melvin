@@ -128,7 +128,8 @@ export const Actions = styled.div`
 	flex-basis: 8%;
 
 	a {
-		color: ${({ theme }) => theme.colors.fg};
+		padding: 0.8em;
+		color: ${({ theme }) => theme.colors.fg}99;
 
 		&:hover {
 			color: ${({ theme }) => theme.colors.brand};
@@ -138,6 +139,7 @@ export const Actions = styled.div`
 	& > div {
 		padding: 0.8em;
 		transition: color 0.1s ease;
+		color: ${({ theme }) => theme.colors.fg}99;
 
 		&:hover {
 			color: ${({ theme }) => theme.colors.brand};

@@ -1,20 +1,35 @@
 import generatePDF from "@utils/pdf-generation";
 import { NextApiRequest, NextApiResponse } from "next";
+import prisma from "@utils/prisma";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
 	if (req.method === "GET") {
 		const { invoiceId } = req.query;
 
-		const [pdf, fileName] = await generatePDF(String(invoiceId));
+		const invoice = await prisma.invoice.findFirst({
+			where: { id: String(invoiceId) },
+			include: {
+				client: true,
+				activities: {
+					include: {
+						supportItem: true,
+					},
+				},
+			},
+		});
 
-		if (!pdf) {
+		if (!invoice || !invoice.client || !invoice.activities) return [null, null];
+
+		const { pdfString, fileName } = await generatePDF(invoice);
+
+		if (!pdfString) {
 			return res.status(404).send("Can't find PDF");
 		}
 
 		return res
 			.status(200)
 			.setHeader("Content-Type", "application/pdf")
-			.setHeader("Content-disposition", `inline; filename="${fileName}"`)
-			.send(pdf);
+			.setHeader("Content-Disposition", `inline; filename="${fileName}"`)
+			.send(pdfString);
 	}
 };

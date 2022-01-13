@@ -7,25 +7,21 @@ import {
 	getRate,
 	getTotalCost,
 } from "./helpers";
-import { RateType } from "@prisma/client";
-import prisma from "./prisma";
+import {
+	Activity,
+	Client,
+	Invoice,
+	RateType,
+	SupportItem,
+} from "@prisma/client";
 import dayjs from "dayjs";
 
-const generatePDF = async (invoiceId: string) => {
-	const invoice = await prisma.invoice.findFirst({
-		where: { id: invoiceId },
-		include: {
-			client: true,
-			activities: {
-				include: {
-					supportItem: true,
-				},
-			},
-		},
-	});
-
-	if (!invoice || !invoice.client || !invoice.activities) return [null, null];
-
+const generatePDF = async (
+	invoice: Invoice & {
+		client: Client;
+		activities: (Activity & { supportItem: SupportItem })[];
+	}
+) => {
 	const margin = 20;
 
 	const doc = new jsPDF();
@@ -55,7 +51,7 @@ const generatePDF = async (invoiceId: string) => {
 		invoice.activities.map(async (activity) => {
 			if (!activity || !activity.supportItem) return;
 
-			const [itemCode, rate] = await getRate(activity.id);
+			const [itemCode, rate] = await getRate(activity);
 
 			let countString = "";
 			let totalCost = 0;
@@ -68,11 +64,9 @@ const generatePDF = async (invoiceId: string) => {
 
 				const prettyDuration = getPrettyDuration(duration);
 
-				countString = `${activity.startTime
-					?.toString()
-					.toLowerCase()}-${activity.endTime
-					?.toString()
-					.toLowerCase()} (${prettyDuration})`;
+				countString = `${dayjs(activity.startTime).format("HH:mm")}-${dayjs(
+					activity.endTime
+				).format("HH:mm")} (${prettyDuration})`;
 			} else if (activity?.supportItem?.rateType === RateType.KM) {
 				totalCost = rate * (activity.itemDistance || 0);
 
@@ -82,9 +76,11 @@ const generatePDF = async (invoiceId: string) => {
 			// Push activity
 			const currentActivity = [
 				`${activity.supportItem.description}\n${itemCode}\n`,
-				`${activity.date}\n`,
+				`${formatDate(activity.date)}\n`,
 				`${countString}\n`,
-				`$${rate?.toFixed(2)}${`/${activity.supportItem.rateType}`}\n`,
+				`$${rate?.toFixed(2)}${`/${
+					activity.supportItem.rateType === RateType.HOUR ? "hr" : "km"
+				}`}\n`,
 				`$${totalCost.toFixed(2)}\n`,
 			];
 
@@ -97,10 +93,12 @@ const generatePDF = async (invoiceId: string) => {
 				const travelTotal = (rate / 60) * activity.transitDuration;
 
 				providerTravel.push(`Provider Travel\n${itemCode}\n`);
-				providerTravel.push(`${activity.date}\n`);
+				providerTravel.push(`${formatDate(activity.date)}\n`);
 				providerTravel.push(`${activity.transitDuration} minutes\n`);
 				providerTravel.push(
-					`$${rate.toFixed(2)}${`/${activity.supportItem.rateType}`}\n`
+					`$${rate.toFixed(2)}${`/${
+						activity.supportItem.rateType === RateType.HOUR ? "hr" : "km"
+					}`}\n`
 				);
 				providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
 
@@ -116,7 +114,7 @@ const generatePDF = async (invoiceId: string) => {
 				providerTravel.push(
 					`Provider Travel - Non Labour Costs\n${itemCode}\n`
 				);
-				providerTravel.push(`${activity.date}\n`);
+				providerTravel.push(`${formatDate(activity.date)}\n`);
 				providerTravel.push(`${activity.transitDistance} km\n`);
 				providerTravel.push("$0.85/km\n");
 				providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
@@ -219,7 +217,7 @@ const generatePDF = async (invoiceId: string) => {
 				fontStyle: "bold",
 			},
 			1: {
-				cellWidth: 20,
+				cellWidth: 24,
 			},
 			3: {
 				cellWidth: 20,
@@ -228,9 +226,14 @@ const generatePDF = async (invoiceId: string) => {
 		},
 	});
 
-	const fileName = `${invoice.invoiceNo}-${date}`;
+	const fileName = `${invoice.invoiceNo}-${date}.pdf`;
 
-	return [doc.output("datauristring"), fileName];
+	return {
+		pdfString: doc
+			.output("dataurlstring")
+			.replace(/^data:application\/pdf;filename=.+\.pdf;base64,/, ""),
+		fileName,
+	};
 };
 
 export default generatePDF;
