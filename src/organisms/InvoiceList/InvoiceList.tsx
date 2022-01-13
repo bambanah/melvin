@@ -1,22 +1,22 @@
 import Title from "@atoms/Title";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Activity, Client, Invoice } from "@prisma/client";
+import { Activity, Client, Invoice, SupportItem } from "@prisma/client";
 import dayjs from "dayjs";
 import Link from "next/link";
 import React, { useState } from "react";
-import useSWR, { mutate } from "swr";
 import * as Styles from "./InvoiceList.styles";
 import PdfDocument from "@molecules/PdfDocument";
 import { toast } from "react-toastify";
 import Button from "@atoms/Button";
 import axios from "axios";
 import { saveAs } from "file-saver";
+import useSWR, { useSWRConfig } from "swr";
+import { getTotalCost } from "@utils/helpers";
 
 const getInvoices = async () => {
 	const response = await fetch("/api/invoices");
-
 	return (await response.json()) as (Invoice & {
-		activities: Activity[];
+		activities: (Activity & { supportItem: SupportItem })[];
 		client: Client;
 	})[];
 };
@@ -40,6 +40,7 @@ const savePdf = (invoiceId: string) => {
 };
 
 export default function InvoiceList() {
+	const { mutate } = useSWRConfig();
 	const { data: invoices, error } = useSWR("/api/invoices", getInvoices);
 
 	const [expandedInvoice, expandInvoice] = useState<number | undefined>(
@@ -85,7 +86,7 @@ export default function InvoiceList() {
 								<span>
 									<b>{invoice.client.name}</b>
 								</span>
-								<span>$1234.56</span>
+								<span>${getTotalCost(invoice.activities)}</span>
 							</Styles.Column>
 						</div>
 

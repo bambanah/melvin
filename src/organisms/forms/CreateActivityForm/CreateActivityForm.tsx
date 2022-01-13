@@ -14,7 +14,7 @@ import { FormikProps, getIn, withFormik } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
 import { toast } from "react-toastify";
-import { mutate } from "swr";
+import { useSWRConfig } from "swr";
 import * as Styles from "./styles";
 
 interface CreateActivityProps {
@@ -27,6 +27,7 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 	returnFunction,
 }) => {
 	const router = useRouter();
+	const { mutate } = useSWRConfig();
 
 	const BaseForm = (props: FormikProps<Partial<SupportItem>>) => {
 		const { values, touched, errors, handleChange, handleBlur, handleSubmit } =
