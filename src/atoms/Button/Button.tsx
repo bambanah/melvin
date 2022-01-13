@@ -15,8 +15,8 @@ const Button = styled.button<ButtonProps>`
 	color: ${({ theme }) => theme.colors.fg};
 	background-color: ${({ theme }) => theme.colors.bg};
 
-	border: 1px solid ${({ theme }) => theme.colors.fg};
-	border-radius: 0.2em;
+	border: 0.1em solid ${({ theme }) => theme.colors.fg};
+	border-radius: 0.6em;
 
 	cursor: pointer;
 	padding: 0.8em 2em;

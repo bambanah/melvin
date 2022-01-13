@@ -3,10 +3,9 @@ import axios from "axios";
 import { FC, useEffect, useState } from "react";
 import { Document as MyDocument, Page, pdfjs } from "react-pdf";
 import { SizeMe } from "react-sizeme";
-import workerSrc from "../../../pdf-worker";
 import * as Styles from "./PdfDocument.styles";
 
-pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 interface PdfProps {
 	invoiceNo: string;

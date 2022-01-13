@@ -7,6 +7,8 @@ import React, { useState } from "react";
 import useSWR from "swr";
 import * as Styles from "./InvoiceList.styles";
 import PdfDocument from "@molecules/PdfDocument";
+import { toast } from "react-toastify";
+import Button from "@atoms/Button";
 
 const getInvoices = async () => {
 	const response = await fetch("/api/invoices");
@@ -32,36 +34,68 @@ export default function InvoiceList() {
 
 	return (
 		<Styles.Container>
-			<Title>Invoices</Title>
-			<Link href="/invoices/create">Create New Invoice</Link>
+			<Styles.Header>
+				<Title>Invoices</Title>
+				<Link href="/invoices/create" passHref>
+					<Button primary>
+						<FontAwesomeIcon icon={["fas", "plus"]} />
+					</Button>
+				</Link>
+			</Styles.Header>
 			{invoices.map((invoice, index) => (
 				<Styles.InvoiceContainer
 					className={expandedInvoice === index ? "expanded" : ""}
 					key={invoice.id}
 				>
-					<Styles.Invoice
-						onClick={() =>
-							expandInvoice(expandedInvoice === index ? undefined : index)
-						}
-					>
-						<Styles.Expander>
-							<FontAwesomeIcon icon={["fas", "chevron-right"]} size="2x" />
-						</Styles.Expander>
-						<Styles.Column>
-							<h2>{invoice.invoiceNo}</h2>
-							<span>{dayjs(invoice.date).format("DD/MM/YYYY")}</span>
-						</Styles.Column>
+					<Styles.Invoice>
+						<div
+							onClick={() =>
+								expandInvoice(expandedInvoice === index ? undefined : index)
+							}
+						>
+							<Styles.Expander>
+								<FontAwesomeIcon icon={["fas", "chevron-right"]} size="2x" />
+							</Styles.Expander>
+							<Styles.Column>
+								<h2>{invoice.invoiceNo}</h2>
+								<span>{dayjs(invoice.date).format("DD/MM/YYYY")}</span>
+							</Styles.Column>
 
-						<Styles.Column>
-							<span>
-								<b>{invoice.client.name}</b>
-							</span>
-							<span>$1234.56</span>
-						</Styles.Column>
+							<Styles.Column>
+								<span>
+									<b>{invoice.client.name}</b>
+								</span>
+								<span>$1234.56</span>
+							</Styles.Column>
+						</div>
+
+						<Styles.Actions>
+							<a
+								download
+								href={`/api/invoices/generate-pdf?invoiceId=${invoice.id}`}
+							>
+								<FontAwesomeIcon icon={["fas", "download"]} size="lg" />
+							</a>
+							<Styles.OptionsMenu tabIndex={0}>
+								<FontAwesomeIcon icon={["fas", "ellipsis-v"]} size="lg" />
+								<div className="dropdown">
+									<Link href={`/invoices/${invoice.id}`}>Edit</Link>
+									<a
+										onClick={() => {
+											toast.error("Invoice Deleted");
+										}}
+									>
+										Delete
+									</a>
+								</div>
+							</Styles.OptionsMenu>
+						</Styles.Actions>
 					</Styles.Invoice>
-					<Styles.PdfPreview>
-						<PdfDocument invoiceNo={invoice.id} />
-					</Styles.PdfPreview>
+					{expandedInvoice === index && (
+						<Styles.PdfPreview>
+							<PdfDocument invoiceNo={invoice.id} />
+						</Styles.PdfPreview>
+					)}
 				</Styles.InvoiceContainer>
 			))}
 		</Styles.Container>

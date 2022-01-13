@@ -8,9 +8,3 @@ yarn test ||
 		printf '\n❌📝 Tests failed 📝❌\n'
 		false
 	)
-
-yarn build ||
-	(
-		printf '\n❌👷 Better call Bob 👷❌\n'
-		false
-	)
