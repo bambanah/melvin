@@ -2,8 +2,11 @@ import React, { FC } from "react";
 import { useField, useFormikContext } from "formik";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+const customParseFormat = require("dayjs/plugin/customParseFormat");
+dayjs.extend(customParseFormat);
 
 import * as Styles from "./DatePicker.styles";
+import dayjs from "dayjs";
 
 interface DatePickerProps {
 	name: string;
@@ -19,11 +22,14 @@ const DatePickerField: FC<DatePickerProps> = ({ name, error }) => {
 			<DatePicker
 				{...field}
 				name={name}
-				selected={(field.value && new Date(field.value)) || new Date()}
+				selected={
+					(field.value && dayjs(field.value, "DD/MM/YYYY").toDate()) ||
+					new Date()
+				}
 				onChange={(val) => {
-					setFieldValue(field.name, val);
+					setFieldValue(field.name, dayjs(val).format("DD/MM/YYYY"));
 				}}
-				dateFormat="dd/MM/yyyy"
+				dateFormat={"dd/MM/yyyy"}
 			/>
 		</Styles.Container>
 	);

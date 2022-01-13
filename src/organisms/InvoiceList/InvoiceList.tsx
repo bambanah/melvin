@@ -4,7 +4,7 @@ import { Activity, Client, Invoice } from "@prisma/client";
 import dayjs from "dayjs";
 import Link from "next/link";
 import React, { useState } from "react";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import * as Styles from "./InvoiceList.styles";
 import PdfDocument from "@molecules/PdfDocument";
 import { toast } from "react-toastify";
@@ -96,10 +96,17 @@ export default function InvoiceList() {
 							<Styles.OptionsMenu tabIndex={0}>
 								<FontAwesomeIcon icon={["fas", "ellipsis-v"]} size="lg" />
 								<div className="dropdown">
-									<Link href={`/invoices/${invoice.id}`}>Edit</Link>
+									<Link href={`/invoices/${invoice.id}`}>View</Link>
+									<Link href={`/invoices/${invoice.id}?edit=true`}>Edit</Link>
 									<a
 										onClick={() => {
-											toast.error("Invoice Deleted");
+											axios
+												.delete(`/api/invoices/${invoice.id}`)
+												.then((res) => {
+													mutate("/api/invoices");
+													toast.success(res);
+												})
+												.catch((err) => toast.error(err));
 										}}
 									>
 										Delete

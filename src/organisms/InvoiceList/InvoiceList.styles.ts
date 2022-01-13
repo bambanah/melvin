@@ -158,7 +158,7 @@ export const OptionsMenu = styled.div`
 		display: flex;
 		flex-direction: column;
 		opacity: 0;
-		transform: scaleY(0) translateY(4.5em);
+		transform: scaleY(0) translateY(4.8em);
 		right: 0;
 
 		background-color: white;
@@ -166,17 +166,15 @@ export const OptionsMenu = styled.div`
 		border-radius: 0.4em;
 		overflow: hidden;
 
+		z-index: 1000;
+
 		a {
 			width: 7em;
-			padding: 1em;
+			padding: 0.6em 1em;
 			color: ${({ theme }) => theme.colors.fg};
 			background-color: ${({ theme }) => theme.colors.bg};
 
 			transition: all 0.1s ease;
-
-			&:not(:first-of-type) {
-				border-top: 1px solid ${({ theme }) => theme.colors.fg}44;
-			}
 
 			&:hover {
 				color: ${({ theme }) => theme.colors.bg};
@@ -188,7 +186,7 @@ export const OptionsMenu = styled.div`
 	&:focus-within {
 		.dropdown {
 			opacity: 1;
-			transform: scaleY(1) translateY(4.5em);
+			transform: scaleY(1) translateY(4.8em);
 		}
 	}
 `;

@@ -99,10 +99,10 @@ model Activity {
   transitDuration Int?
   transitDistance Int?
 
-  invoices  Invoice @relation(fields: [invoiceId], references: [id])
+  invoices  Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   invoiceId String
 
-  supportItem   SupportItem @relation(fields: [supportItemId], references: [id])
+  supportItem   SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
   supportItemId String
 }
 
@@ -142,6 +142,6 @@ model Template {
 
   templateName String
 
-  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   invoiceId String
 }

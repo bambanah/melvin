@@ -19,7 +19,7 @@ export const Container = styled.div<ContainerProps>`
 					return theme.colors.error;
 				}
 
-				return theme.colors.fg + "88";
+				return `${theme.colors.fg}88`;
 			}};
 		border-radius: 0.3rem;
 

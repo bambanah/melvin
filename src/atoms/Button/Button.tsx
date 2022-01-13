@@ -60,9 +60,9 @@ const Button = styled.button<ButtonProps>`
 				? theme.type === "light"
 					? theme.colors.bg
 					: theme.colors.fg
-				: theme.colors.bg + "77"};
+				: `${theme.colors.bg}77`};
 			background-color: ${disabled
-				? theme.colors.brand + "77"
+				? `${theme.colors.brand}77`
 				: theme.colors.brand};
 			box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
 			border: none;
@@ -70,13 +70,13 @@ const Button = styled.button<ButtonProps>`
 			&:hover {
 				box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
 				background-color: ${disabled
-					? theme.colors.brand + "77"
+					? `${theme.colors.brand}77`
 					: shade(0.2, theme.colors.brand)};
 				color: ${!disabled
 					? theme.type === "light"
 						? theme.colors.bg
 						: theme.colors.fg
-					: theme.colors.bg + "77"};
+					: `${theme.colors.bg}77`};
 			}
 		`}
 `;

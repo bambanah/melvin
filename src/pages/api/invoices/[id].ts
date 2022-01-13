@@ -1,15 +1,30 @@
+import { Activity, Invoice } from "@prisma/client";
 import prisma from "@utils/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+interface ApiRequest extends NextApiRequest {
+	body: {
+		invoice?: Partial<Invoice>;
+		activities?: Activity[];
+	};
+}
+
+export default async (req: ApiRequest, res: NextApiResponse) => {
 	const { id } = req.query;
 	const invoiceId = typeof id === "string" ? id : id[0];
 
 	if (req.method === "GET") {
-		const invoice = await prisma.invoice.findFirst({
+		const invoice = await prisma.invoice.findUnique({
 			where: {
 				id: invoiceId,
+			},
+			include: {
+				activities: {
+					include: {
+						supportItem: true,
+					},
+				},
 			},
 		});
 
@@ -19,30 +34,48 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 		return res.status(200).json(invoice);
 	}
 
-	if (req.method === "PATCH") {
+	if (req.method === "POST") {
 		const session = await getSession({ req });
 		if (!session)
 			return res.status(401).send("Must be signed in to update this resource.");
 
-		const newInvoice = await prisma.invoice.update({
-			data: req.body.data,
-			where: {
-				id: req.body.id,
-			},
-		});
+		if (!req.body.invoice || !req.body.activities) {
+			return res.status(402).send("Not enough info");
+		}
 
-		return res.json(newInvoice);
+		console.log(req.body.activities);
+
+		const collection = await prisma.$transaction([
+			prisma.invoice.update({
+				where: { id: String(id) },
+				data: { ...req.body.invoice },
+			}),
+			...req.body.activities?.map((activity) =>
+				prisma.activity.upsert({
+					where: { id: activity.id },
+					update: {
+						...activity,
+					},
+					create: {
+						...activity,
+						invoiceId: String(id),
+					},
+				})
+			),
+		]);
+
+		return res.json(collection);
 	}
 
 	if (req.method === "DELETE") {
+		console.log(invoiceId);
 		await prisma.invoice.delete({
 			where: {
 				id: invoiceId,
 			},
 		});
 
-		res.statusCode = 204;
-		return res;
+		return res.status(204);
 	}
 
 	return res.status(405).send("Unsupported method");

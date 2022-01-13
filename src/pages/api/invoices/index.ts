@@ -9,6 +9,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 				client: true,
 				activities: true,
 			},
+			orderBy: {
+				date: "desc",
+			},
 		});
 
 		return res.status(200).json(invoices);
