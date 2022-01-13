@@ -1,6 +1,5 @@
 import "styled-components";
 
-// and extend them!
 declare module "styled-components" {
 	export interface DefaultTheme {
 		type: "light" | "dark";
@@ -10,6 +9,7 @@ declare module "styled-components" {
 			bg: string;
 			link: string;
 			brand: string;
+			gradientPink: string;
 			error: string;
 		};
 	}

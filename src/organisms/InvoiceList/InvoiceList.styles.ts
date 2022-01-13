@@ -6,16 +6,16 @@ export const Container = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 2rem;
+	gap: 3rem;
 	padding: 3em 0;
 `;
 
 export const InvoiceContainer = styled.div`
 	min-width: 30em;
 	width: 60%;
-	transition: all 0.25s ease 0.3s;
-	box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.8);
-	border-radius: 0.8rem;
+	transition: all 0.25s ease;
+	box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+	border-radius: 1.3rem;
 	overflow: hidden;
 
 	.fa-chevron-right {
@@ -25,18 +25,9 @@ export const InvoiceContainer = styled.div`
 	&.expanded {
 		width: 100%;
 
-		transition-delay: 0s;
-
-		& > div:first-of-type {
-			&:hover {
-				transform: none;
-			}
-		}
-
 		& > div:last-of-type {
 			height: 50vw;
 			max-height: 40em;
-			transition-delay: 0.35s;
 		}
 
 		.fa-chevron-right {
@@ -48,25 +39,37 @@ export const InvoiceContainer = styled.div`
 export const Invoice = styled.div`
 	flex: 1 0 auto;
 	display: flex;
-	padding: 2em 3em;
-	gap: 1rem;
 	justify-content: space-between;
-
 	cursor: pointer;
+
+	background: ${({ theme }) => theme.colors.gradientPink};
+
 	transition: all 0.15s ease;
 
-	&:hover {
-		transform: scale(1.02);
+	div {
+		transition: all 0.15s ease;
+	}
 
-		color: ${({ theme }) => theme.colors.brand};
+	& > div:first-of-type {
+		flex: 1 0 auto;
+		display: flex;
+		justify-content: space-between;
+		padding: 2em 3em;
+
+		color: ${({ theme }) => theme.colors.bg};
+
+		&:hover {
+			color: ${({ theme }) => theme.colors.fg};
+		}
 	}
 `;
 
 // Expander? Hardly know her
 export const Expander = styled.div`
-	flex-basis: 4%;
+	flex-basis: 10%;
 	display: flex;
 	align-items: center;
+	justify-content: flex-start;
 `;
 
 export const Column = styled.div`
@@ -74,9 +77,9 @@ export const Column = styled.div`
 	flex-direction: column;
 	justify-content: center;
 	gap: 1em;
-	flex-basis: 48%;
+	flex: 1;
 
-	&:last-of-type {
+	&:nth-of-type(3) {
 		align-items: flex-end;
 	}
 
@@ -85,12 +88,25 @@ export const Column = styled.div`
 	}
 `;
 
+export const OptionsMenu = styled.div`
+	padding: 2em 3em;
+	flex-basis: 8%;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	color: ${({ theme }) => theme.colors.bg};
+
+	&:hover {
+		color: ${({ theme }) => theme.colors.fg};
+	}
+`;
+
 export const PdfPreview = styled.div`
 	height: 0;
 	min-height: 0;
 	width: 100%;
 
-	overflow: hidden;
+	overflow-y: scroll;
 
 	transition: all 0.25s ease 0s;
 `;

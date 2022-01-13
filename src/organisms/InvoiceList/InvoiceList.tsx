@@ -39,25 +39,31 @@ export default function InvoiceList() {
 					className={expandedInvoice === index ? "expanded" : ""}
 					key={invoice.id}
 				>
-					<Styles.Invoice
-						onClick={() =>
-							expandInvoice(expandedInvoice === index ? undefined : index)
-						}
-					>
-						<Styles.Expander>
-							<FontAwesomeIcon icon={["fas", "chevron-right"]} size="2x" />
-						</Styles.Expander>
-						<Styles.Column>
-							<h2>{invoice.invoiceNo}</h2>
-							<span>{dayjs(invoice.date).format("DD/MM/YYYY")}</span>
-						</Styles.Column>
+					<Styles.Invoice>
+						<div
+							onClick={() =>
+								expandInvoice(expandedInvoice === index ? undefined : index)
+							}
+						>
+							<Styles.Expander>
+								<FontAwesomeIcon icon={["fas", "chevron-right"]} size="2x" />
+							</Styles.Expander>
+							<Styles.Column>
+								<h2>{invoice.invoiceNo}</h2>
+								<span>{dayjs(invoice.date).format("DD/MM/YYYY")}</span>
+							</Styles.Column>
 
-						<Styles.Column>
-							<span>
-								<b>{invoice.client.name}</b>
-							</span>
-							<span>$1234.56</span>
-						</Styles.Column>
+							<Styles.Column>
+								<span>
+									<b>{invoice.client.name}</b>
+								</span>
+								<span>$1234.56</span>
+							</Styles.Column>
+						</div>
+
+						<Styles.OptionsMenu>
+							<FontAwesomeIcon icon={["fas", "ellipsis-v"]} size="lg" />
+						</Styles.OptionsMenu>
 					</Styles.Invoice>
 					<Styles.PdfPreview>
 						<PdfDocument invoiceNo={invoice.id} />
