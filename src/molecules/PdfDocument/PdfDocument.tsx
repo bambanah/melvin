@@ -12,7 +12,7 @@ interface PdfProps {
 }
 
 const PdfDocument: FC<PdfProps> = ({ invoiceNo }) => {
-	const [pdf, setPdf] = useState(null);
+	const [pdf, setPdf] = useState("");
 
 	useEffect(() => {
 		axios
@@ -22,7 +22,7 @@ const PdfDocument: FC<PdfProps> = ({ invoiceNo }) => {
 				},
 			})
 			.then((res) => {
-				setPdf(res.data);
+				setPdf(`data:application/pdf;base64,${res.data}`);
 			});
 	}, [invoiceNo]);
 

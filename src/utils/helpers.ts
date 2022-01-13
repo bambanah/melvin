@@ -1,12 +1,13 @@
 import { FormikErrors, FormikTouched, getIn } from "formik";
 import dayjs from "dayjs";
+import { Activity, SupportItem } from "@prisma/client";
 
 export const formatDate = (date: Date) => {
 	const YYYY = date.getFullYear();
 	const MM = `0${date.getMonth() + 1}`.slice(-2);
 	const DD = `0${date.getDate()}`.slice(-2);
 
-	return `${DD}-${MM}-${YYYY}`;
+	return `${DD}/${MM}/${YYYY}`;
 };
 
 export const getDuration = (startTime: string, endTime: string): number => {
@@ -81,9 +82,12 @@ export const getNextInvoiceNo = (
 };
 
 export const getRate = async (
-	activityId: string
+	activity: Activity & { supportItem: SupportItem }
 ): Promise<[code: string, rate: number]> => {
-	return [activityId, 1];
+	return [
+		activity.supportItem.weekdayCode,
+		Number(activity.supportItem.weekdayRate),
+	];
 };
 
 export const getTotalCost = async (invoiceId: string) => {
