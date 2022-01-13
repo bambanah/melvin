@@ -13,8 +13,8 @@ const StyledCard = styled.div`
 	cursor: pointer;
 	padding: 2em 4em;
 
-	background-color: ${({ theme }) =>
-		theme.type === "dark" ? lighten(0.05, theme.colors.bg) : theme.colors.bg};
+	background: ${({ theme }) => theme.colors.gradientPink};
+	color: ${({ theme }) => theme.colors.bg};
 	box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.8);
 
 	border-radius: 1rem;
@@ -25,9 +25,8 @@ const StyledCard = styled.div`
 		justify-content: center;
 		align-items: center;
 
-		color: ${({ theme }) =>
-			theme.type === "dark" ? theme.colors.bg : theme.colors.fg};
-		background-color: ${({ theme }) => lighten(0.05, theme.colors.brand)};
+		color: ${({ theme }) => theme.colors.fg};
+		background: ${({ theme }) => lighten(0.05, theme.colors.bg)};
 
 		span {
 			font-size: 5em;
@@ -39,7 +38,7 @@ const StyledCard = styled.div`
 		box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.8);
 
 		h1 {
-			color: ${({ theme }) => theme.colors.brand};
+			color: ${({ theme }) => theme.colors.fg};
 		}
 	}
 

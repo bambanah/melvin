@@ -10,13 +10,38 @@ export const Container = styled.div`
 	padding: 3em 0;
 `;
 
+export const Header = styled.div`
+	min-width: 30em;
+	width: 60%;
+	display: flex;
+	justify-content: space-between;
+
+	h1 {
+		font-family: "Patua One";
+		margin: 0;
+	}
+`;
+
+export const CreateNew = styled.a`
+	font-family: "Rubik";
+	padding: 0.8em;
+	border-radius: 0.8em;
+	background: ${({ theme }) => theme.colors.bg};
+	color: ${({ theme }) => theme.colors.fg};
+	box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5);
+
+	&:hover {
+		color: ${({ theme }) => theme.colors.fg};
+	}
+`;
+
 export const InvoiceContainer = styled.div`
 	min-width: 30em;
 	width: 60%;
 	transition: all 0.25s ease;
-	box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+	box-shadow: 0px 4px 12px
+		rgba(0, 0, 0, ${({ theme }) => (theme.type === "dark" ? "0.85" : "0.15")});
 	border-radius: 1.3rem;
-	overflow: hidden;
 
 	.fa-chevron-right {
 		transition: transform 0.2s ease;
@@ -24,7 +49,10 @@ export const InvoiceContainer = styled.div`
 
 	&.expanded {
 		width: 100%;
-
+		& > div:first-of-type {
+			border-bottom-left-radius: 0;
+			border-bottom-right-radius: 0;
+		}
 		& > div:last-of-type {
 			height: 50vw;
 			max-height: 40em;
@@ -41,8 +69,10 @@ export const Invoice = styled.div`
 	display: flex;
 	justify-content: space-between;
 	cursor: pointer;
+	border-radius: 1.3rem;
 
-	background: ${({ theme }) => theme.colors.gradientPink};
+	background: ${({ theme }) => theme.colors.bg};
+	color: ${({ theme }) => theme.colors.fg};
 
 	transition: all 0.15s ease;
 
@@ -56,10 +86,12 @@ export const Invoice = styled.div`
 		justify-content: space-between;
 		padding: 2em 3em;
 
-		color: ${({ theme }) => theme.colors.bg};
+		h2 {
+			color: ${({ theme }) => theme.colors.brand};
+		}
 
 		&:hover {
-			color: ${({ theme }) => theme.colors.fg};
+			color: ${({ theme }) => theme.colors.brand};
 		}
 	}
 `;
@@ -88,16 +120,74 @@ export const Column = styled.div`
 	}
 `;
 
-export const OptionsMenu = styled.div`
-	padding: 2em 3em;
-	flex-basis: 8%;
+export const Actions = styled.div`
 	display: flex;
 	align-items: center;
-	justify-content: flex-end;
-	color: ${({ theme }) => theme.colors.bg};
+	flex-direction: column;
+	justify-content: center;
+	flex-basis: 8%;
 
-	&:hover {
+	a {
 		color: ${({ theme }) => theme.colors.fg};
+
+		&:hover {
+			color: ${({ theme }) => theme.colors.brand};
+		}
+	}
+
+	& > div {
+		padding: 0.8em;
+		transition: color 0.1s ease;
+
+		&:hover {
+			color: ${({ theme }) => theme.colors.brand};
+		}
+	}
+`;
+
+export const OptionsMenu = styled.div`
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	.dropdown {
+		position: absolute;
+		display: flex;
+		flex-direction: column;
+		opacity: 0;
+		transform: scaleY(0) translateY(4.5em);
+		right: 0;
+
+		background-color: white;
+		box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+		border-radius: 0.4em;
+		overflow: hidden;
+
+		a {
+			width: 7em;
+			padding: 1em;
+			color: ${({ theme }) => theme.colors.fg};
+			background-color: ${({ theme }) => theme.colors.bg};
+
+			transition: all 0.1s ease;
+
+			&:not(:first-of-type) {
+				border-top: 1px solid ${({ theme }) => theme.colors.fg}44;
+			}
+
+			&:hover {
+				color: ${({ theme }) => theme.colors.bg};
+				background-color: ${({ theme }) => theme.colors.fg};
+			}
+		}
+	}
+
+	&:focus-within {
+		.dropdown {
+			opacity: 1;
+			transform: scaleY(1) translateY(4.5em);
+		}
 	}
 `;
 
@@ -107,6 +197,7 @@ export const PdfPreview = styled.div`
 	width: 100%;
 
 	overflow-y: scroll;
+	overflow-x: hidden;
 
 	transition: all 0.25s ease 0s;
 `;

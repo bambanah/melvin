@@ -24,7 +24,7 @@ const generatePDF = async (invoiceId: string) => {
 		},
 	});
 
-	if (!invoice || !invoice.client || !invoice.activities) return null;
+	if (!invoice || !invoice.client || !invoice.activities) return [null, null];
 
 	const margin = 20;
 
@@ -228,7 +228,9 @@ const generatePDF = async (invoiceId: string) => {
 		},
 	});
 
-	return doc.output("datauristring");
+	const fileName = `${invoice.invoiceNo}-${date}`;
+
+	return [doc.output("datauristring"), fileName];
 };
 
 export default generatePDF;

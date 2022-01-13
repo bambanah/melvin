@@ -10,6 +10,7 @@ declare module "styled-components" {
 			link: string;
 			brand: string;
 			gradientPink: string;
+			green: string;
 			error: string;
 		};
 	}
