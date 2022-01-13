@@ -31,7 +31,7 @@ function SupportItemList() {
 					<Card href={`/activities/${supportItem.id}`} key={supportItem.id}>
 						<h1>
 							{supportItem.description.length > 25
-								? supportItem.description.slice(0, 25) + "..."
+								? `${supportItem.description.slice(0, 25)}...`
 								: supportItem.description}
 						</h1>
 						<div>

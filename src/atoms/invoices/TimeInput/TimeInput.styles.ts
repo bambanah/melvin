@@ -13,7 +13,7 @@ export const TimeInput = styled(Field)`
 				return theme.colors.error;
 			}
 
-			return theme.colors.fg + "88";
+			return `${theme.colors.fg}88`;
 		}};
 	border-radius: 0.3rem;
 

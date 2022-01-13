@@ -188,11 +188,7 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 						setSubmitting(false);
 						mutate(`/api/support-items/${initialValues.id}`);
 
-						if (returnFunction) {
-							returnFunction();
-						} else {
-							router.push("/activities");
-						}
+						returnFunction ? returnFunction() : router.push("/activities");
 					});
 			} else {
 				axios.post("/api/support-items", values).then(() => {
