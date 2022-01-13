@@ -154,7 +154,7 @@ const generatePDF = async (
 	// Activities only allows strings - need to allow strings and CellDef
 	const values: (CellDef | string)[][] = activityStrings;
 
-	const totalCost = await getTotalCost(invoice.activities);
+	const totalCost = getTotalCost(invoice.activities);
 
 	// Bottom section
 	values.push([

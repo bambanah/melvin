@@ -25,7 +25,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { FC, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import useSWR, { mutate, SWRResponse } from "swr";
+import useSWR, { SWRResponse, useSWRConfig } from "swr";
 import * as Styles from "./styles";
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 dayjs.extend(customParseFormat);
@@ -53,6 +53,7 @@ interface Props {
 
 const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 	const router = useRouter();
+	const { mutate } = useSWRConfig();
 
 	const {
 		data: clients,
@@ -363,14 +364,6 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 
 	const InvoiceForm = withFormik({
 		mapPropsToValues: () => {
-			console.log({
-				date: initialValues?.date ?? "",
-				invoiceNo: initialValues?.invoiceNo ?? "",
-				clientId: initialValues?.clientId ?? "",
-				billTo: initialValues?.billTo ?? "",
-				activities: initialValues?.activities ?? [emptyActivity],
-			} as FormValues);
-
 			return {
 				date: initialValues?.date ?? "",
 				invoiceNo: initialValues?.invoiceNo ?? "",
@@ -381,8 +374,6 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 		},
 		handleSubmit: (values, { setSubmitting }) => {
 			const data = valuesToInvoice(values);
-
-			console.log(data);
 
 			if (initialValues) {
 				axios

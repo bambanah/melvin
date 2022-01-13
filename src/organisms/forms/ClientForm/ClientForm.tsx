@@ -14,11 +14,12 @@ import { FormikProps, getIn, withFormik } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
 import { toast } from "react-toastify";
-import { mutate } from "swr";
+import { useSWRConfig } from "swr";
 import * as Styles from "./styles";
 
 const ClientForm = () => {
 	const router = useRouter();
+	const { mutate } = useSWRConfig();
 
 	const BaseForm = (props: FormikProps<Partial<Client>>) => {
 		const { values, touched, errors, handleChange, handleBlur, handleSubmit } =

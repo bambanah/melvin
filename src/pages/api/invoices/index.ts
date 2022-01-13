@@ -7,7 +7,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 		const invoices = await prisma.invoice.findMany({
 			include: {
 				client: true,
-				activities: true,
+				activities: {
+					select: {
+						startTime: true,
+						endTime: true,
+						transitDistance: true,
+						transitDuration: true,
+						date: true,
+						supportItem: true,
+					},
+				},
 			},
 			orderBy: {
 				date: "desc",

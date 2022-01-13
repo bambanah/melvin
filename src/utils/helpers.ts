@@ -87,10 +87,54 @@ export const getNextInvoiceNo = (
 export const getRate = (
 	activity: Activity & { supportItem: SupportItem }
 ): [code: string, rate: number] => {
-	return [
-		activity.supportItem.weekdayCode,
-		Number(activity.supportItem.weekdayRate),
-	];
+	let rate = 0;
+	let itemCode = "";
+
+	if (
+		dayjs(activity.date).day() === 6 &&
+		activity.supportItem.saturdayRate &&
+		activity.supportItem.saturdayCode?.length
+	) {
+		// Saturday
+		rate =
+			typeof activity.supportItem.saturdayRate === "string"
+				? parseFloat(activity.supportItem.saturdayRate)
+				: activity.supportItem.saturdayRate?.toNumber();
+		itemCode = activity.supportItem.saturdayCode;
+	} else if (
+		dayjs(activity.date).day() === 0 &&
+		activity.supportItem.sundayRate &&
+		activity.supportItem.sundayRate &&
+		activity.supportItem.sundayCode?.length
+	) {
+		// Sunday
+		rate =
+			typeof activity.supportItem.sundayRate === "string"
+				? parseFloat(activity.supportItem.sundayRate)
+				: activity.supportItem.sundayRate?.toNumber();
+		itemCode = activity.supportItem.sundayCode;
+	} else if (
+		activity.endTime &&
+		activity.supportItem.weeknightCode?.length &&
+		activity.supportItem.weeknightRate &&
+		dayjs(activity.endTime).isAfter(dayjs("1970-01-01T20:00"))
+	) {
+		// Day is a weekday and it's after 8pm
+		rate =
+			typeof activity.supportItem.weeknightRate === "string"
+				? parseFloat(activity.supportItem.weeknightRate)
+				: activity.supportItem.weeknightRate?.toNumber();
+		itemCode = activity.supportItem.weeknightCode;
+	} else {
+		// Weekday before 8pm
+		rate =
+			typeof activity.supportItem.weekdayRate === "string"
+				? parseFloat(activity.supportItem.weekdayRate)
+				: activity.supportItem.weekdayRate?.toNumber();
+		itemCode = activity.supportItem.weekdayCode;
+	}
+
+	return [itemCode, rate];
 };
 
 export const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -134,31 +178,37 @@ export const valuesToInvoice = (values: FormValues) => ({
 	})),
 });
 
-export const getTotalCost = async (
+export const round = (numberToRound: number, decimalPlaces: number) =>
+	Math.round(numberToRound * Math.pow(10, decimalPlaces)) /
+	Math.pow(10, decimalPlaces);
+
+export const getTotalCost = (
 	activities: (Activity & { supportItem: SupportItem })[]
 ) => {
-	let totalCost = 0;
+	const grandTotal = activities.reduce((total, activity) => {
+		const [, rate] = getRate(activity);
 
-	activities.map((activity) => {
-		const [code, rate] = getRate(activity);
+		let subTotal = 0;
 
 		const duration = getDuration(
 			dayjs(activity.startTime).format("HH:mm"),
 			dayjs(activity.endTime).format("HH:mm")
 		);
 
-		totalCost += duration * rate;
+		subTotal += round(duration * rate, 2);
 
 		if (activity.transitDistance) {
-			totalCost += activity.transitDistance * 0.85;
+			subTotal += round(activity.transitDistance * 0.85, 2);
 		}
 
 		if (activity.transitDuration) {
-			totalCost += activity.transitDuration;
+			subTotal += round(activity.transitDuration * (rate / 60), 2);
 		}
-	});
 
-	return totalCost;
+		return subTotal + total;
+	}, 0);
+
+	return grandTotal;
 };
 
 // export const getTotalString = (invoiceId: string) =>

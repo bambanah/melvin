@@ -43,8 +43,6 @@ export default async (req: ApiRequest, res: NextApiResponse) => {
 			return res.status(402).send("Not enough info");
 		}
 
-		console.log(req.body.activities);
-
 		const collection = await prisma.$transaction([
 			prisma.invoice.update({
 				where: { id: String(id) },
@@ -68,14 +66,13 @@ export default async (req: ApiRequest, res: NextApiResponse) => {
 	}
 
 	if (req.method === "DELETE") {
-		console.log(invoiceId);
 		await prisma.invoice.delete({
 			where: {
 				id: invoiceId,
 			},
 		});
 
-		return res.status(204);
+		return res.status(204).end();
 	}
 
 	return res.status(405).send("Unsupported method");
