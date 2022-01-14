@@ -28,12 +28,12 @@ const GlobalStyle = createGlobalStyle`
 	}
 
 	a {
-		color: ${(props) => props.theme.colors.link};
+		color: ${({ theme }) => theme.colors.link};
 		text-decoration: none;
 		cursor:pointer;
 
 		&:hover {
-			color: ${(props) => shade(0.15, props.theme.colors.fg)};
+			color: ${({ theme }) => shade(0.15, theme.colors.fg)};
 		}
 	}
 `;

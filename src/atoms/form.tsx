@@ -7,7 +7,7 @@ interface Props {
 const Form = styled.form<Props>`
 	display: flex;
 	flex-wrap: wrap;
-	flex-direction: ${(props) => props.flexDirection || "row"};
+	flex-direction: ${({ flexDirection }) => flexDirection || "row"};
 	align-items: stretch;
 	gap: 1.5rem;
 `;

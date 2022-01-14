@@ -12,7 +12,7 @@ const Label = styled.label<LabelProps>`
 
 	& > span::after {
 		color: red;
-		content: ${(props) => `"${props.required ? " *" : " "}"`};
+		content: ${({ required }) => (required ? " *" : " ")};
 	}
 `;
 
