@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import Navbar from "@organisms/Navbar";
+import Navbar from "@organisms/navbar";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import Loading from "@atoms/Loading";
+import Loading from "@atoms/loading";
 
 interface Props {
 	children: React.ReactNode;
@@ -44,7 +44,7 @@ const Layout: React.FC<Props> = ({ children }) => {
 
 	if (session.status === "unauthenticated") {
 		router.push("/login");
-		return null;
+		return <p>Redirecting...</p>;
 	}
 
 	return (

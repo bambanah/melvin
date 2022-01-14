@@ -2,9 +2,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@utils/prisma";
 import { getTotalCost } from "@utils/helpers";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-	if (req.method === "GET") {
-		const { invoiceId } = req.query;
+export default async (request: NextApiRequest, response: NextApiResponse) => {
+	if (request.method === "GET") {
+		const { invoiceId } = request.query;
 
 		const invoice = await prisma.invoice.findFirst({
 			where: { id: String(invoiceId) },
@@ -17,10 +17,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 			},
 		});
 
-		if (!invoice || !invoice.activities) return [null, null];
+		if (!invoice || !invoice.activities)
+			return response.status(404).send("Can't find");
 
 		const total = getTotalCost(invoice.activities);
 
-		return res.status(200).send(total);
+		return response.status(200).send(total);
 	}
 };

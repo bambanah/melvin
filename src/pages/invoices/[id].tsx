@@ -1,5 +1,5 @@
-import Layout from "@layouts/common/Layout";
-import InvoicePage from "@layouts/InvoicePage";
+import Layout from "@layouts/common/layout";
+import InvoicePage from "@layouts/invoice-page";
 import Head from "next/head";
 import React from "react";
 

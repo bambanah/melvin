@@ -26,7 +26,9 @@ const Select = ({
 			name={name}
 			className="react-select"
 			value={
-				options ? options.find((option) => option.value === field.value) : null
+				options
+					? options.find((option) => option.value === field.value)
+					: undefined
 			}
 			options={options}
 			onChange={(option) => {

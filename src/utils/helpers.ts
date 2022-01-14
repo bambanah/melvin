@@ -1,8 +1,8 @@
 import { FormikErrors, FormikTouched, getIn } from "formik";
 import dayjs from "dayjs";
 import { Activity, Invoice, SupportItem } from "@prisma/client";
-import { FormValues } from "@organisms/forms/CreateInvoiceForm";
-const customParseFormat = require("dayjs/plugin/customParseFormat");
+import { FormValues } from "@organisms/forms/create-invoice-form";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 
 export const formatDate = (date: Date) => {
@@ -42,26 +42,29 @@ export const getPrettyDuration = (duration: number) => {
 	return durationString;
 };
 
+const getNumber = (invoiceNo: string): number | undefined => {
+	const matches = invoiceNo.match(/\d+$/);
+
+	return matches ? Number(matches[0]) : undefined;
+};
+
 export const getHighestInvoiceNo = (
 	invoiceNumbers: string[]
-): string | null => {
-	if (!invoiceNumbers.length) {
-		return null;
+): string | undefined => {
+	if (invoiceNumbers.length === 0) {
+		return undefined;
 	}
 
-	const getNumber = (invoiceNo: string): number | null => {
-		const matches = invoiceNo.match(/\d+$/);
+	// eslint-disable-next-line unicorn/no-array-reduce
+	const highest = invoiceNumbers.reduce((previous, current) => {
+		if (getNumber(current) === null) return previous;
 
-		return matches ? Number(matches[0]) : null;
-	};
-
-	const highest = invoiceNumbers.reduce((prev, current) => {
-		if (getNumber(current) === null) return prev;
-
-		return (getNumber(prev) || 0) > (getNumber(current) || 0) ? prev : current;
+		return (getNumber(previous) || 0) > (getNumber(current) || 0)
+			? previous
+			: current;
 	});
 
-	return getNumber(highest) ? highest : null;
+	return getNumber(highest) ? highest : undefined;
 };
 
 export const getNextInvoiceNo = (
@@ -72,7 +75,7 @@ export const getNextInvoiceNo = (
 
 	const latestInvoiceNo = previousInvoiceNumbers?.length
 		? getHighestInvoiceNo(previousInvoiceNumbers)
-		: null;
+		: undefined;
 
 	const invoicePrefix =
 		clientInvoicePrefix ?? latestInvoiceNo?.replace(/\d+$/, "") ?? "";
@@ -80,7 +83,7 @@ export const getNextInvoiceNo = (
 	const matches = latestInvoiceNo?.match(/\d+$/);
 
 	return `${invoicePrefix.replace(/-+$/, "")}-${
-		matches ? parseInt(matches[0]) + 1 : 1
+		matches ? Number.parseInt(matches[0]) + 1 : 1
 	}`;
 };
 
@@ -98,7 +101,7 @@ export const getRate = (
 		// Saturday
 		rate =
 			typeof activity.supportItem.saturdayRate === "string"
-				? parseFloat(activity.supportItem.saturdayRate)
+				? Number.parseFloat(activity.supportItem.saturdayRate)
 				: activity.supportItem.saturdayRate?.toNumber();
 		itemCode = activity.supportItem.saturdayCode;
 	} else if (
@@ -110,7 +113,7 @@ export const getRate = (
 		// Sunday
 		rate =
 			typeof activity.supportItem.sundayRate === "string"
-				? parseFloat(activity.supportItem.sundayRate)
+				? Number.parseFloat(activity.supportItem.sundayRate)
 				: activity.supportItem.sundayRate?.toNumber();
 		itemCode = activity.supportItem.sundayCode;
 	} else if (
@@ -122,14 +125,14 @@ export const getRate = (
 		// Day is a weekday and it's after 8pm
 		rate =
 			typeof activity.supportItem.weeknightRate === "string"
-				? parseFloat(activity.supportItem.weeknightRate)
+				? Number.parseFloat(activity.supportItem.weeknightRate)
 				: activity.supportItem.weeknightRate?.toNumber();
 		itemCode = activity.supportItem.weeknightCode;
 	} else {
 		// Weekday before 8pm
 		rate =
 			typeof activity.supportItem.weekdayRate === "string"
-				? parseFloat(activity.supportItem.weekdayRate)
+				? Number.parseFloat(activity.supportItem.weekdayRate)
 				: activity.supportItem.weekdayRate?.toNumber();
 		itemCode = activity.supportItem.weekdayCode;
 	}
@@ -137,7 +140,8 @@ export const getRate = (
 	return [itemCode, rate];
 };
 
-export const fetcher = (url: string) => fetch(url).then((res) => res.json());
+export const fetcher = (url: string) =>
+	fetch(url).then((response) => response.json());
 
 export const invoiceToValues = (
 	invoice: Invoice & { activities: Activity[] }
@@ -169,9 +173,9 @@ export const valuesToInvoice = (values: FormValues) => ({
 	activities: values.activities.map((activity) => ({
 		id: activity.id,
 		date: dayjs(activity.date, "DD/MM/YYYY").toDate(),
-		itemDistance: Number(activity.itemDistance) || null,
-		transitDistance: Number(activity.transitDistance) || null,
-		transitDuration: Number(activity.transitDuration) || null,
+		itemDistance: Number(activity.itemDistance) || undefined,
+		transitDistance: Number(activity.transitDistance) || undefined,
+		transitDuration: Number(activity.transitDuration) || undefined,
 		startTime: new Date(`1970-01-01T${activity.startTime}`),
 		endTime: new Date(`1970-01-01T${activity.endTime}`),
 		supportItemId: activity.supportItemId,
@@ -185,28 +189,30 @@ export const round = (numberToRound: number, decimalPlaces: number) =>
 export const getTotalCost = (
 	activities: (Activity & { supportItem: SupportItem })[]
 ) => {
-	const grandTotal = activities.reduce((total, activity) => {
-		const [, rate] = getRate(activity);
+	const grandTotal = activities
+		.map((activity) => {
+			const [, rate] = getRate(activity);
 
-		let subTotal = 0;
+			let subTotal = 0;
 
-		const duration = getDuration(
-			dayjs(activity.startTime).format("HH:mm"),
-			dayjs(activity.endTime).format("HH:mm")
-		);
+			const duration = getDuration(
+				dayjs(activity.startTime).format("HH:mm"),
+				dayjs(activity.endTime).format("HH:mm")
+			);
 
-		subTotal += round(duration * rate, 2);
+			subTotal += round(duration * rate, 2);
 
-		if (activity.transitDistance) {
-			subTotal += round(activity.transitDistance * 0.85, 2);
-		}
+			if (activity.transitDistance) {
+				subTotal += round(activity.transitDistance * 0.85, 2);
+			}
 
-		if (activity.transitDuration) {
-			subTotal += round(activity.transitDuration * (rate / 60), 2);
-		}
+			if (activity.transitDuration) {
+				subTotal += round(activity.transitDuration * (rate / 60), 2);
+			}
 
-		return subTotal + total;
-	}, 0);
+			return subTotal;
+		})
+		.reduce((previous, current) => previous + current, 0);
 
 	return grandTotal;
 };

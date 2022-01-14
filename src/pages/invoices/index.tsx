@@ -1,5 +1,5 @@
-import Layout from "@layouts/common/Layout";
-import InvoiceList from "@organisms/InvoiceList";
+import Layout from "@layouts/common/layout";
+import InvoiceList from "@organisms/invoice-list";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import React from "react";

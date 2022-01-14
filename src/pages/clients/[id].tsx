@@ -1,5 +1,5 @@
-import ClientPage from "@layouts/clients/ClientPage";
-import Layout from "@layouts/common/Layout";
+import ClientPage from "@layouts/clients/client-page";
+import Layout from "@layouts/common/layout";
 import React from "react";
 
 const ClientView = () => {

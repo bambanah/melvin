@@ -11,6 +11,7 @@ export const Header = styled.header`
 `;
 
 export const Brand = styled.span`
+	cursor: pointer;
 	user-select: none;
 	flex: 0 0 auto;
 	font-size: 2.2rem;

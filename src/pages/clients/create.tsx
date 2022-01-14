@@ -1,5 +1,5 @@
-import Layout from "@layouts/common/Layout";
-import ClientForm from "@organisms/forms/ClientForm";
+import Layout from "@layouts/common/layout";
+import ClientForm from "@organisms/forms/client-form";
 import Head from "next/head";
 import React from "react";
 

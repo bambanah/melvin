@@ -1,6 +1,6 @@
-import NavAuth from "@molecules/NavAuth";
-import NavLink from "@molecules/NavLink";
-import ThemeSwitch from "@atoms/ThemeSwitch";
+import NavAuth from "@molecules/nav-auth";
+import NavLink from "@molecules/nav-link";
+import ThemeSwitch from "@atoms/theme-switch";
 import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -13,10 +13,8 @@ const Navbar = () => {
 	return (
 		<Styles.Header>
 			<Styles.Content>
-				<Link href="/">
-					<a>
-						<Styles.Brand>melvin</Styles.Brand>
-					</a>
+				<Link href="/" passHref>
+					<Styles.Brand>melvin</Styles.Brand>
 				</Link>
 
 				<Styles.Links>

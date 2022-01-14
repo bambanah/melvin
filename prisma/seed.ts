@@ -89,9 +89,9 @@ async function main() {
 }
 
 main()
-	.catch((e) => {
-		console.error(e);
-		process.exit(1);
+	.catch((error) => {
+		console.error(error);
+		throw new Error(error);
 	})
 	.finally(async () => {
 		await prisma.$disconnect();

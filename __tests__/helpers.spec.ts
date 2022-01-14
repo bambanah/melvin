@@ -36,8 +36,8 @@ describe("Helpers", () => {
 		);
 
 		expect(getHighestInvoiceNo(["Gawne1"])).toEqual("Gawne1");
-		expect(getHighestInvoiceNo([])).toEqual(null);
-		expect(getHighestInvoiceNo(["Gawne", "string"])).toEqual(null);
+		expect(getHighestInvoiceNo([])).toEqual(undefined);
+		expect(getHighestInvoiceNo(["Gawne", "string"])).toEqual(undefined);
 	});
 
 	it("Should get next invoice number", () => {

@@ -8,9 +8,13 @@
 	"extends": [
 		"next/core-web-vitals",
 		"plugin:@typescript-eslint/recommended",
+		"plugin:unicorn/recommended",
+		"plugin:jsx-a11y/recommended",
+		"plugin:styled-components-a11y/recommended",
+		"plugin:import/recommended",
+		"plugin:import/typescript",
 		"prettier"
 	],
-	"plugins": ["jsx-a11y", "import"],
 	"rules": {
 		"quote-props": ["error", "consistent-as-needed"],
 		"@typescript-eslint/no-var-requires": "off",
@@ -18,7 +22,23 @@
 		"@typescript-eslint/ban-types": "warn",
 		"import/no-anonymous-default-export": "off",
 		"prefer-template": "error",
-		"arrow-parens": ["error", "always"]
+		"arrow-parens": ["error", "always"],
+		"no-console": ["error", { "allow": ["warn", "error"] }],
+		"styled-components-a11y/anchor-is-valid": "off",
+		"jsx-a11y/anchor-is-valid": "off",
+		"jsx-a11y/no-static-element-interactions": "off",
+		"jsx-a11y/click-events-have-key-events": "off",
+		"unicorn/prefer-module": "off",
+		"unicorn/prevent-abbreviations": [
+			"error",
+			{
+				"replacements": {
+					"props": {
+						"properties": false
+					}
+				}
+			}
+		]
 	},
 	"overrides": [
 		// Only uses Testing Library lint rules in test files
