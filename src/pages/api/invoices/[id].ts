@@ -10,11 +10,11 @@ interface ApiRequest extends NextApiRequest {
 	};
 }
 
-export default async (req: ApiRequest, res: NextApiResponse) => {
-	const { id } = req.query;
+export default async (request: ApiRequest, response: NextApiResponse) => {
+	const { id } = request.query;
 	const invoiceId = typeof id === "string" ? id : id[0];
 
-	if (req.method === "GET") {
+	if (request.method === "GET") {
 		const invoice = await prisma.invoice.findUnique({
 			where: {
 				id: invoiceId,
@@ -29,26 +29,28 @@ export default async (req: ApiRequest, res: NextApiResponse) => {
 		});
 
 		if (!invoice)
-			return res.status(404).send("Can't find invoice with that ID");
+			return response.status(404).send("Can't find invoice with that ID");
 
-		return res.status(200).json(invoice);
+		return response.status(200).json(invoice);
 	}
 
-	if (req.method === "POST") {
-		const session = await getSession({ req });
+	if (request.method === "POST") {
+		const session = await getSession({ req: request });
 		if (!session)
-			return res.status(401).send("Must be signed in to update this resource.");
+			return response
+				.status(401)
+				.send("Must be signed in to update this resource.");
 
-		if (!req.body.invoice || !req.body.activities) {
-			return res.status(402).send("Not enough info");
+		if (!request.body.invoice || !request.body.activities) {
+			return response.status(402).send("Not enough info");
 		}
 
 		const collection = await prisma.$transaction([
 			prisma.invoice.update({
 				where: { id: String(id) },
-				data: { ...req.body.invoice },
+				data: { ...request.body.invoice },
 			}),
-			...req.body.activities?.map((activity) =>
+			...request.body.activities?.map((activity) =>
 				prisma.activity.upsert({
 					where: { id: activity.id },
 					update: {
@@ -62,18 +64,18 @@ export default async (req: ApiRequest, res: NextApiResponse) => {
 			),
 		]);
 
-		return res.json(collection);
+		return response.json(collection);
 	}
 
-	if (req.method === "DELETE") {
+	if (request.method === "DELETE") {
 		await prisma.invoice.delete({
 			where: {
 				id: invoiceId,
 			},
 		});
 
-		return res.status(204).end();
+		return response.status(204).end();
 	}
 
-	return res.status(405).send("Unsupported method");
+	return response.status(405).send("Unsupported method");
 };

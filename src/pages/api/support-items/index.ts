@@ -2,38 +2,38 @@ import prisma from "@utils/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async (request: NextApiRequest, response: NextApiResponse) => {
 	// Handle GET request
-	if (req.method === "GET") {
+	if (request.method === "GET") {
 		const supportItems = await prisma.supportItem.findMany();
 
-		return res.status(200).json(supportItems);
+		return response.status(200).json(supportItems);
 	}
 
 	// Handle POST request
-	if (req.method === "POST") {
-		const session = await getSession({ req });
-		if (!session) return res.status(401).send("Not authorized.");
+	if (request.method === "POST") {
+		const session = await getSession({ req: request });
+		if (!session) return response.status(401).send("Not authorized.");
 
 		const user = await prisma.user.findFirst({
 			where: { email: session.user?.email },
 		});
 
-		Object.keys(req.body).map((key) => {
-			req.body[key] = req.body[key] || null;
+		Object.keys(request.body).map((key) => {
+			request.body[key] = request.body[key] || undefined;
 		});
 
 		// Create new support item
 		const supportItem = await prisma.supportItem.create({
 			data: {
 				ownerId: user?.id,
-				...req.body.map((i: unknown) => i || null),
+				...request.body.map((index: unknown) => index || undefined),
 			},
 		});
 
-		return res.status(201).json(supportItem);
+		return response.status(201).json(supportItem);
 	}
 
 	// Unaccepted request method
-	return res.status(405).send("Must be either GET or POST");
+	return response.status(405).send("Must be either GET or POST");
 };

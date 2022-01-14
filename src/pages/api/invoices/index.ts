@@ -2,8 +2,8 @@ import prisma from "@utils/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-	if (req.method === "GET") {
+export default async (request: NextApiRequest, response: NextApiResponse) => {
+	if (request.method === "GET") {
 		const invoices = await prisma.invoice.findMany({
 			include: {
 				client: true,
@@ -23,11 +23,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 			},
 		});
 
-		return res.status(200).json(invoices);
+		return response.status(200).json(invoices);
 	}
 
-	if (req.method === "POST") {
-		const session = await getSession({ req });
+	if (request.method === "POST") {
+		const session = await getSession({ req: request });
 
 		const owner = await prisma.user.findUnique({
 			where: {
@@ -37,11 +37,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
 		const invoice = await prisma.invoice.create({
 			data: {
-				...req.body.invoice,
+				...request.body.invoice,
 				ownerId: owner?.id,
 				activities: {
 					createMany: {
-						data: req.body.activities,
+						data: request.body.activities,
 					},
 				},
 			},
@@ -50,8 +50,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 			},
 		});
 
-		return res.status(201).json(invoice);
+		return response.status(201).json(invoice);
 	}
 
-	return res.status(405).send("Must be either GET or POST");
+	return response.status(405).send("Must be either GET or POST");
 };

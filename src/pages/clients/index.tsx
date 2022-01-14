@@ -1,6 +1,6 @@
-import Layout from "@layouts/common/Layout";
+import Layout from "@layouts/common/layout";
 import React from "react";
-import ClientPage from "@organisms/ClientList";
+import ClientPage from "@organisms/client-list";
 import Head from "next/head";
 
 const Clients = () => {

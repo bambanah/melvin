@@ -1,5 +1,5 @@
-import Layout from "@layouts/common/Layout";
-import CreateInvoiceForm from "@organisms/forms/CreateInvoiceForm";
+import Layout from "@layouts/common/layout";
+import CreateInvoiceForm from "@organisms/forms/create-invoice-form";
 import React from "react";
 
 const CreateInvoice = () => {

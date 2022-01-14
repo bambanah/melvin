@@ -2,11 +2,11 @@ import prisma from "@utils/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-	const { id } = req.query;
+export default async (request: NextApiRequest, response: NextApiResponse) => {
+	const { id } = request.query;
 	const supportItemId = typeof id === "string" ? id : id[0];
 
-	if (req.method === "GET") {
+	if (request.method === "GET") {
 		const supportItem = await prisma.supportItem.findUnique({
 			where: {
 				id: supportItemId,
@@ -14,41 +14,43 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 		});
 
 		if (!supportItem)
-			return res.status(404).send("Can't find support item with that ID");
+			return response.status(404).send("Can't find support item with that ID");
 
-		return res.status(200).json(supportItem);
+		return response.status(200).json(supportItem);
 	}
 
-	if (req.method === "POST") {
+	if (request.method === "POST") {
 		// Update support item here
-		const session = await getSession({ req });
+		const session = await getSession({ req: request });
 		if (!session)
-			return res.status(401).send("Must be signed in to update this resource.");
+			return response
+				.status(401)
+				.send("Must be signed in to update this resource.");
 
-		Object.keys(req.body).map((key) => {
-			req.body[key] = req.body[key] || null;
+		Object.keys(request.body).map((key) => {
+			request.body[key] = request.body[key] || undefined;
 		});
 
 		const newSupportItem = await prisma.supportItem.update({
 			where: {
-				id: req.body.id,
+				id: request.body.id,
 			},
-			data: req.body,
+			data: request.body,
 		});
 
-		return res.json(newSupportItem);
+		return response.json(newSupportItem);
 	}
 
-	if (req.method === "DELETE") {
+	if (request.method === "DELETE") {
 		await prisma.supportItem.delete({
 			where: {
 				id: supportItemId,
 			},
 		});
 
-		res.statusCode = 204;
-		return res;
+		response.statusCode = 204;
+		return response;
 	}
 
-	return res.status(405).send("Unsupported method");
+	return response.status(405).send("Unsupported method");
 };

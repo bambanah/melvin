@@ -1,4 +1,4 @@
-import LoginPage from "@layouts/auth/LoginPage";
+import LoginPage from "@layouts/auth/login-page";
 import { GetServerSideProps } from "next";
 import { BuiltInProviderType } from "next-auth/providers";
 import {

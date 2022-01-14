@@ -1,4 +1,4 @@
-import Layout from "@layouts/common/Layout";
+import Layout from "@layouts/common/layout";
 import React from "react";
 
 const Dashboard = () => {

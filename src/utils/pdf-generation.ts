@@ -1,4 +1,4 @@
-import jsPDF from "jspdf";
+import jspdf from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
 import {
 	formatDate,
@@ -24,12 +24,12 @@ const generatePDF = async (
 ) => {
 	const margin = 20;
 
-	const doc = new jsPDF();
+	const document_ = new jspdf();
 
-	doc.setFontSize(20);
-	doc.text("Tax Invoice", 150, margin);
+	document_.setFontSize(20);
+	document_.text("Tax Invoice", 150, margin);
 
-	doc.setFontSize(10);
+	document_.setFontSize(10);
 
 	const date = formatDate(invoice.date);
 
@@ -41,9 +41,9 @@ const generatePDF = async (
 		`Bill To: ${invoice.billTo}`,
 		`Invoice Number: ${invoice.invoiceNo}`,
 	];
-	invoiceDetails.forEach((detail, index) => {
-		doc.text(detail, margin, margin + index * 5);
-	});
+	for (const [index, detail] of invoiceDetails.entries()) {
+		document_.text(detail, margin, margin + index * 5);
+	}
 
 	let activityStrings: string[][] = [];
 
@@ -92,15 +92,15 @@ const generatePDF = async (
 
 				const travelTotal = (rate / 60) * activity.transitDuration;
 
-				providerTravel.push(`Provider Travel\n${itemCode}\n`);
-				providerTravel.push(`${formatDate(activity.date)}\n`);
-				providerTravel.push(`${activity.transitDuration} minutes\n`);
 				providerTravel.push(
+					`Provider Travel\n${itemCode}\n`,
+					`${formatDate(activity.date)}\n`,
+					`${activity.transitDuration} minutes\n`,
 					`$${rate.toFixed(2)}${`/${
 						activity.supportItem.rateType === RateType.HOUR ? "hr" : "km"
-					}`}\n`
+					}`}\n`,
+					`$${travelTotal.toFixed(2)}\n`
 				);
-				providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
 
 				activityStrings.push(providerTravel);
 			}
@@ -112,12 +112,12 @@ const generatePDF = async (
 				const travelTotal = 0.85 * activity.transitDistance;
 
 				providerTravel.push(
-					`Provider Travel - Non Labour Costs\n${itemCode}\n`
+					`Provider Travel - Non Labour Costs\n${itemCode}\n`,
+					`${formatDate(activity.date)}\n`,
+					`${activity.transitDistance} km\n`,
+					"$0.85/km\n",
+					`$${travelTotal.toFixed(2)}\n`
 				);
-				providerTravel.push(`${formatDate(activity.date)}\n`);
-				providerTravel.push(`${activity.transitDistance} km\n`);
-				providerTravel.push("$0.85/km\n");
-				providerTravel.push(`$${travelTotal.toFixed(2)}\n`);
 
 				activityStrings.push(providerTravel);
 			}
@@ -157,39 +157,38 @@ const generatePDF = async (
 	const totalCost = getTotalCost(invoice.activities);
 
 	// Bottom section
-	values.push([
-		{
-			content: "Total",
-			colSpan: 4,
-			styles: { fontStyle: "bold", halign: "right" },
-		},
-		{
-			content: `$${totalCost.toFixed(2)}`,
-			styles: { fontStyle: "bold" },
-		},
-	]);
-
-	// Add gap between main section and footer
-	values.push([{ content: "", colSpan: 5, styles: { fillColor: "#fff" } }]);
-
-	values.push([
-		{
-			content:
-				"Phoebe Nicholas\nABN: 71 105 617 976\nBank: Up Bank\nBSB: 633 123\nAccount Number: 177 757 663",
-			colSpan: 5,
-			rowSpan: 2,
-			styles: {
-				minCellHeight: 45,
-				halign: "left",
-				fillColor: "#FFF",
-				fontStyle: "bold",
-				lineWidth: 0.2,
-				lineColor: "#000",
+	values.push(
+		[
+			{
+				content: "Total",
+				colSpan: 4,
+				styles: { fontStyle: "bold", halign: "right" },
 			},
-		},
-	]);
+			{
+				content: `$${totalCost.toFixed(2)}`,
+				styles: { fontStyle: "bold" },
+			},
+		],
+		[{ content: "", colSpan: 5, styles: { fillColor: "#fff" } }],
+		[
+			{
+				content:
+					"Phoebe Nicholas\nABN: 71 105 617 976\nBank: Up Bank\nBSB: 633 123\nAccount Number: 177 757 663",
+				colSpan: 5,
+				rowSpan: 2,
+				styles: {
+					minCellHeight: 45,
+					halign: "left",
+					fillColor: "#FFF",
+					fontStyle: "bold",
+					lineWidth: 0.2,
+					lineColor: "#000",
+				},
+			},
+		]
+	);
 
-	autoTable(doc, {
+	autoTable(document_, {
 		head: [
 			[
 				"Description",
@@ -229,7 +228,7 @@ const generatePDF = async (
 	const fileName = `${invoice.invoiceNo}-${date}.pdf`;
 
 	return {
-		pdfString: doc
+		pdfString: document_
 			.output("dataurlstring")
 			.replace(/^data:application\/pdf;filename=.+\.pdf;base64,/, ""),
 		fileName,

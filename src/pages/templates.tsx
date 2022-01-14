@@ -3,8 +3,8 @@ import { useSession } from "next-auth/react";
 import Head from "next/head";
 import React from "react";
 import useSWR from "swr";
-import Layout from "@layouts/common/Layout";
-import Title from "@atoms/Title";
+import Layout from "@layouts/common/layout";
+import Title from "@atoms/title";
 
 const fetchTemplates = async () => {
 	const response = await fetch("/api/templates");

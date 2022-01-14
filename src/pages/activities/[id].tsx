@@ -1,5 +1,5 @@
-import ActivityPage from "@layouts/activities/ActivityPage";
-import Layout from "@layouts/common/Layout";
+import ActivityPage from "@layouts/activities/activity-page";
+import Layout from "@layouts/common/layout";
 import React from "react";
 
 const Activity = () => {

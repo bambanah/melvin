@@ -2,12 +2,14 @@ import prisma from "@utils/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-	const session = await getSession({ req });
+export default async (request: NextApiRequest, response: NextApiResponse) => {
+	const session = await getSession({ req: request });
 	if (!session || !session.user?.email)
-		return res.status(401).send("Must be signed in to update this resource.");
+		return response
+			.status(401)
+			.send("Must be signed in to update this resource.");
 
-	if (req.method === "GET") {
+	if (request.method === "GET") {
 		const clients = await prisma.client.findMany({
 			where: {
 				ownerId: session.user.id,
@@ -22,25 +24,25 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 			},
 		});
 
-		return res.status(200).json(clients);
+		return response.status(200).json(clients);
 	}
 
-	if (req.method === "POST") {
+	if (request.method === "POST") {
 		const user = await prisma.user.findUnique({
 			where: {
 				email: session.user?.email,
 			},
 		});
 		if (!user) {
-			return res.status(401).send("Can't find signed in user.");
+			return response.status(401).send("Can't find signed in user.");
 		}
 
-		req.body.ownerId ??= user?.id;
+		request.body.ownerId ??= user?.id;
 
-		const client = await prisma.client.create({ data: req.body });
+		const client = await prisma.client.create({ data: request.body });
 
-		return res.status(201).json(client);
+		return response.status(201).json(client);
 	}
 
-	return res.status(405).send("Must be either GET or POST");
+	return response.status(405).send("Must be either GET or POST");
 };
