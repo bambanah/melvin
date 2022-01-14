@@ -1,6 +1,5 @@
 import Title from "@atoms/title";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Activity, Client, Invoice, SupportItem } from "@prisma/client";
 import dayjs from "dayjs";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -12,13 +11,11 @@ import axios from "axios";
 import { saveAs } from "file-saver";
 import useSWR, { useSWRConfig } from "swr";
 import { getTotalCost } from "@utils/helpers";
+import { Invoice } from "types/invoice";
 
 const getInvoices = async () => {
 	const response = await fetch("/api/invoices");
-	return (await response.json()) as (Invoice & {
-		activities: (Activity & { supportItem: SupportItem })[];
-		client: Client;
-	})[];
+	return (await response.json()) as Invoice[];
 };
 
 const savePdf = (invoiceId: string) => {
@@ -82,16 +79,16 @@ export default function InvoiceList() {
 
 							<Styles.Column>
 								<span>
-									<b>{invoice.client.name}</b>
+									<b>{invoice.client?.name}</b>
 								</span>
 								<span>${getTotalCost(invoice.activities)}</span>
 							</Styles.Column>
 						</div>
 
 						<Styles.Actions>
-							<button onClick={() => savePdf(invoice.id)}>
+							<a onClick={() => savePdf(invoice.id)}>
 								<FontAwesomeIcon icon={["fas", "download"]} size="lg" />
-							</button>
+							</a>
 							<Styles.OptionsMenu tabIndex={0}>
 								<FontAwesomeIcon icon={["fas", "ellipsis-v"]} size="lg" />
 								<div className="dropdown">
