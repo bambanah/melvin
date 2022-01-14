@@ -22,12 +22,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 		const session = await getSession({ req });
 		if (!session)
 			return res.status(401).send("Must be signed in to update this resource.");
-
+		console.log(req.body);
 		const newClient = await prisma.client.update({
-			data: req.body.data,
 			where: {
 				id: req.body.id,
 			},
+			data: req.body,
 		});
 
 		return res.json(newClient);

@@ -1,29 +1,43 @@
 import Button from "@atoms/Button";
-import { Client } from "@prisma/client";
+import Loading from "@atoms/Loading";
+import ClientForm from "@organisms/forms/ClientForm";
+import { fetcher } from "@utils/helpers";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
+import useSWR from "swr";
 import * as Styles from "./styles";
 
-interface ClientProps {
-	client: Client;
-}
-
-const ClientPage: React.FC<ClientProps> = ({ client }) => {
+const ClientPage = () => {
+	const router = useRouter();
 	const [editing, setEditing] = useState(false);
+	console.log(`/api/clients/${router.query.id}`);
+	const { data: client, error } = useSWR(
+		`/api/clients/${router.query.id}`,
+		fetcher
+	);
+
+	if (error) return <div>Error</div>;
+	if (!client) return <Loading />;
 
 	return (
 		<Styles.ClientPage>
-			<h1>{client.name}</h1>
-
-			<Button onClick={() => setEditing(true)}>Edit</Button>
-
 			{editing ? (
-				<p>Editing</p>
+				<ClientForm
+					initialValues={client}
+					returnFunction={() => {
+						setEditing(false);
+					}}
+				/>
 			) : (
-				<>
-					<p>Client Number: {client.number}</p>
-					<p>Bill To: {client.billTo ?? "Not Set"}</p>
-					<p>Invoice Prefix: {client.invoicePrefix ?? "Not Set"}</p>
-				</>
+				<Styles.Content>
+					<h1>{client.name}</h1>
+					<Button onClick={() => setEditing(true)}>Edit</Button>
+					<div>
+						<p>Client Number: {client.number}</p>
+						<p>Bill To: {client.billTo ?? "Not Set"}</p>
+						<p>Invoice Prefix: {client.invoicePrefix ?? "Not Set"}</p>
+					</div>
+				</Styles.Content>
 			)}
 		</Styles.ClientPage>
 	);

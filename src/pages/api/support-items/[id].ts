@@ -25,11 +25,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 		if (!session)
 			return res.status(401).send("Must be signed in to update this resource.");
 
+		Object.keys(req.body).map((key) => {
+			req.body[key] = req.body[key] || null;
+		});
+
 		const newSupportItem = await prisma.supportItem.update({
-			data: req.body,
 			where: {
 				id: req.body.id,
 			},
+			data: req.body,
 		});
 
 		return res.json(newSupportItem);
