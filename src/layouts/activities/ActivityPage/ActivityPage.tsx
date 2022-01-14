@@ -32,6 +32,7 @@ const ActivityPage = () => {
 	if (!supportItem) return <div>loading...</div>;
 
 	const rateType = supportItem.rateType === RateType.HOUR ? "hr" : "km";
+
 	return (
 		<Styles.Container>
 			<Head>
@@ -39,21 +40,41 @@ const ActivityPage = () => {
 			</Head>
 			{editing ? (
 				<>
-					<h1>Modifying &quot;{supportItem.description}&quot;</h1>
 					<CreateActivityForm
 						initialValues={supportItem}
 						returnFunction={() => setEditing(false)}
 					/>
 				</>
 			) : (
-				<>
+				<Styles.Content>
 					<Link href="/activities">&lt; Back to activities</Link>
 					<h1>{supportItem.description}</h1>
 					<Button onClick={() => setEditing(true)}>Edit</Button>
 					<p>
-						Weekday Rate: ${supportItem.weekdayRate}/{rateType}
+						Weekday: {supportItem.weekdayCode || "N/A"}{" "}
+						{supportItem.weekdayRate
+							? `\$${supportItem.weekdayRate}/${rateType}`
+							: "N/A"}
 					</p>
-				</>
+					<p>
+						Weeknight: {supportItem.weeknightCode || "N/A"}{" "}
+						{supportItem.weeknightRate
+							? `\$${supportItem.weeknightRate}/${rateType}`
+							: "N/A"}
+					</p>
+					<p>
+						Saturday: {supportItem.saturdayCode || "N/A"}{" "}
+						{supportItem.saturdayRate
+							? `$${supportItem.saturdayRate}/${rateType}`
+							: "N/A"}
+					</p>
+					<p>
+						Sunday: {supportItem.sundayCode || "N/A"}{" "}
+						{supportItem.sundayRate
+							? `\$${supportItem.sundayRate}/${rateType}`
+							: "N/A"}
+					</p>
+				</Styles.Content>
 			)}
 		</Styles.Container>
 	);

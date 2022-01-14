@@ -22,6 +22,24 @@ interface CreateActivityProps {
 	returnFunction?: () => void;
 }
 
+interface FormValues {
+	id: string;
+	description: string;
+	rateType: string;
+
+	weekdayCode: string;
+	weekdayRate: string;
+
+	weeknightCode: string;
+	weeknightRate: string;
+
+	saturdayCode: string;
+	saturdayRate: string;
+
+	sundayCode: string;
+	sundayRate: string;
+}
+
 const CreateActivityForm: React.FC<CreateActivityProps> = ({
 	initialValues,
 	returnFunction,
@@ -29,7 +47,7 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 	const router = useRouter();
 	const { mutate } = useSWRConfig();
 
-	const BaseForm = (props: FormikProps<Partial<SupportItem>>) => {
+	const BaseForm = (props: FormikProps<FormValues>) => {
 		const { values, touched, errors, handleChange, handleBlur, handleSubmit } =
 			props;
 
@@ -157,30 +175,39 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 	};
 
 	const FormikForm = withFormik({
-		mapPropsToValues: () =>
-			({
-				description: initialValues?.description ?? ("" as string),
-				rateType: initialValues?.rateType ?? RateType.HOUR,
+		mapPropsToValues: () => {
+			console.log(typeof initialValues?.weekdayRate);
+			return {
+				id: initialValues?.id ?? "",
+				description: initialValues?.description ?? "",
+				rateType: initialValues?.rateType?.toString() ?? "HOUR",
 
 				weekdayCode: initialValues?.weekdayCode ?? "",
-				weekdayRate: initialValues?.weekdayRate ?? "",
+				weekdayRate:
+					typeof initialValues?.weekdayRate === "string"
+						? parseFloat(initialValues?.weekdayRate).toFixed(2)
+						: "",
 
 				weeknightCode: initialValues?.weeknightCode ?? "",
-				weeknightRate: initialValues?.weeknightRate ?? "",
+				weeknightRate:
+					typeof initialValues?.weeknightRate === "string"
+						? parseFloat(initialValues?.weeknightRate).toFixed(2)
+						: "",
 
 				saturdayCode: initialValues?.saturdayCode ?? "",
-				saturdayRate: initialValues?.saturdayRate ?? "",
+				saturdayRate:
+					typeof initialValues?.saturdayRate === "string"
+						? parseFloat(initialValues?.saturdayRate).toFixed(2)
+						: "",
 
 				sundayCode: initialValues?.sundayCode ?? "",
-				sundayRate: initialValues?.sundayRate ?? "",
-			} as Partial<SupportItem>),
+				sundayRate:
+					typeof initialValues?.sundayRate === "string"
+						? parseFloat(initialValues?.sundayRate).toFixed(2)
+						: "",
+			} as FormValues;
+		},
 		handleSubmit: (values, { setSubmitting }) => {
-			// TODO: Find a proper solution when I'm not so sleepy
-
-			values.weeknightRate = values.weeknightRate || null;
-			values.saturdayRate = values.saturdayRate || null;
-			values.sundayRate = values.sundayRate || null;
-
 			if (initialValues) {
 				axios
 					.post(`/api/support-items/${initialValues.id}`, values)

@@ -19,11 +19,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 			where: { email: session.user?.email },
 		});
 
+		Object.keys(req.body).map((key) => {
+			req.body[key] = req.body[key] || null;
+		});
+
 		// Create new support item
 		const supportItem = await prisma.supportItem.create({
 			data: {
 				ownerId: user?.id,
-				...req.body,
+				...req.body.map((i: unknown) => i || null),
 			},
 		});
 

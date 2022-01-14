@@ -1,8 +1,7 @@
 import styled from "styled-components";
 
 export const CreateActivityContainer = styled.div`
-	margin-bottom: 2rem;
-	padding: 3rem;
+	padding: 3rem 0;
 	border-radius: 4px;
 	align-self: center;
 `;

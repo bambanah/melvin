@@ -12,12 +12,17 @@ import { errorIn } from "@utils/helpers";
 import axios from "axios";
 import { FormikProps, getIn, withFormik } from "formik";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { FC } from "react";
 import { toast } from "react-toastify";
 import { useSWRConfig } from "swr";
 import * as Styles from "./styles";
 
-const ClientForm = () => {
+interface Props {
+	initialValues?: Partial<Client>;
+	returnFunction?: () => void;
+}
+
+const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 	const router = useRouter();
 	const { mutate } = useSWRConfig();
 
@@ -28,7 +33,12 @@ const ClientForm = () => {
 		return (
 			<Styles.ClientContainer>
 				<Form onSubmit={handleSubmit} flexDirection="column">
-					<Title>Add New Client</Title>
+					<Title>
+						{initialValues
+							? `Updating ${initialValues.name}`
+							: "Add New Client"}{" "}
+						- Melvin
+					</Title>
 					<Label htmlFor="name" required>
 						<span>Name</span>
 						<Input
@@ -103,12 +113,12 @@ const ClientForm = () => {
 
 					<ButtonGroup>
 						<Button type="submit" primary>
-							Create
+							{initialValues ? "Save" : "Create"}
 						</Button>
 						<Button
 							type="button"
 							onClick={() => {
-								router.push("/activities");
+								returnFunction ? returnFunction() : router.push("/clients");
 							}}
 						>
 							Cancel
@@ -122,19 +132,30 @@ const ClientForm = () => {
 	const FormikForm = withFormik({
 		mapPropsToValues: () =>
 			({
-				name: "",
-				number: "",
-				billTo: "",
-				invoicePrefix: "",
-			} as unknown as Partial<Client>),
+				id: initialValues?.id ?? "",
+				name: initialValues?.name ?? "",
+				number: initialValues?.number ?? "",
+				billTo: initialValues?.billTo ?? "",
+				invoicePrefix: initialValues?.invoicePrefix ?? "",
+			} as Partial<Client>),
 		handleSubmit: (values, { setSubmitting }) => {
-			axios.post("/api/clients", values).then(() => {
-				toast.success("Client Created");
-			});
+			if (initialValues) {
+				axios.post(`/api/clients/${initialValues.id}`, values).then(() => {
+					toast.info("Client Updated");
+					setSubmitting(false);
+					mutate(`/api/clients/${initialValues.id}`);
 
-			setSubmitting(false);
-			mutate("/api/clients");
-			router.push("/clients");
+					returnFunction ? returnFunction() : router.push("/clients");
+				});
+			} else {
+				axios.post("/api/clients", values).then(() => {
+					toast.success("Client Created");
+
+					setSubmitting(false);
+					mutate("/api/clients");
+					router.push("/clients");
+				});
+			}
 		},
 		validationSchema: ClientValidationSchema,
 		validateOnChange: true,
