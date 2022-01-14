@@ -1,6 +1,6 @@
 import { FormikErrors, FormikTouched, getIn } from "formik";
 import dayjs from "dayjs";
-import { Activity, Invoice, SupportItem } from "@prisma/client";
+import { Activity, Invoice } from "@prisma/client";
 import { FormValues } from "@organisms/forms/create-invoice-form";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
@@ -87,9 +87,21 @@ export const getNextInvoiceNo = (
 	}`;
 };
 
-export const getRate = (
-	activity: Activity & { supportItem: SupportItem }
-): [code: string, rate: number] => {
+export const getRate = (activity: {
+	date: Date;
+	startTime: Date;
+	endTime: Date;
+	supportItem: {
+		weekdayCode: string;
+		weekdayRate: number | string;
+		weeknightCode?: string;
+		weeknightRate?: number | string;
+		saturdayCode?: string;
+		saturdayRate?: number | string;
+		sundayCode?: string;
+		sundayRate?: number | string;
+	};
+}): [code: string, rate: number] => {
 	let rate = 0;
 	let itemCode = "";
 
@@ -102,7 +114,7 @@ export const getRate = (
 		rate =
 			typeof activity.supportItem.saturdayRate === "string"
 				? Number.parseFloat(activity.supportItem.saturdayRate)
-				: activity.supportItem.saturdayRate?.toNumber();
+				: activity.supportItem.saturdayRate;
 		itemCode = activity.supportItem.saturdayCode;
 	} else if (
 		dayjs(activity.date).day() === 0 &&
@@ -114,26 +126,26 @@ export const getRate = (
 		rate =
 			typeof activity.supportItem.sundayRate === "string"
 				? Number.parseFloat(activity.supportItem.sundayRate)
-				: activity.supportItem.sundayRate?.toNumber();
+				: activity.supportItem.sundayRate;
 		itemCode = activity.supportItem.sundayCode;
 	} else if (
 		activity.endTime &&
 		activity.supportItem.weeknightCode?.length &&
 		activity.supportItem.weeknightRate &&
-		dayjs(activity.endTime).isAfter(dayjs("1970-01-01T20:00"))
+		dayjs(activity.endTime).isAfter(dayjs("1970-01-01T19:59"))
 	) {
 		// Day is a weekday and it's after 8pm
 		rate =
 			typeof activity.supportItem.weeknightRate === "string"
 				? Number.parseFloat(activity.supportItem.weeknightRate)
-				: activity.supportItem.weeknightRate?.toNumber();
+				: activity.supportItem.weeknightRate;
 		itemCode = activity.supportItem.weeknightCode;
 	} else {
 		// Weekday before 8pm
 		rate =
 			typeof activity.supportItem.weekdayRate === "string"
 				? Number.parseFloat(activity.supportItem.weekdayRate)
-				: activity.supportItem.weekdayRate?.toNumber();
+				: activity.supportItem.weekdayRate;
 		itemCode = activity.supportItem.weekdayCode;
 	}
 
@@ -187,7 +199,23 @@ export const round = (numberToRound: number, decimalPlaces: number) =>
 	Math.pow(10, decimalPlaces);
 
 export const getTotalCost = (
-	activities: (Activity & { supportItem: SupportItem })[]
+	activities: {
+		date: Date;
+		startTime: Date;
+		endTime: Date;
+		transitDuration: number | null;
+		transitDistance: number | null;
+		supportItem: {
+			weekdayCode: string;
+			weekdayRate: number | string;
+			weeknightCode: string;
+			weeknightRate: number | string;
+			saturdayCode: string;
+			saturdayRate: number | string;
+			sundayCode: string;
+			sundayRate: number | string;
+		};
+	}[]
 ) => {
 	const grandTotal = activities
 		.map((activity) => {

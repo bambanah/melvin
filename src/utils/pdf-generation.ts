@@ -7,21 +7,11 @@ import {
 	getRate,
 	getTotalCost,
 } from "./helpers";
-import {
-	Activity,
-	Client,
-	Invoice,
-	RateType,
-	SupportItem,
-} from "@prisma/client";
+import { RateType } from "@prisma/client";
 import dayjs from "dayjs";
+import { Invoice } from "types/invoice";
 
-const generatePDF = async (
-	invoice: Invoice & {
-		client: Client;
-		activities: (Activity & { supportItem: SupportItem })[];
-	}
-) => {
+const generatePDF = async (invoice: Invoice) => {
 	const margin = 20;
 
 	const document_ = new jspdf();
@@ -36,8 +26,8 @@ const generatePDF = async (
 	// Write details at top of page
 	const invoiceDetails = [
 		`Invoice Date: ${date}`,
-		`Participant Name: ${invoice.client.name}`,
-		`Participant Number: ${invoice.client.number}`,
+		`Participant Name: ${invoice.client?.name}`,
+		`Participant Number: ${invoice.client?.number}`,
 		`Bill To: ${invoice.billTo}`,
 		`Invoice Number: ${invoice.invoiceNo}`,
 	];

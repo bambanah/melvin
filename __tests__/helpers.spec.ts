@@ -3,7 +3,11 @@ import {
 	getHighestInvoiceNo,
 	getNextInvoiceNo,
 	getPrettyDuration,
+	getRate,
+	getTotalCost,
+	round,
 } from "@utils/helpers";
+import dayjs from "dayjs";
 
 describe("Helpers", () => {
 	it("Should get duration", () => {
@@ -53,5 +57,102 @@ describe("Helpers", () => {
 		expect(getNextInvoiceNo([], "Gawne")).toEqual("Gawne-1");
 		expect(getNextInvoiceNo(["Gawne1"], "Gawne--")).toEqual("Gawne-2");
 		expect(getNextInvoiceNo([], "")).toEqual("");
+	});
+
+	it("Should round correctly", () => {
+		expect(round(10, 2)).toEqual(10);
+		expect(round(3.546_77, 2)).toEqual(3.55);
+		expect(round(10.1, 2)).toEqual(10.1);
+		expect(round(1.555, 2)).toEqual(1.56);
+		expect(round(1.55, 1)).toEqual(1.6);
+		expect(round(1.5, 0)).toEqual(2);
+	});
+
+	it("Should return correct rates", () => {
+		const activity = {
+			date: new Date("2022-01-14"),
+			startTime: dayjs("1970-01-01T15:00").toDate(),
+			endTime: dayjs("1970-01-01T17:00").toDate(),
+			transitDuration: 7,
+			transitDistance: 15,
+			supportItem: {
+				weekdayCode: "weekday",
+				weekdayRate: 1,
+				weeknightCode: "weeknight",
+				weeknightRate: 2,
+				saturdayCode: "saturday",
+				saturdayRate: 3,
+				sundayCode: "sunday",
+				sundayRate: 4,
+			},
+		};
+
+		// Regular weekday - weekday
+		expect(getRate(activity)).toEqual(["weekday", 1]);
+
+		// After 8pm - weeknight
+		activity.endTime = dayjs("1970-01-01T20:10").toDate();
+		expect(getRate(activity)).toEqual(["weeknight", 2]);
+
+		// At 8pm - weeknight
+		activity.endTime = dayjs("1970-01-01T20:00").toDate();
+		expect(getRate(activity)).toEqual(["weeknight", 2]);
+
+		// Saturday - saturday
+		activity.date = new Date("2022-01-15");
+		activity.endTime = dayjs("1970-01-01T15:10").toDate();
+		expect(getRate(activity)).toEqual(["saturday", 3]);
+
+		// Saturday night - saturday
+		activity.date = new Date("2022-01-15");
+		activity.endTime = dayjs("1970-01-01T20:10").toDate();
+		expect(getRate(activity)).toEqual(["saturday", 3]);
+
+		// Sunday - sunday
+		activity.date = new Date("2022-01-16");
+		activity.endTime = dayjs("1970-01-01T15:10").toDate();
+		expect(getRate(activity)).toEqual(["sunday", 4]);
+
+		// Sunday night - sunday
+		activity.date = new Date("2022-01-16");
+		activity.endTime = dayjs("1970-01-01T20:10").toDate();
+		expect(getRate(activity)).toEqual(["sunday", 4]);
+	});
+
+	it("Should return correct total", () => {
+		const activities = [
+			{
+				date: new Date("2022-01-14"),
+				startTime: dayjs("1970-01-01T15:00").toDate(),
+				endTime: dayjs("1970-01-01T17:00").toDate(),
+				transitDuration: 0,
+				transitDistance: 0,
+				supportItem: {
+					weekdayCode: "weekday",
+					weekdayRate: 10,
+					weeknightCode: "weeknight",
+					weeknightRate: 20,
+					saturdayCode: "saturday",
+					saturdayRate: 30,
+					sundayCode: "sunday",
+					sundayRate: 40,
+				},
+			},
+		];
+
+		// --- Weekday ---
+		// 2 hours
+		// 2 * wdr = 20
+		expect(getTotalCost(activities)).toEqual(20);
+
+		// 2 hours + 10km transit
+		// 2 * wdr + 10 * 0.85 = 28.5
+		activities[0].transitDistance = 10;
+		expect(getTotalCost(activities)).toEqual(28.5);
+
+		// 2 hours + 10km transit + 15min transit
+		// 2 * wdr + 10 * 0.85 + (15/60) * wr = 31
+		activities[0].transitDuration = 15;
+		expect(getTotalCost(activities)).toEqual(31);
 	});
 });
