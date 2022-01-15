@@ -11,6 +11,7 @@ import ClientValidationSchema from "@schema/client-validation-schema";
 import { errorIn } from "@utils/helpers";
 import axios from "axios";
 import { FormikProps, getIn, withFormik } from "formik";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { FC } from "react";
 import { toast } from "react-toastify";
@@ -32,12 +33,19 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 
 		return (
 			<Styles.ClientContainer>
-				<Form onSubmit={handleSubmit} flexDirection="column">
-					<Title>
+				<Head>
+					<title>
 						{initialValues
 							? `Updating ${initialValues.name}`
 							: "Add New Client"}{" "}
 						- Melvin
+					</title>
+				</Head>
+				<Form onSubmit={handleSubmit} flexDirection="column">
+					<Title>
+						{initialValues
+							? `Updating ${initialValues.name}`
+							: "Add New Client"}
 					</Title>
 					<Label htmlFor="name" required>
 						<span>Name</span>
@@ -132,7 +140,7 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 	const FormikForm = withFormik({
 		mapPropsToValues: () =>
 			({
-				id: initialValues?.id ?? "",
+				id: initialValues?.id ?? undefined,
 				name: initialValues?.name ?? "",
 				number: initialValues?.number ?? "",
 				billTo: initialValues?.billTo ?? "",
