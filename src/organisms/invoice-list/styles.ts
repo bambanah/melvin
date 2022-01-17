@@ -37,7 +37,7 @@ export const CreateNew = styled.a`
 
 export const InvoiceContainer = styled.div`
 	min-width: 30em;
-	width: 60%;
+	width: 100%;
 	transition: all 0.25s ease;
 	box-shadow: 0px 4px 12px
 		rgba(0, 0, 0, ${({ theme }) => (theme.type === "dark" ? "0.85" : "0.15")});
@@ -193,7 +193,7 @@ export const OptionsMenu = styled.div`
 
 export const PdfPreview = styled.div`
 	height: 0;
-	min-height: 0;
+	max-height: 0;
 	width: 100%;
 
 	overflow-y: scroll;

@@ -365,6 +365,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 	const InvoiceForm = withFormik({
 		mapPropsToValues: () => {
 			return {
+				id: initialValues?.id ?? undefined,
 				date: initialValues?.date ?? "",
 				invoiceNo: initialValues?.invoiceNo ?? "",
 				clientId: initialValues?.clientId ?? "",

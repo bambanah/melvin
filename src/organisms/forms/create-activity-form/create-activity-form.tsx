@@ -177,7 +177,7 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 	const FormikForm = withFormik({
 		mapPropsToValues: () => {
 			return {
-				id: initialValues?.id ?? "",
+				id: initialValues?.id ?? undefined,
 				description: initialValues?.description ?? "",
 				rateType: initialValues?.rateType?.toString() ?? "HOUR",
 

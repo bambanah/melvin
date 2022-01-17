@@ -111,11 +111,11 @@ export default function InvoiceList() {
 							</Styles.OptionsMenu>
 						</Styles.Actions>
 					</Styles.Invoice>
-					{expandedInvoice === index && (
-						<Styles.PdfPreview>
+					<Styles.PdfPreview>
+						{expandedInvoice === index && (
 							<PdfDocument invoiceNo={invoice.id} />
-						</Styles.PdfPreview>
-					)}
+						)}
+					</Styles.PdfPreview>
 				</Styles.InvoiceContainer>
 			))}
 		</Styles.Container>

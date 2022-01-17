@@ -46,16 +46,16 @@ describe("Helpers", () => {
 
 	it("Should get next invoice number", () => {
 		expect(getNextInvoiceNo(["Gawne1", "Gawne2", "Gawne3"], "Client")).toEqual(
-			"Client-4"
+			"Client4"
 		);
 		expect(
 			getNextInvoiceNo(["Client-1", "Client-2", "Client-3"], "Client")
-		).toEqual("Client-4");
+		).toEqual("Client4");
 		expect(getNextInvoiceNo(["Gawne1", "Gawne2", "Gawne3"], "Gawne")).toEqual(
-			"Gawne-4"
+			"Gawne4"
 		);
-		expect(getNextInvoiceNo([], "Gawne")).toEqual("Gawne-1");
-		expect(getNextInvoiceNo(["Gawne1"], "Gawne--")).toEqual("Gawne-2");
+		expect(getNextInvoiceNo([], "Gawne")).toEqual("Gawne1");
+		expect(getNextInvoiceNo(["Gawne1"], "Gawne--")).toEqual("Gawne2");
 		expect(getNextInvoiceNo([], "")).toEqual("");
 	});
 
@@ -120,16 +120,17 @@ describe("Helpers", () => {
 	});
 
 	it("Should return correct total", () => {
+		// TODO: Expand this test immensely
 		const activities = [
 			{
-				date: new Date("2022-01-14"),
-				startTime: dayjs("1970-01-01T15:00").toDate(),
-				endTime: dayjs("1970-01-01T17:00").toDate(),
-				transitDuration: 0,
-				transitDistance: 0,
+				date: new Date("2022-01-06"),
+				startTime: dayjs("1970-01-01T15:03").toDate(),
+				endTime: dayjs("1970-01-01T19:52").toDate(),
+				transitDistance: 7,
+				transitDuration: 15,
 				supportItem: {
 					weekdayCode: "weekday",
-					weekdayRate: 10,
+					weekdayRate: 54.3,
 					weeknightCode: "weeknight",
 					weeknightRate: 20,
 					saturdayCode: "saturday",
@@ -140,19 +141,26 @@ describe("Helpers", () => {
 			},
 		];
 
-		// --- Weekday ---
-		// 2 hours
-		// 2 * wdr = 20
-		expect(getTotalCost(activities)).toEqual(20);
+		expect(getTotalCost(activities)).toEqual(281.09);
 
-		// 2 hours + 10km transit
-		// 2 * wdr + 10 * 0.85 = 28.5
-		activities[0].transitDistance = 10;
-		expect(getTotalCost(activities)).toEqual(28.5);
+		activities.push({
+			date: new Date("2022-01-13"),
+			startTime: dayjs("1970-01-01T16:00").toDate(),
+			endTime: dayjs("1970-01-01T16:06").toDate(),
+			transitDistance: 7,
+			transitDuration: 45,
+			supportItem: {
+				weekdayCode: "weekday",
+				weekdayRate: 54.3,
+				weeknightCode: "weeknight",
+				weeknightRate: 20,
+				saturdayCode: "saturday",
+				saturdayRate: 30,
+				sundayCode: "sunday",
+				sundayRate: 40,
+			},
+		});
 
-		// 2 hours + 10km transit + 15min transit
-		// 2 * wdr + 10 * 0.85 + (15/60) * wr = 31
-		activities[0].transitDuration = 15;
-		expect(getTotalCost(activities)).toEqual(31);
+		expect(getTotalCost(activities)).toEqual(333.19);
 	});
 });

@@ -29,16 +29,8 @@
 		"jsx-a11y/no-static-element-interactions": "off",
 		"jsx-a11y/click-events-have-key-events": "off",
 		"unicorn/prefer-module": "off",
-		"unicorn/prevent-abbreviations": [
-			"error",
-			{
-				"replacements": {
-					"props": {
-						"properties": false
-					}
-				}
-			}
-		]
+		"unicorn/no-array-reduce": "off",
+		"unicorn/prevent-abbreviations": "off"
 	},
 	"overrides": [
 		// Only uses Testing Library lint rules in test files
