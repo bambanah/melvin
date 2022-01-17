@@ -92,17 +92,26 @@ export default function InvoiceList() {
 							<Styles.OptionsMenu tabIndex={0}>
 								<FontAwesomeIcon icon={["fas", "ellipsis-v"]} size="lg" />
 								<div className="dropdown">
-									<Link href={`/invoices/${invoice.id}`}>View</Link>
 									<Link href={`/invoices/${invoice.id}?edit=true`}>Edit</Link>
+									<Link href={`/invoices/create?copyFrom=${invoice.id}`}>
+										Copy
+									</Link>
 									<a
 										onClick={() => {
-											axios
-												.delete(`/api/invoices/${invoice.id}`)
-												.then((response) => {
-													mutate("/api/invoices");
-													toast.success(response);
-												})
-												.catch((error_) => toast.error(error_));
+											// TODO: Custom confirm component
+											if (
+												confirm(
+													`Are you sure you want to delete ${invoice.invoiceNo}?`
+												)
+											) {
+												axios
+													.delete(`/api/invoices/${invoice.id}`)
+													.then((response) => {
+														mutate("/api/invoices");
+														toast.success(response);
+													})
+													.catch((error_) => toast.error(error_));
+											}
 										}}
 									>
 										Delete

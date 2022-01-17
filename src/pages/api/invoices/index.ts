@@ -19,7 +19,7 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
 				},
 			},
 			orderBy: {
-				date: "desc",
+				created: "desc",
 			},
 		});
 

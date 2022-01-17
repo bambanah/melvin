@@ -31,7 +31,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 
 export type FormActivity = {
-	date: string;
+	date?: string;
 	startTime: string;
 	endTime: string;
 	itemDistance?: string;
@@ -42,7 +42,7 @@ export type FormActivity = {
 };
 
 export type FormValues = Omit<Partial<Invoice>, "date"> & {
-	date: string;
+	date?: string;
 	activities: FormActivity[];
 };
 
@@ -376,7 +376,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 		handleSubmit: (values, { setSubmitting }) => {
 			const data = valuesToInvoice(values);
 
-			if (initialValues) {
+			if (initialValues?.id) {
 				axios
 					.post(`/api/invoices/${initialValues.id}`, data)
 					.then(() => {
