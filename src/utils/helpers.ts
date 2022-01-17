@@ -82,7 +82,7 @@ export const getNextInvoiceNo = (
 
 	const matches = latestInvoiceNo?.match(/\d+$/);
 
-	return `${invoicePrefix.replace(/-+$/, "")}-${
+	return `${invoicePrefix.replace(/-+$/, "")}${
 		matches ? Number.parseInt(matches[0]) + 1 : 1
 	}`;
 };
@@ -177,6 +177,7 @@ export const invoiceToValues = (
 
 export const valuesToInvoice = (values: FormValues) => ({
 	invoice: {
+		id: values.id ?? undefined,
 		invoiceNo: values.invoiceNo,
 		clientId: values.clientId,
 		billTo: values.billTo,
@@ -242,7 +243,7 @@ export const getTotalCost = (
 		})
 		.reduce((previous, current) => previous + current, 0);
 
-	return grandTotal;
+	return round(grandTotal, 2);
 };
 
 // export const getTotalString = (invoiceId: string) =>

@@ -52,7 +52,7 @@ export default async (request: ApiRequest, response: NextApiResponse) => {
 			}),
 			...request.body.activities?.map((activity) =>
 				prisma.activity.upsert({
-					where: { id: activity.id },
+					where: { id: activity.id ?? "" }, // This feels naughty
 					update: {
 						...activity,
 					},

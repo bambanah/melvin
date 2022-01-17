@@ -215,7 +215,22 @@ const generatePDF = async (invoice: Invoice) => {
 		},
 	});
 
-	const fileName = `${invoice.invoiceNo}-${date}.pdf`;
+	let earliestDate = invoice.activities[0].date;
+	let latestDate = invoice.activities[0].date;
+	for (const { date } of invoice.activities) {
+		if (dayjs(date).isBefore(dayjs(earliestDate))) earliestDate = date;
+		if (dayjs(date).isAfter(dayjs(latestDate))) latestDate = date;
+	}
+
+	const dateRangeFormatted = dayjs(earliestDate).isSame(latestDate)
+		? dayjs(earliestDate).format("DD-MM")
+		: `(${dayjs(earliestDate).format("DD-MM")})-(${dayjs(latestDate).format(
+				"DD-MM"
+		  )})`;
+
+	const fileName = `${invoice.invoiceNo}_${dateRangeFormatted}-${dayjs(
+		invoice.date
+	).format("YYYY")}.pdf`;
 
 	return {
 		pdfString: document_
