@@ -1,25 +1,17 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-	align-self: center;
-	width: 100%;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: stretch;
 	gap: 3rem;
-	padding: 3em 0;
+	padding: 3rem 3rem;
 `;
 
 export const Header = styled.div`
-	min-width: 30em;
-	width: 60%;
 	display: flex;
 	justify-content: space-between;
-
-	h1 {
-		font-family: "Patua One";
-		margin: 0;
-	}
+	align-items: center;
 `;
 
 export const CreateNew = styled.a`
@@ -27,7 +19,7 @@ export const CreateNew = styled.a`
 	border-radius: 0.8em;
 	background: ${({ theme }) => theme.colors.bg};
 	color: ${({ theme }) => theme.colors.fg};
-	box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5);
+	box-shadow: -8px 8px 36px rgba(0, 0, 0, 0.17);
 
 	&:hover {
 		color: ${({ theme }) => theme.colors.fg};
@@ -38,7 +30,7 @@ export const InvoiceContainer = styled.div`
 	min-width: 30em;
 	width: 100%;
 	transition: all 0.25s ease;
-	box-shadow: 0px 4px 12px
+	box-shadow: -4px 4px 16px
 		rgba(0, 0, 0, ${({ theme }) => (theme.type === "dark" ? "0.85" : "0.15")});
 	border-radius: 1.3rem;
 

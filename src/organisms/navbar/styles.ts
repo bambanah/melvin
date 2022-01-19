@@ -43,7 +43,8 @@ export const Links = styled.div`
 	gap: 1em;
 	flex: 1 0 auto;
 	align-items: flex-start;
-	justify-content: center;
+	justify-content: flex-start;
+	padding: 3rem 0;
 `;
 
 export const Right = styled.div`

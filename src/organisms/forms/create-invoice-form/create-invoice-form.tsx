@@ -7,7 +7,7 @@ import Label from "@atoms/label";
 import Loading from "@atoms/loading";
 import Select from "@atoms/select";
 import Subheading from "@atoms/subheading";
-import Title from "@atoms/title";
+import Heading from "@atoms/heading";
 import ButtonGroup from "@molecules/button-group";
 import { Client, Invoice, SupportItem } from "@prisma/client";
 import InvoiceValidationSchema from "@schema/invoice-validation-schema";
@@ -422,11 +422,11 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 					- Melvin
 				</title>
 			</Head>
-			<Title>
+			<Heading>
 				{initialValues
 					? `Updating ${initialValues.invoiceNo}`
 					: "Create New Invoice"}
-			</Title>
+			</Heading>
 			<InvoiceForm />
 		</Styles.Container>
 	);

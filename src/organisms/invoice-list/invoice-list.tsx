@@ -1,4 +1,3 @@
-import Title from "@atoms/title";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
 import Link from "next/link";
@@ -12,6 +11,7 @@ import { saveAs } from "file-saver";
 import useSWR, { useSWRConfig } from "swr";
 import { getTotalCost } from "@utils/helpers";
 import { Invoice } from "types/invoice";
+import Display from "@atoms/display";
 
 const getInvoices = async () => {
 	const response = await fetch("/api/invoices");
@@ -51,11 +51,9 @@ export default function InvoiceList() {
 	return (
 		<Styles.Container>
 			<Styles.Header>
-				<Title>Invoices</Title>
+				<Display className="small">Invoices</Display>
 				<Link href="/invoices/create" passHref>
-					<Button primary>
-						<FontAwesomeIcon icon={["fas", "plus"]} />
-					</Button>
+					<Button primary>+ Add New</Button>
 				</Link>
 			</Styles.Header>
 			{invoices.map((invoice, index) => (

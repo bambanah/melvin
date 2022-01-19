@@ -25,7 +25,7 @@ const StyledLink = styled.a<StyleProps>`
 	padding: 0.7em 1.2em;
 	border-radius: 0.3rem;
 
-	transition: color 0.1s, border-color 0.1s;
+	transition: color 0.1s, border-color 0.1s, background-color 0.3s;
 
 	svg {
 		margin-right: 0.5rem;

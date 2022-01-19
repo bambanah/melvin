@@ -1,5 +1,5 @@
 import NavAuth from "@molecules/nav-auth";
-import NavLink from "@molecules/nav-link";
+import NavLink from "@atoms/nav-link";
 import ThemeSwitch from "@atoms/theme-switch";
 import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
@@ -7,6 +7,7 @@ import Link from "next/link";
 import React from "react";
 import * as Styles from "./styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Display from "@atoms/display";
 
 const Navbar = () => {
 	const session = useSession();
@@ -15,7 +16,9 @@ const Navbar = () => {
 		<Styles.Header>
 			<Styles.Content>
 				<Link href="/" passHref>
-					<Styles.Brand>melvin</Styles.Brand>
+					<a>
+						<Display className="xsmall brand">melvin</Display>
+					</a>
 				</Link>
 
 				<Styles.Links>
