@@ -5,8 +5,12 @@ import {
 	faDownload,
 	faEdit,
 	faEllipsisV,
+	faFileAlt,
+	faHome,
 	faPlus,
 	faTrash,
+	faUser,
+	faWalking,
 } from "@fortawesome/free-solid-svg-icons";
 
 const importIcons = () => {
@@ -17,7 +21,11 @@ const importIcons = () => {
 		faChevronRight,
 		faEllipsisV,
 		faPlus,
-		faDownload
+		faDownload,
+		faHome,
+		faUser,
+		faWalking,
+		faFileAlt
 	);
 };
 

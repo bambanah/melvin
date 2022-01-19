@@ -13,19 +13,29 @@ interface StyleProps {
 }
 
 const StyledLink = styled.a<StyleProps>`
-	font-family: "Inter";
+	width: 11em;
 	text-decoration: none;
 	color: ${({ active, theme }) =>
-		active ? theme.colors.brand : theme.colors.fg};
-	margin: 0 0.7rem;
-	font-weight: ${({ active }) => (active ? "bold" : "500")};
-	padding: 0 0.2rem;
-	border-bottom: 2px solid transparent;
+		active ? theme.colors.bg : `${theme.colors.fg}88`};
+	font-weight: 700;
+	border: 2px solid transparent;
+
+	background: ${({ active, theme }) =>
+		active ? theme.colors.fg : theme.colors.bg};
+	padding: 0.7em 1.2em;
+	border-radius: 0.3rem;
+
+	transition: color 0.1s, border-color 0.1s;
+
+	svg {
+		margin-right: 0.5rem;
+	}
 
 	&:hover {
 		color: ${({ active, theme }) =>
-			active ? theme.colors.brand : theme.colors.fg};
-		border-bottom-color: ${({ theme }) => theme.colors.brand};
+			active ? theme.colors.bg : theme.colors.fg};
+		border-color: ${({ active, theme }) =>
+			active ? theme.colors.fg : theme.colors.fg};
 	}
 `;
 

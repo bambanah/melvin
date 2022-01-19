@@ -1,12 +1,11 @@
 import styled from "styled-components";
 
 export const Header = styled.header`
-	position: fixed;
 	top: 0;
-	width: 100vw;
+	width: 15em;
+	height: 100%;
 	box-sizing: border-box;
 	z-index: 100;
-	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
 	background-color: ${({ theme }) => theme.colors.bg};
 `;
 
@@ -25,24 +24,25 @@ export const Brand = styled.span`
 `;
 
 export const Content = styled.div`
-	height: 5rem;
+	height: 100%;
 	width: 100%;
-	padding: 0 2rem;
-	min-width: 700px;
-	max-width: 1100px;
+	padding: 2rem 0;
 
 	box-sizing: border-box;
 	margin: auto;
 
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: space-evenly;
 `;
 
 export const Links = styled.div`
 	display: flex;
+	flex-direction: column;
+	gap: 1em;
 	flex: 1 0 auto;
-	align-items: center;
+	align-items: flex-start;
 	justify-content: center;
 `;
 

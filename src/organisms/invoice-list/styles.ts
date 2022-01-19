@@ -23,7 +23,6 @@ export const Header = styled.div`
 `;
 
 export const CreateNew = styled.a`
-	font-family: "Rubik";
 	padding: 0.8em;
 	border-radius: 0.8em;
 	background: ${({ theme }) => theme.colors.bg};

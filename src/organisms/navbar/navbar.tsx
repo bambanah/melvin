@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
 import * as Styles from "./styles";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const Navbar = () => {
 	const session = useSession();
@@ -18,10 +19,18 @@ const Navbar = () => {
 				</Link>
 
 				<Styles.Links>
-					{/* <NavLink href="/">Dashboard</NavLink> */}
-					<NavLink href="/invoices">Invoices</NavLink>
-					<NavLink href="/activities">Activities</NavLink>
-					<NavLink href="/clients">Clients</NavLink>
+					<NavLink href="/">
+						<FontAwesomeIcon icon={["fas", "home"]} /> Dashboard
+					</NavLink>
+					<NavLink href="/invoices">
+						<FontAwesomeIcon icon={["fas", "file-alt"]} /> Invoices
+					</NavLink>
+					<NavLink href="/activities">
+						<FontAwesomeIcon icon={["fas", "walking"]} /> Activities
+					</NavLink>
+					<NavLink href="/clients">
+						<FontAwesomeIcon icon={["fas", "user"]} /> Clients
+					</NavLink>
 				</Styles.Links>
 
 				<Styles.Right>
