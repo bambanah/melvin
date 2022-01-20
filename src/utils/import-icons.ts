@@ -2,6 +2,8 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import {
 	faChevronRight,
+	faCircle,
+	faCopy,
 	faDownload,
 	faEdit,
 	faEllipsisV,
@@ -25,7 +27,9 @@ const importIcons = () => {
 		faHome,
 		faUser,
 		faWalking,
-		faFileAlt
+		faFileAlt,
+		faCircle,
+		faCopy
 	);
 };
 

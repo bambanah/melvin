@@ -337,7 +337,6 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 								</Styles.ActivityContainer>
 							)}
 						/>
-
 						{values.activities.length > 0 && (
 							<ButtonGroup>
 								<Button type="submit" disabled={!values.clientId} primary>

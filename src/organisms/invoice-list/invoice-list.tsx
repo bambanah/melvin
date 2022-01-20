@@ -56,75 +56,90 @@ export default function InvoiceList() {
 					<Button primary>+ Add New</Button>
 				</Link>
 			</Styles.Header>
-			{invoices.map((invoice, index) => (
-				<Styles.InvoiceContainer
-					className={expandedInvoice === index ? "expanded" : ""}
-					key={invoice.id}
-				>
-					<Styles.Invoice>
-						<div
+			<Styles.InvoiceContainer>
+				{invoices.map((invoice, index) => (
+					<Styles.Invoice
+						key={invoice.id}
+						className={expandedInvoice === index ? "expanded" : ""}
+					>
+						<Styles.InvoiceDetails
 							onClick={() =>
 								expandInvoice(expandedInvoice === index ? undefined : index)
 							}
 						>
-							<Styles.Expander>
-								<FontAwesomeIcon icon={["fas", "chevron-right"]} size="2x" />
-							</Styles.Expander>
-							<Styles.Column>
-								<h2>{invoice.invoiceNo}</h2>
-								<span>{dayjs(invoice.date).format("DD/MM/YYYY")}</span>
-							</Styles.Column>
-
-							<Styles.Column>
-								<span>
-									<b>{invoice.client?.name}</b>
-								</span>
-								<span>${getTotalCost(invoice.activities)}</span>
-							</Styles.Column>
-						</div>
-
-						<Styles.Actions>
+							<div>
+								<FontAwesomeIcon icon={["fas", "chevron-right"]} size="1x" />
+							</div>
+							<span className="date">
+								{dayjs(invoice.date).format("DD/MM/YY")}
+							</span>
+							<h2>{invoice.invoiceNo}</h2>
+							<span className="name">{invoice.client?.name}</span>
+							<span
+								className={`status ${
+									["unsent", "sent", "complete"][index % 3]
+								}`}
+							>
+								<FontAwesomeIcon icon={["fas", "circle"]} />{" "}
+								{["Unsent", "Sent", "Complete"][index % 3]}
+							</span>
+							<span className="total">
+								$
+								{getTotalCost(invoice.activities).toLocaleString(undefined, {
+									minimumFractionDigits: 2,
+								})}
+							</span>
+						</Styles.InvoiceDetails>
+						<Styles.Actions
+							className={expandedInvoice === index ? "expanded" : ""}
+						>
+							<Link href={`/invoices/${invoice.id}?edit=true`}>
+								<a>
+									<FontAwesomeIcon icon={["fas", "edit"]} size="sm" />
+									Edit
+								</a>
+							</Link>
+							<Link href={`/invoices/create?copyFrom=${invoice.id}`}>
+								<a>
+									<FontAwesomeIcon icon={["fas", "copy"]} size="sm" />
+									Copy
+								</a>
+							</Link>
 							<a onClick={() => savePdf(invoice.id)}>
-								<FontAwesomeIcon icon={["fas", "download"]} size="lg" />
+								<FontAwesomeIcon icon={["fas", "download"]} size="sm" />
+								Download
 							</a>
-							<Styles.OptionsMenu tabIndex={0}>
-								<FontAwesomeIcon icon={["fas", "ellipsis-v"]} size="lg" />
-								<div className="dropdown">
-									<Link href={`/invoices/${invoice.id}?edit=true`}>Edit</Link>
-									<Link href={`/invoices/create?copyFrom=${invoice.id}`}>
-										Copy
-									</Link>
-									<a
-										onClick={() => {
-											// TODO: Custom confirm component
-											if (
-												confirm(
-													`Are you sure you want to delete ${invoice.invoiceNo}?`
-												)
-											) {
-												axios
-													.delete(`/api/invoices/${invoice.id}`)
-													.then((response) => {
-														mutate("/api/invoices");
-														toast.success(response);
-													})
-													.catch((error_) => toast.error(error_));
-											}
-										}}
-									>
-										Delete
-									</a>
-								</div>
-							</Styles.OptionsMenu>
+							<a
+								onClick={() => {
+									if (
+										confirm(
+											`Are you sure you want to delete ${invoice.invoiceNo}?`
+										)
+									) {
+										axios
+											.delete(`/api/invoices/${invoice.id}`)
+											.then((response) => {
+												mutate("/api/invoices");
+												toast.success(response);
+											})
+											.catch((error_) => toast.error(error_));
+									}
+								}}
+							>
+								<FontAwesomeIcon icon={["fas", "trash"]} size="sm" />
+								Delete
+							</a>
 						</Styles.Actions>
+						<Styles.PdfPreview
+							className={expandedInvoice === index ? "expanded" : ""}
+						>
+							{expandedInvoice !== undefined && (
+								<PdfDocument invoiceNo={invoices[expandedInvoice].id} />
+							)}
+						</Styles.PdfPreview>
 					</Styles.Invoice>
-					<Styles.PdfPreview>
-						{expandedInvoice === index && (
-							<PdfDocument invoiceNo={invoice.id} />
-						)}
-					</Styles.PdfPreview>
-				</Styles.InvoiceContainer>
-			))}
+				))}
+			</Styles.InvoiceContainer>
 		</Styles.Container>
 	);
 }

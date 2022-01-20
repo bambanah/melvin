@@ -1,8 +1,6 @@
 import styled from "styled-components";
 
-export const Container = styled.div`
-	padding: 3rem;
-`;
+export const Container = styled.div``;
 
 export const Header = styled.div`
 	display: flex;

@@ -1,3 +1,4 @@
+import Display from "@atoms/display";
 import Loading from "@atoms/loading";
 import Card from "@molecules/card";
 import CardContainer from "@molecules/card-container";
@@ -26,6 +27,9 @@ function SupportItemList() {
 
 	return (
 		<Styles.Container>
+			<Styles.Header>
+				<Display className="small">Activities</Display>
+			</Styles.Header>
 			<CardContainer>
 				{supportItems.map((supportItem) => (
 					<Card href={`/activities/${supportItem.id}`} key={supportItem.id}>

@@ -24,6 +24,8 @@ const Content = styled.div`
 	flex-direction: column;
 
 	overflow-y: auto;
+
+	padding: 3rem;
 `;
 
 const Layout: React.FC<Props> = ({ children }) => {
