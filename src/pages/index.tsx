@@ -1,13 +1,13 @@
 import Layout from "@layouts/common/layout";
+import Dashboard from "@layouts/dashboard";
 import React from "react";
 
-const Dashboard = () => {
+const DashboardPage = () => {
 	return (
 		<Layout>
-			<h1>Dashboard</h1>
-			<p>This is the dashboard</p>
+			<Dashboard />
 		</Layout>
 	);
 };
 
-export default Dashboard;
+export default DashboardPage;

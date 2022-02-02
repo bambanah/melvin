@@ -1,3 +1,4 @@
+import Display from "@atoms/display";
 import Card from "@molecules/card";
 import CardContainer from "@molecules/card-container";
 import { Client } from "@prisma/client";
@@ -22,6 +23,9 @@ const ClientList = () => {
 
 	return (
 		<Styles.Container>
+			<Styles.Header>
+				<Display className="small">Clients</Display>
+			</Styles.Header>
 			<CardContainer>
 				{clients.map((client) => (
 					<Card href={`/clients/${client.id}`} key={client.id}>

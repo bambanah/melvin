@@ -2,134 +2,158 @@ import styled from "styled-components";
 
 export const Container = styled.div`
 	align-self: center;
-	width: 100%;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: stretch;
 	gap: 3rem;
-	padding: 3em 0;
+	height: 100%;
+
+	width: 100%;
 `;
 
 export const Header = styled.div`
-	min-width: 30em;
-	width: 60%;
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
 
-	h1 {
-		font-family: "Patua One";
-		margin: 0;
-	}
+	margin: auto;
+	width: 100%;
+	max-width: 60em;
 `;
 
-export const CreateNew = styled.a`
-	font-family: "Rubik";
-	padding: 0.8em;
-	border-radius: 0.8em;
-	background: ${({ theme }) => theme.colors.bg};
-	color: ${({ theme }) => theme.colors.fg};
-	box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5);
+export const PdfPreview = styled.div`
+	height: 0;
+	flex: 1 0 100%;
 
-	&:hover {
-		color: ${({ theme }) => theme.colors.fg};
-	}
+	overflow-y: auto;
+	overflow-x: hidden;
+
+	transition: all 0.25s;
 `;
 
 export const InvoiceContainer = styled.div`
-	min-width: 30em;
-	width: 100%;
-	transition: all 0.25s ease;
-	box-shadow: 0px 4px 12px
-		rgba(0, 0, 0, ${({ theme }) => (theme.type === "dark" ? "0.85" : "0.15")});
-	border-radius: 1.3rem;
-
-	.fa-chevron-right {
-		transition: transform 0.2s ease;
-	}
-
-	&.expanded {
-		width: 100%;
-		& > div:first-of-type {
-			border-bottom-left-radius: 0;
-			border-bottom-right-radius: 0;
-		}
-		& > div:last-of-type {
-			height: 50vw;
-			max-height: 40em;
-		}
-
-		.fa-chevron-right {
-			transform: rotate(90deg);
-		}
-	}
+	flex: 1 0 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1em;
+	padding-bottom: 5em;
 `;
 
 export const Invoice = styled.div`
+	flex: 0 0 auto;
+	max-width: 60em;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: stretch;
+
+	color: ${({ theme }) => theme.colors.fg};
+	border-radius: var(--radius-medium);
+	overflow: hidden;
+	transition: box-shadow 0.2s;
+
+	&.expanded {
+		box-shadow: var(--shadow-medium);
+
+		> div:first-of-type {
+			svg {
+				transform: rotate(90deg);
+			}
+		}
+
+		> div:nth-of-type(2) {
+			height: 4em;
+			opacity: 1;
+			overflow: visible;
+		}
+
+		> div:last-of-type {
+			height: 30em;
+		}
+	}
+`;
+
+export const InvoiceDetails = styled.div`
 	flex: 1 0 auto;
 	display: flex;
 	justify-content: space-between;
-	cursor: pointer;
-	border-radius: 1.3rem;
-
-	background: ${({ theme }) => theme.colors.bg};
-	color: ${({ theme }) => theme.colors.fg};
-
-	transition: all 0.15s ease;
-
-	div {
-		transition: all 0.15s ease;
-	}
-
-	& > div:first-of-type {
-		flex: 1 0 auto;
-		display: flex;
-		justify-content: space-between;
-		padding: 2em 3em;
-
-		h2 {
-			color: ${({ theme }) => theme.colors.brand};
-		}
-
-		&:hover {
-			color: ${({ theme }) => theme.colors.brand};
-		}
-	}
-`;
-
-// Expander? Hardly know her
-export const Expander = styled.div`
-	flex-basis: 10%;
-	display: flex;
 	align-items: center;
-	justify-content: flex-start;
-`;
 
-export const Column = styled.div`
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	gap: 1em;
-	flex: 1;
+	padding: 1.4em 1.2em;
+	cursor: pointer;
 
-	&:nth-of-type(3) {
-		align-items: flex-end;
+	gap: 2rem;
+	transition: background 0.1s;
+
+	&:hover {
+		color: ${({ theme }) => theme.colors.brand};
+	}
+
+	svg {
+		transition: transform 0.2s;
 	}
 
 	h2 {
 		margin: 0;
+		flex: 0 0 4em;
+	}
+
+	.date {
+		flex: 0 0 3em;
+		text-align: left;
+	}
+
+	.name {
+		flex: 1 0 auto;
+	}
+
+	.status {
+		flex: 0 0 6em;
+
+		&.unsent svg {
+			color: #ff8585;
+		}
+
+		&.sent svg {
+			color: #feda22;
+		}
+
+		&.complete svg {
+			color: #88c656;
+		}
+	}
+
+	.total {
+		flex: 0 0 4em;
+		text-align: right;
+		font-weight: 500;
 	}
 `;
 
 export const Actions = styled.div`
 	display: flex;
 	align-items: center;
-	flex-direction: column;
 	justify-content: center;
-	flex-basis: 8%;
+	flex: 1 0 100%;
+	overflow: hidden;
+	gap: 2em;
+
+	height: 0;
+	opacity: 0;
+
+	transition: opacity 0.1s, height 0.1s;
 
 	a {
-		padding: 0.8em;
+		padding: 0.3em 0.8em;
 		color: ${({ theme }) => theme.colors.fg}99;
+		background-color: ${({ theme }) => theme.colors.bg};
+		border-radius: 0.3em;
+		box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.12);
+
+		svg {
+			margin-right: 0.3em;
+		}
 
 		&:hover {
 			color: ${({ theme }) => theme.colors.brand};
@@ -145,59 +169,4 @@ export const Actions = styled.div`
 			color: ${({ theme }) => theme.colors.brand};
 		}
 	}
-`;
-
-export const OptionsMenu = styled.div`
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	.dropdown {
-		position: absolute;
-		display: flex;
-		flex-direction: column;
-		opacity: 0;
-		transform: scaleY(0) translateY(4.8em);
-		right: 0;
-
-		background-color: white;
-		box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-		border-radius: 0.4em;
-		overflow: hidden;
-
-		z-index: 1000;
-
-		a {
-			width: 7em;
-			padding: 0.6em 1em;
-			color: ${({ theme }) => theme.colors.fg};
-			background-color: ${({ theme }) => theme.colors.bg};
-
-			transition: all 0.1s ease;
-
-			&:hover {
-				color: ${({ theme }) => theme.colors.bg};
-				background-color: ${({ theme }) => theme.colors.fg};
-			}
-		}
-	}
-
-	&:focus-within {
-		.dropdown {
-			opacity: 1;
-			transform: scaleY(1) translateY(4.8em);
-		}
-	}
-`;
-
-export const PdfPreview = styled.div`
-	height: 0;
-	max-height: 0;
-	width: 100%;
-
-	overflow-y: scroll;
-	overflow-x: hidden;
-
-	transition: all 0.25s ease 0s;
 `;
