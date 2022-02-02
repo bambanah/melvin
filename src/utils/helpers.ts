@@ -1,6 +1,6 @@
 import { FormikErrors, FormikTouched, getIn } from "formik";
 import dayjs from "dayjs";
-import { Activity, Invoice } from "@prisma/client";
+import { Activity, Invoice, InvoiceStatus } from "@prisma/client";
 import { FormValues } from "@organisms/forms/create-invoice-form";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import axios from "axios";
@@ -183,6 +183,7 @@ export const valuesToInvoice = (values: FormValues) => ({
 		clientId: values.clientId,
 		billTo: values.billTo,
 		date: values.date ? dayjs(values.date, "DD/MM/YYYY").toDate() : new Date(),
+		status: InvoiceStatus.CREATED,
 	},
 	activities: values.activities.map((activity) => ({
 		id: activity.id,

@@ -42,6 +42,7 @@ export const InvoiceContainer = styled.div`
 
 export const Invoice = styled.div`
 	flex: 0 0 auto;
+	width: 100%;
 	max-width: 60em;
 	display: flex;
 	flex-wrap: wrap;
@@ -77,7 +78,6 @@ export const Invoice = styled.div`
 export const InvoiceDetails = styled.div`
 	flex: 1 0 auto;
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
 
 	padding: 1.4em 1.2em;
@@ -96,23 +96,26 @@ export const InvoiceDetails = styled.div`
 
 	h2 {
 		margin: 0;
-		flex: 0 0 4em;
+		flex: 0 1 5em;
 	}
 
 	.date {
-		flex: 0 0 3em;
+		flex: 0 0 4.5em;
 		text-align: left;
+		overflow: hidden;
 	}
 
 	.name {
 		flex: 1 0 auto;
+		overflow: hidden;
 	}
 
 	.status {
-		flex: 0 0 6em;
+		flex: 0 0 5em;
+		overflow: hidden;
 
-		&.unsent svg {
-			color: #ff8585;
+		&.created svg {
+			color: #88c656;
 		}
 
 		&.sent svg {
@@ -120,14 +123,29 @@ export const InvoiceDetails = styled.div`
 		}
 
 		&.complete svg {
-			color: #88c656;
+			color: ${({ theme }) => theme.colors.fg}88;
+		}
+
+		&:focus-within {
+			& > div {
+				transform: scaleY(1);
+			}
+		}
+
+		& > div {
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+			position: absolute;
+			transform: scaleY(0);
 		}
 	}
 
 	.total {
-		flex: 0 0 4em;
+		flex: 0 0 5em;
 		text-align: right;
 		font-weight: 500;
+		overflow: hidden;
 	}
 `;
 

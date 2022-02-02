@@ -27,7 +27,7 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
 		const supportItem = await prisma.supportItem.create({
 			data: {
 				ownerId: user?.id,
-				...request.body.map((index: unknown) => index || undefined),
+				...request.body,
 			},
 		});
 

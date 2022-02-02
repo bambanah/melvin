@@ -175,7 +175,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 							/>
 						</Label>
 
-						<Label htmlFor="billTo" required>
+						<Label htmlFor="billTo">
 							<span>Bill To</span>
 							{billToSource ? (
 								<Subheading>

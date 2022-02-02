@@ -64,13 +64,13 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 							touched={getIn(touched, "name")}
 						/>
 					</Label>
-					<Label htmlFor="number" required>
+					<Label htmlFor="number">
 						<span>ID Number</span>
 						<Input
 							type="text"
 							onChange={handleChange}
 							onBlur={handleBlur}
-							value={values.number}
+							value={values.number ?? ""}
 							name="number"
 							id="number"
 							error={errorIn(errors, touched, "number")}

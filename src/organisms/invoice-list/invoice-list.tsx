@@ -75,14 +75,19 @@ export default function InvoiceList() {
 							</span>
 							<h2>{invoice.invoiceNo}</h2>
 							<span className="name">{invoice.client?.name}</span>
-							<span
-								className={`status ${
-									["unsent", "sent", "complete"][index % 3]
-								}`}
+							{/* <div
+								className={`status ${invoice.status.toLowerCase()}`}
+								onClick={(e) => e.stopPropagation()}
 							>
 								<FontAwesomeIcon icon={["fas", "circle"]} />{" "}
-								{["Unsent", "Sent", "Complete"][index % 3]}
-							</span>
+								{invoice.status.slice(0, 1) +
+									invoice.status.slice(1).toLowerCase()}
+								<div>
+									<span>Created</span>
+									<span>Sent</span>
+									<span>Paid</span>
+								</div>
+							</div> */}
 							<span className="total">
 								$
 								{getTotalCost(invoice.activities).toLocaleString(undefined, {
