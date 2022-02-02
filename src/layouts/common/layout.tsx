@@ -11,27 +11,21 @@ interface Props {
 
 const Container = styled.div`
 	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
-	width: 100%;
-	min-height: 100vh;
-	margin: auto;
+	flex-direction: row;
+	width: 100vw;
+	height: 100vh;
+
+	overflow: hidden;
 `;
 
 const Content = styled.div`
-	box-sizing: border-box;
+	flex: 1 1 auto;
 	display: flex;
-	width: 95vw;
-	max-width: 1200px;
-	margin-top: 5rem;
-	height: 100%;
-	flex: 1 0 auto;
 	flex-direction: column;
 
-	@media screen and (max-width: 900px) {
-		width: inherit;
-	}
+	overflow-y: auto;
+
+	padding: 3rem;
 `;
 
 const Layout: React.FC<Props> = ({ children }) => {

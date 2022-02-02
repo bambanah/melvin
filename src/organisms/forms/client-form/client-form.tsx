@@ -4,7 +4,7 @@ import Form from "@atoms/form";
 import Input from "@atoms/input";
 import Label from "@atoms/label";
 import Subheading from "@atoms/subheading";
-import Title from "@atoms/title";
+import Heading from "@atoms/heading";
 import ButtonGroup from "@molecules/button-group";
 import { Client } from "@prisma/client";
 import ClientValidationSchema from "@schema/client-validation-schema";
@@ -42,11 +42,11 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 					</title>
 				</Head>
 				<Form onSubmit={handleSubmit} flexDirection="column">
-					<Title>
+					<Heading>
 						{initialValues
 							? `Updating ${initialValues.name}`
 							: "Add New Client"}
-					</Title>
+					</Heading>
 					<Label htmlFor="name" required>
 						<span>Name</span>
 						<Input
@@ -64,13 +64,13 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 							touched={getIn(touched, "name")}
 						/>
 					</Label>
-					<Label htmlFor="number" required>
+					<Label htmlFor="number">
 						<span>ID Number</span>
 						<Input
 							type="text"
 							onChange={handleChange}
 							onBlur={handleBlur}
-							value={values.number}
+							value={values.number ?? ""}
 							name="number"
 							id="number"
 							error={errorIn(errors, touched, "number")}

@@ -4,7 +4,7 @@ import Head from "next/head";
 import React from "react";
 import useSWR from "swr";
 import Layout from "@layouts/common/layout";
-import Title from "@atoms/title";
+import Heading from "@atoms/heading";
 
 const fetchTemplates = async () => {
 	const response = await fetch("/api/templates");
@@ -32,7 +32,7 @@ const Templates = () => {
 			<Head>
 				<title>Templates</title>
 			</Head>
-			<Title>Templates</Title>
+			<Heading>Templates</Heading>
 			{templates.length === 0 ? (
 				<div>No templates to load</div>
 			) : (

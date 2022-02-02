@@ -24,13 +24,15 @@ const generatePDF = async (invoice: Invoice) => {
 	const date = formatDate(invoice.date);
 
 	// Write details at top of page
-	const invoiceDetails = [
+	const invoiceDetails: string[] = [
 		`Invoice Date: ${date}`,
 		`Participant Name: ${invoice.client?.name}`,
-		`Participant Number: ${invoice.client?.number}`,
-		`Bill To: ${invoice.billTo}`,
 		`Invoice Number: ${invoice.invoiceNo}`,
 	];
+	if (invoice.client?.number)
+		invoiceDetails.push(`Participant Number: ${invoice.client?.number}`);
+	if (invoice.billTo) invoiceDetails.push(`Bill To: ${invoice.billTo}`);
+
 	for (const [index, detail] of invoiceDetails.entries()) {
 		document_.text(detail, margin, margin + index * 5);
 	}
@@ -178,6 +180,9 @@ const generatePDF = async (invoice: Invoice) => {
 		]
 	);
 
+	const startY =
+		35 + (invoice.billTo ? 5 : 0) + (invoice.client?.number ? 5 : 0);
+
 	autoTable(document_, {
 		head: [
 			[
@@ -189,7 +194,7 @@ const generatePDF = async (invoice: Invoice) => {
 			],
 		],
 		body: values,
-		startY: 45,
+		startY: startY,
 		margin,
 		theme: "striped",
 		headStyles: {

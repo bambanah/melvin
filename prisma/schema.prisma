@@ -61,7 +61,7 @@ model Client {
   id            String   @id @default(cuid())
   created       DateTime @default(now())
   name          String
-  number        String
+  number        String?
   billTo        String?
   invoicePrefix String?
 
@@ -72,11 +72,12 @@ model Client {
 }
 
 model Invoice {
-  id        String   @id @default(cuid())
-  created   DateTime @default(now())
+  id        String        @id @default(cuid())
+  created   DateTime      @default(now())
   invoiceNo String
   billTo    String
   date      DateTime
+  status    InvoiceStatus @default(CREATED)
 
   client   Client @relation(fields: [clientId], references: [id])
   clientId String
@@ -86,6 +87,12 @@ model Invoice {
 
   owner   User   @relation(fields: [ownerId], references: [id])
   ownerId String
+}
+
+enum InvoiceStatus {
+  CREATED
+  SENT
+  PAID
 }
 
 model Activity {

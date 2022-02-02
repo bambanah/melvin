@@ -9,8 +9,8 @@ interface ButtonProps {
 const Button = styled.button<ButtonProps>`
 	display: inline-block;
 
-	font-family: "Inter";
 	font-size: 1rem;
+	font-weight: bold;
 
 	color: ${({ theme }) => theme.colors.fg};
 	background-color: ${({ theme }) => theme.colors.bg};

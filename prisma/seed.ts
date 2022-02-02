@@ -60,13 +60,13 @@ async function main() {
 				date: new Date(),
 				clientId: client.id,
 				ownerId: user.id,
+				status: "CREATED",
 				activities: {
 					create: [
 						{
 							date: new Date(),
 							startTime: new Date(),
 							endTime: new Date(),
-							itemDuration: 2,
 							supportItemId: supportItem.id,
 						},
 					],

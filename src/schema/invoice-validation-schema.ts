@@ -2,7 +2,7 @@ import * as yup from "yup";
 
 const InvoiceValidationSchema = yup.object().shape({
 	clientId: yup.string().required("Required"),
-	billTo: yup.string().required("Required"),
+	billTo: yup.string(),
 	invoiceNo: yup.string().required("Required"),
 	activities: yup.array().of(
 		yup.object().shape({
