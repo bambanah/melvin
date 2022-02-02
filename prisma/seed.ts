@@ -1,4 +1,4 @@
-import { InvoiceStatus, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
@@ -60,14 +60,13 @@ async function main() {
 				date: new Date(),
 				clientId: client.id,
 				ownerId: user.id,
-				status: InvoiceStatus.CREATED,
+				status: "CREATED",
 				activities: {
 					create: [
 						{
 							date: new Date(),
 							startTime: new Date(),
 							endTime: new Date(),
-							itemDuration: 2,
 							supportItemId: supportItem.id,
 						},
 					],
