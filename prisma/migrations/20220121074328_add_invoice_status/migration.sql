@@ -8,4 +8,4 @@
 CREATE TYPE "InvoiceStatus" AS ENUM ('CREATED', 'SENT', 'PAID');
 
 -- AlterTable
-ALTER TABLE "Invoice" ADD COLUMN     "status" "InvoiceStatus" NOT NULL;
+ALTER TABLE "Invoice" ADD COLUMN     "status" "InvoiceStatus" NOT NULL DEFAULT E'CREATED';

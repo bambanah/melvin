@@ -77,7 +77,7 @@ model Invoice {
   invoiceNo String
   billTo    String
   date      DateTime
-  status    InvoiceStatus
+  status    InvoiceStatus @default(CREATED)
 
   client   Client @relation(fields: [clientId], references: [id])
   clientId String
