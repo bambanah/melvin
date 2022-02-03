@@ -4,6 +4,7 @@ import { getSession } from "next-auth/react";
 
 export default async (request: NextApiRequest, response: NextApiResponse) => {
 	const session = await getSession({ req: request });
+
 	if (!session || !session.user?.email)
 		return response
 			.status(401)
@@ -28,16 +29,7 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
 	}
 
 	if (request.method === "POST") {
-		const user = await prisma.user.findUnique({
-			where: {
-				email: session.user?.email,
-			},
-		});
-		if (!user) {
-			return response.status(401).send("Can't find signed in user.");
-		}
-
-		request.body.ownerId ??= user?.id;
+		request.body.ownerId ??= session.user.id;
 
 		const client = await prisma.client.create({ data: request.body });
 
