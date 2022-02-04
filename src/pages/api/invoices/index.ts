@@ -3,8 +3,18 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 
 export default async (request: NextApiRequest, response: NextApiResponse) => {
+	const session = await getSession({ req: request });
+
+	if (!session || !session.user?.email)
+		return response
+			.status(401)
+			.send("Must be signed in to update this resource.");
+
 	if (request.method === "GET") {
 		const invoices = await prisma.invoice.findMany({
+			where: {
+				ownerId: session.user.id,
+			},
 			include: {
 				client: true,
 				activities: {
@@ -27,18 +37,10 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
 	}
 
 	if (request.method === "POST") {
-		const session = await getSession({ req: request });
-
-		const owner = await prisma.user.findUnique({
-			where: {
-				id: session?.user.id,
-			},
-		});
-
 		const invoice = await prisma.invoice.create({
 			data: {
 				...request.body.invoice,
-				ownerId: owner?.id,
+				ownerId: session.user.id,
 				activities: {
 					createMany: {
 						data: request.body.activities,
