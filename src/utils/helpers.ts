@@ -1,33 +1,29 @@
 import { FormikErrors, FormikTouched, getIn } from "formik";
-import dayjs from "dayjs";
 import { Activity, Invoice, InvoiceStatus } from "@prisma/client";
 import { FormValues } from "@organisms/forms/create-invoice-form";
+
+import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import axios from "axios";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 dayjs.extend(customParseFormat);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
-export const formatDate = (date: Date) => {
-	const YYYY = date.getFullYear();
-	const MM = `0${date.getMonth() + 1}`.slice(-2);
-	const DD = `0${date.getDate()}`.slice(-2);
-
-	return `${DD}/${MM}/${YYYY}`;
-};
-
-export const getDuration = (startTime: string, endTime: string): number => {
-	const startDate = dayjs(`1970-01-01T${startTime}`, "YYYY-MM-DDTHH:mm");
-	const endDate = dayjs(`1970-01-01T${endTime}`, "YYYY-MM-DDTHH:mm");
+export const getDuration = (startTime: Date, endTime: Date): number => {
+	const startDate = dayjs(startTime);
+	const endDate = dayjs(endTime);
 
 	const diffInMinutes = Math.abs(startDate.diff(endDate, "minutes"));
 	const diffInHours = diffInMinutes / 60;
 
-	return Math.round(diffInHours * 1000) / 1000;
+	return diffInHours;
 };
 
 export const getPrettyDuration = (duration: number) => {
 	const hourItem = dayjs()
 		.set("hours", duration)
-		.set("minutes", (duration % 1) * 60);
+		.set("minutes", round((duration % 1) * 60, 0));
 
 	let durationString = "";
 
@@ -68,24 +64,16 @@ export const getHighestInvoiceNo = (
 	return getNumber(highest) ? highest : undefined;
 };
 
-export const getNextInvoiceNo = (
-	previousInvoiceNumbers?: string[],
-	clientInvoicePrefix?: string | null
-): string => {
-	if (!previousInvoiceNumbers?.length && !clientInvoicePrefix) return "";
+export const getNextInvoiceNo = (previousInvoiceNumbers: string[]): string => {
+	if (previousInvoiceNumbers.length === 0) return "";
 
-	const latestInvoiceNo = previousInvoiceNumbers?.length
-		? getHighestInvoiceNo(previousInvoiceNumbers)
-		: undefined;
+	const latestInvoiceNo = getHighestInvoiceNo(previousInvoiceNumbers);
 
-	const invoicePrefix =
-		clientInvoicePrefix ?? latestInvoiceNo?.replace(/\d+$/, "") ?? "";
+	const invoicePrefix = latestInvoiceNo?.replace(/\d+$/, "") || "";
 
 	const matches = latestInvoiceNo?.match(/\d+$/);
 
-	return `${invoicePrefix.replace(/-+$/, "")}${
-		matches ? Number.parseInt(matches[0]) + 1 : 1
-	}`;
+	return `${invoicePrefix}${matches ? Number.parseInt(matches[0]) + 1 : 1}`;
 };
 
 export const getRate = (activity: {
@@ -107,7 +95,7 @@ export const getRate = (activity: {
 	let itemCode = "";
 
 	if (
-		dayjs(activity.date).day() === 6 &&
+		dayjs.utc(activity.date).day() === 6 &&
 		activity.supportItem.saturdayRate &&
 		activity.supportItem.saturdayCode?.length
 	) {
@@ -118,7 +106,7 @@ export const getRate = (activity: {
 				: activity.supportItem.saturdayRate;
 		itemCode = activity.supportItem.saturdayCode;
 	} else if (
-		dayjs(activity.date).day() === 0 &&
+		dayjs.utc(activity.date).day() === 0 &&
 		activity.supportItem.sundayRate &&
 		activity.supportItem.sundayRate &&
 		activity.supportItem.sundayCode?.length
@@ -133,7 +121,7 @@ export const getRate = (activity: {
 		activity.endTime &&
 		activity.supportItem.weeknightCode?.length &&
 		activity.supportItem.weeknightRate &&
-		dayjs(activity.endTime).isAfter(dayjs("1970-01-01T19:59"))
+		dayjs.utc(activity.endTime).isAfter(dayjs.utc("1970-01-01T19:59"))
 	) {
 		// Day is a weekday and it's after 8pm
 		rate =
@@ -182,24 +170,39 @@ export const valuesToInvoice = (values: FormValues) => ({
 		invoiceNo: values.invoiceNo,
 		clientId: values.clientId,
 		billTo: values.billTo,
-		date: values.date ? dayjs(values.date, "DD/MM/YYYY").toDate() : new Date(),
+		date: values.date
+			? dayjs.utc(values.date, "DD/MM/YYYY").toDate()
+			: new Date(),
 		status: InvoiceStatus.CREATED,
 	},
 	activities: values.activities.map((activity) => ({
 		id: activity.id,
-		date: dayjs(activity.date, "DD/MM/YYYY").toDate(),
+		date: dayjs.utc(activity.date, "DD/MM/YYYY").toDate(),
 		itemDistance: Number(activity.itemDistance) || undefined,
 		transitDistance: Number(activity.transitDistance) || undefined,
 		transitDuration: Number(activity.transitDuration) || undefined,
-		startTime: new Date(`1970-01-01T${activity.startTime}`),
-		endTime: new Date(`1970-01-01T${activity.endTime}`),
+		startTime: dayjs.utc(`1970-01-01T${activity.startTime}`).toDate(),
+		endTime: dayjs.utc(`1970-01-01T${activity.endTime}`).toDate(),
 		supportItemId: activity.supportItemId,
 	})),
 });
 
-export const round = (numberToRound: number, decimalPlaces: number) =>
-	Math.round(numberToRound * Math.pow(10, decimalPlaces)) /
-	Math.pow(10, decimalPlaces);
+export function round(value: number, exp: number) {
+	if (typeof exp === "undefined" || +exp === 0) return Math.round(value);
+
+	if (Number.isNaN(value) || !(typeof exp === "number" && exp % 1 === 0))
+		return Number.NaN;
+
+	// Shift
+	let valueArray = value.toString().split("e");
+	value = Math.round(
+		+`${valueArray[0]}e${valueArray[1] ? +valueArray[1] + exp : exp}`
+	);
+
+	// Shift back
+	valueArray = value.toString().split("e");
+	return +`${valueArray[0]}e${valueArray[1] ? +valueArray[1] - exp : -exp}`;
+}
 
 export const getTotalCost = (
 	activities: {
@@ -225,11 +228,7 @@ export const getTotalCost = (
 			const [, rate] = getRate(activity);
 
 			let subTotal = 0;
-
-			const duration = getDuration(
-				dayjs(activity.startTime).format("HH:mm"),
-				dayjs(activity.endTime).format("HH:mm")
-			);
+			const duration = getDuration(activity.startTime, activity.endTime);
 
 			subTotal += round(duration * rate, 2);
 

@@ -35,7 +35,6 @@ const ClientPage = () => {
 					<div>
 						<p>Client Number: {client.number}</p>
 						<p>Bill To: {client.billTo ?? "Not Set"}</p>
-						<p>Invoice Prefix: {client.invoicePrefix ?? "Not Set"}</p>
 					</div>
 				</Styles.Content>
 			)}

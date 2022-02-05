@@ -1,4 +1,7 @@
 import { PrismaClient } from "@prisma/client";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 const prisma = new PrismaClient();
 
 async function main() {
@@ -19,7 +22,6 @@ async function main() {
 				number: "123456789",
 				ownerId: user.id,
 				billTo: "HELP Enterprises",
-				invoicePrefix: "JS",
 			},
 			update: {},
 		});
@@ -37,7 +39,7 @@ async function main() {
 				description: "Access Community, Social And Rec Activities - Standard",
 				rateType: "HOUR",
 				weekdayCode: "04_104_0125_6_1",
-				weekdayRate: 54.3,
+				weekdayRate: 55.47,
 				weeknightCode: "04_103_0125_6_1",
 				weeknightRate: 61.05,
 				saturdayCode: "04_105_0125_6_1",
@@ -57,16 +59,16 @@ async function main() {
 			data: {
 				invoiceNo: "Test1",
 				billTo: "Test Enterprise",
-				date: new Date(),
+				date: dayjs.utc().toDate(),
 				clientId: client.id,
 				ownerId: user.id,
 				status: "CREATED",
 				activities: {
 					create: [
 						{
-							date: new Date(),
-							startTime: new Date(),
-							endTime: new Date(),
+							date: dayjs.utc().toDate(),
+							startTime: dayjs.utc("1970-01-01T09:00").toDate(),
+							endTime: dayjs.utc("1970-01-01T09:30").toDate(),
 							supportItemId: supportItem.id,
 						},
 					],
