@@ -99,10 +99,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 
 				values.invoiceNo =
 					highestInvoiceNo !== initialValues?.invoiceNo
-						? getNextInvoiceNo(
-								client.invoices?.map((index) => index.invoiceNo),
-								client?.invoicePrefix
-						  )
+						? getNextInvoiceNo(client.invoices?.map((index) => index.invoiceNo))
 						: highestInvoiceNo;
 
 				if (client.billTo) {

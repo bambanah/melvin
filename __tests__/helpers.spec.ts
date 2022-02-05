@@ -8,30 +8,103 @@ import {
 	round,
 } from "@utils/helpers";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+
+const getActivity = (
+	day: "weekday" | "saturday" | "sunday",
+	startTime: string,
+	endTime: string,
+	transitDuration: number,
+	transitDistance: number
+) => {
+	let date = new Date();
+	if (day === "weekday") date = new Date("2022-01-14");
+	if (day === "saturday") date = new Date("2022-01-15");
+	if (day === "sunday") date = new Date("2022-01-16");
+
+	return {
+		date: date,
+		startTime: dayjs.utc(`1970-01-01T${startTime}`).toDate(),
+		endTime: dayjs.utc(`1970-01-01T${endTime}`).toDate(),
+		transitDuration: transitDuration,
+		transitDistance: transitDistance,
+		supportItem: {
+			weekdayCode: "weekday",
+			weekdayRate: 55.47,
+			weeknightCode: "weeknight",
+			weeknightRate: 61.05,
+			saturdayCode: "saturday",
+			saturdayRate: 77.81,
+			sundayCode: "sunday",
+			sundayRate: 100.16,
+		},
+	};
+};
+
+const dateFromTime = (time: string) => dayjs.utc(`1970-01-01T${time}`).toDate();
 
 describe("Helpers", () => {
 	it("Should get duration", () => {
-		const duration = getDuration("12:00", "13:00");
-		expect(duration).toEqual(1);
-		expect(getDuration("12:00", "13:01")).toEqual(1.017);
-		expect(getDuration("10:00", "18:05")).toEqual(8.083);
+		expect(getDuration(dateFromTime("12:00"), dateFromTime("13:00"))).toEqual(
+			1
+		);
+		expect(getDuration(dateFromTime("12:00"), dateFromTime("13:01"))).toEqual(
+			1.016_666_666_666_666_6
+		);
+		expect(getDuration(dateFromTime("10:00"), dateFromTime("18:05"))).toEqual(
+			8.083_333_333_333_334
+		);
+		expect(getDuration(dateFromTime("09:00"), dateFromTime("09:14"))).toEqual(
+			0.233_333_333_333_333_34
+		);
+		expect(getDuration(dateFromTime("09:30"), dateFromTime("15:10"))).toEqual(
+			5.666_666_666_666_667
+		);
 	});
 
 	it("Should get pretty duration", () => {
-		expect(getPrettyDuration(getDuration("12:00", "13:00"))).toEqual("1 hour");
-		expect(getPrettyDuration(getDuration("12:00", "13:01"))).toEqual(
-			"1 hour, 1 min"
-		);
-		expect(getPrettyDuration(getDuration("13:00", "15:00"))).toEqual("2 hours");
-		expect(getPrettyDuration(getDuration("13:00", "15:30"))).toEqual(
-			"2 hours, 30 mins"
-		);
-		expect(getPrettyDuration(getDuration("01:20", "15:00"))).toEqual(
-			"13 hours, 40 mins"
-		);
-		expect(getPrettyDuration(getDuration("09:12", "13:34"))).toEqual(
-			"4 hours, 22 mins"
-		);
+		expect(
+			getPrettyDuration(
+				getDuration(dateFromTime("12:00"), dateFromTime("13:00"))
+			)
+		).toEqual("1 hour");
+
+		expect(
+			getPrettyDuration(
+				getDuration(dateFromTime("12:00"), dateFromTime("13:01"))
+			)
+		).toEqual("1 hour, 1 min");
+
+		expect(
+			getPrettyDuration(
+				getDuration(dateFromTime("13:00"), dateFromTime("15:00"))
+			)
+		).toEqual("2 hours");
+
+		expect(
+			getPrettyDuration(
+				getDuration(dateFromTime("13:00"), dateFromTime("15:30"))
+			)
+		).toEqual("2 hours, 30 mins");
+
+		expect(
+			getPrettyDuration(
+				getDuration(dateFromTime("01:20"), dateFromTime("15:00"))
+			)
+		).toEqual("13 hours, 40 mins");
+
+		expect(
+			getPrettyDuration(
+				getDuration(dateFromTime("09:12"), dateFromTime("13:34"))
+			)
+		).toEqual("4 hours, 22 mins");
+
+		expect(
+			getPrettyDuration(
+				getDuration(dateFromTime("09:00"), dateFromTime("09:14"))
+			)
+		).toEqual("14 mins");
 	});
 
 	it("Should get latest invoice number", () => {
@@ -45,18 +118,15 @@ describe("Helpers", () => {
 	});
 
 	it("Should get next invoice number", () => {
-		expect(getNextInvoiceNo(["Gawne1", "Gawne2", "Gawne3"], "Client")).toEqual(
-			"Client4"
+		expect(getNextInvoiceNo(["Gawne1", "Gawne2", "Gawne3"])).toEqual("Gawne4");
+		expect(getNextInvoiceNo(["Client-1", "Client-2", "Client-3"])).toEqual(
+			"Client-4"
 		);
-		expect(
-			getNextInvoiceNo(["Client-1", "Client-2", "Client-3"], "Client")
-		).toEqual("Client4");
-		expect(getNextInvoiceNo(["Gawne1", "Gawne2", "Gawne3"], "Gawne")).toEqual(
-			"Gawne4"
+		expect(getNextInvoiceNo(["Gawne1", "Gawne2", "Gawne-3"])).toEqual(
+			"Gawne-4"
 		);
-		expect(getNextInvoiceNo([], "Gawne")).toEqual("Gawne1");
-		expect(getNextInvoiceNo(["Gawne1"], "Gawne--")).toEqual("Gawne2");
-		expect(getNextInvoiceNo([], "")).toEqual("");
+		expect(getNextInvoiceNo([])).toEqual("");
+		expect(getNextInvoiceNo(["Gawne1"])).toEqual("Gawne2");
 	});
 
 	it("Should round correctly", () => {
@@ -66,13 +136,14 @@ describe("Helpers", () => {
 		expect(round(1.555, 2)).toEqual(1.56);
 		expect(round(1.55, 1)).toEqual(1.6);
 		expect(round(1.5, 0)).toEqual(2);
+		expect(round(305.085, 2)).toEqual(305.09);
 	});
 
 	it("Should return correct rates", () => {
 		const activity = {
 			date: new Date("2022-01-14"),
-			startTime: dayjs("1970-01-01T15:00").toDate(),
-			endTime: dayjs("1970-01-01T17:00").toDate(),
+			startTime: dayjs.utc("1970-01-01T15:00").toDate(),
+			endTime: dayjs.utc("1970-01-01T17:00").toDate(),
 			transitDuration: 7,
 			transitDistance: 15,
 			supportItem: {
@@ -91,76 +162,88 @@ describe("Helpers", () => {
 		expect(getRate(activity)).toEqual(["weekday", 1]);
 
 		// After 8pm - weeknight
-		activity.endTime = dayjs("1970-01-01T20:10").toDate();
+		activity.endTime = dayjs.utc("1970-01-01T20:10").toDate();
 		expect(getRate(activity)).toEqual(["weeknight", 2]);
 
 		// At 8pm - weeknight
-		activity.endTime = dayjs("1970-01-01T20:00").toDate();
+		activity.endTime = dayjs.utc("1970-01-01T20:00").toDate();
 		expect(getRate(activity)).toEqual(["weeknight", 2]);
 
 		// Saturday - saturday
 		activity.date = new Date("2022-01-15");
-		activity.endTime = dayjs("1970-01-01T15:10").toDate();
+		activity.endTime = dayjs.utc("1970-01-01T15:10").toDate();
 		expect(getRate(activity)).toEqual(["saturday", 3]);
 
 		// Saturday night - saturday
 		activity.date = new Date("2022-01-15");
-		activity.endTime = dayjs("1970-01-01T20:10").toDate();
+		activity.endTime = dayjs.utc("1970-01-01T20:10").toDate();
 		expect(getRate(activity)).toEqual(["saturday", 3]);
 
 		// Sunday - sunday
 		activity.date = new Date("2022-01-16");
-		activity.endTime = dayjs("1970-01-01T15:10").toDate();
+		activity.endTime = dayjs.utc("1970-01-01T15:10").toDate();
 		expect(getRate(activity)).toEqual(["sunday", 4]);
 
 		// Sunday night - sunday
 		activity.date = new Date("2022-01-16");
-		activity.endTime = dayjs("1970-01-01T20:10").toDate();
+		activity.endTime = dayjs.utc("1970-01-01T20:10").toDate();
 		expect(getRate(activity)).toEqual(["sunday", 4]);
 	});
 
 	it("Should return correct total", () => {
-		// TODO: Expand this test immensely
-		const activities = [
-			{
-				date: new Date("2022-01-06"),
-				startTime: dayjs("1970-01-01T15:03").toDate(),
-				endTime: dayjs("1970-01-01T19:52").toDate(),
-				transitDistance: 7,
-				transitDuration: 15,
-				supportItem: {
-					weekdayCode: "weekday",
-					weekdayRate: 54.3,
-					weeknightCode: "weeknight",
-					weeknightRate: 20,
-					saturdayCode: "saturday",
-					saturdayRate: 30,
-					sundayCode: "sunday",
-					sundayRate: 40,
-				},
-			},
-		];
+		expect(
+			getTotalCost([getActivity("weekday", "16:00", "17:00", 0, 0)])
+		).toEqual(55.47);
 
-		expect(getTotalCost(activities)).toEqual(281.09);
+		expect(
+			getTotalCost([getActivity("weekday", "15:00", "17:00", 7, 15)])
+		).toEqual(130.16);
 
-		activities.push({
-			date: new Date("2022-01-13"),
-			startTime: dayjs("1970-01-01T16:00").toDate(),
-			endTime: dayjs("1970-01-01T16:06").toDate(),
-			transitDistance: 7,
-			transitDuration: 45,
-			supportItem: {
-				weekdayCode: "weekday",
-				weekdayRate: 54.3,
-				weeknightCode: "weeknight",
-				weeknightRate: 20,
-				saturdayCode: "saturday",
-				saturdayRate: 30,
-				sundayCode: "sunday",
-				sundayRate: 40,
-			},
-		});
+		expect(
+			getTotalCost([
+				getActivity("weekday", "15:00", "17:00", 7, 15),
+				getActivity("weekday", "15:00", "21:00", 7, 15),
+			])
+		).toEqual(516.33);
 
-		expect(getTotalCost(activities)).toEqual(333.19);
+		expect(
+			getTotalCost([getActivity("saturday", "15:00", "17:00", 7, 15)])
+		).toEqual(177.45);
+
+		expect(
+			getTotalCost([getActivity("saturday", "19:00", "21:00", 7, 15)])
+		).toEqual(177.45);
+
+		expect(
+			getTotalCost([getActivity("weekday", "09:30", "15:00", 0, 0)])
+		).toEqual(305.09);
+
+		expect(
+			getTotalCost([getActivity("weekday", "09:30", "15:10", 0, 0)])
+		).toEqual(314.33);
+
+		expect(
+			getTotalCost([getActivity("weekday", "16:10", "20:10", 0, 0)])
+		).toEqual(244.2);
+
+		expect(
+			getTotalCost([
+				getActivity("weekday", "09:30", "15:00", 15, 7),
+				getActivity("weekday", "09:30", "15:10", 15, 7),
+				getActivity("weekday", "09:30", "15:23", 15, 7),
+			])
+		).toEqual(1005.23);
+
+		expect(
+			getTotalCost([
+				getActivity("weekday", "09:30", "15:00", 15, 7),
+				getActivity("weekday", "09:30", "15:00", 15, 7),
+				getActivity("weekday", "09:30", "15:00", 15, 7),
+				getActivity("weekday", "09:30", "15:00", 15, 7),
+				getActivity("weekday", "09:30", "15:10", 15, 7),
+				getActivity("weekday", "09:30", "15:10", 15, 7),
+				getActivity("weekday", "09:30", "15:25", 15, 7),
+			])
+		).toEqual(2315.96);
 	});
 });

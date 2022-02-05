@@ -1,15 +1,20 @@
+import { RateType } from "@prisma/client";
 import jspdf from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
+import { Invoice } from "types/invoice";
 import {
-	formatDate,
 	getDuration,
 	getPrettyDuration,
 	getRate,
 	getTotalCost,
+	round,
 } from "./helpers";
-import { RateType } from "@prisma/client";
+
 import dayjs from "dayjs";
-import { Invoice } from "types/invoice";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const generatePDF = async (invoice: Invoice) => {
 	const margin = 20;
@@ -21,13 +26,13 @@ const generatePDF = async (invoice: Invoice) => {
 
 	document_.setFontSize(10);
 
-	const date = formatDate(invoice.date);
+	const date = dayjs.utc(invoice.date).format("DD/MM/YY");
 
 	// Write details at top of page
 	const invoiceDetails: string[] = [
+		`Invoice Number: ${invoice.invoiceNo}`,
 		`Invoice Date: ${date}`,
 		`Participant Name: ${invoice.client?.name}`,
-		`Invoice Number: ${invoice.invoiceNo}`,
 	];
 	if (invoice.client?.number)
 		invoiceDetails.push(`Participant Number: ${invoice.client?.number}`);
@@ -48,19 +53,16 @@ const generatePDF = async (invoice: Invoice) => {
 			let countString = "";
 			let totalCost = 0;
 			if (activity?.supportItem?.rateType === RateType.HOUR) {
-				const duration = getDuration(
-					dayjs(activity.startTime).format("HH:mm"),
-					dayjs(activity.endTime).format("HH:mm")
-				);
-				totalCost = rate * duration;
+				const duration = getDuration(activity.startTime, activity.endTime);
+				totalCost = round(rate * duration, 2);
 
 				const prettyDuration = getPrettyDuration(duration);
 
-				countString = `${dayjs(activity.startTime).format("HH:mm")}-${dayjs(
-					activity.endTime
-				).format("HH:mm")} (${prettyDuration})`;
+				countString = `${dayjs.utc(activity.startTime).format("HH:mm")}-${dayjs
+					.utc(activity.endTime)
+					.format("HH:mm")} (${prettyDuration})`;
 			} else if (activity?.supportItem?.rateType === RateType.KM) {
-				totalCost = rate * (activity.itemDistance || 0);
+				totalCost = round(rate * (activity.itemDistance || 0), 2);
 
 				countString = `${activity.itemDistance?.toString()} kilometres`;
 			}
@@ -68,7 +70,7 @@ const generatePDF = async (invoice: Invoice) => {
 			// Push activity
 			const currentActivity = [
 				`${activity.supportItem.description}\n${itemCode}\n`,
-				`${formatDate(activity.date)}\n`,
+				`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 				`${countString}\n`,
 				`$${rate?.toFixed(2)}${`/${
 					activity.supportItem.rateType === RateType.HOUR ? "hr" : "km"
@@ -82,11 +84,11 @@ const generatePDF = async (invoice: Invoice) => {
 			if (activity.transitDuration) {
 				const providerTravel = [];
 
-				const travelTotal = (rate / 60) * activity.transitDuration;
+				const travelTotal = round((rate / 60) * activity.transitDuration, 2);
 
 				providerTravel.push(
 					`Provider Travel\n${itemCode}\n`,
-					`${formatDate(activity.date)}\n`,
+					`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 					`${activity.transitDuration} minutes\n`,
 					`$${rate.toFixed(2)}${`/${
 						activity.supportItem.rateType === RateType.HOUR ? "hr" : "km"
@@ -105,7 +107,7 @@ const generatePDF = async (invoice: Invoice) => {
 
 				providerTravel.push(
 					`Provider Travel - Non Labour Costs\n${itemCode}\n`,
-					`${formatDate(activity.date)}\n`,
+					`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 					`${activity.transitDistance} km\n`,
 					"$0.85/km\n",
 					`$${travelTotal.toFixed(2)}\n`
@@ -211,7 +213,7 @@ const generatePDF = async (invoice: Invoice) => {
 				fontStyle: "bold",
 			},
 			1: {
-				cellWidth: 24,
+				cellWidth: 20,
 			},
 			3: {
 				cellWidth: 20,

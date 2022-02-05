@@ -48,7 +48,7 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 							: "Add New Client"}
 					</Heading>
 					<Label htmlFor="name" required>
-						<span>Name</span>
+						<span>Participant Name</span>
 						<Input
 							type="text"
 							onChange={handleChange}
@@ -65,7 +65,7 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 						/>
 					</Label>
 					<Label htmlFor="number">
-						<span>ID Number</span>
+						<span>Participant Number</span>
 						<Input
 							type="text"
 							onChange={handleChange}
@@ -98,26 +98,6 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 							touched={getIn(touched, "billTo")}
 						/>
 					</Label>
-					<Label htmlFor="invoicePrefix">
-						<span>Invoice Prefix</span>
-						<Subheading>
-							Prefix to use when generating invoice numbers
-						</Subheading>
-						<Input
-							type="text"
-							onChange={handleChange}
-							onBlur={handleBlur}
-							value={values.invoicePrefix ?? ""}
-							name="invoicePrefix"
-							id="invoicePrefix"
-							error={errorIn(errors, touched, "invoicePrefix")}
-							placeholder="Smith"
-						/>
-						<ErrorMessage
-							error={getIn(errors, "invoicePrefix")}
-							touched={getIn(touched, "invoicePrefix")}
-						/>
-					</Label>
 
 					<ButtonGroup>
 						<Button type="submit" primary>
@@ -144,7 +124,6 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 				name: initialValues?.name ?? "",
 				number: initialValues?.number ?? "",
 				billTo: initialValues?.billTo ?? "",
-				invoicePrefix: initialValues?.invoicePrefix ?? "",
 			} as Partial<Client>),
 		handleSubmit: (values, { setSubmitting }) => {
 			if (initialValues) {

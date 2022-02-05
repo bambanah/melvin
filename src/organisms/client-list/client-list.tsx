@@ -33,7 +33,6 @@ const ClientList = () => {
 						<div>
 							<p>{client.number}</p>
 							<p>{client.billTo ?? "N/A"}</p>
-							<p>{client.invoicePrefix?.concat("-XXX") ?? "N/A"}</p>
 						</div>
 					</Card>
 				))}

@@ -32,15 +32,6 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 			},
 		});
 
-		const client = await prisma.client.findUnique({
-			where: {
-				id: invoice?.ownerId,
-			},
-			select: {
-				invoicePrefix: true,
-			},
-		});
-
 		if (invoice) {
 			const invoiceNumbers = await prisma.invoice.findMany({
 				where: {
@@ -54,8 +45,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 			const initialValues = invoiceToValues(invoice);
 
 			initialValues.invoiceNo = getNextInvoiceNo(
-				invoiceNumbers.map((i) => i.invoiceNo),
-				client?.invoicePrefix
+				invoiceNumbers.map((i) => i.invoiceNo)
 			);
 
 			initialValues.activities = initialValues.activities.map((activity) => {
