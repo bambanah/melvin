@@ -10,7 +10,7 @@ import * as Styles from "./styles";
 export interface EntityListItem {
 	id: string;
 	fields: {
-		value: string;
+		value: string | React.ReactNode;
 		type: "label" | "text";
 		icon?: IconName;
 		align?: "left" | "center" | "right";
@@ -36,8 +36,8 @@ export interface EntityListItem {
 
 interface EntityListProps {
 	title: string;
-	route: string;
 	entities: EntityListItem[];
+	route?: string;
 	shouldExpand?: boolean;
 }
 
@@ -105,7 +105,7 @@ const EntityList: FC<EntityListProps> = ({
 											}}
 											className={field.value === "N/A" ? "disabled" : ""}
 										>
-											{field.icon && (
+											{typeof field.value === "string" && field.icon && (
 												<FontAwesomeIcon
 													icon={["fas", field.icon]}
 													style={{ marginRight: "0.5em" }}

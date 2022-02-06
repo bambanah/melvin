@@ -1,7 +1,7 @@
-import Loading from "@atoms/loading";
 import EntityList, { EntityListItem } from "@molecules/entity-list";
 import { SupportItem } from "@prisma/client";
 import React from "react";
+import Skeleton from "react-loading-skeleton";
 import useSWR from "swr";
 
 const getSupportItems = async () => {
@@ -9,6 +9,29 @@ const getSupportItems = async () => {
 
 	return (await response.json()) as SupportItem[];
 };
+
+const generateEntity = (supportItem?: SupportItem): EntityListItem => ({
+	id: supportItem?.id || "",
+	fields: [
+		{
+			value: !supportItem ? <Skeleton /> : supportItem.description,
+			type: "label",
+			flex: "1 1 auto",
+		},
+		{
+			value: !supportItem ? <Skeleton /> : supportItem.weekdayCode,
+			icon: "id-card",
+			type: "text",
+			flex: "0 0 9.5em",
+		},
+		{
+			value: !supportItem ? <Skeleton /> : `${supportItem.weekdayRate}`,
+			icon: "dollar-sign",
+			type: "text",
+			flex: "0 0 5em",
+		},
+	],
+});
 
 function SupportItemList() {
 	const { data: supportItems, error } = useSWR(
@@ -20,29 +43,16 @@ function SupportItemList() {
 		console.error(error);
 		return <div>Error loading</div>;
 	}
-	if (!supportItems) return <Loading />;
 
-	const entities: EntityListItem[] = supportItems.map((supportItem) => ({
-		id: supportItem.id,
-		fields: [
-			{ value: supportItem.description, type: "label", flex: "1 1 auto" },
-			{
-				value: supportItem.weekdayCode,
-				icon: "id-card",
-				type: "text",
-				flex: "0 0 9.5em",
-			},
-			{
-				value: `${supportItem.weekdayRate}`,
-				icon: "dollar-sign",
-				type: "text",
-				flex: "0 0 5em",
-			},
-		],
-	}));
+	if (!supportItems)
+		return <EntityList title="Activities" entities={[generateEntity()]} />;
 
 	return (
-		<EntityList title="Activities" route="/activities" entities={entities} />
+		<EntityList
+			title="Activities"
+			route="/activities"
+			entities={supportItems.map((supportItem) => generateEntity(supportItem))}
+		/>
 	);
 }
 

@@ -98,7 +98,7 @@ export const EntityDetails = styled.div`
 	h1,
 	span {
 		white-space: nowrap;
-		text-overflow: ellipsis;
+		/* text-overflow: ellipsis; */
 		overflow: hidden;
 	}
 
