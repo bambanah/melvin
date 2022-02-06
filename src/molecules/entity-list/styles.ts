@@ -21,7 +21,7 @@ export const Header = styled.div`
 	max-width: 60em;
 `;
 
-export const PdfPreview = styled.div`
+export const ExpandedComponent = styled.div`
 	height: 0;
 	flex: 1 0 100%;
 
@@ -31,16 +31,16 @@ export const PdfPreview = styled.div`
 	transition: all 0.25s;
 `;
 
-export const InvoiceContainer = styled.div`
+export const Content = styled.div`
 	flex: 1 0 auto;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 1em;
+	gap: 2em;
 	padding-bottom: 5em;
 `;
 
-export const Invoice = styled.div`
+export const Entity = styled.div`
 	flex: 0 0 auto;
 	width: 100%;
 	max-width: 60em;
@@ -54,13 +54,13 @@ export const Invoice = styled.div`
 	overflow: hidden;
 	transition: box-shadow 0.2s;
 
+	box-shadow: var(--shadow-low);
+
 	&.expanded {
 		box-shadow: var(--shadow-medium);
 
-		> div:first-of-type {
-			svg {
-				transform: rotate(90deg);
-			}
+		.fa-chevron-right {
+			transform: rotate(90deg);
 		}
 
 		> div:nth-of-type(2) {
@@ -75,39 +75,39 @@ export const Invoice = styled.div`
 	}
 `;
 
-export const InvoiceDetails = styled.div`
-	flex: 1 0 auto;
+export const EntityDetails = styled.div`
+	flex: 1 1 auto;
 	display: flex;
 	align-items: center;
+	min-width: 0;
 
 	padding: 1.4em 1.2em;
 	cursor: pointer;
 
-	gap: 2rem;
+	gap: 1.5rem;
 	transition: background 0.1s;
 
 	&:hover {
 		color: ${({ theme }) => theme.colors.brand};
+
+		h1 {
+			color: ${({ theme }) => theme.colors.brand};
+		}
+	}
+
+	h1,
+	span {
+		white-space: nowrap;
+		/* text-overflow: ellipsis; */
+		overflow: hidden;
 	}
 
 	svg {
 		transition: transform 0.2s;
 	}
 
-	h2 {
-		margin: 0;
-		flex: 0 1 5em;
-	}
-
-	.date {
-		flex: 0 0 4.5em;
-		text-align: left;
-		overflow: hidden;
-	}
-
-	.name {
-		flex: 1 0 auto;
-		overflow: hidden;
+	.disabled {
+		color: ${({ theme }) => theme.colors.fg}77;
 	}
 
 	.status {
@@ -139,13 +139,6 @@ export const InvoiceDetails = styled.div`
 			position: absolute;
 			transform: scaleY(0);
 		}
-	}
-
-	.total {
-		flex: 0 0 5em;
-		text-align: right;
-		font-weight: 500;
-		overflow: hidden;
 	}
 `;
 

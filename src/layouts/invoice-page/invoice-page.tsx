@@ -1,6 +1,6 @@
 import Button from "@atoms/button";
 import Loading from "@atoms/loading";
-import CreateInvoiceForm from "@organisms/forms/create-invoice-form";
+import CreateInvoiceForm from "@organisms/forms/invoice-form";
 import { Activity, Invoice } from "@prisma/client";
 import { invoiceToValues } from "@utils/helpers";
 import { useRouter } from "next/router";

@@ -1,5 +1,5 @@
 import Layout from "@layouts/common/layout";
-import CreateActivityForm from "@organisms/forms/create-activity-form";
+import CreateActivityForm from "@organisms/forms/activity-form";
 import React from "react";
 
 const CreateActivity = () => {

@@ -1,5 +1,5 @@
 import Button from "@atoms/button";
-import CreateActivityForm from "@organisms/forms/create-activity-form";
+import CreateActivityForm from "@organisms/forms/activity-form";
 import { RateType, SupportItem } from "@prisma/client";
 import Head from "next/head";
 import Link from "next/link";

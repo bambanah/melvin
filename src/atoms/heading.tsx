@@ -7,7 +7,6 @@ const Heading = styled.h1`
 	color: ${({ theme }) => theme.colors.fg};
 	word-break: break-word;
 	margin: 0;
-	margin-bottom: 1.5rem;
 
 	&.xlarge {
 		font-size: 40px;
