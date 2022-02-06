@@ -315,7 +315,11 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 
 											<Button
 												type="button"
-												onClick={() => arrayHelpers.push(emptyActivity)}
+												onClick={() =>
+													arrayHelpers.push(
+														values.activities[values.activities.length - 1]
+													)
+												}
 												disabled={!values.clientId}
 											>
 												Add New Activity
