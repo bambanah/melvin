@@ -4,6 +4,7 @@ import {
 	faChevronRight,
 	faCircle,
 	faCopy,
+	faDollarSign,
 	faDownload,
 	faEdit,
 	faEllipsisV,
@@ -33,7 +34,8 @@ const importIcons = () => {
 		faCircle,
 		faCopy,
 		faIdCard,
-		faWallet
+		faWallet,
+		faDollarSign
 	);
 };
 

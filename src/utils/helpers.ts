@@ -1,6 +1,6 @@
 import { FormikErrors, FormikTouched, getIn } from "formik";
 import { Activity, Invoice, InvoiceStatus } from "@prisma/client";
-import { FormValues } from "@organisms/forms/create-invoice-form";
+import { FormValues } from "@organisms/forms/invoice-form";
 
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";

@@ -33,19 +33,12 @@ const ClientList = () => {
 				value: client.billTo || "N/A",
 				icon: "wallet",
 				type: "text",
-				flex: "0 0 9em",
+				flex: "0 0 9.5em",
 			},
 		],
 	}));
 
-	return (
-		<EntityList
-			title="Clients"
-			route="/clients"
-			maxWidth="40em"
-			entities={entities}
-		/>
-	);
+	return <EntityList title="Clients" route="/clients" entities={entities} />;
 };
 
 export default ClientList;

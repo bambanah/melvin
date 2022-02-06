@@ -1,7 +1,5 @@
 import Layout from "@layouts/common/layout";
-import CreateInvoiceForm, {
-	FormValues,
-} from "@organisms/forms/create-invoice-form";
+import CreateInvoiceForm, { FormValues } from "@organisms/forms/invoice-form";
 import { getNextInvoiceNo, invoiceToValues } from "@utils/helpers";
 import { GetServerSideProps } from "next";
 import React from "react";

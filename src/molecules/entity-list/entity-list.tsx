@@ -17,34 +17,34 @@ export interface EntityListItem {
 		fontWeight?: "bold" | "normal";
 		flex?: string;
 	}[];
-	ExpandedComponent?: ({ index }: { index: number }) => JSX.Element;
+	actions?: (
+		| {
+				value: string;
+				type: "link";
+				icon?: IconName;
+				href: string;
+		  }
+		| {
+				value: string;
+				type: "button";
+				icon?: IconName;
+				onClick: (id: string) => void;
+		  }
+	)[];
+	ExpandedComponent?: (index: number) => JSX.Element;
 }
 
 interface EntityListProps {
 	title: string;
 	route: string;
 	entities: EntityListItem[];
-	maxWidth?: string;
-	actions?:
-		| {
-				value: string;
-				type: "link";
-				href: string;
-		  }[]
-		| {
-				value: string;
-				type: "button";
-				onClick: (id: string) => void;
-		  }[];
 	shouldExpand?: boolean;
 }
 
 const EntityList: FC<EntityListProps> = ({
 	title,
 	route,
-	maxWidth,
 	entities,
-	actions,
 	shouldExpand,
 }) => {
 	const [expandedIndex, setExpandedIndex] = useState<number | undefined>();
@@ -71,11 +71,13 @@ const EntityList: FC<EntityListProps> = ({
 			</Styles.Header>
 			<Styles.Content>
 				{entities.map((entity, index) => (
-					<LinkWrapper href={`${route}/${entity.id}`} key={index}>
+					<LinkWrapper
+						href={shouldExpand ? undefined : `${route}/${entity.id}`}
+						key={index}
+					>
 						<Styles.Entity
 							key={index}
 							className={expandedIndex === index ? "expanded" : ""}
-							style={{ maxWidth: maxWidth ?? "60em" }}
 						>
 							<Styles.EntityDetails
 								onClick={() =>
@@ -113,7 +115,7 @@ const EntityList: FC<EntityListProps> = ({
 										</span>
 									) : (
 										<Heading
-											className="small"
+											className="xsmall"
 											style={{
 												textAlign: field.align ?? "left",
 												flex: field.flex ?? "1 0 auto",
@@ -126,20 +128,28 @@ const EntityList: FC<EntityListProps> = ({
 								})}
 							</Styles.EntityDetails>
 
-							{shouldExpand && actions && (
+							{shouldExpand && entity.actions && (
 								<>
 									<Styles.Actions
 										className={expandedIndex === index ? "expanded" : ""}
 									>
-										{actions.map((action) => (
+										{entity.actions.map((action) => (
 											<>
 												{action.type === "button" ? (
 													<a onClick={() => action.onClick(entity.id)}>
+														{action.icon && (
+															<FontAwesomeIcon icon={["fas", action.icon]} />
+														)}
 														{action.value}
 													</a>
 												) : (
-													<Link href={`${action.href}/${entity.id}`}>
-														<a>{action.value}</a>
+													<Link href={`${action.href}`}>
+														<a>
+															{action.icon && (
+																<FontAwesomeIcon icon={["fas", action.icon]} />
+															)}
+															{action.value}
+														</a>
 													</Link>
 												)}
 											</>
@@ -150,7 +160,7 @@ const EntityList: FC<EntityListProps> = ({
 									>
 										{expandedIndex !== undefined &&
 											entity.ExpandedComponent &&
-											entity.ExpandedComponent({ index: index })}
+											entity.ExpandedComponent(index)}
 									</Styles.ExpandedComponent>
 								</>
 							)}

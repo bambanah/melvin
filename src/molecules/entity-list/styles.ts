@@ -36,7 +36,7 @@ export const Content = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 1em;
+	gap: 2em;
 	padding-bottom: 5em;
 `;
 
@@ -59,10 +59,8 @@ export const Entity = styled.div`
 	&.expanded {
 		box-shadow: var(--shadow-medium);
 
-		> div:first-of-type {
-			svg {
-				transform: rotate(90deg);
-			}
+		.fa-chevron-right {
+			transform: rotate(90deg);
 		}
 
 		> div:nth-of-type(2) {
@@ -78,14 +76,15 @@ export const Entity = styled.div`
 `;
 
 export const EntityDetails = styled.div`
-	flex: 1 0 auto;
+	flex: 1 1 auto;
 	display: flex;
 	align-items: center;
+	min-width: 0;
 
 	padding: 1.4em 1.2em;
 	cursor: pointer;
 
-	gap: 2rem;
+	gap: 1.5rem;
 	transition: background 0.1s;
 
 	&:hover {
@@ -96,6 +95,7 @@ export const EntityDetails = styled.div`
 		}
 	}
 
+	h1,
 	span {
 		white-space: nowrap;
 		text-overflow: ellipsis;
@@ -104,11 +104,6 @@ export const EntityDetails = styled.div`
 
 	svg {
 		transition: transform 0.2s;
-	}
-
-	h2 {
-		margin: 0;
-		flex: 0 1 5em;
 	}
 
 	.disabled {
@@ -144,13 +139,6 @@ export const EntityDetails = styled.div`
 			position: absolute;
 			transform: scaleY(0);
 		}
-	}
-
-	.total {
-		flex: 0 0 5em;
-		text-align: right;
-		font-weight: 500;
-		overflow: hidden;
 	}
 `;
 
