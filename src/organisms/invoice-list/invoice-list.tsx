@@ -48,6 +48,10 @@ export default function InvoiceList() {
 	}
 	if (!invoices) return <div>loading...</div>;
 
+	const PdfPreview = ({ index }: { index: number }) => (
+		<PdfDocument invoiceId={invoices[index].id} />
+	);
+
 	return (
 		<Styles.Container>
 			<Styles.Header>
@@ -138,9 +142,7 @@ export default function InvoiceList() {
 						<Styles.PdfPreview
 							className={expandedInvoice === index ? "expanded" : ""}
 						>
-							{expandedInvoice !== undefined && (
-								<PdfDocument invoiceNo={invoices[expandedInvoice].id} />
-							)}
+							{expandedInvoice !== undefined && <PdfPreview index={index} />}
 						</Styles.PdfPreview>
 					</Styles.Invoice>
 				))}

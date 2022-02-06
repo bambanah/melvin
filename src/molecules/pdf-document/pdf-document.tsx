@@ -8,23 +8,23 @@ import * as Styles from "./styles";
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 interface PdfProps {
-	invoiceNo: string;
+	invoiceId: string;
 }
 
-const PdfDocument: FC<PdfProps> = ({ invoiceNo }) => {
+const PdfDocument: FC<PdfProps> = ({ invoiceId }) => {
 	const [pdf, setPdf] = useState("");
 
 	useEffect(() => {
 		axios
 			.get("/api/invoices/generate-pdf", {
 				params: {
-					invoiceId: invoiceNo,
+					invoiceId,
 				},
 			})
 			.then((response) => {
 				setPdf(`data:application/pdf;base64,${response.data}`);
 			});
-	}, [invoiceNo]);
+	}, [invoiceId]);
 
 	if (!pdf) return <Loading />;
 

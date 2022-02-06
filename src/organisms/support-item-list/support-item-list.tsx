@@ -1,8 +1,9 @@
+import Button from "@atoms/button";
 import Display from "@atoms/display";
+import Heading from "@atoms/heading";
 import Loading from "@atoms/loading";
-import Card from "@molecules/card";
-import CardContainer from "@molecules/card-container";
 import { SupportItem } from "@prisma/client";
+import Link from "next/link";
 import React from "react";
 import useSWR from "swr";
 import * as Styles from "./styles";
@@ -29,25 +30,25 @@ function SupportItemList() {
 		<Styles.Container>
 			<Styles.Header>
 				<Display className="small">Activities</Display>
+				<Link href="/activities/create" passHref>
+					<Button primary>+ Add New</Button>
+				</Link>
 			</Styles.Header>
-			<CardContainer>
+			<Styles.SupportItemList>
 				{supportItems.map((supportItem) => (
-					<Card href={`/activities/${supportItem.id}`} key={supportItem.id}>
-						<h1>
-							{supportItem.description.length > 25
-								? `${supportItem.description.slice(0, 25)}...`
-								: supportItem.description}
-						</h1>
-						<div>
-							<p>{supportItem.weekdayCode}</p>
-							<p>${supportItem.weekdayRate}/hr</p>
-						</div>
-					</Card>
+					<Link
+						key={supportItem.id}
+						href={`/activities/${supportItem.id}`}
+						passHref
+					>
+						<Styles.SupportItem>
+							<Heading className="small">{supportItem.description}</Heading>
+							<span className="code">{supportItem.weekdayCode}</span>
+							<span className="rate">${supportItem.weekdayRate}/hr</span>
+						</Styles.SupportItem>
+					</Link>
 				))}
-				<Card href="/activities/create" create>
-					<span>+</span>
-				</Card>
-			</CardContainer>
+			</Styles.SupportItemList>
 		</Styles.Container>
 	);
 }

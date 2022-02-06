@@ -9,10 +9,12 @@ import {
 	faEllipsisV,
 	faFileAlt,
 	faHome,
+	faIdCard,
 	faPlus,
 	faTrash,
 	faUser,
 	faWalking,
+	faWallet,
 } from "@fortawesome/free-solid-svg-icons";
 
 const importIcons = () => {
@@ -29,7 +31,9 @@ const importIcons = () => {
 		faWalking,
 		faFileAlt,
 		faCircle,
-		faCopy
+		faCopy,
+		faIdCard,
+		faWallet
 	);
 };
 
