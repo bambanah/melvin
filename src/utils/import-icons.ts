@@ -1,6 +1,7 @@
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import {
+	faChevronDown,
 	faChevronRight,
 	faCircle,
 	faCopy,
@@ -35,7 +36,8 @@ const importIcons = () => {
 		faCopy,
 		faIdCard,
 		faWallet,
-		faDollarSign
+		faDollarSign,
+		faChevronDown
 	);
 };
 

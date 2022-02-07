@@ -51,6 +51,12 @@ export default function InvoiceList() {
 			? []
 			: [
 					{
+						value: "Download",
+						type: "button",
+						icon: "download",
+						onClick: () => savePdf(invoice.id),
+					},
+					{
 						value: "Edit",
 						type: "link",
 						icon: "edit",
@@ -61,12 +67,6 @@ export default function InvoiceList() {
 						type: "link",
 						icon: "copy",
 						href: `/invoices/create?copyFrom=${invoice.id}`,
-					},
-					{
-						value: "Download",
-						type: "button",
-						icon: "download",
-						onClick: () => savePdf(invoice.id),
 					},
 					{
 						value: "Delete",

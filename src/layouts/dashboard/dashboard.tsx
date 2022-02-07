@@ -9,7 +9,6 @@ const Dashboard = () => {
 			<Styles.Header>
 				<Display className="small">Dashboard</Display>
 				<Styles.HeaderActions>
-					<Button>?</Button>
 					<Button primary>+ Add New</Button>
 				</Styles.HeaderActions>
 			</Styles.Header>

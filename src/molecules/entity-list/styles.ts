@@ -63,16 +63,18 @@ export const Entity = styled.div`
 			transform: rotate(90deg);
 		}
 
-		> div:nth-of-type(2) {
-			height: 4em;
-			opacity: 1;
-			overflow: visible;
-		}
-
 		> div:last-of-type {
 			height: 30em;
 		}
 	}
+`;
+
+export const EntityContent = styled.div`
+	flex: 1 1 auto;
+	display: flex;
+	align-items: center;
+	gap: 1.5em;
+	padding-right: 1.2em;
 `;
 
 export const EntityDetails = styled.div`
@@ -80,11 +82,11 @@ export const EntityDetails = styled.div`
 	display: flex;
 	align-items: center;
 	min-width: 0;
+	padding: 1.6em 1.2em;
 
-	padding: 1.4em 1.2em;
 	cursor: pointer;
 
-	gap: 1.5rem;
+	gap: 1.5em;
 	transition: background 0.1s;
 
 	&:hover {

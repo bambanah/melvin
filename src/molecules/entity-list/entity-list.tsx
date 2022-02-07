@@ -1,5 +1,6 @@
 import Button from "@atoms/button";
 import Display from "@atoms/display";
+import Dropdown from "@atoms/dropdown";
 import Heading from "@atoms/heading";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -79,71 +80,84 @@ const EntityList: FC<EntityListProps> = ({
 							key={index}
 							className={expandedIndex === index ? "expanded" : ""}
 						>
-							<Styles.EntityDetails
-								onClick={() =>
-									shouldExpand &&
-									setExpandedIndex(expandedIndex === index ? undefined : index)
-								}
-							>
-								{shouldExpand && (
-									<div>
-										<FontAwesomeIcon
-											icon={["fas", "chevron-right"]}
-											size="1x"
-										/>
-									</div>
-								)}
+							<Styles.EntityContent>
+								<Styles.EntityDetails
+									onClick={() =>
+										shouldExpand &&
+										setExpandedIndex(
+											expandedIndex === index ? undefined : index
+										)
+									}
+								>
+									{shouldExpand && (
+										<div>
+											<FontAwesomeIcon
+												icon={["fas", "chevron-right"]}
+												size="1x"
+											/>
+										</div>
+									)}
 
-								{entity.fields.map((field, index) => {
-									return field.type === "text" ? (
-										<span
-											key={index}
-											style={{
-												textAlign: field.align ?? "left",
-												flex: field.flex ?? "1 0 auto",
-												fontWeight: field.fontWeight ?? "normal",
-											}}
-											className={field.value === "N/A" ? "disabled" : ""}
-										>
-											{typeof field.value === "string" && field.icon && (
-												<FontAwesomeIcon
-													icon={["fas", field.icon]}
-													style={{ marginRight: "0.5em" }}
-												/>
-											)}
-											{field.value}
-										</span>
-									) : (
-										<Heading
-											className="xsmall"
-											style={{
-												textAlign: field.align ?? "left",
-												flex: field.flex ?? "1 0 auto",
-												fontWeight: field.fontWeight ?? "bold",
-											}}
-										>
-											{field.value}
-										</Heading>
-									);
-								})}
-							</Styles.EntityDetails>
+									{entity.fields.map((field, index) => {
+										return field.type === "text" ? (
+											<span
+												key={index}
+												style={{
+													textAlign: field.align ?? "left",
+													flex: field.flex ?? "1 0 auto",
+													fontWeight: field.fontWeight ?? "normal",
+												}}
+												className={field.value === "N/A" ? "disabled" : ""}
+											>
+												{typeof field.value === "string" && field.icon && (
+													<FontAwesomeIcon
+														icon={["fas", field.icon]}
+														style={{ marginRight: "0.5em" }}
+													/>
+												)}
+												{field.value}
+											</span>
+										) : (
+											<Heading
+												className="xsmall"
+												style={{
+													textAlign: field.align ?? "left",
+													flex: field.flex ?? "1 0 auto",
+													fontWeight: field.fontWeight ?? "bold",
+												}}
+											>
+												{field.value}
+											</Heading>
+										);
+									})}
+								</Styles.EntityDetails>
 
-							{shouldExpand && entity.actions && (
-								<>
-									<Styles.Actions
-										className={expandedIndex === index ? "expanded" : ""}
+								{entity.actions && (
+									<Dropdown
+										key={index}
+										title={entity.actions[0]?.value ?? ""}
+										action={() => {
+											if (
+												entity.actions?.length &&
+												entity.actions[0].type === "button"
+											)
+												entity.actions[0].onClick(entity.id);
+										}}
+										style={{ flex: "0 0 auto" }}
 									>
-										{entity.actions.map((action) => (
-											<>
-												{action.type === "button" ? (
+										{entity.actions.slice(1).map((action, index) => {
+											return action.type === "button" ? (
+												<span>
 													<a onClick={() => action.onClick(entity.id)}>
 														{action.icon && (
 															<FontAwesomeIcon icon={["fas", action.icon]} />
 														)}
 														{action.value}
 													</a>
-												) : (
-													<Link href={`${action.href}`}>
+												</span>
+											) : (
+												<span>
+													<Link key={index} href={`${action.href}`}>
 														<a>
 															{action.icon && (
 																<FontAwesomeIcon icon={["fas", action.icon]} />
@@ -151,18 +165,21 @@ const EntityList: FC<EntityListProps> = ({
 															{action.value}
 														</a>
 													</Link>
-												)}
-											</>
-										))}
-									</Styles.Actions>
-									<Styles.ExpandedComponent
-										className={expandedIndex === index ? "expanded" : ""}
-									>
-										{expandedIndex !== undefined &&
-											entity.ExpandedComponent &&
-											entity.ExpandedComponent(index)}
-									</Styles.ExpandedComponent>
-								</>
+												</span>
+											);
+										})}
+									</Dropdown>
+								)}
+							</Styles.EntityContent>
+
+							{shouldExpand && entity.actions && (
+								<Styles.ExpandedComponent
+									className={expandedIndex === index ? "expanded" : ""}
+								>
+									{expandedIndex !== undefined &&
+										entity.ExpandedComponent &&
+										entity.ExpandedComponent(index)}
+								</Styles.ExpandedComponent>
 							)}
 						</Styles.Entity>
 					</LinkWrapper>
