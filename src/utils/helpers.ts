@@ -1,11 +1,12 @@
-import { FormikErrors, FormikTouched, getIn } from "formik";
-import { Activity, Invoice, InvoiceStatus } from "@prisma/client";
 import { FormValues } from "@organisms/forms/invoice-form";
-
+import { Activity, Invoice, InvoiceStatus } from "@prisma/client";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+import { FormikErrors, FormikTouched, getIn } from "formik";
+import InvoiceType from "types/invoice";
+
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -186,6 +187,27 @@ export const valuesToInvoice = (values: FormValues) => ({
 		supportItemId: activity.supportItemId,
 	})),
 });
+
+export const getInvoiceFileName = (invoice: InvoiceType) => {
+	let earliestDate = invoice.activities[0].date;
+	let latestDate = invoice.activities[0].date;
+	for (const { date } of invoice.activities) {
+		if (dayjs(date).isBefore(dayjs(earliestDate))) earliestDate = date;
+		if (dayjs(date).isAfter(dayjs(latestDate))) latestDate = date;
+	}
+
+	const dateRangeFormatted = dayjs(earliestDate).isSame(latestDate)
+		? dayjs(earliestDate).format("DD-MM")
+		: `(${dayjs(earliestDate).format("DD-MM")})-(${dayjs(latestDate).format(
+				"DD-MM"
+		  )})`;
+
+	const fileName = `${invoice.invoiceNo}_${dateRangeFormatted}-${dayjs(
+		invoice.date
+	).format("YYYY")}.pdf`;
+
+	return fileName;
+};
 
 export function round(value: number, exp: number) {
 	if (typeof exp === "undefined" || +exp === 0) return Math.round(value);

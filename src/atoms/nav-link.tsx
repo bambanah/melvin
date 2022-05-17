@@ -23,7 +23,6 @@ const StyledLink = styled.a<StyleProps>`
 	background: ${({ active, theme }) =>
 		active ? theme.colors.fg : theme.colors.bg};
 	padding: 0.7em 1.2em;
-	border-radius: 0.3rem;
 
 	transition: color 0.1s, border-color 0.1s, background-color 0.1s;
 
@@ -41,10 +40,9 @@ const StyledLink = styled.a<StyleProps>`
 
 const Link = ({ href, children }: Props) => {
 	const router = useRouter();
-
 	return (
 		<NextLink href={href}>
-			<StyledLink active={`/${router.pathname.split("/")[1]}` === href}>
+			<StyledLink active={router.pathname.split("/")[2] === href.split("/")[2]}>
 				{children}
 			</StyledLink>
 		</NextLink>

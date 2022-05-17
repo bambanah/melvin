@@ -1,7 +1,7 @@
 import generatePDF from "@utils/pdf-generation";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@utils/prisma";
-import { Invoice } from "types/invoice";
+import Invoice from "types/invoice";
 
 export default async (request: NextApiRequest, response: NextApiResponse) => {
 	if (request.method === "GET") {

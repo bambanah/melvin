@@ -21,7 +21,6 @@ export const Container = styled.div<ContainerProps>`
 
 			return `${theme.colors.fg}88`;
 		}};
-	border-radius: 0.3rem;
 
 	&:focus-within {
 		border-color: ${({ theme }) => theme.colors.link};

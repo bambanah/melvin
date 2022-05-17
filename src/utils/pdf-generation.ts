@@ -1,7 +1,7 @@
 import { RateType } from "@prisma/client";
 import jspdf from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
-import { Invoice } from "types/invoice";
+import Invoice from "types/invoice";
 import {
 	getDuration,
 	getPrettyDuration,

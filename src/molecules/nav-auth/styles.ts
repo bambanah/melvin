@@ -1,4 +1,3 @@
-import { shade } from "polished";
 import styled from "styled-components";
 
 export const AuthDropdown = styled.div`
@@ -22,11 +21,12 @@ export const AuthDropdown = styled.div`
 
 export const DropdownContent = styled.div`
 	position: absolute;
+	bottom: 5rem;
+	left: 8rem;
 	margin-top: 2.5rem;
 	min-width: 5rem;
-	border-radius: 5px;
+
 	background-color: ${({ theme }) => theme.colors.bg};
-	border: 1px solid ${({ theme }) => shade(0.2, theme.colors.bg)};
 
 	padding: 1rem;
 
@@ -42,7 +42,6 @@ export const DropdownContent = styled.div`
 		background: none;
 		font: inherit;
 		padding: 0.4rem;
-		border-radius: 4px;
 		background-color: #f3f3f3;
 
 		&:hover {
@@ -60,7 +59,7 @@ export const Profile = styled.div`
 	width: 2rem;
 	height: 2rem;
 
-	border-radius: 100%;
+	border-radius: 50%;
 	background-color: ${({ theme }) => theme.colors.brand};
 	font-size: 1.3rem;
 	font-weight: bold;

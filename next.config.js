@@ -5,12 +5,17 @@ module.exports = {
 		return [
 			{
 				source: "/",
-				destination: "/invoices",
+				destination: "/dashboard/invoices",
+				permanent: true,
+			},
+			{
+				source: "/dashboard",
+				destination: "/dashboard/invoices",
 				permanent: true,
 			},
 		];
 	},
-	experimental: {
+	compiler: {
 		styledComponents: true,
 	},
 	sassOptions: {

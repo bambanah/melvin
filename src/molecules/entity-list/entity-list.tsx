@@ -1,9 +1,12 @@
 import Button from "@atoms/button";
 import Display from "@atoms/display";
+import Dropdown from "@atoms/dropdown";
 import Heading from "@atoms/heading";
-import { IconName } from "@fortawesome/fontawesome-svg-core";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { FC, useState } from "react";
 import * as Styles from "./styles";
 
@@ -12,7 +15,7 @@ export interface EntityListItem {
 	fields: {
 		value: string | React.ReactNode;
 		type: "label" | "text";
-		icon?: IconName;
+		icon?: IconDefinition;
 		align?: "left" | "center" | "right";
 		fontWeight?: "bold" | "normal";
 		flex?: string;
@@ -21,13 +24,13 @@ export interface EntityListItem {
 		| {
 				value: string;
 				type: "link";
-				icon?: IconName;
+				icon?: IconDefinition;
 				href: string;
 		  }
 		| {
 				value: string;
 				type: "button";
-				icon?: IconName;
+				icon?: IconDefinition;
 				onClick: (id: string) => void;
 		  }
 	)[];
@@ -48,19 +51,7 @@ const EntityList: FC<EntityListProps> = ({
 	shouldExpand,
 }) => {
 	const [expandedIndex, setExpandedIndex] = useState<number | undefined>();
-
-	const LinkWrapper: FC<{ href?: string }> = ({ children, href }) => {
-		if (href) {
-			return (
-				<Link href={href} passHref>
-					{children}
-				</Link>
-			);
-		}
-
-		return <>{children}</>;
-	};
-
+	const router = useRouter();
 	return (
 		<Styles.Container>
 			<Styles.Header>
@@ -71,14 +62,11 @@ const EntityList: FC<EntityListProps> = ({
 			</Styles.Header>
 			<Styles.Content>
 				{entities.map((entity, index) => (
-					<LinkWrapper
-						href={shouldExpand ? undefined : `${route}/${entity.id}`}
+					<Styles.Entity
 						key={index}
+						className={expandedIndex === index ? "expanded" : ""}
 					>
-						<Styles.Entity
-							key={index}
-							className={expandedIndex === index ? "expanded" : ""}
-						>
+						<Styles.EntityContent>
 							<Styles.EntityDetails
 								onClick={() =>
 									shouldExpand &&
@@ -87,10 +75,7 @@ const EntityList: FC<EntityListProps> = ({
 							>
 								{shouldExpand && (
 									<div>
-										<FontAwesomeIcon
-											icon={["fas", "chevron-right"]}
-											size="1x"
-										/>
+										<FontAwesomeIcon icon={faChevronRight} size="1x" />
 									</div>
 								)}
 
@@ -107,7 +92,7 @@ const EntityList: FC<EntityListProps> = ({
 										>
 											{typeof field.value === "string" && field.icon && (
 												<FontAwesomeIcon
-													icon={["fas", field.icon]}
+													icon={field.icon}
 													style={{ marginRight: "0.5em" }}
 												/>
 											)}
@@ -121,6 +106,7 @@ const EntityList: FC<EntityListProps> = ({
 												flex: field.flex ?? "1 0 auto",
 												fontWeight: field.fontWeight ?? "bold",
 											}}
+											key={index}
 										>
 											{field.value}
 										</Heading>
@@ -128,44 +114,76 @@ const EntityList: FC<EntityListProps> = ({
 								})}
 							</Styles.EntityDetails>
 
-							{shouldExpand && entity.actions && (
-								<>
-									<Styles.Actions
-										className={expandedIndex === index ? "expanded" : ""}
-									>
-										{entity.actions.map((action) => (
-											<>
-												{action.type === "button" ? (
-													<a onClick={() => action.onClick(entity.id)}>
-														{action.icon && (
-															<FontAwesomeIcon icon={["fas", action.icon]} />
-														)}
-														{action.value}
-													</a>
-												) : (
-													<Link href={`${action.href}`}>
-														<a>
-															{action.icon && (
-																<FontAwesomeIcon icon={["fas", action.icon]} />
-															)}
-															{action.value}
-														</a>
-													</Link>
-												)}
-											</>
-										))}
-									</Styles.Actions>
-									<Styles.ExpandedComponent
-										className={expandedIndex === index ? "expanded" : ""}
-									>
-										{expandedIndex !== undefined &&
-											entity.ExpandedComponent &&
-											entity.ExpandedComponent(index)}
-									</Styles.ExpandedComponent>
-								</>
+							{entity.actions && entity.actions.length > 1 && (
+								<Dropdown
+									key={index}
+									title={entity.actions[0]?.value ?? ""}
+									action={() => {
+										if (
+											entity.actions?.length &&
+											entity.actions[0].type === "button"
+										) {
+											entity.actions[0].onClick(entity.id);
+										} else if (
+											entity.actions?.length &&
+											entity.actions[0].type === "link"
+										) {
+											router.push(entity.actions[0].href);
+										}
+									}}
+									style={{ flex: "0 0 auto" }}
+								>
+									{entity.actions.slice(1).map((action, index) => {
+										return action.type === "button" ? (
+											<a onClick={() => action.onClick(entity.id)} key={index}>
+												{action.icon && <FontAwesomeIcon icon={action.icon} />}
+												{action.value}
+											</a>
+										) : (
+											<Link key={index} href={`${action.href}`}>
+												<a>
+													{action.icon && (
+														<FontAwesomeIcon icon={action.icon} />
+													)}
+													{action.value}
+												</a>
+											</Link>
+										);
+									})}
+								</Dropdown>
 							)}
-						</Styles.Entity>
-					</LinkWrapper>
+
+							{entity.actions && entity.actions.length === 1 && (
+								<Button
+									onClick={() => {
+										if (
+											entity.actions?.length &&
+											entity.actions[0].type === "button"
+										) {
+											entity.actions[0].onClick(entity.id);
+										} else if (
+											entity.actions?.length &&
+											entity.actions[0].type === "link"
+										) {
+											router.push(entity.actions[0].href);
+										}
+									}}
+								>
+									{entity.actions[0].value}
+								</Button>
+							)}
+						</Styles.EntityContent>
+
+						{shouldExpand && entity.actions && (
+							<Styles.ExpandedComponent
+								className={expandedIndex === index ? "expanded" : ""}
+							>
+								{expandedIndex !== undefined &&
+									entity.ExpandedComponent &&
+									entity.ExpandedComponent(index)}
+							</Styles.ExpandedComponent>
+						)}
+					</Styles.Entity>
 				))}
 			</Styles.Content>
 		</Styles.Container>

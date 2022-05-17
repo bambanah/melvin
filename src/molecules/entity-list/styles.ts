@@ -50,7 +50,6 @@ export const Entity = styled.div`
 	align-items: stretch;
 
 	color: ${({ theme }) => theme.colors.fg};
-	border-radius: var(--radius-medium);
 	overflow: hidden;
 	transition: box-shadow 0.2s;
 
@@ -63,16 +62,18 @@ export const Entity = styled.div`
 			transform: rotate(90deg);
 		}
 
-		> div:nth-of-type(2) {
-			height: 4em;
-			opacity: 1;
-			overflow: visible;
-		}
-
 		> div:last-of-type {
 			height: 30em;
 		}
 	}
+`;
+
+export const EntityContent = styled.div`
+	flex: 1 1 auto;
+	display: flex;
+	align-items: center;
+	gap: 1.5em;
+	padding-right: 1.2em;
 `;
 
 export const EntityDetails = styled.div`
@@ -80,11 +81,11 @@ export const EntityDetails = styled.div`
 	display: flex;
 	align-items: center;
 	min-width: 0;
+	padding: 1.6em 1.2em;
 
-	padding: 1.4em 1.2em;
 	cursor: pointer;
 
-	gap: 1.5rem;
+	gap: 1.5em;
 	transition: background 0.1s;
 
 	&:hover {
@@ -159,7 +160,6 @@ export const Actions = styled.div`
 		padding: 0.3em 0.8em;
 		color: ${({ theme }) => theme.colors.fg}99;
 		background-color: ${({ theme }) => theme.colors.bg};
-		border-radius: 0.3em;
 		box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.12);
 
 		svg {

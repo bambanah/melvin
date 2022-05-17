@@ -1,6 +1,6 @@
 import NavAuth from "@molecules/nav-auth";
 import NavLink from "@atoms/nav-link";
-import ThemeSwitch from "@atoms/theme-switch";
+import ThemeSwitch from "@molecules/theme-switch";
 import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -8,6 +8,11 @@ import React from "react";
 import * as Styles from "./styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Display from "@atoms/display";
+import {
+	faFileAlt,
+	faUser,
+	faWalking,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Navbar = () => {
 	const session = useSession();
@@ -15,24 +20,21 @@ const Navbar = () => {
 	return (
 		<Styles.Header>
 			<Styles.Content>
-				<Link href="/" passHref>
+				<Link href="/dashboard/invoices" passHref>
 					<a>
 						<Display className="xsmall brand">melvin</Display>
 					</a>
 				</Link>
 
 				<Styles.Links>
-					<NavLink href="/">
-						<FontAwesomeIcon icon={["fas", "home"]} /> Dashboard
+					<NavLink href="/dashboard/invoices">
+						<FontAwesomeIcon icon={faFileAlt} /> Invoices
 					</NavLink>
-					<NavLink href="/invoices">
-						<FontAwesomeIcon icon={["fas", "file-alt"]} /> Invoices
+					<NavLink href="/dashboard/activities">
+						<FontAwesomeIcon icon={faWalking} /> Activities
 					</NavLink>
-					<NavLink href="/activities">
-						<FontAwesomeIcon icon={["fas", "walking"]} /> Activities
-					</NavLink>
-					<NavLink href="/clients">
-						<FontAwesomeIcon icon={["fas", "user"]} /> Clients
+					<NavLink href="/dashboard/clients">
+						<FontAwesomeIcon icon={faUser} /> Clients
 					</NavLink>
 				</Styles.Links>
 

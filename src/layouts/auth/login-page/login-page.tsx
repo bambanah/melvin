@@ -1,4 +1,5 @@
 import Button from "@atoms/button";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import LoginForm from "@molecules/login-form";
 import { Brand } from "@organisms/navbar/styles";
@@ -42,7 +43,7 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 						onClick={() => signIn(provider.id, { callbackUrl })}
 						key={provider.id}
 					>
-						<FontAwesomeIcon icon={["fab", "google"]} />
+						<FontAwesomeIcon icon={faGoogle} />
 						Continue with {provider.name}
 					</Button>
 				))}

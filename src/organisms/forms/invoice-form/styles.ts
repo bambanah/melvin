@@ -20,7 +20,6 @@ export const Container = styled.div`
 		transition: all 0.2s ease;
 
 		&.highlighted {
-			border-radius: 1em;
 			padding: 2em;
 			background-color: ${({ theme }) => theme.colors.link}1e;
 		}
@@ -35,7 +34,6 @@ export const ClientDetails = styled.div`
 	display: flex;
 	gap: 1em;
 	padding: 0em;
-	border-radius: 0.5em;
 	background-color: ${({ theme }) => theme.colors.bg};
 
 	label {
