@@ -8,6 +8,12 @@ import React from "react";
 import * as Styles from "./styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Display from "@atoms/display";
+import {
+	faFileAlt,
+	faHome,
+	faUser,
+	faWalking,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Navbar = () => {
 	const session = useSession();
@@ -23,16 +29,16 @@ const Navbar = () => {
 
 				<Styles.Links>
 					<NavLink href="/">
-						<FontAwesomeIcon icon={["fas", "home"]} /> Dashboard
+						<FontAwesomeIcon icon={faHome} /> Dashboard
 					</NavLink>
 					<NavLink href="/invoices">
-						<FontAwesomeIcon icon={["fas", "file-alt"]} /> Invoices
+						<FontAwesomeIcon icon={faFileAlt} /> Invoices
 					</NavLink>
 					<NavLink href="/activities">
-						<FontAwesomeIcon icon={["fas", "walking"]} /> Activities
+						<FontAwesomeIcon icon={faWalking} /> Activities
 					</NavLink>
 					<NavLink href="/clients">
-						<FontAwesomeIcon icon={["fas", "user"]} /> Clients
+						<FontAwesomeIcon icon={faUser} /> Clients
 					</NavLink>
 				</Styles.Links>
 

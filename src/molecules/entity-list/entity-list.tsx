@@ -2,9 +2,11 @@ import Button from "@atoms/button";
 import Display from "@atoms/display";
 import Dropdown from "@atoms/dropdown";
 import Heading from "@atoms/heading";
-import { IconName } from "@fortawesome/fontawesome-svg-core";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { FC, useState } from "react";
 import * as Styles from "./styles";
 
@@ -13,7 +15,7 @@ export interface EntityListItem {
 	fields: {
 		value: string | React.ReactNode;
 		type: "label" | "text";
-		icon?: IconName;
+		icon?: IconDefinition;
 		align?: "left" | "center" | "right";
 		fontWeight?: "bold" | "normal";
 		flex?: string;
@@ -22,13 +24,13 @@ export interface EntityListItem {
 		| {
 				value: string;
 				type: "link";
-				icon?: IconName;
+				icon?: IconDefinition;
 				href: string;
 		  }
 		| {
 				value: string;
 				type: "button";
-				icon?: IconName;
+				icon?: IconDefinition;
 				onClick: (id: string) => void;
 		  }
 	)[];
@@ -49,7 +51,7 @@ const EntityList: FC<EntityListProps> = ({
 	shouldExpand,
 }) => {
 	const [expandedIndex, setExpandedIndex] = useState<number | undefined>();
-
+	const router = useRouter();
 	return (
 		<Styles.Container>
 			<Styles.Header>
@@ -73,10 +75,7 @@ const EntityList: FC<EntityListProps> = ({
 							>
 								{shouldExpand && (
 									<div>
-										<FontAwesomeIcon
-											icon={["fas", "chevron-right"]}
-											size="1x"
-										/>
+										<FontAwesomeIcon icon={faChevronRight} size="1x" />
 									</div>
 								)}
 
@@ -93,7 +92,7 @@ const EntityList: FC<EntityListProps> = ({
 										>
 											{typeof field.value === "string" && field.icon && (
 												<FontAwesomeIcon
-													icon={["fas", field.icon]}
+													icon={field.icon}
 													style={{ marginRight: "0.5em" }}
 												/>
 											)}
@@ -125,6 +124,11 @@ const EntityList: FC<EntityListProps> = ({
 											entity.actions[0].type === "button"
 										) {
 											entity.actions[0].onClick(entity.id);
+										} else if (
+											entity.actions?.length &&
+											entity.actions[0].type === "link"
+										) {
+											router.push(entity.actions[0].href);
 										}
 									}}
 									style={{ flex: "0 0 auto" }}
@@ -132,16 +136,14 @@ const EntityList: FC<EntityListProps> = ({
 									{entity.actions.slice(1).map((action, index) => {
 										return action.type === "button" ? (
 											<a onClick={() => action.onClick(entity.id)} key={index}>
-												{action.icon && (
-													<FontAwesomeIcon icon={["fas", action.icon]} />
-												)}
+												{action.icon && <FontAwesomeIcon icon={action.icon} />}
 												{action.value}
 											</a>
 										) : (
 											<Link key={index} href={`${action.href}`}>
 												<a>
 													{action.icon && (
-														<FontAwesomeIcon icon={["fas", action.icon]} />
+														<FontAwesomeIcon icon={action.icon} />
 													)}
 													{action.value}
 												</a>

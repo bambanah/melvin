@@ -1,3 +1,4 @@
+import { faDollarSign, faIdCard } from "@fortawesome/free-solid-svg-icons";
 import EntityList, { EntityListItem } from "@molecules/entity-list";
 import { SupportItem } from "@prisma/client";
 import React from "react";
@@ -20,13 +21,13 @@ const generateEntity = (supportItem?: SupportItem): EntityListItem => ({
 		},
 		{
 			value: !supportItem ? <Skeleton /> : supportItem.weekdayCode,
-			icon: "id-card",
+			icon: faIdCard,
 			type: "text",
 			flex: "0 0 9.5em",
 		},
 		{
 			value: !supportItem ? <Skeleton /> : `${supportItem.weekdayRate}`,
-			icon: "dollar-sign",
+			icon: faDollarSign,
 			type: "text",
 			flex: "0 0 5em",
 		},

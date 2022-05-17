@@ -1,3 +1,4 @@
+import { faIdCard, faWallet } from "@fortawesome/free-solid-svg-icons";
 import EntityList from "@molecules/entity-list";
 import { EntityListItem } from "@molecules/entity-list/entity-list";
 import { Client } from "@prisma/client";
@@ -5,8 +6,8 @@ import { useRouter } from "next/router";
 import React from "react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import Invoice from "types/invoice";
 import useSWR from "swr";
-import { Invoice } from "types/invoice";
 
 const getClients = async () => {
 	const response = await fetch("/api/clients");
@@ -45,13 +46,13 @@ const ClientList = () => {
 			},
 			{
 				value: !client ? <Skeleton /> : client?.number || "N/A",
-				icon: "id-card",
+				icon: faIdCard,
 				type: "text",
 				flex: "1 0 7em",
 			},
 			{
 				value: !client ? <Skeleton /> : client?.billTo || "N/A",
-				icon: "wallet",
+				icon: faWallet,
 				type: "text",
 				flex: "0 0 9.5em",
 			},

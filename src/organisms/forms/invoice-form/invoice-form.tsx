@@ -179,7 +179,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 									Loaded from <b>{billToSource}</b>
 								</Subheading>
 							) : (
-								<Subheading></Subheading>
+								<Subheading>Leave blank if required</Subheading>
 							)}
 							<Input
 								type="text"

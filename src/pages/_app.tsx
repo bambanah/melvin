@@ -6,10 +6,6 @@ import React from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AppContextProvider } from "@context/app-context";
-import importFontAwesomeIcons from "@utils/import-icons";
-
-// Import Fontawesome Icons
-importFontAwesomeIcons();
 
 function App({ Component, pageProps }: AppProps) {
 	return (

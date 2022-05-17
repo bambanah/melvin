@@ -32,13 +32,7 @@ const InvoicePage = () => {
 
 	return editing ? (
 		<Styles.Container>
-			<CreateInvoiceForm
-				initialValues={invoiceToValues(invoice)}
-				returnFunction={() => {
-					setEditing(false);
-					router.push(`/invoices/${invoice.id}`);
-				}}
-			/>
+			<CreateInvoiceForm initialValues={invoiceToValues(invoice)} />
 		</Styles.Container>
 	) : (
 		<Styles.Container>
