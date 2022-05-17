@@ -21,7 +21,6 @@ export const Modal = styled.div`
 	background-color: ${({ theme }) =>
 		theme.type === "dark" ? lighten(0.1, theme.colors.bg) : "#fff"};
 
-	border-radius: 5px;
 	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
 
 	span {

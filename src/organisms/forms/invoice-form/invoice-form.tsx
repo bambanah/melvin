@@ -100,7 +100,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 				values.invoiceNo =
 					highestInvoiceNo !== initialValues?.invoiceNo
 						? getNextInvoiceNo(client.invoices?.map((index) => index.invoiceNo))
-						: highestInvoiceNo;
+						: highestInvoiceNo ?? "";
 
 				if (client.billTo) {
 					setBillToSource("client information");
@@ -349,7 +349,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 									onClick={() => {
 										returnFunction
 											? returnFunction()
-											: router.push("/invoices");
+											: router.push("/dashboard/invoices");
 									}}
 								>
 									Cancel
@@ -384,7 +384,9 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 						setSubmitting(false);
 						mutate(`/api/invoices/${initialValues.id}`);
 
-						returnFunction ? returnFunction() : router.push("/invoices");
+						returnFunction
+							? returnFunction()
+							: router.push("/dashboard/invoices");
 					})
 					.catch((error) => {
 						console.error(error);

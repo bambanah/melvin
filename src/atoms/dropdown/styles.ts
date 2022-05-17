@@ -27,7 +27,6 @@ export const DropdownContent = styled.div`
 	overflow: hidden;
 	position: fixed;
 
-	border-radius: 0.3rem;
 	border: 0.1em solid ${({ theme }) => theme.colors.fg}33;
 
 	a {

@@ -50,7 +50,6 @@ export const Entity = styled.div`
 	align-items: stretch;
 
 	color: ${({ theme }) => theme.colors.fg};
-	border-radius: var(--radius-medium);
 	overflow: hidden;
 	transition: box-shadow 0.2s;
 
@@ -161,7 +160,6 @@ export const Actions = styled.div`
 		padding: 0.3em 0.8em;
 		color: ${({ theme }) => theme.colors.fg}99;
 		background-color: ${({ theme }) => theme.colors.bg};
-		border-radius: 0.3em;
 		box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.12);
 
 		svg {

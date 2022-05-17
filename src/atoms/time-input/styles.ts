@@ -15,7 +15,6 @@ export const TimeInput = styled(Field)`
 
 			return `${theme.colors.fg}88`;
 		}};
-	border-radius: 0.3rem;
 
 	&:focus {
 		border-color: ${({ theme }) => theme.colors.link};

@@ -39,7 +39,7 @@ export const Circle = styled.div`
 	justify-content: center;
 	align-items: center;
 	position: relative;
-	border-radius: 100%;
+	border-radius: 50%;
 	width: 1.4em;
 	overflow: hidden;
 	height: 1.4em;
@@ -87,7 +87,7 @@ interface StarProps {
 
 export const Star = styled.div<StarProps>`
 	opacity: 1;
-	border-radius: 100%;
+	border-radius: 50%;
 	background-color: white;
 	position: absolute;
 	transition: all ${(props) => props.speed}ms linear 0ms;

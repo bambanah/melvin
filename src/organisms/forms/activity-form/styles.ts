@@ -2,7 +2,6 @@ import styled from "styled-components";
 
 export const CreateActivityContainer = styled.div`
 	padding: 3rem 0;
-	border-radius: 4px;
 	align-self: center;
 `;
 

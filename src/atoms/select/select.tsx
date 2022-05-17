@@ -40,9 +40,15 @@ const Select = ({
 					...styles,
 					borderColor: error ? theme.colors.error : styles.borderColor,
 					cursor: "pointer",
+					borderRadius: 0,
 				}),
 				option: (styles) => ({
 					...styles,
+					borderRadius: 0,
+				}),
+				menu: (styles) => ({
+					...styles,
+					borderRadius: 0,
 				}),
 			}}
 			theme={(selectTheme) => ({

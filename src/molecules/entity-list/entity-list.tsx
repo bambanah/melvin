@@ -114,7 +114,7 @@ const EntityList: FC<EntityListProps> = ({
 								})}
 							</Styles.EntityDetails>
 
-							{entity.actions && (
+							{entity.actions && entity.actions.length > 1 && (
 								<Dropdown
 									key={index}
 									title={entity.actions[0]?.value ?? ""}
@@ -151,6 +151,26 @@ const EntityList: FC<EntityListProps> = ({
 										);
 									})}
 								</Dropdown>
+							)}
+
+							{entity.actions && entity.actions.length === 1 && (
+								<Button
+									onClick={() => {
+										if (
+											entity.actions?.length &&
+											entity.actions[0].type === "button"
+										) {
+											entity.actions[0].onClick(entity.id);
+										} else if (
+											entity.actions?.length &&
+											entity.actions[0].type === "link"
+										) {
+											router.push(entity.actions[0].href);
+										}
+									}}
+								>
+									{entity.actions[0].value}
+								</Button>
 							)}
 						</Styles.EntityContent>
 

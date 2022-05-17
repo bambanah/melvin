@@ -28,11 +28,11 @@ const ClientList = () => {
 		const response = await fetch(`/api/clients/${id}/latest-invoice`);
 
 		if (response.status === 404) {
-			router.push(`/invoices/create?for=${id}`);
+			router.push(`/dashboard/invoices/create?for=${id}`);
 		} else {
 			const invoice = (await response.json()) as Invoice;
 
-			router.push(`/invoices/create?copyFrom=${invoice.id}`);
+			router.push(`/dashboard/invoices/create?copyFrom=${invoice.id}`);
 		}
 	};
 
@@ -48,13 +48,13 @@ const ClientList = () => {
 				value: !client ? <Skeleton /> : client?.number || "N/A",
 				icon: faIdCard,
 				type: "text",
-				flex: "1 0 7em",
+				flex: "1 0 7.2em",
 			},
 			{
 				value: !client ? <Skeleton /> : client?.billTo || "N/A",
 				icon: faWallet,
 				type: "text",
-				flex: "0 0 9.5em",
+				flex: "0 0 9.7em",
 			},
 		],
 		actions: !client

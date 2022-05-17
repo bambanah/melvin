@@ -10,7 +10,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Display from "@atoms/display";
 import {
 	faFileAlt,
-	faHome,
 	faUser,
 	faWalking,
 } from "@fortawesome/free-solid-svg-icons";
@@ -21,23 +20,20 @@ const Navbar = () => {
 	return (
 		<Styles.Header>
 			<Styles.Content>
-				<Link href="/" passHref>
+				<Link href="/dashboard/invoices" passHref>
 					<a>
 						<Display className="xsmall brand">melvin</Display>
 					</a>
 				</Link>
 
 				<Styles.Links>
-					<NavLink href="/">
-						<FontAwesomeIcon icon={faHome} /> Dashboard
-					</NavLink>
-					<NavLink href="/invoices">
+					<NavLink href="/dashboard/invoices">
 						<FontAwesomeIcon icon={faFileAlt} /> Invoices
 					</NavLink>
-					<NavLink href="/activities">
+					<NavLink href="/dashboard/activities">
 						<FontAwesomeIcon icon={faWalking} /> Activities
 					</NavLink>
-					<NavLink href="/clients">
+					<NavLink href="/dashboard/clients">
 						<FontAwesomeIcon icon={faUser} /> Clients
 					</NavLink>
 				</Styles.Links>
