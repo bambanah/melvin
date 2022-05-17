@@ -50,18 +50,6 @@ const EntityList: FC<EntityListProps> = ({
 }) => {
 	const [expandedIndex, setExpandedIndex] = useState<number | undefined>();
 
-	const LinkWrapper: FC<{ href?: string }> = ({ children, href }) => {
-		if (href) {
-			return (
-				<Link href={href} passHref>
-					{children}
-				</Link>
-			);
-		}
-
-		return <>{children}</>;
-	};
-
 	return (
 		<Styles.Container>
 			<Styles.Header>
@@ -72,117 +60,108 @@ const EntityList: FC<EntityListProps> = ({
 			</Styles.Header>
 			<Styles.Content>
 				{entities.map((entity, index) => (
-					<LinkWrapper
-						href={shouldExpand ? undefined : `${route}/${entity.id}`}
+					<Styles.Entity
 						key={index}
+						className={expandedIndex === index ? "expanded" : ""}
 					>
-						<Styles.Entity
-							key={index}
-							className={expandedIndex === index ? "expanded" : ""}
-						>
-							<Styles.EntityContent>
-								<Styles.EntityDetails
-									onClick={() =>
-										shouldExpand &&
-										setExpandedIndex(
-											expandedIndex === index ? undefined : index
-										)
-									}
-								>
-									{shouldExpand && (
-										<div>
-											<FontAwesomeIcon
-												icon={["fas", "chevron-right"]}
-												size="1x"
-											/>
-										</div>
-									)}
+						<Styles.EntityContent>
+							<Styles.EntityDetails
+								onClick={() =>
+									shouldExpand &&
+									setExpandedIndex(expandedIndex === index ? undefined : index)
+								}
+							>
+								{shouldExpand && (
+									<div>
+										<FontAwesomeIcon
+											icon={["fas", "chevron-right"]}
+											size="1x"
+										/>
+									</div>
+								)}
 
-									{entity.fields.map((field, index) => {
-										return field.type === "text" ? (
-											<span
-												key={index}
-												style={{
-													textAlign: field.align ?? "left",
-													flex: field.flex ?? "1 0 auto",
-													fontWeight: field.fontWeight ?? "normal",
-												}}
-												className={field.value === "N/A" ? "disabled" : ""}
-											>
-												{typeof field.value === "string" && field.icon && (
-													<FontAwesomeIcon
-														icon={["fas", field.icon]}
-														style={{ marginRight: "0.5em" }}
-													/>
+								{entity.fields.map((field, index) => {
+									return field.type === "text" ? (
+										<span
+											key={index}
+											style={{
+												textAlign: field.align ?? "left",
+												flex: field.flex ?? "1 0 auto",
+												fontWeight: field.fontWeight ?? "normal",
+											}}
+											className={field.value === "N/A" ? "disabled" : ""}
+										>
+											{typeof field.value === "string" && field.icon && (
+												<FontAwesomeIcon
+													icon={["fas", field.icon]}
+													style={{ marginRight: "0.5em" }}
+												/>
+											)}
+											{field.value}
+										</span>
+									) : (
+										<Heading
+											className="xsmall"
+											style={{
+												textAlign: field.align ?? "left",
+												flex: field.flex ?? "1 0 auto",
+												fontWeight: field.fontWeight ?? "bold",
+											}}
+											key={index}
+										>
+											{field.value}
+										</Heading>
+									);
+								})}
+							</Styles.EntityDetails>
+
+							{entity.actions && (
+								<Dropdown
+									key={index}
+									title={entity.actions[0]?.value ?? ""}
+									action={() => {
+										if (
+											entity.actions?.length &&
+											entity.actions[0].type === "button"
+										) {
+											entity.actions[0].onClick(entity.id);
+										}
+									}}
+									style={{ flex: "0 0 auto" }}
+								>
+									{entity.actions.slice(1).map((action, index) => {
+										return action.type === "button" ? (
+											<a onClick={() => action.onClick(entity.id)} key={index}>
+												{action.icon && (
+													<FontAwesomeIcon icon={["fas", action.icon]} />
 												)}
-												{field.value}
-											</span>
+												{action.value}
+											</a>
 										) : (
-											<Heading
-												className="xsmall"
-												style={{
-													textAlign: field.align ?? "left",
-													flex: field.flex ?? "1 0 auto",
-													fontWeight: field.fontWeight ?? "bold",
-												}}
-											>
-												{field.value}
-											</Heading>
+											<Link key={index} href={`${action.href}`}>
+												<a>
+													{action.icon && (
+														<FontAwesomeIcon icon={["fas", action.icon]} />
+													)}
+													{action.value}
+												</a>
+											</Link>
 										);
 									})}
-								</Styles.EntityDetails>
-
-								{entity.actions && (
-									<Dropdown
-										key={index}
-										title={entity.actions[0]?.value ?? ""}
-										action={() => {
-											if (
-												entity.actions?.length &&
-												entity.actions[0].type === "button"
-											)
-												entity.actions[0].onClick(entity.id);
-										}}
-										style={{ flex: "0 0 auto" }}
-									>
-										{entity.actions.slice(1).map((action, index) => {
-											return action.type === "button" ? (
-												<span>
-													<a onClick={() => action.onClick(entity.id)}>
-														{action.icon && (
-															<FontAwesomeIcon icon={["fas", action.icon]} />
-														)}
-														{action.value}
-													</a>
-												</span>
-											) : (
-												<span>
-													<Link key={index} href={`${action.href}`}>
-														<a>
-															{action.icon && (
-																<FontAwesomeIcon icon={["fas", action.icon]} />
-															)}
-															{action.value}
-														</a>
-													</Link>
-												</span>
-											);
-										})}
-									</Dropdown>
-								)}
-							</Styles.EntityContent>
-
-							{shouldExpand && entity.actions && (
-								<Styles.ExpandedComponent
-									className={expandedIndex === index ? "expanded" : ""}
-								>
-									{expandedIndex !== undefined &&
-										entity.ExpandedComponent &&
-										entity.ExpandedComponent(index)}
-								</Styles.ExpandedComponent>
+								</Dropdown>
 							)}
-						</Styles.Entity>
-					</LinkWrapper>
+						</Styles.EntityContent>
+
+						{shouldExpand && entity.actions && (
+							<Styles.ExpandedComponent
+								className={expandedIndex === index ? "expanded" : ""}
+							>
+								{expandedIndex !== undefined &&
+									entity.ExpandedComponent &&
+									entity.ExpandedComponent(index)}
+							</Styles.ExpandedComponent>
+						)}
+					</Styles.Entity>
 				))}
 			</Styles.Content>
 		</Styles.Container>

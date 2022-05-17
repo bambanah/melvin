@@ -1,13 +1,9 @@
-import React from "react";
+import React, { FC } from "react";
 import styled from "styled-components";
 import Navbar from "@organisms/navbar";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import Loading from "@atoms/loading";
-
-interface Props {
-	children: React.ReactNode;
-}
 
 const Container = styled.div`
 	display: flex;
@@ -28,7 +24,7 @@ const Content = styled.div`
 	padding: 3rem;
 `;
 
-const Layout: React.FC<Props> = ({ children }) => {
+const Layout: FC = ({ children }) => {
 	const session = useSession();
 	const router = useRouter();
 

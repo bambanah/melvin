@@ -1,4 +1,5 @@
 import Button from "@atoms/button";
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { FC, useEffect, useRef, useState } from "react";
 import * as Styles from "./styles";
@@ -42,7 +43,7 @@ const Dropdown: FC<DropdownProps> = ({ title, children, action, style }) => {
 				{title}
 			</Button>
 			<Button onClick={() => setShowDropdown(!showDropdown)}>
-				<FontAwesomeIcon icon={["fas", "chevron-down"]} />
+				<FontAwesomeIcon icon={faChevronDown} />
 			</Button>
 			{showDropdown && (
 				<Styles.DropdownContent onClick={() => setShowDropdown(false)}>

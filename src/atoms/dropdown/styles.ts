@@ -7,21 +7,19 @@ export const DropdownContainer = styled.div`
 	button:first-of-type {
 		border-top-right-radius: 0;
 		border-bottom-right-radius: 0;
-		padding: 0.8em 1em;
+		padding: 0.6em 0.7em;
 	}
 
 	button:last-of-type {
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
-		padding: 0.8em 0.5em;
+		padding: 0.6em 0.5em;
 		border-left-width: 0;
 	}
 `;
 
 export const DropdownContent = styled.div`
 	position: absolute;
-	/* top: 3em;
-	right: 0; */
 	display: flex;
 	flex-direction: column;
 	z-index: 100;
@@ -32,19 +30,18 @@ export const DropdownContent = styled.div`
 	border-radius: 0.3rem;
 	border: 0.1em solid ${({ theme }) => theme.colors.fg}33;
 
-	span {
+	a {
 		padding: 0.5em 1em;
 		min-width: 8em;
+		width: 100%;
 		background-color: ${({ theme }) => theme.colors.bg};
 
 		cursor: pointer;
 
-		a {
-			color: ${({ theme }) => theme.colors.fg};
+		color: ${({ theme }) => theme.colors.fg};
 
-			svg {
-				margin-right: 0.2em;
-			}
+		svg {
+			margin-right: 0.2em;
 		}
 
 		&:hover {

@@ -6,7 +6,7 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
 		const { id } = request.query;
 
 		const invoice = await prisma.invoice.findFirst({
-			where: { ownerId: String(id) },
+			where: { clientId: String(id) },
 			include: {
 				activities: true,
 				client: true,

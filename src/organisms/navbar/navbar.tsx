@@ -1,6 +1,6 @@
 import NavAuth from "@molecules/nav-auth";
 import NavLink from "@atoms/nav-link";
-import ThemeSwitch from "@atoms/theme-switch";
+import ThemeSwitch from "@molecules/theme-switch";
 import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";

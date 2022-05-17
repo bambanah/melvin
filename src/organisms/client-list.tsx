@@ -1,10 +1,12 @@
 import EntityList from "@molecules/entity-list";
 import { EntityListItem } from "@molecules/entity-list/entity-list";
 import { Client } from "@prisma/client";
+import { useRouter } from "next/router";
 import React from "react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import useSWR from "swr";
+import { Invoice } from "types/invoice";
 
 const getClients = async () => {
 	const response = await fetch("/api/clients");
@@ -14,11 +16,24 @@ const getClients = async () => {
 
 const ClientList = () => {
 	const { data: clients, error } = useSWR("/api/clients", getClients);
+	const router = useRouter();
 
 	if (error) {
 		console.error(error);
 		return <div>Error loading</div>;
 	}
+
+	const copyLatestInvoice = async (id: string) => {
+		const response = await fetch(`/api/clients/${id}/latest-invoice`);
+
+		if (response.status === 404) {
+			router.push(`/invoices/create?for=${id}`);
+		} else {
+			const invoice = (await response.json()) as Invoice;
+
+			router.push(`/invoices/create?copyFrom=${invoice.id}`);
+		}
+	};
 
 	const generateEntity = (client?: Client): EntityListItem => ({
 		id: !client ? "loading" : client?.id || "",
@@ -41,6 +56,15 @@ const ClientList = () => {
 				flex: "0 0 9.5em",
 			},
 		],
+		actions: !client
+			? []
+			: [
+					{
+						value: "New Invoice",
+						type: "button",
+						onClick: () => copyLatestInvoice(client.id),
+					},
+			  ],
 	});
 
 	if (!clients)
