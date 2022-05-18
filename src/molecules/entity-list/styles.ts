@@ -76,7 +76,7 @@ export const EntityContent = styled.div`
 	flex: 1 1 auto;
 	display: flex;
 	align-items: center;
-	gap: 1.5em;
+	gap: 1em;
 	padding-right: 1.2em;
 `;
 
@@ -89,7 +89,7 @@ export const EntityDetails = styled.div`
 
 	cursor: pointer;
 
-	gap: 1.5em;
+	gap: 1em;
 	transition: background 0.1s;
 
 	&:hover {

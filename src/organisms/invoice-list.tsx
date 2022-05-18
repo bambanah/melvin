@@ -81,7 +81,7 @@ export default function InvoiceList() {
 			{
 				value: !invoice ? <Skeleton /> : dayjs(invoice.date).format("DD/MM/YY"),
 				type: "text",
-				flex: "0 0 4.4em",
+				flex: "0 0 4.5em",
 			},
 			{
 				value: !invoice ? <Skeleton /> : invoice.invoiceNo,
