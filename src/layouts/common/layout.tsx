@@ -22,6 +22,10 @@ const Content = styled.div`
 	overflow-y: auto;
 
 	padding: 3rem;
+
+	@media screen and (max-width: 1000px) {
+		padding: 3rem 0;
+	}
 `;
 
 const Layout: FC = ({ children }) => {

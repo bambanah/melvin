@@ -7,19 +7,9 @@ export const Header = styled.header`
 	box-sizing: border-box;
 	z-index: 100;
 	background-color: ${({ theme }) => theme.colors.bg};
-`;
 
-export const Brand = styled.span`
-	cursor: pointer;
-	user-select: none;
-	flex: 0 0 auto;
-	font-size: 2.2rem;
-	font-weight: bold;
-	font-family: "Patua One";
-	color: ${({ theme }) => theme.colors.brand};
-
-	&:hover {
-		color: ${({ theme }) => theme.colors.brand};
+	@media screen and (max-width: 1200px) {
+		flex-basis: 6em;
 	}
 `;
 
@@ -50,4 +40,9 @@ export const Links = styled.div`
 export const Right = styled.div`
 	display: flex;
 	gap: 1rem;
+
+	@media screen and (max-width: 1200px) {
+		flex-direction: column-reverse;
+		align-items: center;
+	}
 `;

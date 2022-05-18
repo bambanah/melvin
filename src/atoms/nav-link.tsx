@@ -30,6 +30,19 @@ const StyledLink = styled.a<StyleProps>`
 		margin-right: 0.5rem;
 	}
 
+	@media screen and (max-width: 1200px) {
+		width: auto;
+		padding: 0.5 1em;
+
+		svg {
+			margin: 0;
+		}
+
+		span {
+			display: none;
+		}
+	}
+
 	&:hover {
 		color: ${({ active, theme }) =>
 			active ? theme.colors.bg : theme.colors.fg};

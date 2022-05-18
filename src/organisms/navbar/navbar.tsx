@@ -13,28 +13,35 @@ import {
 	faUser,
 	faWalking,
 } from "@fortawesome/free-solid-svg-icons";
+import { useMediaQuery } from "react-responsive";
 
 const Navbar = () => {
 	const session = useSession();
+	const isSmallScreen = useMediaQuery({ query: "(max-width: 1200px)" });
 
 	return (
 		<Styles.Header>
 			<Styles.Content>
 				<Link href="/dashboard/invoices" passHref>
 					<a>
-						<Display className="xsmall brand">melvin</Display>
+						<Display className="xsmall brand">
+							{isSmallScreen ? "m" : "melvin"}
+						</Display>
 					</a>
 				</Link>
 
 				<Styles.Links>
 					<NavLink href="/dashboard/invoices">
-						<FontAwesomeIcon icon={faFileAlt} /> Invoices
+						<FontAwesomeIcon icon={faFileAlt} title="Invoices" />{" "}
+						<span>Invoices</span>
 					</NavLink>
 					<NavLink href="/dashboard/activities">
-						<FontAwesomeIcon icon={faWalking} /> Activities
+						<FontAwesomeIcon icon={faWalking} title="Activities" />{" "}
+						<span>Activities</span>
 					</NavLink>
 					<NavLink href="/dashboard/clients">
-						<FontAwesomeIcon icon={faUser} /> Clients
+						<FontAwesomeIcon icon={faUser} title="Clients" />{" "}
+						<span>Clients</span>
 					</NavLink>
 				</Styles.Links>
 

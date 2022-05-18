@@ -19,6 +19,10 @@ export const Header = styled.div`
 	margin: auto;
 	width: 100%;
 	max-width: 60em;
+
+	@media screen and (max-width: 1000px) {
+		padding: 0 3rem;
+	}
 `;
 
 export const ExpandedComponent = styled.div`
@@ -99,7 +103,7 @@ export const EntityDetails = styled.div`
 	h1,
 	span {
 		white-space: nowrap;
-		/* text-overflow: ellipsis; */
+		text-overflow: ellipsis;
 		overflow: hidden;
 	}
 

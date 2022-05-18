@@ -72,7 +72,7 @@ const ClientList = () => {
 		return (
 			<EntityList
 				title="Clients"
-				route="/clients"
+				route="/dashboard/clients"
 				entities={
 					Array.from({ length: 3 }).fill(generateEntity()) as EntityListItem[]
 				}
@@ -82,7 +82,7 @@ const ClientList = () => {
 	return (
 		<EntityList
 			title="Clients"
-			route="/clients"
+			route="/dashboard/clients"
 			entities={clients.map((client) => generateEntity(client))}
 		/>
 	);

@@ -8,9 +8,9 @@ const LoginForm = () => {
 		<Styles.Form>
 			<p>Log in to Melvin to continue</p>
 			<Input placeholder="Email Address" />
-			<Input placeholder="Password" />
+			<Input placeholder="Password" type="password" />
 			<a>Forgot password?</a>
-			<Button primary>Continue</Button>
+			<Button>Continue</Button>
 		</Styles.Form>
 	);
 };

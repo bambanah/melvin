@@ -1,8 +1,8 @@
 import Button from "@atoms/button";
+import Display from "@atoms/display";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import LoginForm from "@molecules/login-form";
-import { Brand } from "@organisms/navbar/styles";
 import { BuiltInProviderType } from "next-auth/providers";
 import { ClientSafeProvider, LiteralUnion, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -26,7 +26,7 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 	return (
 		<Styles.Container>
 			<Styles.Modal>
-				<Brand>melvin</Brand>
+				<Display className="small brand">melvin</Display>
 
 				<LoginForm />
 
@@ -42,6 +42,7 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 					<Button
 						onClick={() => signIn(provider.id, { callbackUrl })}
 						key={provider.id}
+						primary
 					>
 						<FontAwesomeIcon icon={faGoogle} />
 						Continue with {provider.name}

@@ -51,7 +51,7 @@ function SupportItemList() {
 	return (
 		<EntityList
 			title="Activities"
-			route="/activities"
+			route="/dashboard/activities"
 			entities={supportItems.map((supportItem) => generateEntity(supportItem))}
 		/>
 	);

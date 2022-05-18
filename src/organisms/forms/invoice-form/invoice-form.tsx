@@ -399,7 +399,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 						toast.success("Invoice Created");
 						setSubmitting(false);
 						mutate("/api/invoices");
-						router.push("/invoices");
+						router.push("/dashboard/invoices");
 					})
 					.catch((error) => {
 						console.error(error);

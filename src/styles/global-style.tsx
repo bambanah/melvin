@@ -10,6 +10,10 @@ const GlobalStyle = createGlobalStyle`
 		--radius-small: 0.3em;
 		--radius-medium: 0.6em;
 		--radius-large: 1em;
+
+		--breakpoint-sm: 500px;
+		--breakpoint-md: 700px;
+		--breakpoint-lg: 1200px;
 	}
 
 	html,
