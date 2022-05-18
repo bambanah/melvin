@@ -7,6 +7,7 @@ interface ApiRequest extends NextApiRequest {
 	body: {
 		invoice?: Partial<Invoice>;
 		activities?: Activity[];
+		activitiesToDelete?: string[];
 	};
 }
 
@@ -41,10 +42,13 @@ export default async (request: ApiRequest, response: NextApiResponse) => {
 				.status(401)
 				.send("Must be signed in to update this resource.");
 
-		if (!request.body.invoice || !request.body.activities) {
+		if (
+			!request.body.invoice ||
+			!request.body.activities ||
+			!request.body.activitiesToDelete
+		) {
 			return response.status(402).send("Not enough info");
 		}
-
 		const collection = await prisma.$transaction([
 			prisma.invoice.update({
 				where: { id: String(id) },
@@ -61,6 +65,9 @@ export default async (request: ApiRequest, response: NextApiResponse) => {
 						invoiceId: String(id),
 					},
 				})
+			),
+			...request.body.activitiesToDelete?.map((id) =>
+				prisma.activity.delete({ where: { id } })
 			),
 		]);
 

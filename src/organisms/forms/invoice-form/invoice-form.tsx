@@ -78,6 +78,8 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 		supportItemId: "",
 	};
 
+	const activitiesToDelete: string[] = [];
+
 	const BaseForm = (props: FormikProps<FormValues>) => {
 		const { values, touched, errors, handleChange, handleBlur, handleSubmit } =
 			props;
@@ -97,10 +99,14 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 					client.invoices?.map((index) => index.invoiceNo) ?? []
 				);
 
-				values.invoiceNo =
-					highestInvoiceNo !== initialValues?.invoiceNo
-						? getNextInvoiceNo(client.invoices?.map((index) => index.invoiceNo))
-						: highestInvoiceNo ?? "";
+				if (!initialValues?.invoiceNo) {
+					values.invoiceNo =
+						highestInvoiceNo !== initialValues?.invoiceNo
+							? getNextInvoiceNo(
+									client.invoices?.map((index) => index.invoiceNo)
+							  )
+							: highestInvoiceNo ?? "";
+				}
 
 				if (client.billTo) {
 					setBillToSource("client information");
@@ -157,9 +163,17 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 						<Label htmlFor="invoiceNo" required>
 							<span>Invoice Number</span>
 							<Subheading>
-								{getPreviousInvoiceNo()
-									? `Previous invoice number was ${getPreviousInvoiceNo()}`
-									: "This is the first invoice"}
+								{!initialValues?.invoiceNo ? (
+									getPreviousInvoiceNo() ? (
+										<>
+											Previous invoice was <b>{getPreviousInvoiceNo()}</b>
+										</>
+									) : (
+										"This is the first invoice"
+									)
+								) : (
+									"Update if required"
+								)}
 							</Subheading>
 							<Input
 								type="text"
@@ -176,7 +190,13 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 							<span>Bill To</span>
 							{billToSource ? (
 								<Subheading>
-									Loaded from <b>{billToSource}</b>
+									{initialValues?.billTo ? (
+										"Update if required"
+									) : (
+										<>
+											Loaded from <b>{billToSource}</b>
+										</>
+									)}
 								</Subheading>
 							) : (
 								<Subheading>Leave blank if required</Subheading>
@@ -239,7 +259,12 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 															<Button
 																type="button"
 																className="danger"
-																onClick={() => arrayHelpers.remove(index)}
+																onClick={() => {
+																	if (activity.id) {
+																		activitiesToDelete.push(activity.id);
+																	}
+																	arrayHelpers.remove(index);
+																}}
 															>
 																X
 															</Button>
@@ -316,9 +341,10 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 											<Button
 												type="button"
 												onClick={() =>
-													arrayHelpers.push(
-														values.activities[values.activities.length - 1]
-													)
+													arrayHelpers.push({
+														...values.activities[values.activities.length - 1],
+														id: undefined,
+													})
 												}
 												disabled={!values.clientId}
 											>
@@ -378,7 +404,10 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 
 			if (initialValues?.id) {
 				axios
-					.post(`/api/invoices/${initialValues.id}`, data)
+					.post(`/api/invoices/${initialValues.id}`, {
+						...data,
+						activitiesToDelete,
+					})
 					.then(() => {
 						toast.info("Invoice Updated");
 						setSubmitting(false);

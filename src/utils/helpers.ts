@@ -152,16 +152,16 @@ export const invoiceToValues = (
 	invoiceNo: invoice.invoiceNo,
 	clientId: invoice.clientId,
 	billTo: invoice.billTo,
-	date: dayjs(invoice.date).format("DD/MM/YYYY"),
+	date: dayjs.utc(invoice.date).format("DD/MM/YYYY"),
 	activities: invoice.activities.map((activity) => ({
 		id: activity.id,
 		supportItemId: activity.supportItemId ?? "",
-		date: dayjs(activity.date).format("DD/MM/YYYY"),
+		date: dayjs.utc(activity.date).format("DD/MM/YYYY"),
 		itemDistance: activity.itemDistance?.toString() ?? "",
 		transitDistance: activity.transitDistance?.toString() ?? "",
 		transitDuration: activity.transitDuration?.toString() ?? "",
-		startTime: dayjs(activity.startTime).format("HH:mm"),
-		endTime: dayjs(activity.endTime).format("HH:mm"),
+		startTime: dayjs.utc(activity.startTime).format("HH:mm"),
+		endTime: dayjs.utc(activity.endTime).format("HH:mm"),
 	})),
 });
 
