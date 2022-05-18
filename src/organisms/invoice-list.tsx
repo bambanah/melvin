@@ -111,7 +111,7 @@ export default function InvoiceList() {
 				),
 				icon: faDollarSign,
 				type: "text",
-				flex: "0 0 5em",
+				flex: "0 0 5.4em",
 			},
 		],
 	});
