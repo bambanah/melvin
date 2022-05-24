@@ -60,6 +60,7 @@ const StyledCard = styled.div`
 interface CardProps {
 	href?: string;
 	create?: boolean;
+	children: React.ReactNode;
 }
 
 const Card: FC<CardProps> = ({ href, children, create }) => {

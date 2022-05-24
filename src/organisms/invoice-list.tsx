@@ -68,11 +68,11 @@ export default function InvoiceList() {
 							) {
 								axios
 									.delete(`/api/invoices/${invoice.id}`)
-									.then((response) => {
+									.then(() => {
 										mutate("/api/invoices");
-										toast.success(response);
+										toast.error("Invoice deleted");
 									})
-									.catch((error_) => toast.error(error_));
+									.catch((error) => toast.error(error));
 							}
 						},
 					},

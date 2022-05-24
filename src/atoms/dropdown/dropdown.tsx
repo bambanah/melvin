@@ -8,6 +8,7 @@ interface DropdownProps {
 	title: string;
 	action: () => void;
 	style: React.CSSProperties;
+	children: React.ReactNode;
 }
 
 const Dropdown: FC<DropdownProps> = ({ title, children, action, style }) => {

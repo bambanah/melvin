@@ -28,7 +28,11 @@ const Content = styled.div`
 	}
 `;
 
-const Layout: FC = ({ children }) => {
+interface Props {
+	children: React.ReactNode;
+}
+
+const Layout: FC<Props> = ({ children }) => {
 	const session = useSession();
 	const router = useRouter();
 

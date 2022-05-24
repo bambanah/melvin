@@ -21,7 +21,11 @@ const AppContext = createContext<AppContextState>({
 	],
 });
 
-export const AppContextProvider: React.FC = ({ children }) => {
+interface Props {
+	children: React.ReactNode;
+}
+
+export const AppContextProvider: React.FC<Props> = ({ children }) => {
 	let initialTheme = "light";
 
 	if (typeof window !== "undefined") {
