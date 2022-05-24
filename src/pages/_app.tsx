@@ -1,11 +1,16 @@
+import React from "react";
 import GlobalStyle from "@styles/global-style";
+import Head from "next/head";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
-import Head from "next/head";
-import React from "react";
+import { AppContextProvider } from "@context/app-context";
+
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { AppContextProvider } from "@context/app-context";
+
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+config.autoAddCss = false;
 
 function App({ Component, pageProps }: AppProps) {
 	return (
