@@ -51,12 +51,18 @@ export type FormValues = Omit<Partial<Invoice>, "date"> & {
 interface Props {
 	initialValues?: FormValues;
 	returnFunction?: () => void;
+	copiedFrom?: string;
 }
 
-const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
+const CreateInvoiceForm: FC<Props> = ({
+	initialValues,
+	returnFunction,
+	copiedFrom,
+}) => {
 	const router = useRouter();
 	const { mutate } = useSWRConfig();
 
+	// Get clients and support items
 	const {
 		data: clients,
 		error: cError,
@@ -81,6 +87,11 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 	};
 
 	const activitiesToDelete: string[] = [];
+
+	const title =
+		router.query.edit && initialValues
+			? `Updating ${initialValues.invoiceNo}`
+			: "Creating new invoice";
 
 	const BaseForm = (props: FormikProps<FormValues>) => {
 		const { values, touched, errors, handleChange, handleBlur, handleSubmit } =
@@ -173,6 +184,10 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 									) : (
 										"This is the first invoice"
 									)
+								) : copiedFrom ? (
+									<>
+										Previous invoice was <b>{copiedFrom}</b>
+									</>
 								) : (
 									"Update if required"
 								)}
@@ -257,7 +272,6 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 															/>
 														</Label>
 														<Label className="delete-button">
-															{" "}
 															<Button
 																type="button"
 																variant="danger"
@@ -349,6 +363,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 													})
 												}
 												disabled={!values.clientId}
+												variant="secondary"
 											>
 												Add New Activity
 											</Button>
@@ -373,7 +388,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 									disabled={!values.clientId}
 									variant="primary"
 								>
-									{initialValues ? "Save" : "Create"}
+									{router.query.edit ? "Update" : "Create"}
 								</Button>
 								<Button
 									type="button"
@@ -450,18 +465,9 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 	return (
 		<Styles.Container>
 			<Head>
-				<title>
-					{initialValues
-						? `Updating ${initialValues.invoiceNo}`
-						: "Create Invoice"}{" "}
-					- Melvin
-				</title>
+				<title>{title} - Melvin</title>
 			</Head>
-			<Heading>
-				{initialValues
-					? `Updating ${initialValues.invoiceNo}`
-					: "Create New Invoice"}
-			</Heading>
+			<Heading>{title}</Heading>
 			<InvoiceForm />
 		</Styles.Container>
 	);

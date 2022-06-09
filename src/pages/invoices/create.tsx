@@ -7,12 +7,16 @@ import prisma from "@utils/prisma";
 
 interface Props {
 	initialValues?: FormValues;
+	copiedFrom?: string;
 }
 
-const CreateInvoice = ({ initialValues }: Props) => {
+const CreateInvoice = ({ initialValues, copiedFrom }: Props) => {
 	return (
 		<Layout>
-			<CreateInvoiceForm initialValues={initialValues} />
+			<CreateInvoiceForm
+				initialValues={initialValues}
+				copiedFrom={copiedFrom}
+			/>
 		</Layout>
 	);
 };
@@ -34,6 +38,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 			const invoiceNumbers = await prisma.invoice.findMany({
 				where: {
 					ownerId: invoice.ownerId,
+					clientId: invoice.clientId,
 				},
 				select: {
 					invoiceNo: true,
@@ -42,6 +47,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 
 			const initialValues = invoiceToValues(invoice);
 
+			const originalInvoiceNo = initialValues.invoiceNo;
 			initialValues.invoiceNo = getNextInvoiceNo(
 				invoiceNumbers.map((i) => i.invoiceNo)
 			);
@@ -59,6 +65,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 			return {
 				props: {
 					initialValues,
+					copiedFrom: originalInvoiceNo,
 				},
 			};
 		}
