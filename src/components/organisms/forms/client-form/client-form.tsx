@@ -99,7 +99,7 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 					</Label>
 
 					<ButtonGroup>
-						<Button type="submit" primary>
+						<Button type="submit" variant="primary">
 							{initialValues ? "Save" : "Create"}
 						</Button>
 						<Button

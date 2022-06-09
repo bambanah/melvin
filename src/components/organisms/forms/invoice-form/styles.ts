@@ -57,7 +57,7 @@ export const ActivityContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 
-	button {
+	/* button {
 		color: ${({ theme }) => theme.colors.bg};
 		background-color: ${({ theme }) => theme.colors.fg};
 		transition: all 0.15s ease;
@@ -66,7 +66,7 @@ export const ActivityContainer = styled.div`
 			color: ${({ theme }) => theme.colors.fg};
 			background-color: ${({ theme }) => theme.colors.bg};
 		}
-	}
+	} */
 `;
 
 export const Activity = styled.div`

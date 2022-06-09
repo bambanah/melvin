@@ -28,6 +28,8 @@ import { toast } from "react-toastify";
 import useSWR, { SWRResponse, useSWRConfig } from "swr";
 import * as Styles from "./styles";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashAlt } from "@fortawesome/free-regular-svg-icons";
 dayjs.extend(customParseFormat);
 
 export type FormActivity = {
@@ -221,7 +223,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 						<Button
 							type="button"
 							onClick={() => confirmInvoiceNo(true)}
-							primary
+							variant="primary"
 						>
 							Confirm
 						</Button>
@@ -258,7 +260,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 															{" "}
 															<Button
 																type="button"
-																className="danger"
+																variant="danger"
 																onClick={() => {
 																	if (activity.id) {
 																		activitiesToDelete.push(activity.id);
@@ -266,7 +268,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 																	arrayHelpers.remove(index);
 																}}
 															>
-																X
+																<FontAwesomeIcon icon={faTrashAlt} />
 															</Button>
 														</Label>
 													</Styles.ActivityRow>
@@ -356,7 +358,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 											type="button"
 											onClick={() => arrayHelpers.push(emptyActivity)}
 											disabled={!values.clientId}
-											primary
+											variant="primary"
 										>
 											Add New Activity
 										</Button>
@@ -366,7 +368,11 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 						/>
 						{values.activities.length > 0 && (
 							<ButtonGroup>
-								<Button type="submit" disabled={!values.clientId} primary>
+								<Button
+									type="submit"
+									disabled={!values.clientId}
+									variant="primary"
+								>
 									{initialValues ? "Save" : "Create"}
 								</Button>
 								<Button

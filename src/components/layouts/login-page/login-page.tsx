@@ -42,7 +42,7 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 					<Button
 						onClick={() => signIn(provider.id, { callbackUrl })}
 						key={provider.id}
-						primary
+						variant="primary"
 					>
 						<FontAwesomeIcon icon={faGoogle} />
 						Continue with {provider.name}

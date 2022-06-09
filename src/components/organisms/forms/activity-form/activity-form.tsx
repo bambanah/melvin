@@ -153,7 +153,7 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 					</Styles.InputGroup>
 
 					<ButtonGroup>
-						<Button type="submit" primary>
+						<Button type="submit" variant="primary">
 							{initialValues ? "Update" : "Create"}
 						</Button>
 						<Button

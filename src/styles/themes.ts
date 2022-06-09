@@ -10,7 +10,7 @@ export const light: DefaultTheme = {
 		green: "#EBFCF6",
 		gradientPink:
 			"linear-gradient(31deg, rgba(255,112,112,1) 0%, rgba(215,185,255,1) 100%)",
-		error: "#ff574e",
+		error: "#F14348",
 	},
 };
 

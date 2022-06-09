@@ -28,7 +28,6 @@ const Dropdown: FC<DropdownProps> = ({ title, children, action, style }) => {
 		document.addEventListener("mousedown", handleClickOutside);
 
 		return () => {
-			// Unbind the event listener on clean up
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
 	});
@@ -43,7 +42,10 @@ const Dropdown: FC<DropdownProps> = ({ title, children, action, style }) => {
 			>
 				{title}
 			</Button>
-			<Button onClick={() => setShowDropdown(!showDropdown)}>
+			<Button
+				onClick={() => setShowDropdown(!showDropdown)}
+				className={showDropdown ? "raised" : ""}
+			>
 				<FontAwesomeIcon icon={faChevronDown} />
 			</Button>
 			{showDropdown && (

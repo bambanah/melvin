@@ -14,7 +14,7 @@ export const DropdownContainer = styled.div`
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
 		padding: 0.6em 0.5em;
-		border-left-width: 0;
+		margin-left: -1px;
 	}
 `;
 
@@ -24,14 +24,11 @@ export const DropdownContent = styled.div`
 	flex-direction: column;
 	z-index: 100;
 
-	overflow: hidden;
 	position: fixed;
-
-	border: 0.1em solid ${({ theme }) => theme.colors.fg}33;
 
 	a {
 		padding: 0.5em 1em;
-		min-width: 8em;
+		min-width: 8.4em;
 		width: 100%;
 		background-color: ${({ theme }) => theme.colors.bg};
 
@@ -39,15 +36,17 @@ export const DropdownContent = styled.div`
 
 		color: ${({ theme }) => theme.colors.fg};
 
+		border: 0.1em solid ${({ theme }) => theme.colors.fg};
+		margin-top: -0.1em;
+		transition: all 0.1s ease;
+
 		svg {
 			margin-right: 0.2em;
 		}
 
 		&:hover {
-			background-color: ${({ theme }) =>
-				theme.type === "light"
-					? shade(0.2, theme.colors.bg)
-					: lighten(0.1, theme.colors.bg)};
+			transform: translate(-0.21rem, -0.2rem);
+			box-shadow: 0.2rem 0.2rem #000;
 		}
 	}
 `;

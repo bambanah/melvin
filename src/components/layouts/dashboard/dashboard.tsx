@@ -12,7 +12,7 @@ const Dashboard = () => {
 			<Styles.Header>
 				<Display className="small">Welcome to Melvin!</Display>
 				<Styles.HeaderActions>
-					<Button primary onClick={() => router.push("/login")}>
+					<Button variant="primary" onClick={() => router.push("/login")}>
 						Login
 					</Button>
 				</Styles.HeaderActions>

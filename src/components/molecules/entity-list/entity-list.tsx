@@ -57,7 +57,7 @@ const EntityList: FC<EntityListProps> = ({
 			<Styles.Header>
 				<Display className="small">{title}</Display>
 				<Link href={`${route}/create`} passHref>
-					<Button primary>+ Add New</Button>
+					<Button variant="primary">+ Add New</Button>
 				</Link>
 			</Styles.Header>
 			<Styles.Content>
