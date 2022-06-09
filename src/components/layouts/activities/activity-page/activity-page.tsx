@@ -23,7 +23,7 @@ const ActivityPage = () => {
 		() => getActivity(supportItemId)
 	);
 
-	const [editing, setEditing] = useState(false);
+	const [editing, setEditing] = useState(router.query.edit || false);
 
 	if (error) {
 		console.error(error);
@@ -42,7 +42,7 @@ const ActivityPage = () => {
 				<>
 					<CreateActivityForm
 						initialValues={supportItem}
-						returnFunction={() => setEditing(false)}
+						returnFunction={() => router.push("/activities")}
 					/>
 				</>
 			) : (

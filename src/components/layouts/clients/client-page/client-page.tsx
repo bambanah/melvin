@@ -9,7 +9,7 @@ import * as Styles from "./styles";
 
 const ClientPage = () => {
 	const router = useRouter();
-	const [editing, setEditing] = useState(false);
+	const [editing, setEditing] = useState(router.query.edit || false);
 
 	const { data: client, error } = useSWR(
 		`/api/clients/${router.query.id}`,
@@ -25,7 +25,7 @@ const ClientPage = () => {
 				<ClientForm
 					initialValues={client}
 					returnFunction={() => {
-						setEditing(false);
+						router.push("/clients");
 					}}
 				/>
 			) : (

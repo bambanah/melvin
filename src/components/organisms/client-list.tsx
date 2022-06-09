@@ -1,4 +1,9 @@
-import { faIdCard, faWallet } from "@fortawesome/free-solid-svg-icons";
+import {
+	faEdit,
+	faIdCard,
+	faTrash,
+	faWallet,
+} from "@fortawesome/free-solid-svg-icons";
 import EntityList from "@molecules/entity-list";
 import { EntityListItem } from "@molecules/entity-list/entity-list";
 import { Client } from "@prisma/client";
@@ -7,7 +12,9 @@ import React from "react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import Invoice from "types/invoice";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const getClients = async () => {
 	const response = await fetch("/api/clients");
@@ -64,6 +71,28 @@ const ClientList = () => {
 						value: "New Invoice",
 						type: "button",
 						onClick: () => copyLatestInvoice(client.id),
+					},
+					{
+						value: "Edit",
+						type: "link",
+						icon: faEdit,
+						href: `/clients/${client.id}?edit=true`,
+					},
+					{
+						value: "Delete",
+						type: "button",
+						icon: faTrash,
+						onClick: () => {
+							if (confirm(`Are you sure you want to delete ${client.name}?`)) {
+								axios
+									.delete(`/api/clients/${client.id}`)
+									.then(() => {
+										mutate("/api/clients");
+										toast.success("Client deleted");
+									})
+									.catch((error) => toast.error(error));
+							}
+						},
 					},
 			  ],
 	});

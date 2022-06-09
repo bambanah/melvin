@@ -70,7 +70,7 @@ export default function InvoiceList() {
 									.delete(`/api/invoices/${invoice.id}`)
 									.then(() => {
 										mutate("/api/invoices");
-										toast.error("Invoice deleted");
+										toast.success("Invoice deleted");
 									})
 									.catch((error) => toast.error(error));
 							}

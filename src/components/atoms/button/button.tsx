@@ -20,7 +20,7 @@ const BaseButton = styled.button`
 
 	&:hover,
 	&.raised {
-		transform: translate(-0.21rem, -0.2rem);
+		transform: translate(-0.2rem, -0.2rem);
 		box-shadow: 0.2rem 0.2rem #000;
 	}
 

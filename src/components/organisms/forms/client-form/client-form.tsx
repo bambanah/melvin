@@ -40,12 +40,10 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 						- Melvin
 					</title>
 				</Head>
+				<Heading>
+					{initialValues ? `Updating ${initialValues.name}` : "Add New Client"}
+				</Heading>
 				<Form onSubmit={handleSubmit} flexDirection="column">
-					<Heading>
-						{initialValues
-							? `Updating ${initialValues.name}`
-							: "Add New Client"}
-					</Heading>
 					<Label htmlFor="name" required>
 						<span>Participant Name</span>
 						<Input
@@ -100,7 +98,7 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 
 					<ButtonGroup>
 						<Button type="submit" variant="primary">
-							{initialValues ? "Save" : "Create"}
+							{initialValues ? "Update" : "Create"}
 						</Button>
 						<Button
 							type="button"

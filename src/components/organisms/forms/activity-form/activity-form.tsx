@@ -1,6 +1,7 @@
 import Button from "@atoms/button";
 import ErrorMessage from "@atoms/error-message";
 import Form from "@atoms/form";
+import Heading from "@atoms/heading";
 import Input from "@atoms/input";
 import Label from "@atoms/label";
 import Select from "@atoms/select/select";
@@ -53,6 +54,9 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 
 		return (
 			<Styles.CreateActivityContainer>
+				<Heading>
+					{initialValues ? `Updating Activity` : "Create New Activity"}
+				</Heading>
 				<Form onSubmit={handleSubmit} flexDirection="column">
 					<Styles.InputGroup>
 						<Styles.Heading>General</Styles.Heading>

@@ -5,4 +5,9 @@ export const ClientContainer = styled.div`
 	padding: 3rem;
 	min-width: 500px;
 	align-self: center;
+
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	align-items: center;
 `;

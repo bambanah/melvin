@@ -3,6 +3,11 @@ import styled from "styled-components";
 export const CreateActivityContainer = styled.div`
 	padding: 3rem 0;
 	align-self: center;
+
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	align-items: center;
 `;
 
 export const InputGroup = styled.div`
