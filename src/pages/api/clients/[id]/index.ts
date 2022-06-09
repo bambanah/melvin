@@ -43,8 +43,7 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
 			},
 		});
 
-		response.statusCode = 204;
-		return response;
+		return response.status(204).end();
 	}
 
 	return response.status(405).send("Unsupported method");
