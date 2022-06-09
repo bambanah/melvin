@@ -9,7 +9,7 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
-		"lint:fix": "eslint . --fix",
+		"lint:fix": "next lint --fix",
 		"test": "jest",
 		"seed": "ts-node prisma/seed.ts",
 		"prepare": "husky install"
