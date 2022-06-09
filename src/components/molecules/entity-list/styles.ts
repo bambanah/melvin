@@ -1,3 +1,4 @@
+import { breakpoints } from "@styles/themes";
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -20,7 +21,7 @@ export const Header = styled.div`
 	width: 100%;
 	max-width: 60em;
 
-	@media screen and (max-width: 1000px) {
+	@media ${breakpoints.laptop} {
 		padding: 0 3rem;
 	}
 `;

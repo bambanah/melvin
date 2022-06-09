@@ -101,6 +101,7 @@ const Button: React.FC<Props> = ({
 	children,
 	disabled,
 	onClick,
+	className,
 	...rest
 }) => {
 	let ButtonComponent: StyledComponent<"button", DefaultTheme>;
@@ -124,7 +125,7 @@ const Button: React.FC<Props> = ({
 
 	return (
 		<ButtonComponent
-			className={disabled ? "disabled" : ""}
+			className={`${disabled ? "disabled" : ""} ${className}`}
 			onClick={!disabled ? onClick : undefined}
 			{...rest}
 		>

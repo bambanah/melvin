@@ -1,6 +1,6 @@
 import Button from "@atoms/button";
 import Display from "@atoms/display";
-import Dropdown from "@atoms/dropdown";
+import Dropdown from "@molecules/dropdown";
 import Heading from "@atoms/heading";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";

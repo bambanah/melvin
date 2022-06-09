@@ -2,6 +2,7 @@ import React from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import { breakpoints } from "@styles/themes";
 
 interface Props {
 	href: string;
@@ -13,7 +14,7 @@ interface StyleProps {
 }
 
 const StyledLink = styled.a<StyleProps>`
-	width: 11em;
+	width: 100%;
 	text-decoration: none;
 	color: ${({ active, theme }) =>
 		active ? theme.colors.bg : `${theme.colors.fg}88`};
@@ -30,7 +31,7 @@ const StyledLink = styled.a<StyleProps>`
 		margin-right: 0.5rem;
 	}
 
-	@media screen and (max-width: 1200px) {
+	@media ${breakpoints.desktop} {
 		width: auto;
 		padding: 0.5 1em;
 
@@ -40,6 +41,19 @@ const StyledLink = styled.a<StyleProps>`
 
 		span {
 			display: none;
+		}
+	}
+
+	@media ${breakpoints.tablet} {
+		width: 100%;
+		padding: 0.5 1em;
+
+		svg {
+			margin-right: 0.5rem;
+		}
+
+		span {
+			display: inline;
 		}
 	}
 
