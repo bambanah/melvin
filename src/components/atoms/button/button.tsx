@@ -40,8 +40,9 @@ const BaseButton = styled.button`
 `;
 
 const PrimaryButton = styled(BaseButton)`
+	border: none;
 	color: ${({ theme }) =>
-		theme.type === "light" ? theme.colors.bg : theme.colors.fg};
+		theme.type === "light" ? theme.colors.fg : theme.colors.bg};
 	background-color: ${({ theme }) => theme.colors.brand};
 
 	&.disabled {

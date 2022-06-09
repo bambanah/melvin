@@ -54,7 +54,6 @@ export const Entity = styled.div`
 	align-items: stretch;
 
 	color: ${({ theme }) => theme.colors.fg};
-	overflow: hidden;
 	transition: box-shadow 0.2s;
 
 	box-shadow: var(--shadow-low);
@@ -78,6 +77,7 @@ export const EntityContent = styled.div`
 	align-items: center;
 	gap: 1em;
 	padding-right: 1.2em;
+	width: 100%;
 `;
 
 export const EntityDetails = styled.div`
@@ -86,17 +86,20 @@ export const EntityDetails = styled.div`
 	align-items: center;
 	min-width: 0;
 	padding: 1.6em 1.2em;
-
-	cursor: pointer;
+	padding-right: 0;
 
 	gap: 1em;
 	transition: background 0.1s;
 
-	&:hover {
-		color: ${({ theme }) => theme.colors.brand};
+	&.expand {
+		cursor: pointer;
 
-		h1 {
+		:hover {
 			color: ${({ theme }) => theme.colors.brand};
+
+			h1 {
+				color: ${({ theme }) => theme.colors.brand};
+			}
 		}
 	}
 

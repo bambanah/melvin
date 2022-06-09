@@ -72,6 +72,7 @@ const EntityList: FC<EntityListProps> = ({
 									shouldExpand &&
 									setExpandedIndex(expandedIndex === index ? undefined : index)
 								}
+								className={shouldExpand ? "expand" : ""}
 							>
 								{shouldExpand && (
 									<div>
