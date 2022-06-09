@@ -47,7 +47,7 @@ const ActivityPage = () => {
 				</>
 			) : (
 				<Styles.Content>
-					<Link href="/dashboard/activities">&lt; Back to activities</Link>
+					<Link href="/activities">&lt; Back to activities</Link>
 					<h1>{supportItem.description}</h1>
 					<Button onClick={() => setEditing(true)}>Edit</Button>
 					<p>

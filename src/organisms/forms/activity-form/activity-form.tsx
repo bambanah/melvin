@@ -162,7 +162,7 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 								if (returnFunction) {
 									returnFunction();
 								} else {
-									router.push("/dashboard/activities");
+									router.push("/activities");
 								}
 							}}
 						>
@@ -215,16 +215,14 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 						setSubmitting(false);
 						mutate(`/api/support-items/${initialValues.id}`);
 
-						returnFunction
-							? returnFunction()
-							: router.push("/dashboard/activities");
+						returnFunction ? returnFunction() : router.push("/activities");
 					});
 			} else {
 				axios.post("/api/support-items", values).then(() => {
 					toast.success("Support Item Created");
 					setSubmitting(false);
 					mutate("/api/support-items");
-					router.push("/dashboard/activities");
+					router.push("/activities");
 				});
 			}
 		},

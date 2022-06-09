@@ -375,7 +375,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 									onClick={() => {
 										returnFunction
 											? returnFunction()
-											: router.push("/dashboard/invoices");
+											: router.push("/invoices");
 									}}
 								>
 									Cancel
@@ -413,9 +413,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 						setSubmitting(false);
 						mutate(`/api/invoices/${initialValues.id}`);
 
-						returnFunction
-							? returnFunction()
-							: router.push("/dashboard/invoices");
+						returnFunction ? returnFunction() : router.push("/invoices");
 					})
 					.catch((error) => {
 						console.error(error);
@@ -428,7 +426,7 @@ const CreateInvoiceForm: FC<Props> = ({ initialValues, returnFunction }) => {
 						toast.success("Invoice Created");
 						setSubmitting(false);
 						mutate("/api/invoices");
-						router.push("/dashboard/invoices");
+						router.push("/invoices");
 					})
 					.catch((error) => {
 						console.error(error);

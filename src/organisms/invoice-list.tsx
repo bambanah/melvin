@@ -50,13 +50,13 @@ export default function InvoiceList() {
 						value: "Edit",
 						type: "link",
 						icon: faEdit,
-						href: `/dashboard/invoices/${invoice.id}?edit=true`,
+						href: `/invoices/${invoice.id}?edit=true`,
 					},
 					{
 						value: "Copy",
 						type: "link",
 						icon: faCopy,
-						href: `/dashboard/invoices/create?copyFrom=${invoice.id}`,
+						href: `/invoices/create?copyFrom=${invoice.id}`,
 					},
 					{
 						value: "Delete",
@@ -129,7 +129,7 @@ export default function InvoiceList() {
 	return (
 		<EntityList
 			title="Invoices"
-			route="/dashboard/invoices"
+			route="/invoices"
 			entities={invoices.map((invoice) => generateEntity(invoice))}
 			shouldExpand
 		/>

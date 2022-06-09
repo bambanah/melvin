@@ -28,11 +28,11 @@ const ClientList = () => {
 		const response = await fetch(`/api/clients/${id}/latest-invoice`);
 
 		if (response.status === 404) {
-			router.push(`/dashboard/invoices/create?for=${id}`);
+			router.push(`/invoices/create?for=${id}`);
 		} else {
 			const invoice = (await response.json()) as Invoice;
 
-			router.push(`/dashboard/invoices/create?copyFrom=${invoice.id}`);
+			router.push(`/invoices/create?copyFrom=${invoice.id}`);
 		}
 	};
 
@@ -72,7 +72,7 @@ const ClientList = () => {
 		return (
 			<EntityList
 				title="Clients"
-				route="/dashboard/clients"
+				route="/clients"
 				entities={
 					Array.from({ length: 3 }).fill(generateEntity()) as EntityListItem[]
 				}
@@ -82,7 +82,7 @@ const ClientList = () => {
 	return (
 		<EntityList
 			title="Clients"
-			route="/dashboard/clients"
+			route="/clients"
 			entities={clients.map((client) => generateEntity(client))}
 		/>
 	);

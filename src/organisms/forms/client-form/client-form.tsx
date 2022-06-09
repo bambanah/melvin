@@ -105,9 +105,7 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 						<Button
 							type="button"
 							onClick={() => {
-								returnFunction
-									? returnFunction()
-									: router.push("/dashboard/clients");
+								returnFunction ? returnFunction() : router.push("/clients");
 							}}
 						>
 							Cancel
@@ -133,7 +131,7 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 					setSubmitting(false);
 					mutate(`/api/clients/${initialValues.id}`);
 
-					returnFunction ? returnFunction() : router.push("/dashboard/clients");
+					returnFunction ? returnFunction() : router.push("/clients");
 				});
 			} else {
 				axios.post("/api/clients", values).then(() => {
@@ -141,7 +139,7 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 
 					setSubmitting(false);
 					mutate("/api/clients");
-					router.push("/dashboard/clients");
+					router.push("/clients");
 				});
 			}
 		},

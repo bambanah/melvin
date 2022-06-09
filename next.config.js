@@ -5,12 +5,7 @@ module.exports = {
 		return [
 			{
 				source: "/",
-				destination: "/dashboard/invoices",
-				permanent: true,
-			},
-			{
-				source: "/dashboard",
-				destination: "/dashboard/invoices",
+				destination: "/invoices",
 				permanent: true,
 			},
 		];

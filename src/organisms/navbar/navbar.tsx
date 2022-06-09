@@ -22,7 +22,7 @@ const Navbar = () => {
 	return (
 		<Styles.Header>
 			<Styles.Content>
-				<Link href="/dashboard/invoices" passHref>
+				<Link href="/invoices" passHref>
 					<a>
 						<Display className="xsmall brand">
 							{isSmallScreen ? "m" : "melvin"}
@@ -31,15 +31,15 @@ const Navbar = () => {
 				</Link>
 
 				<Styles.Links>
-					<NavLink href="/dashboard/invoices">
+					<NavLink href="/invoices">
 						<FontAwesomeIcon icon={faFileAlt} title="Invoices" />{" "}
 						<span>Invoices</span>
 					</NavLink>
-					<NavLink href="/dashboard/activities">
+					<NavLink href="/activities">
 						<FontAwesomeIcon icon={faWalking} title="Activities" />{" "}
 						<span>Activities</span>
 					</NavLink>
-					<NavLink href="/dashboard/clients">
+					<NavLink href="/clients">
 						<FontAwesomeIcon icon={faUser} title="Clients" />{" "}
 						<span>Clients</span>
 					</NavLink>

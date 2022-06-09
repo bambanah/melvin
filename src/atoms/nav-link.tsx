@@ -55,7 +55,7 @@ const Link = ({ href, children }: Props) => {
 	const router = useRouter();
 	return (
 		<NextLink href={href}>
-			<StyledLink active={router.pathname.split("/")[2] === href.split("/")[2]}>
+			<StyledLink active={router.pathname.split("/")[1] === href.split("/")[1]}>
 				{children}
 			</StyledLink>
 		</NextLink>
