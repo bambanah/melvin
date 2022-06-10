@@ -9,6 +9,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FC, useState } from "react";
 import * as Styles from "./styles";
+import { useMediaQuery } from "react-responsive";
+import { breakpoints } from "@styles/themes";
 
 export interface EntityListItem {
 	id: string;
@@ -52,12 +54,15 @@ const EntityList: FC<EntityListProps> = ({
 }) => {
 	const [expandedIndex, setExpandedIndex] = useState<number | undefined>();
 	const router = useRouter();
+
+	const isSmallScreen = useMediaQuery({ query: breakpoints.mobile });
+
 	return (
 		<Styles.Container>
 			<Styles.Header>
 				<Display className="small">{title}</Display>
 				<Link href={`${route}/create`} passHref>
-					<Button variant="primary">+ Add New</Button>
+					<Button variant="primary">+ {!isSmallScreen && "Add New"}</Button>
 				</Link>
 			</Styles.Header>
 			<Styles.Content>

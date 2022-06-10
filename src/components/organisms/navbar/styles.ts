@@ -2,46 +2,57 @@ import { breakpoints } from "@styles/themes";
 import styled from "styled-components";
 
 export const Header = styled.header`
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 2rem 0;
+
 	flex: 0 0 15rem;
 	width: 15rem;
 	height: 100%;
 	box-sizing: border-box;
 	z-index: 100;
 	background-color: ${({ theme }) => theme.colors.bg};
+	gap: 2rem;
 
 	@media ${breakpoints.desktop} {
-		flex-basis: 6em;
+		flex-basis: 5rem;
 	}
 
 	.nav-toggle {
 		display: none;
-		position: fixed;
-		top: 1rem;
-		left: 1rem;
+		width: 2.5rem;
+		height: 2.5rem;
+		padding: 0;
 	}
 
 	@media ${breakpoints.tablet} {
-		position: fixed;
-		margin-left: -15rem;
-		transition: all 0.2s;
-		padding-top: 2rem;
-
-		flex-basis: 12rem;
-		width: 12rem;
-
-		&.expanded {
-			margin-left: 0;
-		}
+		flex-direction: row;
+		inset: 0;
+		height: 5rem;
+		width: 100vw;
+		padding: 0;
+		margin-right: 0;
+		padding: 0 2rem;
+		justify-content: space-between;
 
 		.nav-toggle {
-			display: block;
+			display: inline-block;
+			flex: 0 0 2.5rem;
+		}
+
+		.brand {
+			flex: 1 1 auto;
+		}
+
+		&.expanded {
+			position: fixed;
 		}
 	}
 `;
 
 export const Content = styled.div`
-	height: 100%;
-	padding: 2rem 0;
+	flex: 1 0 auto;
 
 	box-sizing: border-box;
 	margin: auto;
@@ -53,19 +64,19 @@ export const Content = styled.div`
 
 	text-align: center;
 
-	@media ${breakpoints.desktop} {
-		.brand {
-			font-size: 0px;
-
-			:first-letter {
-				font-size: 36px;
-			}
-		}
-	}
-
 	@media ${breakpoints.tablet} {
-		.brand {
-			font-size: 36px;
+		position: absolute;
+		width: 100vw;
+		height: calc(100vh - 5rem);
+		top: 5rem;
+		left: 0;
+		background-color: ${({ theme }) => theme.colors.bg};
+		padding-bottom: 2rem;
+
+		display: none;
+
+		&.expanded {
+			display: flex;
 		}
 	}
 `;
@@ -77,7 +88,7 @@ export const Links = styled.div`
 	flex: 1 0 auto;
 	align-items: flex-start;
 	justify-content: flex-start;
-	padding: 3rem 0;
+	/* padding: 3rem 0; */
 
 	@media ${breakpoints.tablet} {
 		width: 100%;

@@ -7,9 +7,12 @@ export const Container = styled.div`
 	flex-direction: column;
 	align-items: stretch;
 	gap: 3rem;
+	width: 100%;
 	height: 100%;
 
-	width: 100%;
+	@media ${breakpoints.tablet} {
+		gap: 1rem;
+	}
 `;
 
 export const Header = styled.div`

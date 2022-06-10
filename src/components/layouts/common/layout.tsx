@@ -13,6 +13,12 @@ const Container = styled.div`
 	height: 100vh;
 
 	overflow: hidden;
+
+	@media ${breakpoints.tablet} {
+		flex-direction: column;
+		height: 100%;
+		overflow: auto;
+	}
 `;
 
 const Content = styled.div`
@@ -26,6 +32,10 @@ const Content = styled.div`
 
 	@media ${breakpoints.laptop} {
 		padding: 3rem 0;
+	}
+
+	@media ${breakpoints.tablet} {
+		padding: 0.5rem 0;
 	}
 `;
 
