@@ -56,6 +56,7 @@ const EntityList: FC<EntityListProps> = ({
 	const router = useRouter();
 
 	const isSmallScreen = useMediaQuery({ query: breakpoints.mobile });
+	const isTabletScreen = useMediaQuery({ query: breakpoints.tablet });
 
 	return (
 		<Styles.Container>
@@ -137,6 +138,7 @@ const EntityList: FC<EntityListProps> = ({
 											router.push(entity.actions[0].href);
 										}
 									}}
+									collapsed={isTabletScreen}
 									style={{ flex: "0 0 auto" }}
 								>
 									{entity.actions.slice(1).map((action, index) => {

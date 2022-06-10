@@ -1,9 +1,7 @@
 import Button from "@atoms/button";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { breakpoints } from "@styles/themes";
 import React, { FC, useEffect, useRef, useState } from "react";
-import { useMediaQuery } from "react-responsive";
 import * as Styles from "./styles";
 
 interface DropdownProps {
@@ -11,13 +9,18 @@ interface DropdownProps {
 	action: () => void;
 	style: React.CSSProperties;
 	children: React.ReactNode;
+	collapsed?: boolean;
 }
 
-const Dropdown: FC<DropdownProps> = ({ title, children, action, style }) => {
+const Dropdown: FC<DropdownProps> = ({
+	title,
+	children,
+	action,
+	style,
+	collapsed,
+}) => {
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [showDropdown, setShowDropdown] = useState(false);
-
-	const isTabletScreen = useMediaQuery({ query: breakpoints.tablet });
 
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -37,8 +40,12 @@ const Dropdown: FC<DropdownProps> = ({ title, children, action, style }) => {
 	});
 
 	return (
-		<Styles.DropdownContainer ref={dropdownRef} style={style}>
-			{!isTabletScreen && (
+		<Styles.DropdownContainer
+			ref={dropdownRef}
+			style={style}
+			className={collapsed ? "collapsed" : ""}
+		>
+			{!collapsed && (
 				<Button
 					onClick={() => {
 						action();
@@ -56,7 +63,7 @@ const Dropdown: FC<DropdownProps> = ({ title, children, action, style }) => {
 			</Button>
 			{showDropdown && (
 				<Styles.DropdownContent onClick={() => setShowDropdown(false)}>
-					{isTabletScreen && (
+					{collapsed && (
 						<a onClick={action} className="primary">
 							{title}
 						</a>
