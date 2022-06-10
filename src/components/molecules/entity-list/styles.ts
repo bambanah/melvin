@@ -44,8 +44,12 @@ export const Content = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 2em;
-	padding-bottom: 5em;
+	gap: 2rem;
+	padding-bottom: 5rem;
+
+	@media ${breakpoints.tablet} {
+		gap: 1rem;
+	}
 `;
 
 export const Entity = styled.div`

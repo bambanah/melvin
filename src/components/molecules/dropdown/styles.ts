@@ -23,6 +23,7 @@ export const DropdownContent = styled.div`
 	flex-direction: column;
 	z-index: 100;
 	min-width: 100%;
+	right: 0;
 
 	a {
 		padding: 0.5em 1em;
@@ -37,6 +38,10 @@ export const DropdownContent = styled.div`
 		border: 0.1em solid ${({ theme }) => theme.colors.fg};
 		margin-top: -0.1em;
 		transition: all 0.1s ease;
+
+		&.primary {
+			font-weight: bold;
+		}
 
 		svg {
 			margin-right: 0.2em;

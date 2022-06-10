@@ -1,7 +1,9 @@
 import Button from "@atoms/button";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { breakpoints } from "@styles/themes";
 import React, { FC, useEffect, useRef, useState } from "react";
+import { useMediaQuery } from "react-responsive";
 import * as Styles from "./styles";
 
 interface DropdownProps {
@@ -14,6 +16,8 @@ interface DropdownProps {
 const Dropdown: FC<DropdownProps> = ({ title, children, action, style }) => {
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [showDropdown, setShowDropdown] = useState(false);
+
+	const isTabletScreen = useMediaQuery({ query: breakpoints.tablet });
 
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -34,14 +38,16 @@ const Dropdown: FC<DropdownProps> = ({ title, children, action, style }) => {
 
 	return (
 		<Styles.DropdownContainer ref={dropdownRef} style={style}>
-			<Button
-				onClick={() => {
-					action();
-					setShowDropdown(false);
-				}}
-			>
-				{title}
-			</Button>
+			{!isTabletScreen && (
+				<Button
+					onClick={() => {
+						action();
+						setShowDropdown(false);
+					}}
+				>
+					{title}
+				</Button>
+			)}
 			<Button
 				onClick={() => setShowDropdown(!showDropdown)}
 				className={showDropdown ? "raised" : ""}
@@ -50,6 +56,11 @@ const Dropdown: FC<DropdownProps> = ({ title, children, action, style }) => {
 			</Button>
 			{showDropdown && (
 				<Styles.DropdownContent onClick={() => setShowDropdown(false)}>
+					{isTabletScreen && (
+						<a onClick={action} className="primary">
+							{title}
+						</a>
+					)}
 					{children}
 				</Styles.DropdownContent>
 			)}
