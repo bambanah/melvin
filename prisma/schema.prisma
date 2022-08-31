@@ -35,18 +35,16 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?       @unique
   emailVerified DateTime?
   image         String?
-
-  account  Account?
-  sessions Session[]
-
-  supportItems SupportItem[]
-  invoices     Invoice[]
-  clients      Client[]
+  account       Account?
+  clients       Client[]
+  invoices      Invoice[]
+  sessions      Session[]
+  supportItems  SupportItem[]
 }
 
 model VerificationToken {
@@ -58,34 +56,70 @@ model VerificationToken {
 }
 
 model Client {
-  id      String   @id @default(cuid())
-  created DateTime @default(now())
-  name    String
-  number  String?
-  billTo  String?
-
+  id       String    @id @default(cuid())
+  created  DateTime  @default(now())
+  number   String?
+  ownerId  String
+  name     String
+  billTo   String?
+  owner    User      @relation(fields: [ownerId], references: [id])
   invoices Invoice[]
-
-  owner   User   @relation(fields: [ownerId], references: [id])
-  ownerId String
 }
 
 model Invoice {
-  id        String        @id @default(cuid())
-  created   DateTime      @default(now())
-  invoiceNo String
-  billTo    String
-  date      DateTime
-  status    InvoiceStatus @default(CREATED)
-
-  client   Client @relation(fields: [clientId], references: [id])
-  clientId String
-
+  id         String        @id @default(cuid())
+  created    DateTime      @default(now())
+  invoiceNo  String
+  billTo     String
+  date       DateTime
+  clientId   String
+  ownerId    String
+  status     InvoiceStatus @default(CREATED)
+  client     Client        @relation(fields: [clientId], references: [id])
+  owner      User          @relation(fields: [ownerId], references: [id])
   activities Activity[]
   templates  Template[]
+}
 
-  owner   User   @relation(fields: [ownerId], references: [id])
-  ownerId String
+model Activity {
+  id              String      @id @default(cuid())
+  created         DateTime    @default(now())
+  date            DateTime
+  startTime       DateTime
+  endTime         DateTime
+  transitDuration Int?
+  transitDistance Int?
+  invoiceId       String
+  supportItemId   String
+  itemDistance    Int?
+  invoices        Invoice     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  supportItem     SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
+}
+
+model SupportItem {
+  id            String     @id @default(cuid())
+  created       DateTime   @default(now())
+  description   String
+  rateType      RateType
+  weekdayCode   String
+  weeknightCode String?
+  saturdayCode  String?
+  sundayCode    String?
+  ownerId       String
+  weekdayRate   Decimal
+  weeknightRate Decimal?
+  saturdayRate  Decimal?
+  sundayRate    Decimal?
+  owner         User       @relation(fields: [ownerId], references: [id])
+  activities    Activity[]
+}
+
+model Template {
+  id           String   @id @default(cuid())
+  created      DateTime @default(now())
+  templateName String
+  invoiceId    String
+  invoice      Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
 
 enum InvoiceStatus {
@@ -94,60 +128,7 @@ enum InvoiceStatus {
   PAID
 }
 
-model Activity {
-  id      String   @id @default(cuid())
-  created DateTime @default(now())
-
-  date            DateTime
-  startTime       DateTime
-  endTime         DateTime
-  itemDistance    Int?
-  transitDuration Int?
-  transitDistance Int?
-
-  invoices  Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  invoiceId String
-
-  supportItem   SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
-  supportItemId String
-}
-
 enum RateType {
   KM
   HOUR
-}
-
-model SupportItem {
-  id      String   @id @default(cuid())
-  created DateTime @default(now())
-
-  description String
-  rateType    RateType
-
-  weekdayCode String
-  weekdayRate Decimal
-
-  weeknightCode String?
-  weeknightRate Decimal?
-
-  saturdayCode String?
-  saturdayRate Decimal?
-
-  sundayCode String?
-  sundayRate Decimal?
-
-  owner   User   @relation(fields: [ownerId], references: [id])
-  ownerId String
-
-  activities Activity[]
-}
-
-model Template {
-  id      String   @id @default(cuid())
-  created DateTime @default(now())
-
-  templateName String
-
-  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  invoiceId String
 }
