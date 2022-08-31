@@ -32,6 +32,7 @@
 		"jsx-a11y/click-events-have-key-events": "off",
 		"unicorn/prefer-module": "off",
 		"unicorn/no-array-reduce": "off",
+		"unicorn/prefer-top-level-await": "off",
 		"unicorn/prevent-abbreviations": "off"
 	},
 	"overrides": [

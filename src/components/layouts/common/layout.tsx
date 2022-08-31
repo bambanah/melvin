@@ -4,6 +4,7 @@ import Navbar from "@organisms/navbar";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import Loading from "@atoms/loading";
+import { breakpoints } from "@styles/themes";
 
 const Container = styled.div`
 	display: flex;
@@ -12,6 +13,12 @@ const Container = styled.div`
 	height: 100vh;
 
 	overflow: hidden;
+
+	@media ${breakpoints.tablet} {
+		flex-direction: column;
+		height: 100%;
+		overflow: auto;
+	}
 `;
 
 const Content = styled.div`
@@ -23,8 +30,12 @@ const Content = styled.div`
 
 	padding: 3rem;
 
-	@media screen and (max-width: 1000px) {
+	@media ${breakpoints.laptop} {
 		padding: 3rem 0;
+	}
+
+	@media ${breakpoints.tablet} {
+		padding: 0.5rem 0;
 	}
 `;
 

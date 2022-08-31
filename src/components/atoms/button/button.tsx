@@ -40,8 +40,9 @@ const BaseButton = styled.button`
 `;
 
 const PrimaryButton = styled(BaseButton)`
+	border: none;
 	color: ${({ theme }) =>
-		theme.type === "light" ? theme.colors.bg : theme.colors.fg};
+		theme.type === "light" ? theme.colors.fg : theme.colors.bg};
 	background-color: ${({ theme }) => theme.colors.brand};
 
 	&.disabled {
@@ -100,6 +101,7 @@ const Button: React.FC<Props> = ({
 	children,
 	disabled,
 	onClick,
+	className,
 	...rest
 }) => {
 	let ButtonComponent: StyledComponent<"button", DefaultTheme>;
@@ -123,7 +125,7 @@ const Button: React.FC<Props> = ({
 
 	return (
 		<ButtonComponent
-			className={disabled ? "disabled" : ""}
+			className={`${disabled ? "disabled" : ""} ${className}`}
 			onClick={!disabled ? onClick : undefined}
 			{...rest}
 		>

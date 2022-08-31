@@ -27,3 +27,10 @@ export const dark: DefaultTheme = {
 		error: "#ff6961",
 	},
 };
+
+export const breakpoints = {
+	mobile: `(max-width: 425px)`,
+	tablet: `(max-width: 768px)`,
+	laptop: `(max-width: 1024px)`,
+	desktop: `(max-width: 1200px)`,
+};

@@ -1,3 +1,4 @@
+import { breakpoints } from "@styles/themes";
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -6,9 +7,12 @@ export const Container = styled.div`
 	flex-direction: column;
 	align-items: stretch;
 	gap: 3rem;
+	width: 100%;
 	height: 100%;
 
-	width: 100%;
+	@media ${breakpoints.tablet} {
+		gap: 1rem;
+	}
 `;
 
 export const Header = styled.div`
@@ -20,7 +24,7 @@ export const Header = styled.div`
 	width: 100%;
 	max-width: 60em;
 
-	@media screen and (max-width: 1000px) {
+	@media ${breakpoints.laptop} {
 		padding: 0 3rem;
 	}
 `;
@@ -40,8 +44,12 @@ export const Content = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 2em;
-	padding-bottom: 5em;
+	gap: 2rem;
+	padding-bottom: 5rem;
+
+	@media ${breakpoints.tablet} {
+		gap: 1rem;
+	}
 `;
 
 export const Entity = styled.div`
@@ -54,7 +62,6 @@ export const Entity = styled.div`
 	align-items: stretch;
 
 	color: ${({ theme }) => theme.colors.fg};
-	overflow: hidden;
 	transition: box-shadow 0.2s;
 
 	box-shadow: var(--shadow-low);
@@ -78,6 +85,7 @@ export const EntityContent = styled.div`
 	align-items: center;
 	gap: 1em;
 	padding-right: 1.2em;
+	width: 100%;
 `;
 
 export const EntityDetails = styled.div`
@@ -86,17 +94,20 @@ export const EntityDetails = styled.div`
 	align-items: center;
 	min-width: 0;
 	padding: 1.6em 1.2em;
-
-	cursor: pointer;
+	padding-right: 0;
 
 	gap: 1em;
 	transition: background 0.1s;
 
-	&:hover {
-		color: ${({ theme }) => theme.colors.brand};
+	&.expand {
+		cursor: pointer;
 
-		h1 {
+		:hover {
 			color: ${({ theme }) => theme.colors.brand};
+
+			h1 {
+				color: ${({ theme }) => theme.colors.brand};
+			}
 		}
 	}
 

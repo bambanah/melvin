@@ -4,7 +4,10 @@ import { getSession } from "next-auth/react";
 
 export default async (request: NextApiRequest, response: NextApiResponse) => {
 	const { id } = request.query;
-	const supportItemId = typeof id === "string" ? id : id[0];
+	const supportItemId = id ? (typeof id === "string" ? id : id[0]) : undefined;
+
+	if (supportItemId === undefined)
+		return response.status(400).send("No support item ID provided.");
 
 	if (request.method === "GET") {
 		const supportItem = await prisma.supportItem.findUnique({

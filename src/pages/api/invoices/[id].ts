@@ -13,7 +13,49 @@ interface ApiRequest extends NextApiRequest {
 
 export default async (request: ApiRequest, response: NextApiResponse) => {
 	const { id } = request.query;
-	const invoiceId = typeof id === "string" ? id : id[0];
+	const invoiceId = id ? (typeof id === "string" ? id : id[0]) : undefined;
+
+	if (invoiceId === undefined)
+		return response.status(400).send("No invoice ID provided.");
+
+	if (request.method === "POST") {
+		const session = await getSession({ req: request });
+		if (!session)
+			return response
+				.status(401)
+				.send("Must be signed in to update this resource.");
+
+		if (
+			!request.body.invoice ||
+			!request.body.activities ||
+			!request.body.activitiesToDelete
+		) {
+			return response.status(402).send("Not enough info");
+		}
+		const collection = await prisma.$transaction([
+			prisma.invoice.update({
+				where: { id: invoiceId },
+				data: { ...request.body.invoice },
+			}),
+			...request.body.activities?.map((activity) =>
+				prisma.activity.upsert({
+					where: { id: activity.id ?? "" },
+					update: {
+						...activity,
+					},
+					create: {
+						...activity,
+						invoiceId,
+					},
+				})
+			),
+			...request.body.activitiesToDelete?.map((id) =>
+				prisma.activity.delete({ where: { id } })
+			),
+		]);
+
+		return response.json(collection);
+	}
 
 	if (request.method === "GET") {
 		const invoice = await prisma.invoice.findUnique({
@@ -33,45 +75,6 @@ export default async (request: ApiRequest, response: NextApiResponse) => {
 			return response.status(404).send("Can't find invoice with that ID");
 
 		return response.status(200).json(invoice);
-	}
-
-	if (request.method === "POST") {
-		const session = await getSession({ req: request });
-		if (!session)
-			return response
-				.status(401)
-				.send("Must be signed in to update this resource.");
-
-		if (
-			!request.body.invoice ||
-			!request.body.activities ||
-			!request.body.activitiesToDelete
-		) {
-			return response.status(402).send("Not enough info");
-		}
-		const collection = await prisma.$transaction([
-			prisma.invoice.update({
-				where: { id: String(id) },
-				data: { ...request.body.invoice },
-			}),
-			...request.body.activities?.map((activity) =>
-				prisma.activity.upsert({
-					where: { id: activity.id ?? "" }, // This feels naughty
-					update: {
-						...activity,
-					},
-					create: {
-						...activity,
-						invoiceId: String(id),
-					},
-				})
-			),
-			...request.body.activitiesToDelete?.map((id) =>
-				prisma.activity.delete({ where: { id } })
-			),
-		]);
-
-		return response.json(collection);
 	}
 
 	if (request.method === "DELETE") {

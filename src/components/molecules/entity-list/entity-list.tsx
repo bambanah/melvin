@@ -1,6 +1,6 @@
 import Button from "@atoms/button";
 import Display from "@atoms/display";
-import Dropdown from "@atoms/dropdown";
+import Dropdown from "@molecules/dropdown";
 import Heading from "@atoms/heading";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
@@ -9,6 +9,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FC, useState } from "react";
 import * as Styles from "./styles";
+import { useMediaQuery } from "react-responsive";
+import { breakpoints } from "@styles/themes";
 
 export interface EntityListItem {
 	id: string;
@@ -52,12 +54,16 @@ const EntityList: FC<EntityListProps> = ({
 }) => {
 	const [expandedIndex, setExpandedIndex] = useState<number | undefined>();
 	const router = useRouter();
+
+	const isSmallScreen = useMediaQuery({ query: breakpoints.mobile });
+	const isTabletScreen = useMediaQuery({ query: breakpoints.tablet });
+
 	return (
 		<Styles.Container>
 			<Styles.Header>
 				<Display className="small">{title}</Display>
 				<Link href={`${route}/create`} passHref>
-					<Button variant="primary">+ Add New</Button>
+					<Button variant="primary">+ {!isSmallScreen && "Add New"}</Button>
 				</Link>
 			</Styles.Header>
 			<Styles.Content>
@@ -72,6 +78,7 @@ const EntityList: FC<EntityListProps> = ({
 									shouldExpand &&
 									setExpandedIndex(expandedIndex === index ? undefined : index)
 								}
+								className={shouldExpand ? "expand" : ""}
 							>
 								{shouldExpand && (
 									<div>
@@ -131,6 +138,7 @@ const EntityList: FC<EntityListProps> = ({
 											router.push(entity.actions[0].href);
 										}
 									}}
+									collapsed={isTabletScreen}
 									style={{ flex: "0 0 auto" }}
 								>
 									{entity.actions.slice(1).map((action, index) => {
