@@ -26,9 +26,9 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 	return (
 		<Styles.Container>
 			<Styles.Modal>
-				<Display className="small brand">melvin</Display>
+				{/* <Display className="small">melvin</Display> */}
 
-				<LoginForm />
+				{/* <LoginForm />
 
 				<p>
 					Don&#39;t have an account? <a>Sign up</a>
@@ -36,7 +36,7 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 
 				<Styles.Separator>
 					<span>OR</span>
-				</Styles.Separator>
+				</Styles.Separator> */}
 
 				{Object.values(providers).map((provider) => (
 					<Button

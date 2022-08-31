@@ -18,10 +18,10 @@ export const Modal = styled.div`
 	min-width: 26rem;
 
 	padding: 3rem;
-	background-color: ${({ theme }) =>
+	/* background-color: ${({ theme }) =>
 		theme.type === "dark" ? lighten(0.1, theme.colors.bg) : "#fff"};
 
-	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12); */
 
 	span {
 		cursor: auto;
