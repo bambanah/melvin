@@ -89,10 +89,10 @@ model Activity {
   endTime         DateTime
   transitDuration Int?
   transitDistance Int?
-  invoiceId       String
+  invoiceId       String?
   supportItemId   String
   itemDistance    Int?
-  invoices        Invoice     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoices        Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   supportItem     SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
 }
 
