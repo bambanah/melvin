@@ -25,6 +25,7 @@
 			"@hooks/*": ["src/hooks/*"],
 			"@pages/*": ["src/pages/*"],
 			"@schema/*": ["src/schema/*"],
+			"@server/*": ["src/server/*"],
 			"@styles/*": ["src/styles/*"],
 			"@utils/*": ["src/utils/*"]
 		},
