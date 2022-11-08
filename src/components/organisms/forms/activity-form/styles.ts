@@ -39,7 +39,7 @@ export const ActivityRow = styled.div`
 `;
 
 export const Heading = styled.h2`
-	flex: 0 0 100%;
+	flex: 0 1 100%;
 	font-size: 1.3rem;
 	font-weight: bold;
 	margin: 0;
