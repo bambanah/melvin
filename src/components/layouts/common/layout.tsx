@@ -8,16 +8,13 @@ import { breakpoints } from "@styles/themes";
 
 const Container = styled.div`
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	width: 100vw;
-	height: 100vh;
-
-	overflow: hidden;
+	min-height: 100vh;
 
 	@media ${breakpoints.tablet} {
 		flex-direction: column;
 		height: 100%;
-		overflow: auto;
 	}
 `;
 
@@ -25,8 +22,6 @@ const Content = styled.div`
 	flex: 1 1 auto;
 	display: flex;
 	flex-direction: column;
-
-	overflow-y: auto;
 
 	padding: 3rem;
 

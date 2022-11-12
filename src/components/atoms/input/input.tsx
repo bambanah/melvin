@@ -1,5 +1,5 @@
 import React, { HTMLProps, ReactElement } from "react";
-import * as Styles from "./styles";
+import * as Styles from "./input.styles";
 
 interface InputProps {
 	error?: boolean;
