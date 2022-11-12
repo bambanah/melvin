@@ -3,11 +3,12 @@ import { DefaultTheme } from "styled-components";
 export const light: DefaultTheme = {
 	type: "light",
 	colors: {
-		fg: "#1a242c",
-		bg: "#fefbfd",
+		fg: "#1A1A0F",
+		display: "#1a242c",
+		bg: "#FCFBFC",
 		link: "#2374ab",
-		brand: "#FF7070",
-		green: "#EBFCF6",
+		brand: "#669B3C",
+		success: "#ebfcf6",
 		gradientPink:
 			"linear-gradient(31deg, rgba(255,112,112,1) 0%, rgba(215,185,255,1) 100%)",
 		error: "#F14348",
@@ -18,10 +19,11 @@ export const dark: DefaultTheme = {
 	type: "dark",
 	colors: {
 		fg: "#FEFBFD",
+		display: "#38574D",
 		bg: "#161E27",
 		link: "#4dccbd",
-		brand: "#FF7070",
-		green: "",
+		brand: "#567568",
+		success: "ebfcf6",
 		gradientPink:
 			"linear-gradient(31deg, rgba(255,112,112,1) 0%, rgba(255,112,156,1) 100%)",
 		error: "#ff6961",
