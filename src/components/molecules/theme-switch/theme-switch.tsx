@@ -1,6 +1,6 @@
 import { useTheme } from "@context/app-context";
 import React from "react";
-import * as Styles from "./styles";
+import * as Styles from "./theme-switch.styles";
 
 const ThemeSwitch = () => {
 	const [theme, setTheme] = useTheme();

@@ -1,7 +1,10 @@
 import styled from "styled-components";
 
 export const AuthDropdown = styled.div`
+	position: relative;
 	flex: 0 0 2rem;
+
+	margin-left: 1.5rem;
 
 	display: flex;
 	align-items: flex-end;
@@ -19,10 +22,27 @@ export const AuthDropdown = styled.div`
 	}
 `;
 
+export const Profile = styled.div`
+	color: ${({ theme }) => theme.colors.fg};
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	width: 2rem;
+	height: 2rem;
+
+	cursor: pointer;
+
+	&:hover {
+		color: ${({ theme }) => theme.colors.brand};
+	}
+`;
+
 export const DropdownContent = styled.div`
 	position: absolute;
-	bottom: 5rem;
-	left: 8rem;
+	top: 0;
+	right: 0;
 	margin-top: 2.5rem;
 	min-width: 5rem;
 
@@ -35,35 +55,4 @@ export const DropdownContent = styled.div`
 	gap: 1.5rem;
 
 	box-shadow: 0px 0px 13px rgba(0, 0, 0, 0.3);
-
-	button {
-		cursor: pointer;
-		border: none;
-		background: none;
-		font: inherit;
-		padding: 0.4rem;
-		background-color: #f3f3f3;
-
-		&:hover {
-			background-color: #ddd;
-		}
-	}
-`;
-
-export const Profile = styled.div`
-	position: relative;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-
-	width: 2rem;
-	height: 2rem;
-
-	border-radius: 50%;
-	background-color: ${({ theme }) => theme.colors.brand};
-	font-size: 1.3rem;
-	font-weight: bold;
-	color: #fff;
-
-	cursor: pointer;
 `;

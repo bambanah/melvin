@@ -1,8 +1,6 @@
 import Button from "@atoms/button";
-import Display from "@atoms/display";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import LoginForm from "@molecules/login-form";
 import { BuiltInProviderType } from "next-auth/providers";
 import { ClientSafeProvider, LiteralUnion, signIn } from "next-auth/react";
 import { useRouter } from "next/router";

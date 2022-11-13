@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FC, useState } from "react";
-import * as Styles from "./styles";
+import * as Styles from "./entity-list.styles";
 import { useMediaQuery } from "react-responsive";
 import { breakpoints } from "@styles/themes";
 
@@ -63,7 +63,7 @@ const EntityList: FC<EntityListProps> = ({
 			<Styles.Header>
 				<Display className="small">{title}</Display>
 				<Link href={`${route}/create`} passHref>
-					<Button variant="primary">+ {!isSmallScreen && "Add New"}</Button>
+					<Button variant="secondary">+ {!isSmallScreen && "Add New"}</Button>
 				</Link>
 			</Styles.Header>
 			<Styles.Content>
@@ -149,12 +149,8 @@ const EntityList: FC<EntityListProps> = ({
 											</a>
 										) : (
 											<Link key={index} href={`${action.href}`}>
-												<a>
-													{action.icon && (
-														<FontAwesomeIcon icon={action.icon} />
-													)}
-													{action.value}
-												</a>
+												{action.icon && <FontAwesomeIcon icon={action.icon} />}
+												{action.value}
 											</Link>
 										);
 									})}

@@ -22,6 +22,7 @@ const GlobalStyle = createGlobalStyle`
 
 		color: ${({ theme }) => theme.colors.fg};
 		background-color: ${({ theme }) => theme.colors.bg};
+		overflow-x: hidden;
 	}
 
 	* {

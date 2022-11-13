@@ -19,6 +19,7 @@ const PdfDocument: FC<PdfProps> = ({ invoiceId }) => {
 			.get("/api/invoices/generate-pdf", {
 				params: {
 					invoiceId,
+					base64: true,
 				},
 			})
 			.then((response) => {

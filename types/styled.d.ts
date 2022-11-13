@@ -6,11 +6,12 @@ declare module "styled-components" {
 
 		colors: {
 			fg: string;
+			display: string;
 			bg: string;
 			link: string;
 			brand: string;
 			gradientPink: string;
-			green: string;
+			success: string;
 			error: string;
 		};
 	}

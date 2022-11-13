@@ -9,25 +9,27 @@ interface Props {
 	children: React.ReactNode;
 }
 
-interface StyleProps {
-	active: boolean;
-}
+const StyledLink = styled.a`
+	display: flex;
+	align-items: center;
 
-const StyledLink = styled.a<StyleProps>`
 	width: 100%;
 	text-decoration: none;
-	color: ${({ active, theme }) =>
-		active ? theme.colors.bg : `${theme.colors.fg}88`};
-	font-weight: 700;
-	border: 2px solid transparent;
+	color: ${({ theme }) => theme.colors.fg};
+	font-weight: 600;
 
-	background: ${({ active, theme }) =>
-		active ? theme.colors.fg : theme.colors.bg};
-	padding: 0.7em 1.2em;
+	padding: 0.4em 0.8em;
 
-	transition: color 0.1s, border-color 0.1s, background-color 0.1s;
+	font-family: "Poppins", "Inter", sans-serif;
 
-	svg {
+	transition: all 0.1s ease;
+
+	&:hover,
+	&.active {
+		color: ${({ theme }) => theme.colors.brand};
+	}
+
+	& svg {
 		margin-right: 0.5rem;
 	}
 
@@ -56,22 +58,16 @@ const StyledLink = styled.a<StyleProps>`
 			display: inline;
 		}
 	}
-
-	&:hover {
-		color: ${({ active, theme }) =>
-			active ? theme.colors.bg : theme.colors.fg};
-		border-color: ${({ active, theme }) =>
-			active ? theme.colors.fg : theme.colors.fg};
-	}
 `;
 
 const Link = ({ href, children }: Props) => {
 	const router = useRouter();
+
+	const className =
+		router.pathname.split("/")[1] === href.split("/")[1] ? "active" : "";
 	return (
-		<NextLink href={href}>
-			<StyledLink active={router.pathname.split("/")[1] === href.split("/")[1]}>
-				{children}
-			</StyledLink>
+		<NextLink href={href} legacyBehavior>
+			<StyledLink className={className}>{children}</StyledLink>
 		</NextLink>
 	);
 };

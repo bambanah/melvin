@@ -42,7 +42,7 @@ const BaseButton = styled.button`
 const PrimaryButton = styled(BaseButton)`
 	border: none;
 	color: ${({ theme }) =>
-		theme.type === "light" ? theme.colors.fg : theme.colors.bg};
+		theme.type === "light" ? theme.colors.bg : theme.colors.fg};
 	background-color: ${({ theme }) => theme.colors.brand};
 
 	&.disabled {
@@ -64,7 +64,7 @@ const SecondaryButton = styled(BaseButton)`
 const SuccessButton = styled(BaseButton)`
 	color: ${({ theme }) =>
 		theme.type === "light" ? theme.colors.fg : theme.colors.bg};
-	background-color: ${({ theme }) => theme.colors.green};
+	background-color: ${({ theme }) => theme.colors.success};
 
 	&.disabled {
 		color: ${({ theme }) =>
@@ -72,7 +72,8 @@ const SuccessButton = styled(BaseButton)`
 				0.3,
 				theme.type === "light" ? theme.colors.fg : theme.colors.bg
 			)};
-		background-color: ${({ theme }) => transparentize(0.8, theme.colors.green)};
+		background-color: ${({ theme }) =>
+			transparentize(0.8, theme.colors.success)};
 	}
 `;
 
@@ -107,20 +108,25 @@ const Button: React.FC<Props> = ({
 	let ButtonComponent: StyledComponent<"button", DefaultTheme>;
 
 	switch (variant) {
-		case "primary":
+		case "primary": {
 			ButtonComponent = PrimaryButton;
 			break;
-		case "secondary":
+		}
+		case "secondary": {
 			ButtonComponent = SecondaryButton;
 			break;
-		case "success":
+		}
+		case "success": {
 			ButtonComponent = SuccessButton;
 			break;
-		case "danger":
+		}
+		case "danger": {
 			ButtonComponent = DangerButton;
 			break;
-		default:
+		}
+		default: {
 			ButtonComponent = BaseButton;
+		}
 	}
 
 	return (

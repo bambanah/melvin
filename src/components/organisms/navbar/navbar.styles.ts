@@ -2,17 +2,17 @@ import { breakpoints } from "@styles/themes";
 import styled from "styled-components";
 
 export const Header = styled.header`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+	width: 60%;
+	height: 5rem;
 	padding: 2rem 0;
-
-	flex: 0 0 15rem;
-	width: 15rem;
-	height: 100%;
+	margin: auto;
 	box-sizing: border-box;
 	z-index: 100;
 	background-color: ${({ theme }) => theme.colors.bg};
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 	gap: 2rem;
 
 	@media ${breakpoints.desktop} {
@@ -52,15 +52,11 @@ export const Header = styled.header`
 `;
 
 export const Content = styled.div`
-	flex: 1 0 auto;
-
 	box-sizing: border-box;
-	margin: auto;
 
 	display: flex;
-	flex-direction: column;
 	align-items: center;
-	justify-content: space-evenly;
+	justify-content: flex-end;
 
 	text-align: center;
 
@@ -83,12 +79,10 @@ export const Content = styled.div`
 
 export const Links = styled.div`
 	display: flex;
-	flex-direction: column;
-	gap: 1em;
+	gap: 0.4em;
 	flex: 1 0 auto;
-	align-items: flex-start;
-	justify-content: flex-start;
-	/* padding: 3rem 0; */
+	align-items: center;
+	justify-content: flex-end;
 
 	@media ${breakpoints.tablet} {
 		width: 100%;
