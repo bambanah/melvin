@@ -23,7 +23,7 @@ export const AuthDropdown = styled.div`
 `;
 
 export const Profile = styled.div`
-	color: ${({ theme }) => theme.colors.fg};
+	color: ${({ theme }) => `${theme.colors.fg}bb`};
 	position: relative;
 	display: flex;
 	justify-content: center;

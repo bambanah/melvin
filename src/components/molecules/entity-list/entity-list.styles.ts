@@ -44,7 +44,7 @@ export const Content = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 2rem;
+	gap: 1rem;
 	padding-bottom: 5rem;
 
 	@media ${breakpoints.tablet} {
@@ -53,6 +53,7 @@ export const Content = styled.div`
 `;
 
 export const Entity = styled.div`
+	margin-top: -1px;
 	flex: 0 0 auto;
 	width: 100%;
 	max-width: 60em;
@@ -61,13 +62,22 @@ export const Entity = styled.div`
 	justify-content: space-between;
 	align-items: stretch;
 
+	background-color: ${({ theme }) => theme.colors.bg};
 	color: ${({ theme }) => theme.colors.fg};
-	transition: box-shadow 0.2s;
+	transition: box-shadow 0.2s, border-color 0.1s, translate 0.1s;
 
-	box-shadow: var(--shadow-low);
+	border: 1px solid #e2e2e2;
+
+	&:hover {
+		border-color: ${({ theme }) => theme.colors.brand};
+		box-shadow: var(--shadow-low);
+		translate: -0.1rem -0.1rem;
+	}
 
 	&.expanded {
+		border-color: ${({ theme }) => theme.colors.brand};
 		box-shadow: var(--shadow-medium);
+		translate: -0.1rem -0.1rem;
 
 		.fa-chevron-right {
 			transform: rotate(90deg);

@@ -4,7 +4,7 @@ export const light: DefaultTheme = {
 	type: "light",
 	colors: {
 		fg: "#1A1A0F",
-		display: "#1a242c",
+		display: "#446928",
 		bg: "#FCFBFC",
 		link: "#2374ab",
 		brand: "#669B3C",

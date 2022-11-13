@@ -1,5 +1,5 @@
 import Button from "@atoms/button";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { faCog } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { User } from "@prisma/client";
 import { signOut } from "next-auth/react";
@@ -15,7 +15,7 @@ const NavAuth: React.FC<NavAuthProps> = ({ user }) => {
 	return (
 		<Styles.AuthDropdown tabIndex={0}>
 			<Styles.Profile>
-				<FontAwesomeIcon icon={faUser} title="Clients" />
+				<FontAwesomeIcon icon={faCog} title="Clients" />
 			</Styles.Profile>
 			<Styles.DropdownContent>
 				{user && <span>{user.email}</span>}
