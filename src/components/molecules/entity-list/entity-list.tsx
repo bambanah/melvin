@@ -61,7 +61,9 @@ const EntityList: FC<EntityListProps> = ({
 	return (
 		<Styles.Container>
 			<Styles.Header>
-				<Display className="small">{title}</Display>
+				<Display className={isTabletScreen ? "xsmall" : "small"}>
+					{title}
+				</Display>
 				<Link href={`${route}/create`} passHref>
 					<Button variant="secondary">+ {!isSmallScreen && "Add New"}</Button>
 				</Link>

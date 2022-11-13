@@ -2,9 +2,10 @@ import { breakpoints } from "@styles/themes";
 import styled from "styled-components";
 
 export const Header = styled.header`
-	width: 60%;
+	width: 100%;
+	max-width: 65rem;
 	height: 5rem;
-	padding: 2rem 0;
+	padding: 2rem 2.5rem;
 	margin: auto;
 	box-sizing: border-box;
 	z-index: 100;
@@ -40,14 +41,6 @@ export const Header = styled.header`
 			display: inline-block;
 			flex: 0 0 2.5rem;
 		}
-
-		.brand {
-			flex: 1 1 auto;
-		}
-
-		&.expanded {
-			position: fixed;
-		}
 	}
 `;
 
@@ -61,6 +54,7 @@ export const Content = styled.div`
 	text-align: center;
 
 	@media ${breakpoints.tablet} {
+		flex-direction: column;
 		position: absolute;
 		width: 100vw;
 		height: calc(100vh - 5rem);
@@ -85,21 +79,19 @@ export const Links = styled.div`
 	justify-content: flex-end;
 
 	@media ${breakpoints.tablet} {
+		padding-top: 5rem;
+		gap: 5rem;
 		width: 100%;
+		flex-direction: column;
+		justify-content: flex-start;
+
+		a {
+			padding: 1.2rem;
+		}
 	}
 `;
 
 export const Right = styled.div`
 	display: flex;
 	gap: 1rem;
-
-	@media ${breakpoints.desktop} {
-		flex-direction: column-reverse;
-		align-items: center;
-	}
-
-	@media ${breakpoints.tablet} {
-		flex-direction: row;
-		align-items: flex-start;
-	}
 `;

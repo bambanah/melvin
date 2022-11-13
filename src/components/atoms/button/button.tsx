@@ -9,7 +9,7 @@ const BaseButton = styled.button`
 	font-weight: bold;
 
 	cursor: pointer;
-	padding: 0.6em 1.7em;
+	padding: 0.4em 1.1em;
 
 	transition: all 0.1s ease;
 

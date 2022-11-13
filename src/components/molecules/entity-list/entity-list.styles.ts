@@ -87,6 +87,13 @@ export const Entity = styled.div`
 			height: 30em;
 		}
 	}
+
+	@media ${breakpoints.tablet} {
+		&:hover,
+		&.expanded {
+			translate: 0;
+		}
+	}
 `;
 
 export const EntityContent = styled.div`
