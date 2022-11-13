@@ -108,20 +108,25 @@ const Button: React.FC<Props> = ({
 	let ButtonComponent: StyledComponent<"button", DefaultTheme>;
 
 	switch (variant) {
-		case "primary":
+		case "primary": {
 			ButtonComponent = PrimaryButton;
 			break;
-		case "secondary":
+		}
+		case "secondary": {
 			ButtonComponent = SecondaryButton;
 			break;
-		case "success":
+		}
+		case "success": {
 			ButtonComponent = SuccessButton;
 			break;
-		case "danger":
+		}
+		case "danger": {
 			ButtonComponent = DangerButton;
 			break;
-		default:
+		}
+		default: {
 			ButtonComponent = BaseButton;
+		}
 	}
 
 	return (

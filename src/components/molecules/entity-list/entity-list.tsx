@@ -149,12 +149,8 @@ const EntityList: FC<EntityListProps> = ({
 											</a>
 										) : (
 											<Link key={index} href={`${action.href}`}>
-												<a>
-													{action.icon && (
-														<FontAwesomeIcon icon={action.icon} />
-													)}
-													{action.value}
-												</a>
+												{action.icon && <FontAwesomeIcon icon={action.icon} />}
+												{action.value}
 											</Link>
 										);
 									})}

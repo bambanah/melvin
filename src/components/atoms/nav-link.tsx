@@ -16,7 +16,7 @@ const StyledLink = styled.a`
 	width: 100%;
 	text-decoration: none;
 	color: ${({ theme }) => theme.colors.fg};
-	font-weight: 500;
+	font-weight: 600;
 
 	padding: 0.4em 0.8em;
 
@@ -27,7 +27,6 @@ const StyledLink = styled.a`
 	&:hover,
 	&.active {
 		color: ${({ theme }) => theme.colors.brand};
-		font-weight: 700;
 	}
 
 	& svg {
@@ -67,7 +66,7 @@ const Link = ({ href, children }: Props) => {
 	const className =
 		router.pathname.split("/")[1] === href.split("/")[1] ? "active" : "";
 	return (
-		<NextLink href={href}>
+		<NextLink href={href} legacyBehavior>
 			<StyledLink className={className}>{children}</StyledLink>
 		</NextLink>
 	);

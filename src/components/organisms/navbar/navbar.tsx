@@ -21,12 +21,10 @@ const Navbar = () => {
 
 	return (
 		<Styles.Header className={isExpanded ? "expanded" : ""}>
-			<Link href="/invoices" passHref>
-				<a>
-					<Display className="xsmall brand">
-						m{!isDesktopScreen || isTabletScreen ? "elvin" : ""}
-					</Display>
-				</a>
+			<Link href="/invoices">
+				<Display className="xsmall brand">
+					m{!isDesktopScreen || isTabletScreen ? "elvin" : ""}
+				</Display>
 			</Link>
 			<Button className="nav-toggle" onClick={() => setIsExpanded(!isExpanded)}>
 				<FontAwesomeIcon icon={isExpanded ? faX : faBars} />
