@@ -22,7 +22,7 @@ export const Header = styled.div`
 
 	margin: auto;
 	width: 100%;
-	max-width: 60em;
+	max-width: 80em;
 
 	@media ${breakpoints.laptop} {
 		padding: 0 3rem;
@@ -56,7 +56,7 @@ export const Entity = styled.div`
 	margin-top: -1px;
 	flex: 0 0 auto;
 	width: 100%;
-	max-width: 60em;
+	max-width: 80rem;
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
