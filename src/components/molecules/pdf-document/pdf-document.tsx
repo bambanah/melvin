@@ -1,8 +1,9 @@
 import Loading from "@atoms/loading";
 import axios from "axios";
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import { Document as MyDocument, Page, pdfjs } from "react-pdf";
 import { SizeMe } from "react-sizeme";
+import useSWR from "swr";
 import * as Styles from "./styles";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
@@ -11,21 +12,25 @@ interface PdfProps {
 	invoiceId: string;
 }
 
-const PdfDocument: FC<PdfProps> = ({ invoiceId }) => {
-	const [pdf, setPdf] = useState("");
+const fetchInvoice = (invoiceId: string) =>
+	axios
+		.get(`/api/invoices/generate-pdf/${invoiceId}`, {
+			params: { base64: true },
+		})
+		.then((response) => {
+			return `data:application/pdf;base64,${response.data}`;
+		});
 
-	useEffect(() => {
-		axios
-			.get("/api/invoices/generate-pdf", {
-				params: {
-					invoiceId,
-					base64: true,
-				},
-			})
-			.then((response) => {
-				setPdf(`data:application/pdf;base64,${response.data}`);
-			});
-	}, [invoiceId]);
+const PdfDocument: FC<PdfProps> = ({ invoiceId }) => {
+	const { data: pdf, error } = useSWR(
+		`/api/invoices/generate-pdf/${invoiceId}`,
+		() => fetchInvoice(invoiceId)
+	);
+
+	if (error) {
+		console.error(error);
+		return <div>Error loading</div>;
+	}
 
 	if (!pdf) return <Loading />;
 

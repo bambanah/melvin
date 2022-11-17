@@ -64,20 +64,18 @@ export const Entity = styled.div`
 
 	background-color: ${({ theme }) => theme.colors.bg};
 	color: ${({ theme }) => theme.colors.fg};
-	transition: box-shadow 0.2s, border-color 0.1s, translate 0.1s;
+	transition: box-shadow 0.1s, border-color 0.1s;
 
 	border: 1px solid #e2e2e2;
 
 	&:hover {
 		border-color: ${({ theme }) => theme.colors.brand};
 		box-shadow: var(--shadow-low);
-		translate: -0.1rem -0.1rem;
 	}
 
 	&.expanded {
 		border-color: ${({ theme }) => theme.colors.brand};
 		box-shadow: var(--shadow-medium);
-		translate: -0.1rem -0.1rem;
 
 		.fa-chevron-right {
 			transform: rotate(90deg);

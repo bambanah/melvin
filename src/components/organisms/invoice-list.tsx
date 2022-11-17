@@ -44,7 +44,7 @@ export default function InvoiceList() {
 						value: "Download",
 						type: "link",
 						icon: faDownload,
-						href: `/api/invoices/generate-pdf?invoiceId=${invoice.id}`,
+						href: `/api/invoices/generate-pdf/${invoice.id}`,
 					},
 					{
 						value: "Edit",

@@ -5,10 +5,10 @@ import Invoice from "types/invoice";
 
 export default async (request: NextApiRequest, response: NextApiResponse) => {
 	if (request.method === "GET") {
-		const { invoiceId, base64 } = request.query;
+		const { id, base64 } = request.query;
 
 		const invoice = await prisma.invoice.findFirst({
-			where: { id: String(invoiceId) },
+			where: { id: String(id) },
 			include: {
 				client: true,
 				activities: {

@@ -21,7 +21,6 @@ export const DropdownContent = styled.div`
 	position: absolute;
 	display: flex;
 	flex-direction: column;
-	z-index: 100;
 	min-width: 100%;
 	right: 0;
 

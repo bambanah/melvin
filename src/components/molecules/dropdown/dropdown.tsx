@@ -2,7 +2,7 @@ import Button from "@atoms/button";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { FC, useEffect, useRef, useState } from "react";
-import * as Styles from "./styles";
+import * as Styles from "./dropbox.styles";
 
 interface DropdownProps {
 	title: string;
