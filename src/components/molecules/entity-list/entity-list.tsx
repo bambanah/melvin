@@ -180,10 +180,8 @@ const EntityList: FC<EntityListProps> = ({
 							)}
 						</Styles.EntityContent>
 
-						{shouldExpand && entity.actions && (
-							<Styles.ExpandedComponent
-								className={expandedIndex === index ? "expanded" : ""}
-							>
+						{shouldExpand && entity.actions && expandedIndex === index && (
+							<Styles.ExpandedComponent className="expanded">
 								{expandedIndex !== undefined &&
 									entity.ExpandedComponent &&
 									entity.ExpandedComponent(index)}
