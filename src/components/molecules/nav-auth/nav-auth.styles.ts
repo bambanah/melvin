@@ -1,3 +1,4 @@
+import { breakpoints } from "@styles/themes";
 import styled from "styled-components";
 
 export const AuthDropdown = styled.div`
@@ -20,6 +21,10 @@ export const AuthDropdown = styled.div`
 			display: flex;
 		}
 	}
+
+	@media ${breakpoints.tablet} {
+		margin: 0;
+	}
 `;
 
 export const Profile = styled.div`
@@ -37,12 +42,15 @@ export const Profile = styled.div`
 	&:hover {
 		color: ${({ theme }) => theme.colors.brand};
 	}
+
+	@media ${breakpoints.tablet} {
+		font-size: 2rem;
+	}
 `;
 
 export const DropdownContent = styled.div`
 	position: absolute;
-	bottom: 3rem;
-	left: -7rem;
+	top: 10;
 	margin-top: 2.5rem;
 	width: 15rem;
 
@@ -55,4 +63,9 @@ export const DropdownContent = styled.div`
 	gap: 3rem;
 
 	box-shadow: 0px 0px 13px rgba(0, 0, 0, 0.3);
+
+	@media ${breakpoints.tablet} {
+		bottom: 3rem;
+		left: -7rem;
+	}
 `;

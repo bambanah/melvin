@@ -79,11 +79,12 @@ export const Links = styled.div`
 	justify-content: flex-end;
 
 	@media ${breakpoints.tablet} {
-		padding-top: 5rem;
-		gap: 5rem;
+		padding-top: 3rem;
+		gap: 3rem;
 		width: 100%;
 		flex-direction: column;
 		justify-content: flex-start;
+		font-size: 2rem;
 
 		a {
 			padding: 1.2rem;
