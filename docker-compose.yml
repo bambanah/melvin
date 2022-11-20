@@ -1,0 +1,14 @@
+version: "3.6"
+services:
+  mysql-db:
+    container_name: mysql-db
+    image: mysql:8
+    ports:
+      - "3309:3306"
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=Passw0rd
+volumes:
+  db_data:
