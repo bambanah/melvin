@@ -106,7 +106,8 @@ const generatePDF = async (invoice: Invoice) => {
 				const travelTotal = 0.85 * activity.transitDistance;
 
 				providerTravel.push(
-					`Provider Travel - Non Labour Costs\n${itemCode}\n`,
+					// `Provider Travel - Non Labour Costs\n${itemCode}\n`,
+					`Provider Travel - Non Labour Costs\n${"04_799_0125_6_1"}\n`,
 					`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 					`${activity.transitDistance} km\n`,
 					"$0.85/km\n",
