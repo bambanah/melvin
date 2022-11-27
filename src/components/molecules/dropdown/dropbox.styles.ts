@@ -23,6 +23,7 @@ export const DropdownContent = styled.div`
 	flex-direction: column;
 	min-width: 100%;
 	right: 0;
+	z-index: 100;
 
 	a {
 		padding: 0.5em 1em;
