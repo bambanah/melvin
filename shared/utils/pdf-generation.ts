@@ -82,7 +82,9 @@ const generatePDF = (invoice: Invoice) => {
 					if (activity.travel_duration > 0 && rate) {
 						const providerTravel = [];
 
-						const travelTotal = roundToTwo((rate / 60) * activity.travel_duration);
+						const travelTotal = roundToTwo(
+							(rate / 60) * activity.travel_duration
+						);
 
 						providerTravel.push(`Provider Travel\n${itemCode}\n`);
 						providerTravel.push(`${activity.date}\n`);
@@ -105,8 +107,11 @@ const generatePDF = (invoice: Invoice) => {
 						const providerTravel = [];
 
 						const travelRate = isGroup ? 0.43 : 0.85;
-						const travelTotal = roundToTwo(travelRate * activity.travel_distance);
-						const travelCode = isGroup ? "04_799_0136_6_1" : itemCode;
+						const travelTotal = roundToTwo(
+							travelRate * activity.travel_distance
+						);
+						// const travelCode = isGroup ? "04_799_0136_6_1" : itemCode;
+						const travelCode = "04_799_0125_6_1";
 
 						providerTravel.push(
 							`Provider Travel - Non Labour Costs\n${travelCode}\n`
