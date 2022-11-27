@@ -1,5 +1,4 @@
 import Button from "@atoms/button";
-import DatePickerField from "@atoms/date-picker-field";
 import Form from "@atoms/form";
 import Input from "@atoms/input";
 import TimePicker from "@atoms/time-input";
@@ -290,8 +289,18 @@ const CreateInvoiceForm: FC<Props> = ({
 													<Styles.ActivityRow>
 														<Label required>
 															<span>Date</span>
-															<DatePickerField
+															<Input
+																type="text"
+																onChange={handleChange}
+																onBlur={handleBlur}
+																value={values.activities[index].date}
+																id={`activities.${index}.date`}
 																name={`activities.${index}.date`}
+																error={errorIn(
+																	errors,
+																	touched,
+																	`activities.${index}.date`
+																)}
 															/>
 														</Label>
 
@@ -299,6 +308,11 @@ const CreateInvoiceForm: FC<Props> = ({
 															<span>Start Time</span>
 															<TimePicker
 																name={`activities.${index}.startTime`}
+																error={errorIn(
+																	errors,
+																	touched,
+																	`activities.${index}.startTime`
+																)}
 															/>
 														</Label>
 
@@ -306,6 +320,11 @@ const CreateInvoiceForm: FC<Props> = ({
 															<span>End Time</span>
 															<TimePicker
 																name={`activities.${index}.endTime`}
+																error={errorIn(
+																	errors,
+																	touched,
+																	`activities.${index}.endTime`
+																)}
 															/>
 														</Label>
 													</Styles.ActivityRow>
@@ -456,7 +475,7 @@ const CreateInvoiceForm: FC<Props> = ({
 			}
 		},
 		validationSchema: InvoiceValidationSchema,
-		validateOnChange: true,
+		validateOnChange: false,
 		validateOnMount: false,
 		validateOnBlur: true,
 		displayName: "Create Invoice",

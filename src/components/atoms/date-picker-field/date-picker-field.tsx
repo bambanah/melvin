@@ -1,12 +1,12 @@
-import React, { FC } from "react";
 import { useField, useFormikContext } from "formik";
+import { FC } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import * as Styles from "./styles";
+
+import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
-
-import * as Styles from "./styles";
-import dayjs from "dayjs";
 
 interface DatePickerProps {
 	name: string;
