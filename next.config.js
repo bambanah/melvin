@@ -19,7 +19,4 @@ module.exports = {
 	eslint: {
 		dirs: ["."],
 	},
-	webpack: (config) => {
-		return config;
-	},
 };
