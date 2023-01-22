@@ -67,7 +67,6 @@ const generatePDF = async (invoice: Invoice) => {
 				countString = `${activity.itemDistance?.toString()} kilometres`;
 			}
 
-			// Push activity
 			const currentActivity = [
 				`${activity.supportItem.description}\n${itemCode}\n`,
 				`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
@@ -80,14 +79,14 @@ const generatePDF = async (invoice: Invoice) => {
 
 			activityStrings.push(currentActivity);
 
-			// Provider Travel
+			// Provider Travel - Labour Costs
 			if (activity.transitDuration) {
 				const providerTravel = [];
 
 				const travelTotal = round((rate / 60) * activity.transitDuration, 2);
 
 				providerTravel.push(
-					`Provider Travel\n${itemCode}\n`,
+					`Provider Travel - Labour Costs\n${itemCode}\n`,
 					`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 					`${activity.transitDuration} minutes\n`,
 					`$${rate.toFixed(2)}${`/${
