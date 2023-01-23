@@ -6,6 +6,7 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { FormikErrors, FormikTouched, getIn } from "formik";
 import InvoiceType from "types/invoice";
+import { INPUT_DATE_FORMATS } from "./constants";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
@@ -172,13 +173,13 @@ export const valuesToInvoice = (values: FormValues) => ({
 		clientId: values.clientId,
 		billTo: values.billTo,
 		date: values.date
-			? dayjs.utc(values.date, "DD/MM/YYYY").toDate()
+			? dayjs(values.date, INPUT_DATE_FORMATS).utc().toDate()
 			: new Date(),
 		status: InvoiceStatus.CREATED,
 	},
 	activities: values.activities.map((activity) => ({
 		id: activity.id,
-		date: dayjs.utc(activity.date, "DD/MM/YYYY").toDate(),
+		date: dayjs(activity.date, INPUT_DATE_FORMATS).utc().toDate(),
 		itemDistance: Number(activity.itemDistance) || undefined,
 		transitDistance: Number(activity.transitDistance) || undefined,
 		transitDuration: Number(activity.transitDuration) || undefined,

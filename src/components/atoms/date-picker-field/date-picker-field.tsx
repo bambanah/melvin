@@ -6,6 +6,7 @@ import * as Styles from "./styles";
 
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { INPUT_DATE_FORMATS } from "@utils/constants";
 dayjs.extend(customParseFormat);
 
 interface DatePickerProps {
@@ -23,7 +24,7 @@ const DatePickerField: FC<DatePickerProps> = ({ name, error }) => {
 				{...field}
 				name={name}
 				selected={
-					(field.value && dayjs(field.value, "DD/MM/YYYY").toDate()) ||
+					(field.value && dayjs(field.value, INPUT_DATE_FORMATS).toDate()) ||
 					new Date()
 				}
 				onChange={(value) => {
