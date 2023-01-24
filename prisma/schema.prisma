@@ -1,12 +1,10 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider             = "mysql"
-  url                  = env("DATABASE_URL")
-  referentialIntegrity = "prisma"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model Account {
@@ -58,19 +56,19 @@ model VerificationToken {
 }
 
 model Client {
-  id       String    @id @default(cuid())
-  created  DateTime  @default(now())
-  number   String?
-  ownerId  String
-  name     String
-  billTo   String?
-  owner    User      @relation(fields: [ownerId], references: [id])
-  invoices Invoice[]
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @map("created")
+  number    String?
+  ownerId   String
+  name      String
+  billTo    String?
+  owner     User      @relation(fields: [ownerId], references: [id])
+  invoices  Invoice[]
 }
 
 model Invoice {
   id         String        @id @default(cuid())
-  created    DateTime      @default(now())
+  createdAt  DateTime      @default(now()) @map("created")
   invoiceNo  String
   billTo     String
   date       DateTime
@@ -80,12 +78,11 @@ model Invoice {
   client     Client        @relation(fields: [clientId], references: [id])
   owner      User          @relation(fields: [ownerId], references: [id])
   activities Activity[]
-  templates  Template[]
 }
 
 model Activity {
   id              String      @id @default(cuid())
-  created         DateTime    @default(now())
+  createdAt       DateTime    @default(now()) @map("created")
   date            DateTime
   startTime       DateTime
   endTime         DateTime
@@ -100,7 +97,7 @@ model Activity {
 
 model SupportItem {
   id            String     @id @default(cuid())
-  created       DateTime   @default(now())
+  createdAt     DateTime   @default(now()) @map("created")
   description   String
   rateType      RateType
   weekdayCode   String
@@ -114,14 +111,6 @@ model SupportItem {
   sundayRate    Decimal?
   owner         User       @relation(fields: [ownerId], references: [id])
   activities    Activity[]
-}
-
-model Template {
-  id           String   @id @default(cuid())
-  created      DateTime @default(now())
-  templateName String
-  invoiceId    String
-  invoice      Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
 
 enum InvoiceStatus {
