@@ -34,6 +34,7 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
+		"strictNullChecks": true,
 		"target": "es2018",
 		"tsBuildInfoFile": ".next/cache/.tsbuildinfo"
 	},
