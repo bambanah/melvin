@@ -45,6 +45,7 @@ model User {
   invoices      Invoice[]
   sessions      Session[]
   supportItems  SupportItem[]
+  Activity      Activity[]
 }
 
 model VerificationToken {
@@ -58,8 +59,8 @@ model VerificationToken {
 model Client {
   id        String    @id @default(cuid())
   createdAt DateTime  @default(now()) @map("created")
-  number    String?
   ownerId   String
+  number    String?
   name      String
   billTo    String?
   owner     User      @relation(fields: [ownerId], references: [id])
@@ -69,11 +70,11 @@ model Client {
 model Invoice {
   id         String        @id @default(cuid())
   createdAt  DateTime      @default(now()) @map("created")
+  ownerId    String
   invoiceNo  String
   billTo     String
   date       DateTime
   clientId   String
-  ownerId    String
   status     InvoiceStatus @default(CREATED)
   client     Client        @relation(fields: [clientId], references: [id])
   owner      User          @relation(fields: [ownerId], references: [id])
@@ -83,6 +84,7 @@ model Invoice {
 model Activity {
   id              String      @id @default(cuid())
   createdAt       DateTime    @default(now()) @map("created")
+  ownerId         String
   date            DateTime
   startTime       DateTime
   endTime         DateTime
@@ -91,6 +93,7 @@ model Activity {
   invoiceId       String?
   supportItemId   String
   itemDistance    Int?
+  owner           User        @relation(fields: [ownerId], references: [id])
   invoices        Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   supportItem     SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
 }
@@ -98,13 +101,13 @@ model Activity {
 model SupportItem {
   id            String     @id @default(cuid())
   createdAt     DateTime   @default(now()) @map("created")
+  ownerId       String
   description   String
   rateType      RateType
   weekdayCode   String
   weeknightCode String?
   saturdayCode  String?
   sundayCode    String?
-  ownerId       String
   weekdayRate   Decimal
   weeknightRate Decimal?
   saturdayRate  Decimal?
