@@ -85,16 +85,16 @@ model Activity {
   id              String      @id @default(cuid())
   createdAt       DateTime    @default(now()) @map("created")
   ownerId         String
+  supportItemId   String
+  invoiceId       String?
   date            DateTime
   startTime       DateTime
   endTime         DateTime
   transitDuration Int?
   transitDistance Int?
-  invoiceId       String?
-  supportItemId   String
   itemDistance    Int?
   owner           User        @relation(fields: [ownerId], references: [id])
-  invoices        Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoice         Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   supportItem     SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
 }
 

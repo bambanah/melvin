@@ -12,7 +12,7 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
 				client: true,
 			},
 			orderBy: {
-				created: "desc",
+				createdAt: "desc",
 			},
 		});
 

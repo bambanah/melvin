@@ -1,9 +1,24 @@
-import { createRouter } from "@server/create-router";
-import { invoiceRouter } from "./invoice";
-import superjson from "superjson";
+import { publicProcedure, router } from "@server/trpc";
+import { z } from "zod";
+import { activityRouter } from "./activity-router";
+import { invoiceRouter } from "./invoice-router";
+import { pdfRouter } from "./pdf-router";
 
-export const appRouter = createRouter()
-	.transformer(superjson)
-	.merge("invoice.", invoiceRouter);
+export const appRouter = router({
+	hello: publicProcedure
+		.input(
+			z.object({
+				text: z.string(),
+			})
+		)
+		.query(({ input }) => {
+			return {
+				greeting: `hello ${input.text}`,
+			};
+		}),
+	invoice: invoiceRouter,
+	activity: activityRouter,
+	pdf: pdfRouter,
+});
 
 export type AppRouter = typeof appRouter;

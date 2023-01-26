@@ -113,11 +113,11 @@ const CreateInvoiceForm: FC<Props> = ({
 
 				if (!initialValues?.invoiceNo) {
 					values.invoiceNo =
-						highestInvoiceNo !== initialValues?.invoiceNo
-							? getNextInvoiceNo(
+						highestInvoiceNo === initialValues?.invoiceNo
+							? highestInvoiceNo ?? ""
+							: getNextInvoiceNo(
 									client.invoices?.map((index) => index.invoiceNo)
-							  )
-							: highestInvoiceNo ?? "";
+							  );
 				}
 
 				if (client.billTo) {
@@ -152,7 +152,7 @@ const CreateInvoiceForm: FC<Props> = ({
 				<Styles.ClientSelect>
 					<Label
 						htmlFor="clientId"
-						className={`highlightable${!values.clientId ? " highlighted" : ""}`}
+						className={`highlightable${values.clientId ? "" : " highlighted"}`}
 					>
 						<Subheading>Who will this invoice be for?</Subheading>
 						<Select
@@ -169,13 +169,19 @@ const CreateInvoiceForm: FC<Props> = ({
 				{values.clientId && (
 					<Styles.ClientDetails
 						className={`highlightable${
-							!invoiceNoConfirmed ? " highlighted" : ""
+							invoiceNoConfirmed ? "" : " highlighted"
 						}`}
 					>
 						<Label htmlFor="invoiceNo" required>
 							<span>Invoice Number</span>
 							<Subheading>
-								{!initialValues?.invoiceNo ? (
+								{initialValues?.invoiceNo ? copiedFrom ? (
+									<>
+										Previous invoice was <b>{copiedFrom}</b>
+									</>
+								) : (
+									"Update if required"
+								) : (
 									getPreviousInvoiceNo() ? (
 										<>
 											Previous invoice was <b>{getPreviousInvoiceNo()}</b>
@@ -183,12 +189,6 @@ const CreateInvoiceForm: FC<Props> = ({
 									) : (
 										"This is the first invoice"
 									)
-								) : copiedFrom ? (
-									<>
-										Previous invoice was <b>{copiedFrom}</b>
-									</>
-								) : (
-									"Update if required"
 								)}
 							</Subheading>
 							<Input

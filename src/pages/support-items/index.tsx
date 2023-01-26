@@ -1,9 +1,9 @@
 import { useSession } from "next-auth/react";
 import React from "react";
-import ActivityList from "@organisms/activity-list";
+import SupportItemList from "@organisms/support-item-list";
 import Layout from "@layouts/common/layout";
 
-function Activities() {
+function SupportItems() {
 	const { status } = useSession({
 		required: true,
 	});
@@ -14,9 +14,9 @@ function Activities() {
 
 	return (
 		<Layout>
-			<ActivityList />
+			<SupportItemList />
 		</Layout>
 	);
 }
 
-export default Activities;
+export default SupportItems;

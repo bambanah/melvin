@@ -10,32 +10,6 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
 			.status(401)
 			.send("Must be signed in to update this resource.");
 
-	if (request.method === "GET") {
-		const invoices = await prisma.invoice.findMany({
-			where: {
-				ownerId: session.user.id,
-			},
-			include: {
-				client: true,
-				activities: {
-					select: {
-						startTime: true,
-						endTime: true,
-						transitDistance: true,
-						transitDuration: true,
-						date: true,
-						supportItem: true,
-					},
-				},
-			},
-			orderBy: {
-				created: "desc",
-			},
-		});
-
-		return response.status(200).json(invoices);
-	}
-
 	if (request.method === "POST") {
 		const invoice = await prisma.invoice.create({
 			data: {

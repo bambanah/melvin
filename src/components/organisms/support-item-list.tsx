@@ -22,26 +22,25 @@ const generateEntity = (supportItem?: SupportItem): EntityListItem => ({
 	id: supportItem?.id || "",
 	fields: [
 		{
-			value: !supportItem ? <Skeleton /> : supportItem.description,
+			value: supportItem ? supportItem.description : <Skeleton />,
 			type: "label",
 			flex: "1 1 auto",
 		},
 		{
-			value: !supportItem ? <Skeleton /> : supportItem.weekdayCode,
+			value: supportItem ? supportItem.weekdayCode : <Skeleton />,
 			icon: faIdCard,
 			type: "text",
 			flex: "0 0 9.5em",
 		},
 		{
-			value: !supportItem ? <Skeleton /> : `${supportItem.weekdayRate}`,
+			value: supportItem ? `${supportItem.weekdayRate}` : <Skeleton />,
 			icon: faDollarSign,
 			type: "text",
 			flex: "0 0 5em",
 		},
 	],
-	actions: !supportItem
-		? []
-		: [
+	actions: supportItem
+		? [
 				{
 					value: "Edit",
 					type: "link",
@@ -68,7 +67,8 @@ const generateEntity = (supportItem?: SupportItem): EntityListItem => ({
 						}
 					},
 				},
-		  ],
+		  ]
+		: [],
 });
 
 function SupportItemList() {

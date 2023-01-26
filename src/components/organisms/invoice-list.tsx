@@ -9,37 +9,43 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import EntityList, { EntityListItem } from "@molecules/entity-list";
 import PdfDocument from "@molecules/pdf-document";
+import { invoiceRouter } from "@server/routers/invoice-router";
+import { inferRouterOutputs } from "@trpc/server";
 import { getTotalCost } from "@utils/helpers";
+import { trpc } from "@utils/trpc";
 import axios from "axios";
 import dayjs from "dayjs";
-import React from "react";
 import Skeleton from "react-loading-skeleton";
 import { toast } from "react-toastify";
-import useSWR, { useSWRConfig } from "swr";
-import Invoice from "types/invoice";
-
-const getInvoices = async () => {
-	const response = await fetch("/api/invoices");
-	return (await response.json()) as Invoice[];
-};
+import { useSWRConfig } from "swr";
 
 export default function InvoiceList() {
 	const { mutate } = useSWRConfig();
-	const { data: invoices, error } = useSWR("/api/invoices", getInvoices);
 
-	if (error) {
-		console.error(error);
+	type InvoiceType = inferRouterOutputs<
+		typeof invoiceRouter
+	>["list"]["invoices"][0];
+
+	const invoices = trpc.invoice.list.useQuery({});
+
+	if (invoices.error) {
+		console.error(invoices.error);
 		return <div>Error loading</div>;
 	}
 
-	const generateEntity = (invoice?: Invoice): EntityListItem => ({
+	if (!invoices.data) {
+		return <div>Loading...</div>;
+	}
+
+	const generateEntity = (invoice?: InvoiceType): EntityListItem => ({
 		id: invoice?.id ?? "",
-		ExpandedComponent: !invoices
-			? undefined
-			: (index: number) => <PdfDocument invoiceId={invoices[index].id} />,
-		actions: !invoice
-			? []
-			: [
+		ExpandedComponent: invoices
+			? (index: number) => (
+					<PdfDocument invoiceId={invoices.data.invoices[index].id} />
+			  )
+			: undefined,
+		actions: invoice
+			? [
 					{
 						value: "Download",
 						type: "link",
@@ -76,38 +82,39 @@ export default function InvoiceList() {
 							}
 						},
 					},
-			  ],
+			  ]
+			: [],
 		fields: [
 			{
-				value: !invoice ? <Skeleton /> : dayjs(invoice.date).format("DD/MM/YY"),
+				value: invoice ? dayjs(invoice.date).format("DD/MM/YY") : <Skeleton />,
 				type: "text",
 				flex: "0 0 4.5em",
 			},
 			{
-				value: !invoice ? <Skeleton /> : invoice.invoiceNo,
+				value: invoice ? invoice.invoiceNo : <Skeleton />,
 				type: "label",
 				flex: "1 0 7em",
 			},
 			{
-				value: !invoice ? <Skeleton /> : invoice.client?.name || "",
+				value: invoice ? invoice.client?.name || "" : <Skeleton />,
 				icon: faUser,
 				type: "text",
 				align: "left",
 				flex: "1 1 100%",
 			},
 			{
-				value: !invoice ? <Skeleton /> : invoice.activities.length.toString(),
+				value: invoice ? invoice._count.activities.toString() : <Skeleton />,
 				icon: faWalking,
 				type: "text",
 				flex: "0 0 2em",
 			},
 			{
-				value: !invoice ? (
-					<Skeleton />
-				) : (
+				value: invoice ? (
 					getTotalCost(invoice.activities).toLocaleString(undefined, {
 						minimumFractionDigits: 2,
 					})
+				) : (
+					<Skeleton />
 				),
 				icon: faDollarSign,
 				type: "text",
@@ -130,7 +137,9 @@ export default function InvoiceList() {
 		<EntityList
 			title="Invoices"
 			route="/invoices"
-			entities={invoices.map((invoice) => generateEntity(invoice))}
+			entities={invoices.data.invoices.map((invoice) =>
+				generateEntity(invoice)
+			)}
 			shouldExpand
 		/>
 	);

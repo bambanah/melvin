@@ -44,29 +44,28 @@ const ClientList = () => {
 	};
 
 	const generateEntity = (client?: Client): EntityListItem => ({
-		id: !client ? "loading" : client?.id || "",
+		id: client ? client?.id || "" : "loading",
 		fields: [
 			{
-				value: !client ? <Skeleton /> : client?.name || "N/A",
+				value: client ? client?.name || "N/A" : <Skeleton />,
 				type: "label",
 				flex: "1 1 100%",
 			},
 			{
-				value: !client ? <Skeleton /> : client?.number || "N/A",
+				value: client ? client?.number || "N/A" : <Skeleton />,
 				icon: faIdCard,
 				type: "text",
 				flex: "1 0 7.2em",
 			},
 			{
-				value: !client ? <Skeleton /> : client?.billTo || "N/A",
+				value: client ? client?.billTo || "N/A" : <Skeleton />,
 				icon: faWallet,
 				type: "text",
 				flex: "0 0 9.7em",
 			},
 		],
-		actions: !client
-			? []
-			: [
+		actions: client
+			? [
 					{
 						value: "New Invoice",
 						type: "button",
@@ -94,7 +93,8 @@ const ClientList = () => {
 							}
 						},
 					},
-			  ],
+			  ]
+			: [],
 	});
 
 	if (!clients)

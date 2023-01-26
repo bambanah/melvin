@@ -1,5 +1,5 @@
 import Button from "@atoms/button";
-import CreateActivityForm from "@organisms/forms/activity-form";
+import CreateSupportItemForm from "@organisms/forms/support-item-form";
 import { RateType, SupportItem } from "@prisma/client";
 import Head from "next/head";
 import Link from "next/link";
@@ -14,7 +14,7 @@ const getActivity = async (id: string) => {
 	return (await response.json()) as SupportItem;
 };
 
-const ActivityPage = () => {
+const SupportItemPage = () => {
 	const router = useRouter();
 	const supportItemId = String(router.query.id);
 
@@ -40,14 +40,14 @@ const ActivityPage = () => {
 			</Head>
 			{editing ? (
 				<>
-					<CreateActivityForm
+					<CreateSupportItemForm
 						initialValues={supportItem}
-						returnFunction={() => router.push("/activities")}
+						returnFunction={() => router.push("/support-items")}
 					/>
 				</>
 			) : (
 				<Styles.Content>
-					<Link href="/activities">&lt; Back to activities</Link>
+					<Link href="/support-items">&lt; Back to Support Items</Link>
 					<h1>{supportItem.description}</h1>
 					<Button onClick={() => setEditing(true)}>Edit</Button>
 					<p>
@@ -80,4 +80,4 @@ const ActivityPage = () => {
 	);
 };
 
-export default ActivityPage;
+export default SupportItemPage;

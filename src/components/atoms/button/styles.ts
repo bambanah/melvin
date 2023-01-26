@@ -63,7 +63,7 @@ export const SecondaryButton = styled(BaseButton)`
 export const SuccessButton = styled(BaseButton)`
 	color: ${({ theme }) =>
 		theme.type === "light" ? theme.colors.fg : theme.colors.bg};
-	background-color: ${({ theme }) => theme.colors.green};
+	background-color: ${({ theme }) => theme.colors.success};
 
 	&.disabled {
 		color: ${({ theme }) =>
@@ -71,7 +71,8 @@ export const SuccessButton = styled(BaseButton)`
 				0.3,
 				theme.type === "light" ? theme.colors.fg : theme.colors.bg
 			)};
-		background-color: ${({ theme }) => transparentize(0.8, theme.colors.green)};
+		background-color: ${({ theme }) =>
+			transparentize(0.8, theme.colors.success)};
 	}
 `;
 

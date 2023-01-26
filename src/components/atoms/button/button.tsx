@@ -48,7 +48,7 @@ const Button: React.FC<Props> = ({
 	return (
 		<ButtonComponent
 			className={`${disabled ? "disabled" : ""} ${className}`}
-			onClick={!disabled ? onClick : undefined}
+			onClick={disabled ? undefined : onClick}
 			{...rest}
 		>
 			{children}

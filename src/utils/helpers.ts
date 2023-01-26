@@ -1,5 +1,5 @@
 import { FormValues } from "@organisms/forms/invoice-form";
-import { Activity, Invoice, InvoiceStatus } from "@prisma/client";
+import { Activity, Invoice, InvoiceStatus, Prisma } from "@prisma/client";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import timezone from "dayjs/plugin/timezone";
@@ -84,16 +84,16 @@ export const getRate = (activity: {
 	endTime: Date;
 	supportItem: {
 		weekdayCode: string;
-		weekdayRate: number | string;
-		weeknightCode?: string;
-		weeknightRate?: number | string;
-		saturdayCode?: string;
-		saturdayRate?: number | string;
-		sundayCode?: string;
-		sundayRate?: number | string;
+		weekdayRate: Prisma.Decimal | string;
+		weeknightCode?: string | null;
+		weeknightRate?: Prisma.Decimal | null;
+		saturdayCode?: string | null;
+		saturdayRate?: Prisma.Decimal | null;
+		sundayCode?: string | null;
+		sundayRate?: Prisma.Decimal | null;
 	};
-}): [code: string, rate: number] => {
-	let rate = 0;
+}): [code: string, rate: Prisma.Decimal] => {
+	let rate = new Prisma.Decimal(0);
 	let itemCode = "";
 
 	if (
@@ -104,7 +104,7 @@ export const getRate = (activity: {
 		// Saturday
 		rate =
 			typeof activity.supportItem.saturdayRate === "string"
-				? Number.parseFloat(activity.supportItem.saturdayRate)
+				? new Prisma.Decimal(activity.supportItem.saturdayRate)
 				: activity.supportItem.saturdayRate;
 		itemCode = activity.supportItem.saturdayCode;
 	} else if (
@@ -116,7 +116,7 @@ export const getRate = (activity: {
 		// Sunday
 		rate =
 			typeof activity.supportItem.sundayRate === "string"
-				? Number.parseFloat(activity.supportItem.sundayRate)
+				? new Prisma.Decimal(activity.supportItem.sundayRate)
 				: activity.supportItem.sundayRate;
 		itemCode = activity.supportItem.sundayCode;
 	} else if (
@@ -128,14 +128,14 @@ export const getRate = (activity: {
 		// Day is a weekday and it's after 8pm
 		rate =
 			typeof activity.supportItem.weeknightRate === "string"
-				? Number.parseFloat(activity.supportItem.weeknightRate)
+				? new Prisma.Decimal(activity.supportItem.weeknightRate)
 				: activity.supportItem.weeknightRate;
 		itemCode = activity.supportItem.weeknightCode;
 	} else {
 		// Weekday before 8pm
 		rate =
 			typeof activity.supportItem.weekdayRate === "string"
-				? Number.parseFloat(activity.supportItem.weekdayRate)
+				? new Prisma.Decimal(activity.supportItem.weekdayRate)
 				: activity.supportItem.weekdayRate;
 		itemCode = activity.supportItem.weekdayCode;
 	}
@@ -211,7 +211,7 @@ export const getInvoiceFileName = (invoice: InvoiceType) => {
 };
 
 export function round(value: number, exp: number) {
-	if (typeof exp === "undefined" || +exp === 0) return Math.round(value);
+	if (exp === undefined || +exp === 0) return Math.round(value);
 
 	if (Number.isNaN(value) || !(typeof exp === "number" && exp % 1 === 0))
 		return Number.NaN;
@@ -236,13 +236,13 @@ export const getTotalCost = (
 		transitDistance: number | null;
 		supportItem: {
 			weekdayCode: string;
-			weekdayRate: number | string;
-			weeknightCode: string;
-			weeknightRate: number | string;
-			saturdayCode: string;
-			saturdayRate: number | string;
-			sundayCode: string;
-			sundayRate: number | string;
+			weekdayRate: Prisma.Decimal | string;
+			weeknightCode?: string | null;
+			weeknightRate: Prisma.Decimal | null;
+			saturdayCode?: string | null;
+			saturdayRate: Prisma.Decimal | null;
+			sundayCode?: string | null;
+			sundayRate: Prisma.Decimal | null;
 		};
 	}[]
 ) => {
@@ -253,14 +253,14 @@ export const getTotalCost = (
 			let subTotal = 0;
 			const duration = getDuration(activity.startTime, activity.endTime);
 
-			subTotal += round(duration * rate, 2);
+			subTotal += round(duration * Number(rate), 2);
 
 			if (activity.transitDistance) {
 				subTotal += round(activity.transitDistance * 0.85, 2);
 			}
 
 			if (activity.transitDuration) {
-				subTotal += round(activity.transitDuration * (rate / 60), 2);
+				subTotal += round(activity.transitDuration * (Number(rate) / 60), 2);
 			}
 
 			return subTotal;
