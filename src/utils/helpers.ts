@@ -92,7 +92,7 @@ export const getRate = (activity: {
 		sundayCode?: string | null;
 		sundayRate?: Prisma.Decimal | null;
 	};
-}): [code: string, rate: Prisma.Decimal] => {
+}): [code: string, rate: number] => {
 	let rate = new Prisma.Decimal(0);
 	let itemCode = "";
 
@@ -140,7 +140,7 @@ export const getRate = (activity: {
 		itemCode = activity.supportItem.weekdayCode;
 	}
 
-	return [itemCode, rate];
+	return [itemCode, Number(rate)];
 };
 
 export const fetcher = (url: string) =>

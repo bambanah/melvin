@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import {
 	getDuration,
 	getHighestInvoiceNo,
@@ -31,13 +32,13 @@ const getActivity = (
 		transitDistance: transitDistance,
 		supportItem: {
 			weekdayCode: "weekday",
-			weekdayRate: 55.47,
+			weekdayRate: new Prisma.Decimal(55.47),
 			weeknightCode: "weeknight",
-			weeknightRate: 61.05,
+			weeknightRate: new Prisma.Decimal(61.05),
 			saturdayCode: "saturday",
-			saturdayRate: 77.81,
+			saturdayRate: new Prisma.Decimal(77.81),
 			sundayCode: "sunday",
-			sundayRate: 100.16,
+			sundayRate: new Prisma.Decimal(100.16),
 		},
 	};
 };
@@ -148,13 +149,13 @@ describe("Helpers", () => {
 			transitDistance: 15,
 			supportItem: {
 				weekdayCode: "weekday",
-				weekdayRate: 1,
+				weekdayRate: new Prisma.Decimal(1),
 				weeknightCode: "weeknight",
-				weeknightRate: 2,
+				weeknightRate: new Prisma.Decimal(2),
 				saturdayCode: "saturday",
-				saturdayRate: 3,
+				saturdayRate: new Prisma.Decimal(3),
 				sundayCode: "sunday",
-				sundayRate: 4,
+				sundayRate: new Prisma.Decimal(4),
 			},
 		};
 
