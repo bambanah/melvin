@@ -6,44 +6,24 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import EntityList from "@molecules/entity-list";
 import { EntityListItem } from "@molecules/entity-list/entity-list";
-import { Client } from "@prisma/client";
-import { useRouter } from "next/router";
-import React from "react";
+import { ClientListOutput } from "@server/routers/client-router";
+import { trpc } from "@utils/trpc";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import Invoice from "types/invoice";
-import useSWR, { mutate } from "swr";
-import axios from "axios";
 import { toast } from "react-toastify";
 
-const getClients = async () => {
-	const response = await fetch("/api/clients");
-
-	return (await response.json()) as Client[];
-};
-
 const ClientList = () => {
-	const { data: clients, error } = useSWR("/api/clients", getClients);
-	const router = useRouter();
+	const utils = trpc.useContext();
 
-	if (error) {
-		console.error(error);
+	const clients = trpc.clients.list.useQuery();
+	const deleteClientMutation = trpc.clients.delete.useMutation();
+
+	if (clients.error) {
+		console.error(clients.error);
 		return <div>Error loading</div>;
 	}
 
-	const copyLatestInvoice = async (id: string) => {
-		const response = await fetch(`/api/clients/${id}/latest-invoice`);
-
-		if (response.status === 404) {
-			router.push(`/invoices/create?for=${id}`);
-		} else {
-			const invoice = (await response.json()) as Invoice;
-
-			router.push(`/invoices/create?copyFrom=${invoice.id}`);
-		}
-	};
-
-	const generateEntity = (client?: Client): EntityListItem => ({
+	const generateEntity = (client?: ClientListOutput): EntityListItem => ({
 		id: client ? client?.id || "" : "loading",
 		fields: [
 			{
@@ -68,8 +48,11 @@ const ClientList = () => {
 			? [
 					{
 						value: "New Invoice",
-						type: "button",
-						onClick: () => copyLatestInvoice(client.id),
+						type: "link",
+						href:
+							client.invoices.length > 0
+								? `/invoices/create?copyFrom=${client.invoices[0].id}`
+								: `/invoices/create?for=${client.id}`,
 					},
 					{
 						value: "Edit",
@@ -83,13 +66,16 @@ const ClientList = () => {
 						icon: faTrash,
 						onClick: () => {
 							if (confirm(`Are you sure you want to delete ${client.name}?`)) {
-								axios
-									.delete(`/api/clients/${client.id}`)
-									.then(() => {
-										mutate("/api/clients");
-										toast.success("Client deleted");
-									})
-									.catch((error) => toast.error(error));
+								deleteClientMutation.mutateAsync(
+									{ id: client.id },
+									{
+										onSuccess: () => {
+											utils.clients.list.invalidate();
+											toast.success("Client deleted");
+										},
+										onError: (error) => toast.error(error.message),
+									}
+								);
 							}
 						},
 					},
@@ -97,7 +83,7 @@ const ClientList = () => {
 			: [],
 	});
 
-	if (!clients)
+	if (!clients.data)
 		return (
 			<EntityList
 				title="Clients"
@@ -112,7 +98,7 @@ const ClientList = () => {
 		<EntityList
 			title="Clients"
 			route="/clients"
-			entities={clients.map((client) => generateEntity(client))}
+			entities={clients.data.map((client) => generateEntity(client))}
 		/>
 	);
 };

@@ -7,24 +7,28 @@ import Label from "@atoms/label";
 import ButtonGroup from "@molecules/button-group";
 import { Client } from "@prisma/client";
 import ClientValidationSchema from "@schema/client-validation-schema";
+import { ClientByIdOutput } from "@server/routers/client-router";
 import { errorIn } from "@utils/helpers";
-import axios from "axios";
+import { trpc } from "@utils/trpc";
 import { FormikProps, getIn, withFormik } from "formik";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { FC } from "react";
+import { FC } from "react";
 import { toast } from "react-toastify";
-import { useSWRConfig } from "swr";
 import * as Styles from "./styles";
 
 interface Props {
-	initialValues?: Partial<Client>;
+	initialValues?: Partial<ClientByIdOutput>;
 	returnFunction?: () => void;
 }
 
 const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 	const router = useRouter();
-	const { mutate } = useSWRConfig();
+
+	const utils = trpc.useContext();
+
+	const clientUpdateMutation = trpc.clients.update.useMutation();
+	const clientCreateMutation = trpc.clients.create.useMutation();
 
 	const BaseForm = (props: FormikProps<Partial<Client>>) => {
 		const { values, touched, errors, handleChange, handleBlur, handleSubmit } =
@@ -115,30 +119,47 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 	};
 
 	const FormikForm = withFormik({
-		mapPropsToValues: () =>
-			({
-				id: initialValues?.id ?? undefined,
-				name: initialValues?.name ?? "",
-				number: initialValues?.number ?? "",
-				billTo: initialValues?.billTo ?? "",
-			} as Partial<Client>),
+		mapPropsToValues: () => ({
+			id: initialValues?.id ?? undefined,
+			name: initialValues?.name ?? "",
+			number: initialValues?.number ?? "",
+			billTo: initialValues?.billTo ?? "",
+		}),
 		handleSubmit: (values, { setSubmitting }) => {
-			if (initialValues) {
-				axios.post(`/api/clients/${initialValues.id}`, values).then(() => {
-					toast.info("Client Updated");
-					setSubmitting(false);
-					mutate(`/api/clients/${initialValues.id}`);
+			if (initialValues && initialValues.id) {
+				clientUpdateMutation.mutateAsync(
+					{ id: initialValues.id, client: values },
+					{
+						onSuccess: () => {
+							toast.info("Client Updated");
 
-					returnFunction ? returnFunction() : router.push("/clients");
-				});
+							returnFunction ? returnFunction() : router.push("/clients");
+							utils.clients.invalidate();
+						},
+						onError: (error) => {
+							toast.error("An unknown error occured. Refresh and try again.");
+							console.error(error.message);
+							setSubmitting(false);
+						},
+					}
+				);
 			} else {
-				axios.post("/api/clients", values).then(() => {
-					toast.success("Client Created");
+				clientCreateMutation.mutateAsync(
+					{ client: values },
+					{
+						onSuccess: () => {
+							toast.success("Client Created");
 
-					setSubmitting(false);
-					mutate("/api/clients");
-					router.push("/clients");
-				});
+							router.push("/clients");
+							utils.clients.invalidate();
+						},
+						onError: (error) => {
+							toast.error("An unknown error occured. Refresh and try again.");
+							console.error(error.message);
+							setSubmitting(false);
+						},
+					}
+				);
 			}
 		},
 		validationSchema: ClientValidationSchema,

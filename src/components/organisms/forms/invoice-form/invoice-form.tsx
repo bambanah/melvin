@@ -1,14 +1,16 @@
 import Button from "@atoms/button";
 import Form from "@atoms/form";
+import Heading from "@atoms/heading";
 import Input from "@atoms/input";
-import TimePicker from "@atoms/time-input";
 import Label from "@atoms/label";
 import Loading from "@atoms/loading";
 import Select from "@atoms/select";
 import Subheading from "@atoms/subheading";
-import Heading from "@atoms/heading";
+import TimePicker from "@atoms/time-input";
+import { faTrashAlt } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ButtonGroup from "@molecules/button-group";
-import { Client, Invoice, SupportItem } from "@prisma/client";
+import { Invoice, SupportItem } from "@prisma/client";
 import InvoiceValidationSchema from "@schema/invoice-validation-schema";
 import {
 	errorIn,
@@ -17,18 +19,17 @@ import {
 	getNextInvoiceNo,
 	valuesToInvoice,
 } from "@utils/helpers";
+import { trpc } from "@utils/trpc";
 import axios from "axios";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { FieldArray, FormikProps, withFormik } from "formik";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import useSWR, { SWRResponse, useSWRConfig } from "swr";
 import * as Styles from "./styles";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashAlt } from "@fortawesome/free-regular-svg-icons";
 dayjs.extend(customParseFormat);
 
 export type FormActivity = {
@@ -62,17 +63,12 @@ const CreateInvoiceForm: FC<Props> = ({
 	const { mutate } = useSWRConfig();
 
 	// Get clients and support items
-	const {
-		data: clients,
-		error: cError,
-	}: SWRResponse<
-		(Client & { invoices: { invoiceNo: string; billTo: string }[] })[]
-	> = useSWR("/api/clients", fetcher);
+	const { data: clients, error: clientError } = trpc.clients.list.useQuery();
 
 	const { data: supportItems, error: sError }: SWRResponse<SupportItem[]> =
 		useSWR("/api/support-items", fetcher);
 
-	if (cError || sError) return <div>An error occurred</div>;
+	if (clientError || sError) return <div>An error occurred</div>;
 	if (!clients || !supportItems) return <Loading />;
 
 	const emptyActivity: FormActivity = {
@@ -175,20 +171,20 @@ const CreateInvoiceForm: FC<Props> = ({
 						<Label htmlFor="invoiceNo" required>
 							<span>Invoice Number</span>
 							<Subheading>
-								{initialValues?.invoiceNo ? copiedFrom ? (
-									<>
-										Previous invoice was <b>{copiedFrom}</b>
-									</>
-								) : (
-									"Update if required"
-								) : (
-									getPreviousInvoiceNo() ? (
+								{initialValues?.invoiceNo ? (
+									copiedFrom ? (
 										<>
-											Previous invoice was <b>{getPreviousInvoiceNo()}</b>
+											Previous invoice was <b>{copiedFrom}</b>
 										</>
 									) : (
-										"This is the first invoice"
+										"Update if required"
 									)
+								) : getPreviousInvoiceNo() ? (
+									<>
+										Previous invoice was <b>{getPreviousInvoiceNo()}</b>
+									</>
+								) : (
+									"This is the first invoice"
 								)}
 							</Subheading>
 							<Input

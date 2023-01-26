@@ -1,6 +1,7 @@
 import { publicProcedure, router } from "@server/trpc";
 import { z } from "zod";
 import { activityRouter } from "./activity-router";
+import { clientRouter } from "./client-router";
 import { invoiceRouter } from "./invoice-router";
 import { pdfRouter } from "./pdf-router";
 
@@ -18,6 +19,7 @@ export const appRouter = router({
 		}),
 	invoice: invoiceRouter,
 	activity: activityRouter,
+	clients: clientRouter,
 	pdf: pdfRouter,
 });
 
