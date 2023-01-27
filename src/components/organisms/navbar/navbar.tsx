@@ -24,11 +24,14 @@ const Navbar = () => {
 			</Button>
 			<Styles.Content className={isExpanded ? "expanded" : ""}>
 				<Styles.Links className={`nav-links`}>
+					<NavLink href="/activities">
+						<span>Activities</span>
+					</NavLink>
 					<NavLink href="/invoices">
 						<span>Invoices</span>
 					</NavLink>
-					<NavLink href="/activities">
-						<span>Activities</span>
+					<NavLink href="/support-items">
+						<span>Support Items</span>
 					</NavLink>
 					<NavLink href="/clients">
 						<span>Clients</span>
