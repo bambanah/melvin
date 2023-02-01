@@ -24,18 +24,6 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 	return (
 		<Styles.Container>
 			<Styles.Modal>
-				{/* <Display className="small">melvin</Display> */}
-
-				{/* <LoginForm />
-
-				<p>
-					Don&#39;t have an account? <a>Sign up</a>
-				</p>
-
-				<Styles.Separator>
-					<span>OR</span>
-				</Styles.Separator> */}
-
 				{Object.values(providers).map((provider) => (
 					<Button
 						onClick={() => signIn(provider.id, { callbackUrl })}

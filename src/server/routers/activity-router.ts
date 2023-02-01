@@ -1,8 +1,9 @@
-import { authedProcedure, publicProcedure, router } from "@server/trpc";
+import { authedProcedure, router } from "@server/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 const defaultActivitySelect = {
+	id: true,
 	startTime: true,
 	endTime: true,
 	transitDistance: true,
@@ -24,8 +25,12 @@ export const defaultActivityCreate = z.object({
 });
 
 export const activityRouter = router({
-	list: publicProcedure.query(async () => {
+	list: authedProcedure.query(async ({ ctx }) => {
 		const activities = await prisma.activity.findMany({
+			select: defaultActivitySelect,
+			where: {
+				ownerId: ctx.session.user.id,
+			},
 			orderBy: {
 				createdAt: "desc",
 			},
@@ -41,12 +46,16 @@ export const activityRouter = router({
 			const activity = await prisma.activity.findFirst({
 				select: defaultActivitySelect,
 				where: {
-					ownerId: ctx.session.user.id,
 					id: input.id,
+					ownerId: ctx.session.user.id,
 				},
 			});
 
-			return activity ? { activity } : new TRPCError({ code: "NOT_FOUND" });
+			if (!activity) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			return activity;
 		}),
 	forInvoice: authedProcedure
 		.input(z.object({ invoiceId: z.string() }))
@@ -75,9 +84,7 @@ export const activityRouter = router({
 			});
 
 			if (!activity) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-				});
+				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
 			return activity;
@@ -98,9 +105,7 @@ export const activityRouter = router({
 			});
 
 			if (!activity) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-				});
+				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
 			return { activity };
@@ -115,12 +120,10 @@ export const activityRouter = router({
 			});
 
 			if (!activity) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-				});
+				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			return {};
+			return true;
 		}),
 });
 

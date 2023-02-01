@@ -1,5 +1,6 @@
 import { authedProcedure, router } from "@server/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
+import { baseListQueryInput } from "@utils/trpc";
 import { z } from "zod";
 import { defaultActivityCreate } from "./activity-router";
 
@@ -26,7 +27,7 @@ const defaultInvoiceSelect = {
 };
 
 const defaultInvoiceCreate = z.object({
-	date: z.date().nullish(),
+	date: z.date().optional(),
 	clientId: z.string(),
 	billTo: z.string(),
 	invoiceNo: z.string(),
@@ -34,12 +35,7 @@ const defaultInvoiceCreate = z.object({
 
 export const invoiceRouter = router({
 	list: authedProcedure
-		.input(
-			z.object({
-				limit: z.number().min(1).max(100).nullish(),
-				cursor: z.string().nullish(),
-			})
-		)
+		.input(baseListQueryInput)
 		.query(async ({ ctx, input }) => {
 			const limit = input.limit ?? 50;
 			const { cursor } = input;
@@ -55,7 +51,6 @@ export const invoiceRouter = router({
 				where: {
 					ownerId: ctx.session.user.id,
 				},
-
 				cursor: cursor ? { id: cursor } : undefined,
 				orderBy: {
 					createdAt: "asc",
@@ -120,9 +115,22 @@ export const invoiceRouter = router({
 
 			return activity;
 		}),
-	modify: authedProcedure.input(z.object({})).mutation(({}) => {
-		return "";
-	}),
+	modify: authedProcedure
+		.input(z.object({ id: z.string(), invoice: defaultInvoiceCreate }))
+		.mutation(async ({ input }) => {
+			const invoice = await prisma.invoice.update({
+				where: {
+					id: input.id,
+				},
+				data: { ...input.invoice },
+			});
+
+			if (!invoice) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			return invoice;
+		}),
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ input }) => {
@@ -133,9 +141,7 @@ export const invoiceRouter = router({
 			});
 
 			if (!invoice) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-				});
+				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
 			return {};

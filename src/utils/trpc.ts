@@ -2,6 +2,7 @@ import { AppRouter } from "@server/routers/_app";
 import { httpBatchLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import superjson from "superjson";
+import { z } from "zod";
 
 function getBaseUrl() {
 	if (typeof window !== "undefined") {
@@ -47,4 +48,9 @@ export const trpc = createTRPCNext<AppRouter>({
 		};
 	},
 	ssr: true,
+});
+
+export const baseListQueryInput = z.object({
+	limit: z.number().min(1).max(100).optional(),
+	cursor: z.string().optional(),
 });
