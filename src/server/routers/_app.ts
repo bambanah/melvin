@@ -4,6 +4,7 @@ import { activityRouter } from "./activity-router";
 import { clientRouter } from "./client-router";
 import { invoiceRouter } from "./invoice-router";
 import { pdfRouter } from "./pdf-router";
+import { supportItemRouter } from "./support-item-router";
 
 export const appRouter = router({
 	hello: publicProcedure
@@ -19,6 +20,7 @@ export const appRouter = router({
 		}),
 	invoice: invoiceRouter,
 	activity: activityRouter,
+	supportItem: supportItemRouter,
 	clients: clientRouter,
 	pdf: pdfRouter,
 });

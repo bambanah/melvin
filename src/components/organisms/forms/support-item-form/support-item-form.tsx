@@ -8,14 +8,13 @@ import Select from "@atoms/select/select";
 import Subheading from "@atoms/subheading";
 import ButtonGroup from "@molecules/button-group";
 import { RateType, SupportItem } from "@prisma/client";
-import ActivityValidationSchema from "@schema/activity-validation-schema";
+import SupportItemValidationSchema from "@schema/support-item-validation-schema";
 import { errorIn } from "@utils/helpers";
-import axios from "axios";
+import { trpc } from "@utils/trpc";
 import { FormikProps, getIn, withFormik } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
 import { toast } from "react-toastify";
-import { useSWRConfig } from "swr";
 import * as Styles from "./styles";
 
 interface CreateActivityProps {
@@ -26,7 +25,7 @@ interface CreateActivityProps {
 interface FormValues {
 	id: string;
 	description: string;
-	rateType: string;
+	rateType: RateType;
 
 	weekdayCode: string;
 	weekdayRate: string;
@@ -46,7 +45,10 @@ const CreateSupportItemForm: React.FC<CreateActivityProps> = ({
 	returnFunction,
 }) => {
 	const router = useRouter();
-	const { mutate } = useSWRConfig();
+
+	const utils = trpc.useContext();
+	const createSupportItemMutation = trpc.supportItem.add.useMutation();
+	const modifySupportItemMutation = trpc.supportItem.modify.useMutation();
 
 	const BaseForm = (props: FormikProps<FormValues>) => {
 		const { values, touched, errors, handleChange, handleBlur, handleSubmit } =
@@ -166,7 +168,7 @@ const CreateSupportItemForm: React.FC<CreateActivityProps> = ({
 								if (returnFunction) {
 									returnFunction();
 								} else {
-									router.push("/activities");
+									router.push("/support-items");
 								}
 							}}
 						>
@@ -211,30 +213,40 @@ const CreateSupportItemForm: React.FC<CreateActivityProps> = ({
 			} as FormValues;
 		},
 		handleSubmit: (values, { setSubmitting }) => {
-			if (initialValues) {
-				axios
-					.post(`/api/support-items/${initialValues.id}`, values)
+			if (initialValues?.id) {
+				modifySupportItemMutation
+					.mutateAsync({
+						id: initialValues.id,
+						supportItem: values,
+					})
+					.then(() => {
+						toast.success("Support Item Updated");
+						setSubmitting(false);
+
+						utils.supportItem.invalidate();
+
+						returnFunction ? returnFunction() : router.push("/support-items");
+					});
+			} else {
+				createSupportItemMutation
+					.mutateAsync({
+						supportItem: values,
+					})
 					.then(() => {
 						toast.success("Support Item Created");
 						setSubmitting(false);
-						mutate(`/api/support-items/${initialValues.id}`);
 
-						returnFunction ? returnFunction() : router.push("/activities");
+						utils.supportItem.invalidate();
+
+						router.push("/support-items");
 					});
-			} else {
-				axios.post("/api/support-items", values).then(() => {
-					toast.success("Support Item Created");
-					setSubmitting(false);
-					mutate("/api/support-items");
-					router.push("/activities");
-				});
 			}
 		},
-		validationSchema: ActivityValidationSchema,
+		validationSchema: SupportItemValidationSchema,
 		validateOnChange: false,
 		validateOnMount: false,
 		validateOnBlur: true,
-		displayName: "Activity Form",
+		displayName: "SupportItem Form",
 	})(BaseForm);
 
 	return <FormikForm />;

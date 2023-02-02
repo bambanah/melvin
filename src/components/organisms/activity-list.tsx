@@ -1,38 +1,56 @@
+import { faClock } from "@fortawesome/free-regular-svg-icons";
 import {
-	faDollarSign,
+	faArrowRight,
 	faEdit,
-	faIdCard,
 	faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import EntityList, { EntityListItem } from "@molecules/entity-list";
-import { activityRouter } from "@server/routers/activity-router";
-import { inferRouterOutputs } from "@trpc/server";
+import { ActivityFetchAllOutput } from "@server/routers/activity-router";
 import { trpc } from "@utils/trpc";
+import dayjs from "dayjs";
 import Skeleton from "react-loading-skeleton";
 
-type ActivityType = inferRouterOutputs<
-	typeof activityRouter
->["list"]["activities"][0];
-
-const generateEntity = (activity?: ActivityType): EntityListItem => ({
+const generateEntity = (activity?: ActivityFetchAllOutput): EntityListItem => ({
 	id: activity?.id || "",
 	fields: [
 		{
-			value: activity ? `${activity.date}` : <Skeleton />,
+			value: activity ? (
+				`${dayjs(activity.date).format("DD/MM/YY")}`
+			) : (
+				<Skeleton />
+			),
+			type: "text",
+			flex: "0 0 6em",
+		},
+		{
+			value: activity ? `${activity.client.name}` : <Skeleton />,
+			type: "text",
+			flex: "0 0 8em",
+		},
+		{
+			value: activity ? `${activity.supportItem.description}` : <Skeleton />,
 			type: "label",
 			flex: "1 1 auto",
 		},
 		{
-			value: activity ? `${activity.startTime}` : <Skeleton />,
-			icon: faIdCard,
+			value: activity ? (
+				`${dayjs(activity.startTime).format("hh:mma")}`
+			) : (
+				<Skeleton />
+			),
+			icon: faClock,
 			type: "text",
-			flex: "0 0 9.5em",
+			flex: "0 0 5.7em",
 		},
 		{
-			value: activity ? `${activity.endTime}` : <Skeleton />,
-			icon: faDollarSign,
+			value: activity ? (
+				`${dayjs(activity.endTime).format("hh:mma")}`
+			) : (
+				<Skeleton />
+			),
+			icon: faArrowRight,
 			type: "text",
-			flex: "0 0 5em",
+			flex: "0 0 7em",
 		},
 	],
 	actions: activity

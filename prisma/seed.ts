@@ -67,6 +67,7 @@ async function main() {
 					create: [
 						{
 							ownerId: user.id,
+							clientId: client.id,
 							date: dayjs.utc().toDate(),
 							startTime: dayjs.utc("1970-01-01T09:00").toDate(),
 							endTime: dayjs.utc("1970-01-01T09:30").toDate(),

@@ -9,7 +9,6 @@ datasource db {
 
 model Account {
   id                 String  @id @default(cuid())
-  userId             String  @unique
   type               String
   provider           String
   providerAccountId  String
@@ -22,30 +21,35 @@ model Account {
   session_state      String?
   oauth_token_secret String?
   oauth_token        String?
-  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model Session {
   sessionToken String   @unique
-  userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id            String        @id @default(cuid())
+  id String @id @default(cuid())
+
   name          String?
-  email         String?       @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
   account       Account?
-  clients       Client[]
-  invoices      Invoice[]
-  sessions      Session[]
-  supportItems  SupportItem[]
-  Activity      Activity[]
+
+  clients      Client[]
+  invoices     Invoice[]
+  sessions     Session[]
+  supportItems SupportItem[]
+  Activity     Activity[]
 }
 
 model VerificationToken {
@@ -57,51 +61,62 @@ model VerificationToken {
 }
 
 model Client {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now()) @map("created")
-  ownerId   String
-  number    String?
-  name      String
-  billTo    String?
-  owner     User      @relation(fields: [ownerId], references: [id])
-  invoices  Invoice[]
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created")
+
+  number String?
+  name   String
+  billTo String?
+
+  invoices   Invoice[]
+  activities Activity[]
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
 }
 
 model Invoice {
-  id         String        @id @default(cuid())
-  createdAt  DateTime      @default(now()) @map("created")
-  ownerId    String
-  invoiceNo  String
-  billTo     String
-  date       DateTime
-  clientId   String
-  status     InvoiceStatus @default(CREATED)
-  client     Client        @relation(fields: [clientId], references: [id])
-  owner      User          @relation(fields: [ownerId], references: [id])
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created")
+
+  invoiceNo String
+  billTo    String
+  date      DateTime
+  status    InvoiceStatus @default(CREATED)
+
   activities Activity[]
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id])
+  ownerId  String
+  owner    User   @relation(fields: [ownerId], references: [id])
 }
 
 model Activity {
-  id              String      @id @default(cuid())
-  createdAt       DateTime    @default(now()) @map("created")
-  ownerId         String
-  supportItemId   String
-  invoiceId       String?
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created")
+
   date            DateTime
   startTime       DateTime
   endTime         DateTime
   transitDuration Int?
   transitDistance Int?
   itemDistance    Int?
-  owner           User        @relation(fields: [ownerId], references: [id])
-  invoice         Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  supportItem     SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
+
+  ownerId       String
+  owner         User        @relation(fields: [ownerId], references: [id])
+  clientId      String
+  client        Client      @relation(fields: [clientId], references: [id])
+  supportItemId String
+  supportItem   SupportItem @relation(fields: [supportItemId], references: [id])
+  invoiceId     String?
+  invoice       Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
 }
 
 model SupportItem {
-  id            String     @id @default(cuid())
-  createdAt     DateTime   @default(now()) @map("created")
-  ownerId       String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created")
+
   description   String
   rateType      RateType
   weekdayCode   String
@@ -112,8 +127,11 @@ model SupportItem {
   weeknightRate Decimal?
   saturdayRate  Decimal?
   sundayRate    Decimal?
-  owner         User       @relation(fields: [ownerId], references: [id])
-  activities    Activity[]
+
+  activities Activity[]
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
 }
 
 enum InvoiceStatus {

@@ -11,11 +11,13 @@ const defaultActivitySelect = {
 	itemDistance: true,
 	date: true,
 	supportItem: true,
+	client: true,
 };
 
 export const defaultActivityCreate = z.object({
 	id: z.string().optional(),
 	supportItemId: z.string(),
+	clientId: z.string(),
 	date: z.date(),
 	startTime: z.date(),
 	endTime: z.date(),

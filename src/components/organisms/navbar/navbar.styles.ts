@@ -73,7 +73,7 @@ export const Content = styled.div`
 
 export const Links = styled.div`
 	display: flex;
-	gap: 0.4em;
+	gap: 0.5em;
 	flex: 1 0 auto;
 	align-items: center;
 	justify-content: flex-end;

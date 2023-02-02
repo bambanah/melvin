@@ -4,41 +4,34 @@ import Form from "@atoms/form";
 import Heading from "@atoms/heading";
 import Input from "@atoms/input";
 import Label from "@atoms/label";
-import Select from "@atoms/select/select";
-import Subheading from "@atoms/subheading";
+import ClientSelect from "@components/forms/client-select";
+import SupportItemSelect from "@components/forms/support-item-select";
 import ButtonGroup from "@molecules/button-group";
-import { RateType, SupportItem } from "@prisma/client";
+import { Activity } from "@prisma/client";
 import ActivityValidationSchema from "@schema/activity-validation-schema";
 import { errorIn } from "@utils/helpers";
-import axios from "axios";
+import { trpc } from "@utils/trpc";
+import dayjs from "dayjs";
 import { FormikProps, getIn, withFormik } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
 import { toast } from "react-toastify";
-import { useSWRConfig } from "swr";
 import * as Styles from "./styles";
 
 interface CreateActivityProps {
-	initialValues?: Partial<SupportItem>;
+	initialValues?: Partial<Activity> & { id: string };
 	returnFunction?: () => void;
 }
 
 interface FormValues {
 	id: string;
-	description: string;
-	rateType: string;
 
-	weekdayCode: string;
-	weekdayRate: string;
+	clientId: string;
+	supportItemId: string;
+	date: string;
 
-	weeknightCode: string;
-	weeknightRate: string;
-
-	saturdayCode: string;
-	saturdayRate: string;
-
-	sundayCode: string;
-	sundayRate: string;
+	startTime: string;
+	endTime: string;
 }
 
 const CreateActivityForm: React.FC<CreateActivityProps> = ({
@@ -46,7 +39,9 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 	returnFunction,
 }) => {
 	const router = useRouter();
-	const { mutate } = useSWRConfig();
+
+	const createActivityMutation = trpc.activity.add.useMutation();
+	const modifyActivityMutation = trpc.activity.modify.useMutation();
 
 	const BaseForm = (props: FormikProps<FormValues>) => {
 		const { values, touched, errors, handleChange, handleBlur, handleSubmit } =
@@ -60,39 +55,39 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 				<Form onSubmit={handleSubmit} flexDirection="column">
 					<Styles.InputGroup>
 						<Styles.Heading>General</Styles.Heading>
+
 						<Styles.InputRow>
+							<Label htmlFor="clientId" required>
+								<span>Client</span>
+
+								<ClientSelect
+									name="clientId"
+									error={errorIn(errors, touched, "clientId")}
+								/>
+							</Label>
+							<Label htmlFor="supportItemId" required>
+								<span>Support Item</span>
+
+								<SupportItemSelect
+									name="supportItemId"
+									error={errorIn(errors, touched, "supportItemId")}
+								/>
+							</Label>
 							<Label htmlFor="description" required>
-								<span>Description</span>
-								<Subheading>
-									The official description from the{" "}
-									<a href="/price-guide-3-21.pdf">Price Guide</a>
-								</Subheading>
+								<span>Date</span>
 								<Input
 									type="text"
 									onChange={handleChange}
 									onBlur={handleBlur}
-									value={values.description}
-									name="description"
-									id="description"
-									error={errorIn(errors, touched, "description")}
-									placeholder="Description"
+									value={values.date}
+									name="date"
+									id="date"
+									error={errorIn(errors, touched, "date")}
+									placeholder="Date"
 								/>
 								<ErrorMessage
-									error={getIn(errors, "description")}
-									touched={getIn(touched, "description")}
-								/>
-							</Label>
-
-							<Label htmlFor="rateType" required>
-								<span>Rate Type</span>
-								<Subheading>This will almost always be per hour</Subheading>
-								<Select
-									name="rateType"
-									error={errorIn(errors, touched, "rateType")}
-									options={[
-										{ label: "per hour", value: "HOUR" },
-										{ label: "per km", value: "KM" },
-									]}
+									error={getIn(errors, "date")}
+									touched={getIn(touched, "date")}
 								/>
 							</Label>
 						</Styles.InputRow>
@@ -100,60 +95,44 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 
 					<Styles.InputGroup>
 						<Styles.Heading>Rates</Styles.Heading>
-						<Subheading>
-							Only the weekday information is required, and will be used in the
-							event of another rate not being entered
-						</Subheading>
 
-						{["weekday", "weeknight", "saturday", "sunday"].map((day) => (
-							<Styles.ActivityRow key={day}>
-								<Label required={day === "weekday"}>
-									<span>
-										{day
-											.split("_")
-											.map(
-												(word) => word.charAt(0).toUpperCase() + word.slice(1)
-											)
-											.join(" ")}
-									</span>
-								</Label>
-								<Styles.InputContainer>
-									<Input
-										type="text"
-										onChange={handleChange}
-										onBlur={handleBlur}
-										name={`${day}Code`}
-										id={`${day}Code`}
-										value={getIn(values, `${day}Code`)}
-										placeholder="XX_XXX_XXXX_X_X"
-										error={errorIn(errors, touched, `${day}Code`)}
-									/>
-									<ErrorMessage
-										error={getIn(errors, `${day}Code`)}
-										touched={getIn(touched, `${day}Code`)}
-									/>
-								</Styles.InputContainer>
+						<Styles.InputRow>
+							<Label htmlFor="startTime" required>
+								<span>Start Time</span>
 
-								<Styles.InputContainer>
-									<Input
-										type="text"
-										onChange={handleChange}
-										onBlur={handleBlur}
-										name={`${day}Rate`}
-										id={`${day}Rate`}
-										value={getIn(values, `${day}Rate`)}
-										placeholder=""
-										error={errorIn(errors, touched, `${day}Rate`)}
-										prefix="$"
-										suffix={values.rateType === RateType.HOUR ? "/hr" : "/km"}
-									/>
-									<ErrorMessage
-										error={getIn(errors, `${day}Rate`)}
-										touched={getIn(touched, `${day}Rate`)}
-									/>
-								</Styles.InputContainer>
-							</Styles.ActivityRow>
-						))}
+								<Input
+									type="text"
+									onChange={handleChange}
+									onBlur={handleBlur}
+									value={values.startTime}
+									name="startTime"
+									id="startTime"
+									error={errorIn(errors, touched, "startTime")}
+									placeholder="Start Time"
+								/>
+								<ErrorMessage
+									error={getIn(errors, "startTime")}
+									touched={getIn(touched, "startTime")}
+								/>
+							</Label>
+							<Label htmlFor="endTime" required>
+								<span>End Time</span>
+								<Input
+									type="text"
+									onChange={handleChange}
+									onBlur={handleBlur}
+									value={values.endTime}
+									name="endTime"
+									id="endTime"
+									error={errorIn(errors, touched, "endTime")}
+									placeholder="End Time"
+								/>
+								<ErrorMessage
+									error={getIn(errors, "endTime")}
+									touched={getIn(touched, "endTime")}
+								/>
+							</Label>
+						</Styles.InputRow>
 					</Styles.InputGroup>
 
 					<ButtonGroup>
@@ -182,52 +161,47 @@ const CreateActivityForm: React.FC<CreateActivityProps> = ({
 		mapPropsToValues: () => {
 			return {
 				id: initialValues?.id ?? undefined,
-				description: initialValues?.description ?? "",
-				rateType: initialValues?.rateType?.toString() ?? "HOUR",
+				supportItemId: initialValues?.supportItemId ?? "",
+				date: initialValues?.date?.toString() ?? new Date().toString(),
 
-				weekdayCode: initialValues?.weekdayCode ?? "",
-				weekdayRate:
-					typeof initialValues?.weekdayRate === "string"
-						? Number.parseFloat(initialValues?.weekdayRate).toFixed(2)
-						: "",
-
-				weeknightCode: initialValues?.weeknightCode ?? "",
-				weeknightRate:
-					typeof initialValues?.weeknightRate === "string"
-						? Number.parseFloat(initialValues?.weeknightRate).toFixed(2)
-						: "",
-
-				saturdayCode: initialValues?.saturdayCode ?? "",
-				saturdayRate:
-					typeof initialValues?.saturdayRate === "string"
-						? Number.parseFloat(initialValues?.saturdayRate).toFixed(2)
-						: "",
-
-				sundayCode: initialValues?.sundayCode ?? "",
-				sundayRate:
-					typeof initialValues?.sundayRate === "string"
-						? Number.parseFloat(initialValues?.sundayRate).toFixed(2)
-						: "",
+				startTime: initialValues?.startTime ?? "",
+				endTime: initialValues?.endTime ?? "",
 			} as FormValues;
 		},
 		handleSubmit: (values, { setSubmitting }) => {
 			if (initialValues) {
-				axios
-					.post(`/api/support-items/${initialValues.id}`, values)
+				modifyActivityMutation
+					.mutateAsync({
+						id: initialValues.id,
+						activity: {
+							...values,
+							date: dayjs(values.date).toDate(),
+							startTime: dayjs(values.startTime).toDate(),
+							endTime: dayjs(values.endTime).toDate(),
+						},
+					})
 					.then(() => {
-						toast.success("Support Item Created");
+						toast.success("Activity Created");
 						setSubmitting(false);
-						mutate(`/api/support-items/${initialValues.id}`);
 
 						returnFunction ? returnFunction() : router.push("/activities");
 					});
 			} else {
-				axios.post("/api/support-items", values).then(() => {
-					toast.success("Support Item Created");
-					setSubmitting(false);
-					mutate("/api/support-items");
-					router.push("/activities");
-				});
+				createActivityMutation
+					.mutateAsync({
+						activity: {
+							...values,
+							date: dayjs(values.date).toDate(),
+							startTime: dayjs(values.startTime).toDate(),
+							endTime: dayjs(values.endTime).toDate(),
+						},
+					})
+					.then(() => {
+						toast.success("Activity Created");
+						setSubmitting(false);
+
+						returnFunction ? returnFunction() : router.push("/activities");
+					});
 			}
 		},
 		validationSchema: ActivityValidationSchema,

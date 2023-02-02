@@ -12,6 +12,7 @@ const StyledLink = styled.a`
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	white-space: nowrap;
 
 	width: 100%;
 	text-decoration: none;

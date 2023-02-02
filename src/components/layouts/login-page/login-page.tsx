@@ -24,16 +24,17 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 	return (
 		<Styles.Container>
 			<Styles.Modal>
-				{Object.values(providers).map((provider) => (
-					<Button
-						onClick={() => signIn(provider.id, { callbackUrl })}
-						key={provider.id}
-						variant="primary"
-					>
-						<FontAwesomeIcon icon={faGoogle} />
-						Continue with {provider.name}
-					</Button>
-				))}
+				{providers &&
+					Object.values(providers).map((provider) => (
+						<Button
+							onClick={() => signIn(provider.id, { callbackUrl })}
+							key={provider.id}
+							variant="primary"
+						>
+							<FontAwesomeIcon icon={faGoogle} />
+							Continue with {provider.name}
+						</Button>
+					))}
 			</Styles.Modal>
 		</Styles.Container>
 	);

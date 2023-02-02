@@ -1,5 +1,6 @@
 import { FormValues } from "@organisms/forms/invoice-form";
-import { Activity, Invoice, InvoiceStatus, Prisma } from "@prisma/client";
+import { InvoiceStatus, Prisma } from "@prisma/client";
+import { InvoiceByIdOutput } from "@server/routers/invoice-router";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import timezone from "dayjs/plugin/timezone";
@@ -146,9 +147,7 @@ export const getRate = (activity: {
 export const fetcher = (url: string) =>
 	fetch(url).then((response) => response.json());
 
-export const invoiceToValues = (
-	invoice: Invoice & { activities: Activity[] }
-): FormValues => ({
+export const invoiceToValues = (invoice: InvoiceByIdOutput): FormValues => ({
 	id: invoice.id,
 	invoiceNo: invoice.invoiceNo,
 	clientId: invoice.clientId,

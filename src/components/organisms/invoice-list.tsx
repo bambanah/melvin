@@ -9,23 +9,16 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import EntityList, { EntityListItem } from "@molecules/entity-list";
 import PdfDocument from "@molecules/pdf-document";
-import { invoiceRouter } from "@server/routers/invoice-router";
-import { inferRouterOutputs } from "@trpc/server";
+import { InvoiceFetchAllOutput } from "@server/routers/invoice-router";
 import { getTotalCost } from "@utils/helpers";
 import { trpc } from "@utils/trpc";
-import axios from "axios";
 import dayjs from "dayjs";
 import Skeleton from "react-loading-skeleton";
 import { toast } from "react-toastify";
-import { useSWRConfig } from "swr";
 
 export default function InvoiceList() {
-	const { mutate } = useSWRConfig();
-
-	type InvoiceType = inferRouterOutputs<
-		typeof invoiceRouter
-	>["list"]["invoices"][0];
-
+	const utils = trpc.useContext();
+	const deleteInvoice = trpc.invoice.delete.useMutation();
 	const invoices = trpc.invoice.list.useQuery({});
 
 	if (invoices.error) {
@@ -37,7 +30,7 @@ export default function InvoiceList() {
 		return <div>Loading...</div>;
 	}
 
-	const generateEntity = (invoice?: InvoiceType): EntityListItem => ({
+	const generateEntity = (invoice?: InvoiceFetchAllOutput): EntityListItem => ({
 		id: invoice?.id ?? "",
 		ExpandedComponent: invoices
 			? (index: number) => (
@@ -72,10 +65,11 @@ export default function InvoiceList() {
 							if (
 								confirm(`Are you sure you want to delete ${invoice.invoiceNo}?`)
 							) {
-								axios
-									.delete(`/api/invoices/${invoice.id}`)
+								deleteInvoice
+									.mutateAsync({ id: invoice.id })
 									.then(() => {
-										mutate("/api/invoices");
+										utils.invoice.invalidate();
+
 										toast.success("Invoice deleted");
 									})
 									.catch((error) => toast.error(error));

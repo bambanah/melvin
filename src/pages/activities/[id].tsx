@@ -1,4 +1,4 @@
-import ActivityPage from "@layouts/activities/activity-page";
+import ActivityPage from "@layouts/activity-page";
 import Layout from "@layouts/common/layout";
 import React from "react";
 

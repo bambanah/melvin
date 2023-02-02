@@ -72,12 +72,29 @@ export const invoiceRouter = router({
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
 			const invoice = await prisma.invoice.findFirst({
-				select: defaultInvoiceSelect,
+				select: {
+					...defaultInvoiceSelect,
+					createdAt: true,
+					status: true,
+					clientId: true,
+					ownerId: true,
+					activities: {
+						select: {
+							...defaultInvoiceSelect.activities.select,
+							id: true,
+							supportItemId: true,
+						},
+					},
+				},
 				where: {
 					ownerId: ctx.session.user.id,
 					id: input.id,
 				},
 			});
+
+			if (!invoice) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
 
 			return invoice;
 		}),
@@ -108,9 +125,7 @@ export const invoiceRouter = router({
 			});
 
 			if (!activity) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-				});
+				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
 			return activity;

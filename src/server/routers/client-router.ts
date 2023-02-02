@@ -1,8 +1,10 @@
 import { authedProcedure, router } from "@server/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
+import { baseListQueryInput } from "@utils/trpc";
 import { z } from "zod";
 
 const defaultClientSelect = {
+	id: true,
 	name: true,
 	number: true,
 	billTo: true,
@@ -22,28 +24,42 @@ export const defaultClientCreate = z.object({
 });
 
 export const clientRouter = router({
-	list: authedProcedure.query(async () => {
-		const clients = await prisma.client.findMany({
-			include: {
-				invoices: {
-					take: 1,
-					select: { id: true, invoiceNo: true, billTo: true },
-					orderBy: {
-						createdAt: "desc",
+	list: authedProcedure
+		.input(baseListQueryInput)
+		.query(async ({ ctx, input }) => {
+			const limit = input.limit ?? 50;
+			const { cursor } = input;
+
+			const clients = await prisma.client.findMany({
+				take: limit + 1,
+				select: {
+					...defaultClientSelect,
+					invoices: {
+						take: 1,
+						select: { id: true, invoiceNo: true, billTo: true },
+						orderBy: {
+							createdAt: "desc",
+						},
 					},
 				},
-			},
-			orderBy: {
-				createdAt: "desc",
-			},
-		});
+				where: { ownerId: ctx.session.user.id },
+				cursor: cursor ? { id: cursor } : undefined,
+				orderBy: {
+					createdAt: "asc",
+				},
+			});
 
-		if (!clients) {
-			throw new TRPCError({ code: "NOT_FOUND" });
-		}
+			let nextCursor: typeof cursor | undefined;
+			if (clients.length > limit) {
+				const nextClient = clients.pop();
+				nextCursor = nextClient?.id;
+			}
 
-		return clients;
-	}),
+			return {
+				clients: clients.reverse(),
+				nextCursor,
+			};
+		}),
 	byId: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
@@ -138,6 +154,6 @@ export const clientRouter = router({
 
 export type ClientListOutput = inferRouterOutputs<
 	typeof clientRouter
->["list"][0];
+>["list"]["clients"][0];
 
 export type ClientByIdOutput = inferRouterOutputs<typeof clientRouter>["byId"];

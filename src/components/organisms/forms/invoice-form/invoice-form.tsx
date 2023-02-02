@@ -10,11 +10,10 @@ import TimePicker from "@atoms/time-input";
 import { faTrashAlt } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ButtonGroup from "@molecules/button-group";
-import { Invoice, SupportItem } from "@prisma/client";
+import { Invoice } from "@prisma/client";
 import InvoiceValidationSchema from "@schema/invoice-validation-schema";
 import {
 	errorIn,
-	fetcher,
 	getHighestInvoiceNo,
 	getNextInvoiceNo,
 	valuesToInvoice,
@@ -28,7 +27,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { FC, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import useSWR, { SWRResponse, useSWRConfig } from "swr";
+import { useSWRConfig } from "swr";
 import * as Styles from "./styles";
 dayjs.extend(customParseFormat);
 
@@ -63,12 +62,13 @@ const CreateInvoiceForm: FC<Props> = ({
 	const { mutate } = useSWRConfig();
 
 	// Get clients and support items
-	const { data: clients, error: clientError } = trpc.clients.list.useQuery();
+	const { data: { clients } = {}, error: clientError } =
+		trpc.clients.list.useQuery({});
 
-	const { data: supportItems, error: sError }: SWRResponse<SupportItem[]> =
-		useSWR("/api/support-items", fetcher);
+	const { data: { supportItems } = {}, error: supportItemError } =
+		trpc.supportItem.list.useQuery({});
 
-	if (clientError || sError) return <div>An error occurred</div>;
+	if (clientError || supportItemError) return <div>An error occurred</div>;
 	if (!clients || !supportItems) return <Loading />;
 
 	const emptyActivity: FormActivity = {

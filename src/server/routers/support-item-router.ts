@@ -88,12 +88,12 @@ export const supportItemRouter = router({
 	add: authedProcedure
 		.input(
 			z.object({
-				activity: defaultSupportItemCreate,
+				supportItem: defaultSupportItemCreate,
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
 			const activity = await prisma.supportItem.create({
-				data: { ...input.activity, ownerId: ctx.session.user.id },
+				data: { ...input.supportItem, ownerId: ctx.session.user.id },
 			});
 
 			if (!activity) {
@@ -106,7 +106,7 @@ export const supportItemRouter = router({
 		.input(
 			z.object({
 				id: z.string(),
-				activity: defaultSupportItemCreate,
+				supportItem: defaultSupportItemCreate,
 			})
 		)
 		.mutation(async ({ input }) => {
@@ -114,7 +114,7 @@ export const supportItemRouter = router({
 				where: {
 					id: input.id,
 				},
-				data: { ...input.activity },
+				data: { ...input.supportItem },
 			});
 
 			if (!activity) {

@@ -15,11 +15,11 @@ import { toast } from "react-toastify";
 const ClientList = () => {
 	const utils = trpc.useContext();
 
-	const clients = trpc.clients.list.useQuery();
+	const { data: { clients } = {}, error } = trpc.clients.list.useQuery({});
 	const deleteClientMutation = trpc.clients.delete.useMutation();
 
-	if (clients.error) {
-		console.error(clients.error);
+	if (error) {
+		console.error(error);
 		return <div>Error loading</div>;
 	}
 
@@ -83,7 +83,7 @@ const ClientList = () => {
 			: [],
 	});
 
-	if (!clients.data)
+	if (!clients)
 		return (
 			<EntityList
 				title="Clients"
@@ -98,7 +98,7 @@ const ClientList = () => {
 		<EntityList
 			title="Clients"
 			route="/clients"
-			entities={clients.data.map((client) => generateEntity(client))}
+			entities={clients.map((client) => generateEntity(client))}
 		/>
 	);
 };

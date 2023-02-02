@@ -1,4 +1,4 @@
-import ClientPage from "@layouts/clients/client-page";
+import ClientPage from "@layouts/client-page";
 import Layout from "@layouts/common/layout";
 import React from "react";
 

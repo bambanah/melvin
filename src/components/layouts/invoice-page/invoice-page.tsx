@@ -1,18 +1,11 @@
 import Button from "@atoms/button";
 import Loading from "@atoms/loading";
 import CreateInvoiceForm from "@organisms/forms/invoice-form";
-import { Activity, Invoice } from "@prisma/client";
 import { invoiceToValues } from "@utils/helpers";
+import { trpc } from "@utils/trpc";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
-import useSWR from "swr";
+import { useState } from "react";
 import * as Styles from "./styles";
-
-const getInvoice = async (id: string) => {
-	const response = await fetch(`/api/invoices/${id}`);
-
-	return (await response.json()) as Invoice & { activities: Activity[] };
-};
 
 const InvoicePage = () => {
 	const router = useRouter();
@@ -20,9 +13,9 @@ const InvoicePage = () => {
 
 	const [editing, setEditing] = useState(router.query.edit ?? false);
 
-	const { data: invoice, error } = useSWR(`/api/invoices/${invoiceId}`, () =>
-		getInvoice(invoiceId)
-	);
+	const { data: invoice, error } = trpc.invoice.byId.useQuery({
+		id: invoiceId,
+	});
 
 	if (error) {
 		console.error(error);

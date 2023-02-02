@@ -1,27 +1,20 @@
 import Button from "@atoms/button";
 import CreateSupportItemForm from "@organisms/forms/support-item-form";
-import { RateType, SupportItem } from "@prisma/client";
+import { RateType } from "@prisma/client";
+import { trpc } from "@utils/trpc";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
-import useSWR from "swr";
+import { useState } from "react";
 import * as Styles from "./styles";
-
-const getActivity = async (id: string) => {
-	const response = await fetch(`/api/support-items/${id}`);
-
-	return (await response.json()) as SupportItem;
-};
 
 const SupportItemPage = () => {
 	const router = useRouter();
 	const supportItemId = String(router.query.id);
 
-	const { data: supportItem, error } = useSWR(
-		`/api/support-items/${supportItemId}`,
-		() => getActivity(supportItemId)
-	);
+	const { data: supportItem, error } = trpc.supportItem.byId.useQuery({
+		id: supportItemId,
+	});
 
 	const [editing, setEditing] = useState(router.query.edit || false);
 
