@@ -1,11 +1,9 @@
-"use client";
-
-import React from "react";
+import { AppContextProvider } from "@context/app-context";
 import GlobalStyle from "@styles/global-style";
-import Head from "next/head";
+import { trpc } from "@utils/trpc";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
-import { AppContextProvider } from "@context/app-context";
+import Head from "next/head";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -33,4 +31,4 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 	);
 }
 
-export default App;
+export default trpc.withTRPC(App);

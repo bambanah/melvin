@@ -5,10 +5,10 @@ dayjs.extend(utc);
 const prisma = new PrismaClient();
 
 async function main() {
+	// TODO: Implement email/pass auth and create test user
 	const user = await prisma.user.findFirst({
 		where: { email: "lachlanu@gmail.com" },
 	});
-
 	if (!user) throw new Error("Must create a user first");
 
 	let client = await prisma.client.findFirst({
@@ -36,6 +36,7 @@ async function main() {
 	if (!supportItem) {
 		supportItem = await prisma.supportItem.create({
 			data: {
+				ownerId: user.id,
 				description: "Access Community, Social And Rec Activities - Standard",
 				rateType: "HOUR",
 				weekdayCode: "04_104_0125_6_1",
@@ -46,7 +47,6 @@ async function main() {
 				saturdayRate: 77.81,
 				sundayCode: "04_106_0125_6_1",
 				sundayRate: 100.16,
-				ownerId: user.id,
 			},
 		});
 	}
@@ -57,15 +57,17 @@ async function main() {
 	if (!invoice) {
 		invoice = await prisma.invoice.create({
 			data: {
+				ownerId: user.id,
 				invoiceNo: "Test1",
 				billTo: "Test Enterprise",
 				date: dayjs.utc().toDate(),
 				clientId: client.id,
-				ownerId: user.id,
 				status: "CREATED",
 				activities: {
 					create: [
 						{
+							ownerId: user.id,
+							clientId: client.id,
 							date: dayjs.utc().toDate(),
 							startTime: dayjs.utc("1970-01-01T09:00").toDate(),
 							endTime: dayjs.utc("1970-01-01T09:30").toDate(),
@@ -73,18 +75,6 @@ async function main() {
 						},
 					],
 				},
-			},
-		});
-	}
-
-	let template = await prisma.template.findFirst({
-		where: { invoiceId: invoice.id, templateName: "Test Template" },
-	});
-	if (!template) {
-		template = await prisma.template.create({
-			data: {
-				templateName: "Test Template",
-				invoiceId: invoice.id,
 			},
 		});
 	}

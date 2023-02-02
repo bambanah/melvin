@@ -18,13 +18,12 @@
 		"noImplicitReturns": true,
 		"paths": {
 			"@atoms/*": ["src/components/atoms/*"],
-			"@layouts/*": ["src/components/layouts/*"],
-			"@molecules/*": ["src/components/molecules/*"],
-			"@organisms/*": ["src/components/organisms/*"],
+			"@components/*": ["src/components/*"],
 			"@context/*": ["src/context/*"],
 			"@hooks/*": ["src/hooks/*"],
 			"@pages/*": ["src/pages/*"],
 			"@schema/*": ["src/schema/*"],
+			"@server/*": ["src/server/*"],
 			"@styles/*": ["src/styles/*"],
 			"@utils/*": ["src/utils/*"]
 		},
@@ -33,6 +32,7 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
+		"strictNullChecks": true,
 		"target": "es2018",
 		"tsBuildInfoFile": ".next/cache/.tsbuildinfo"
 	},

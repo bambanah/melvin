@@ -1,7 +1,7 @@
 import { RateType } from "@prisma/client";
+import { InvoiceByIdOutput } from "@server/routers/invoice-router";
 import jspdf from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
-import Invoice from "types/invoice";
 import {
 	getDuration,
 	getPrettyDuration,
@@ -11,12 +11,12 @@ import {
 } from "./helpers";
 
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const generatePDF = async (invoice: Invoice) => {
+const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 	const margin = 20;
 
 	const document_ = new jspdf();
@@ -54,7 +54,7 @@ const generatePDF = async (invoice: Invoice) => {
 			let totalCost = 0;
 			if (activity?.supportItem?.rateType === RateType.HOUR) {
 				const duration = getDuration(activity.startTime, activity.endTime);
-				totalCost = round(rate * duration, 2);
+				totalCost = round(Number(rate) * duration, 2);
 
 				const prettyDuration = getPrettyDuration(duration);
 
@@ -62,7 +62,7 @@ const generatePDF = async (invoice: Invoice) => {
 					.utc(activity.endTime)
 					.format("HH:mm")} (${prettyDuration})`;
 			} else if (activity?.supportItem?.rateType === RateType.KM) {
-				totalCost = round(rate * (activity.itemDistance || 0), 2);
+				totalCost = round(Number(rate) * (activity.itemDistance || 0), 2);
 
 				countString = `${activity.itemDistance?.toString()} kilometres`;
 			}
@@ -83,7 +83,10 @@ const generatePDF = async (invoice: Invoice) => {
 			if (activity.transitDuration) {
 				const providerTravel = [];
 
-				const travelTotal = round((rate / 60) * activity.transitDuration, 2);
+				const travelTotal = round(
+					(Number(rate) / 60) * activity.transitDuration,
+					2
+				);
 
 				providerTravel.push(
 					`Provider Travel - Labour Costs\n${itemCode}\n`,
