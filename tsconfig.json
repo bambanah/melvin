@@ -19,9 +19,6 @@
 		"paths": {
 			"@atoms/*": ["src/components/atoms/*"],
 			"@components/*": ["src/components/*"],
-			"@layouts/*": ["src/components/layouts/*"],
-			"@molecules/*": ["src/components/molecules/*"],
-			"@organisms/*": ["src/components/organisms/*"],
 			"@context/*": ["src/context/*"],
 			"@hooks/*": ["src/hooks/*"],
 			"@pages/*": ["src/pages/*"],

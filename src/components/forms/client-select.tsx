@@ -1,4 +1,4 @@
-import Select from "@atoms/select";
+import Select from "@components/forms/select";
 import { trpc } from "@utils/trpc";
 
 interface Props {

@@ -1,5 +1,5 @@
-import Layout from "@layouts/common/layout";
-import CreateActivityForm from "@organisms/forms/support-item-form";
+import Layout from "@components/shared/layout";
+import CreateActivityForm from "@components/support-items/support-item-form";
 import React from "react";
 
 const CreateSupportItem = () => {

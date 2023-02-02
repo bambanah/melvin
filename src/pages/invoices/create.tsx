@@ -1,5 +1,7 @@
-import Layout from "@layouts/common/layout";
-import CreateInvoiceForm, { FormValues } from "@organisms/forms/invoice-form";
+import Layout from "@components/shared/layout";
+import CreateInvoiceForm, {
+	FormValues,
+} from "@components/invoices/invoice-form";
 
 interface Props {
 	initialValues?: FormValues;

@@ -1,4 +1,4 @@
-import { FormValues } from "@organisms/forms/invoice-form";
+import { FormValues } from "@components/invoices/invoice-form";
 import { InvoiceStatus, Prisma } from "@prisma/client";
 import { InvoiceByIdOutput } from "@server/routers/invoice-router";
 import dayjs from "dayjs";
