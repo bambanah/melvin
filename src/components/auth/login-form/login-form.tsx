@@ -1,0 +1,47 @@
+import Button from "@atoms/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
+import { useForm } from "react-hook-form";
+import styled from "styled-components";
+import { z } from "zod";
+import * as Styles from "./styles";
+
+const StyledInput = styled.input`
+	color: ${({ theme }) => theme.colors.fg};
+	background-color: ${({ theme }) => theme.colors.bg};
+
+	flex-grow: 1;
+
+	outline: none;
+	padding: 0.85rem 1.4rem;
+	border: 0.01rem solid
+		${({ theme }) => {
+			return `${theme.colors.fg}88`;
+		}};
+`;
+
+const loginFormSchema = z.object({
+	email: z.string().email(),
+});
+type LoginFormSchema = z.infer<typeof loginFormSchema>;
+
+const LoginForm = () => {
+	const { register, handleSubmit } = useForm<LoginFormSchema>({
+		resolver: zodResolver(loginFormSchema),
+	});
+
+	const onSubmit = (data: LoginFormSchema) => {
+		signIn("email", { email: data.email });
+	};
+
+	return (
+		<Styles.Form onSubmit={handleSubmit(onSubmit)}>
+			<StyledInput placeholder="Email Address" {...register("email")} />
+			<Button type="submit" variant="primary">
+				Continue
+			</Button>
+		</Styles.Form>
+	);
+};
+
+export default LoginForm;

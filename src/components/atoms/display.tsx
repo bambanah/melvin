@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 const Display = styled.h1`
 	font-family: "Patua One";
-	font-size: 1.3rem;
+	font-size: 2.75rem;
 	font-weight: 400;
 	color: ${({ theme }) => theme.colors.display};
 
