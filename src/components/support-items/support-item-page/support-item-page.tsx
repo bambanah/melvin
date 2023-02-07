@@ -1,5 +1,5 @@
 import Button from "@atoms/button";
-import CreateSupportItemForm from "@components/support-items/support-item-form";
+import CreateSupportItemForm from "@components/support-items/support-item-formik";
 import { RateType } from "@prisma/client";
 import { trpc } from "@utils/trpc";
 import Head from "next/head";

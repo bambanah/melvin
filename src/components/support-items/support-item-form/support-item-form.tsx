@@ -1,265 +1,231 @@
 import Button from "@atoms/button";
 import ButtonGroup from "@atoms/button-group";
-import Form from "@atoms/form";
-import Heading from "@atoms/heading";
 import Label from "@atoms/label";
 import Subheading from "@atoms/subheading";
 import ErrorMessage from "@components/forms/error-message";
 import Input from "@components/forms/input";
-import Select from "@components/forms/select/select";
-import { RateType, SupportItem } from "@prisma/client";
-import SupportItemValidationSchema from "@schema/support-item-validation-schema";
-import { errorIn } from "@utils/helpers";
+import Select from "@components/forms/select";
+import { Form } from "@components/navigation/login-form/styles";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { trpc } from "@utils/trpc";
-import { FormikProps, getIn, withFormik } from "formik";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { z } from "zod";
+import { supportItemFormSchema } from "./schema";
 import * as Styles from "./styles";
 
-interface CreateActivityProps {
-	initialValues?: Partial<SupportItem>;
-	returnFunction?: () => void;
+interface Props {
+	purpose?: "create" | "update";
 }
 
-interface FormValues {
-	id: string;
-	description: string;
-	rateType: RateType;
+type FormData = z.infer<typeof supportItemFormSchema>;
 
-	weekdayCode: string;
-	weekdayRate: string;
+const SupportItemForm = ({ purpose }: Props) => {
+	const formPurpose = purpose ?? "create";
 
-	weeknightCode: string;
-	weeknightRate: string;
-
-	saturdayCode: string;
-	saturdayRate: string;
-
-	sundayCode: string;
-	sundayRate: string;
-}
-
-const CreateSupportItemForm: React.FC<CreateActivityProps> = ({
-	initialValues,
-	returnFunction,
-}) => {
 	const router = useRouter();
 
-	const utils = trpc.useContext();
+	const trpcContext = trpc.useContext();
 	const createSupportItemMutation = trpc.supportItem.add.useMutation();
-	const modifySupportItemMutation = trpc.supportItem.modify.useMutation();
 
-	const BaseForm = (props: FormikProps<FormValues>) => {
-		const { values, touched, errors, handleChange, handleBlur, handleSubmit } =
-			props;
+	const {
+		register,
+		handleSubmit,
+		formState: { errors, isSubmitting },
+		control,
+	} = useForm<FormData>({ resolver: zodResolver(supportItemFormSchema) });
 
-		return (
-			<Styles.CreateActivityContainer>
-				<Heading>
-					{initialValues ? `Updating Activity` : "Create New Activity"}
-				</Heading>
-				<Form onSubmit={handleSubmit} flexDirection="column">
-					<Styles.InputGroup>
-						<Styles.Heading>General</Styles.Heading>
-						<Styles.InputRow>
-							<Label htmlFor="description" required>
-								<span>Description</span>
-								<Subheading>
-									The official description from the{" "}
-									<a href="/price-guide-3-21.pdf">Price Guide</a>
-								</Subheading>
-								<Input
-									type="text"
-									onChange={handleChange}
-									onBlur={handleBlur}
-									value={values.description}
-									name="description"
-									id="description"
-									error={errorIn(errors, touched, "description")}
-									placeholder="Description"
-								/>
-								<ErrorMessage
-									error={getIn(errors, "description")}
-									touched={getIn(touched, "description")}
-								/>
-							</Label>
+	const onSubmit = (data: FormData) => {
+		createSupportItemMutation
+			.mutateAsync({
+				supportItem: data,
+			})
+			.then(async () => {
+				toast.success("Support Item Created");
 
-							<Label htmlFor="rateType" required>
-								<span>Rate Type</span>
-								<Subheading>This will almost always be per hour</Subheading>
-								<Select
-									name="rateType"
-									error={errorIn(errors, touched, "rateType")}
-									options={[
-										{ label: "per hour", value: "HOUR" },
-										{ label: "per km", value: "KM" },
-									]}
-								/>
-							</Label>
-						</Styles.InputRow>
-					</Styles.InputGroup>
+				trpcContext.supportItem.list.invalidate();
 
-					<Styles.InputGroup>
-						<Styles.Heading>Rates</Styles.Heading>
-						<Subheading>
-							Only the weekday information is required, and will be used in the
-							event of another rate not being entered
-						</Subheading>
+				await new Promise((r) => setTimeout(r, 2000));
 
-						{["weekday", "weeknight", "saturday", "sunday"].map((day) => (
-							<Styles.ActivityRow key={day}>
-								<Label required={day === "weekday"}>
-									<span>
-										{day
-											.split("_")
-											.map(
-												(word) => word.charAt(0).toUpperCase() + word.slice(1)
-											)
-											.join(" ")}
-									</span>
-								</Label>
-								<Styles.InputContainer>
-									<Input
-										type="text"
-										onChange={handleChange}
-										onBlur={handleBlur}
-										name={`${day}Code`}
-										id={`${day}Code`}
-										value={getIn(values, `${day}Code`)}
-										placeholder="XX_XXX_XXXX_X_X"
-										error={errorIn(errors, touched, `${day}Code`)}
-									/>
-									<ErrorMessage
-										error={getIn(errors, `${day}Code`)}
-										touched={getIn(touched, `${day}Code`)}
-									/>
-								</Styles.InputContainer>
-
-								<Styles.InputContainer>
-									<Input
-										type="text"
-										onChange={handleChange}
-										onBlur={handleBlur}
-										name={`${day}Rate`}
-										id={`${day}Rate`}
-										value={getIn(values, `${day}Rate`)}
-										placeholder=""
-										error={errorIn(errors, touched, `${day}Rate`)}
-										prefix="$"
-										suffix={values.rateType === RateType.HOUR ? "/hr" : "/km"}
-									/>
-									<ErrorMessage
-										error={getIn(errors, `${day}Rate`)}
-										touched={getIn(touched, `${day}Rate`)}
-									/>
-								</Styles.InputContainer>
-							</Styles.ActivityRow>
-						))}
-					</Styles.InputGroup>
-
-					<ButtonGroup>
-						<Button type="submit" variant="primary">
-							{initialValues ? "Update" : "Create"}
-						</Button>
-						<Button
-							type="button"
-							onClick={() => {
-								if (returnFunction) {
-									returnFunction();
-								} else {
-									router.push("/support-items");
-								}
-							}}
-						>
-							Cancel
-						</Button>
-					</ButtonGroup>
-				</Form>
-			</Styles.CreateActivityContainer>
-		);
+				router.push("/support-items");
+			});
 	};
 
-	const FormikForm = withFormik({
-		mapPropsToValues: () => {
-			return {
-				id: initialValues?.id ?? undefined,
-				description: initialValues?.description ?? "",
-				rateType: initialValues?.rateType?.toString() ?? "HOUR",
+	return (
+		<Styles.CreateActivityContainer>
+			<Form onSubmit={handleSubmit(onSubmit)}>
+				<Styles.InputGroup>
+					<Styles.Heading>General</Styles.Heading>
+					<Styles.InputRow>
+						<Label htmlFor="description" required>
+							<span>Description</span>
+							<Subheading>
+								The official description from the{" "}
+								<a href="/price-guide-3-21.pdf">Price Guide</a>
+							</Subheading>
+							<Input
+								name="description"
+								register={register}
+								type="text"
+								placeholder="Description"
+							/>
+							<ErrorMessage error={errors.description?.message} />
+						</Label>
 
-				weekdayCode: initialValues?.weekdayCode ?? "",
-				weekdayRate:
-					typeof initialValues?.weekdayRate === "string"
-						? Number.parseFloat(initialValues?.weekdayRate).toFixed(2)
-						: "",
+						<Label htmlFor="rateType" required>
+							<span>Rate Type</span>
+							<Subheading>This will almost always be per hour</Subheading>
+							<Select
+								name="rateType"
+								control={control}
+								defaultValue="HOUR"
+								options={[
+									{ label: "per hour", value: "HOUR" },
+									{ label: "per km", value: "KM" },
+								]}
+							/>
+							<ErrorMessage error={errors.rateType?.message} />
+						</Label>
+					</Styles.InputRow>
+				</Styles.InputGroup>
 
-				weeknightCode: initialValues?.weeknightCode ?? "",
-				weeknightRate:
-					typeof initialValues?.weeknightRate === "string"
-						? Number.parseFloat(initialValues?.weeknightRate).toFixed(2)
-						: "",
+				<Styles.InputGroup>
+					<Styles.Heading>Rates</Styles.Heading>
+					<Subheading>
+						Only the weekday information is required, and will be used in the
+						event of another rate not being entered
+					</Subheading>
 
-				saturdayCode: initialValues?.saturdayCode ?? "",
-				saturdayRate:
-					typeof initialValues?.saturdayRate === "string"
-						? Number.parseFloat(initialValues?.saturdayRate).toFixed(2)
-						: "",
+					<Styles.ActivityRow>
+						<Label required>
+							<span>Weekday</span>
+						</Label>
+						<Styles.InputContainer>
+							<Input
+								name="weekdayCode"
+								register={register}
+								type="text"
+								placeholder="XX_XXX_XXXX_X_X"
+							/>
+							<ErrorMessage error={errors.weekdayCode?.message} />
+						</Styles.InputContainer>
 
-				sundayCode: initialValues?.sundayCode ?? "",
-				sundayRate:
-					typeof initialValues?.sundayRate === "string"
-						? Number.parseFloat(initialValues?.sundayRate).toFixed(2)
-						: "",
-			} as FormValues;
-		},
-		handleSubmit: (values, { setSubmitting }) => {
-			if (initialValues?.id) {
-				modifySupportItemMutation
-					.mutateAsync({
-						id: initialValues.id,
-						supportItem: {
-							...values,
-							weeknightRate: values.weeknightRate || undefined,
-							saturdayRate: values.saturdayRate || undefined,
-							sundayRate: values.sundayRate || undefined,
-						},
-					})
-					.then(() => {
-						toast.success("Support Item Updated");
-						setSubmitting(false);
+						<Styles.InputContainer>
+							<Input
+								name="weekdayRate"
+								register={register}
+								rules={{
+									valueAsNumber: true,
+								}}
+								type="number"
+								step="0.01"
+								prefix="$"
+							/>
+							<ErrorMessage error={errors.weekdayRate?.message} />
+						</Styles.InputContainer>
+					</Styles.ActivityRow>
 
-						utils.supportItem.invalidate();
+					<Styles.ActivityRow>
+						<Label>
+							<span>Weeknight</span>
+						</Label>
+						<Styles.InputContainer>
+							<Input
+								name="weeknightCode"
+								register={register}
+								type="text"
+								placeholder="XX_XXX_XXXX_X_X"
+							/>
+							<ErrorMessage error={errors.weeknightCode?.message} />
+						</Styles.InputContainer>
 
-						returnFunction ? returnFunction() : router.push("/support-items");
-					});
-			} else {
-				createSupportItemMutation
-					.mutateAsync({
-						supportItem: {
-							...values,
-							weeknightRate: values.weeknightRate || undefined,
-							saturdayRate: values.saturdayRate || undefined,
-							sundayRate: values.sundayRate || undefined,
-						},
-					})
-					.then(() => {
-						toast.success("Support Item Created");
-						setSubmitting(false);
+						<Styles.InputContainer>
+							<Input
+								name="weeknightRate"
+								register={register}
+								rules={{
+									setValueAs: (v) => (v === "" ? undefined : Number(v)),
+								}}
+								type="text"
+								step="0.01"
+								prefix="$"
+							/>
+							<ErrorMessage error={errors.weeknightRate?.message} />
+						</Styles.InputContainer>
+					</Styles.ActivityRow>
 
-						utils.supportItem.invalidate();
+					<Styles.ActivityRow>
+						<Label>
+							<span>Saturday</span>
+						</Label>
+						<Styles.InputContainer>
+							<Input
+								name="saturdayCode"
+								register={register}
+								type="text"
+								placeholder="XX_XXX_XXXX_X_X"
+							/>
+							<ErrorMessage error={errors.saturdayCode?.message} />
+						</Styles.InputContainer>
 
-						router.push("/support-items");
-					});
-			}
-		},
-		validationSchema: SupportItemValidationSchema,
-		validateOnChange: false,
-		validateOnMount: false,
-		validateOnBlur: true,
-		displayName: "SupportItem Form",
-	})(BaseForm);
+						<Styles.InputContainer>
+							<Input
+								name="saturdayRate"
+								register={register}
+								rules={{
+									setValueAs: (v) => (v === "" ? undefined : Number(v)),
+								}}
+								type="number"
+								step="0.01"
+								prefix="$"
+							/>
+							<ErrorMessage error={errors.saturdayRate?.message} />
+						</Styles.InputContainer>
+					</Styles.ActivityRow>
 
-	return <FormikForm />;
+					<Styles.ActivityRow>
+						<Label>
+							<span>Sunday</span>
+						</Label>
+						<Styles.InputContainer>
+							<Input
+								name="sundayCode"
+								register={register}
+								type="text"
+								placeholder="XX_XXX_XXXX_X_X"
+							/>
+							<ErrorMessage error={errors.sundayCode?.message} />
+						</Styles.InputContainer>
+
+						<Styles.InputContainer>
+							<Input
+								name="sundayRate"
+								register={register}
+								rules={{
+									setValueAs: (v) => (v === "" ? undefined : Number(v)),
+								}}
+								type="number"
+								step="0.01"
+								prefix="$"
+							/>
+							<ErrorMessage error={errors.sundayRate?.message} />
+						</Styles.InputContainer>
+					</Styles.ActivityRow>
+				</Styles.InputGroup>
+
+				<ButtonGroup>
+					<Button type="submit" variant="primary" disabled={isSubmitting}>
+						{formPurpose === "create" ? "Create" : "Update"}
+					</Button>
+					<Link href="/support-items">
+						<Button type="button">Cancel</Button>
+					</Link>
+				</ButtonGroup>
+			</Form>
+		</Styles.CreateActivityContainer>
+	);
 };
 
-export default CreateSupportItemForm;
+export default SupportItemForm;

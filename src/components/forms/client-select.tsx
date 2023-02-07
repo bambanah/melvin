@@ -1,4 +1,4 @@
-import Select from "@components/forms/select";
+import Select from "@components/forms/select-formik";
 import { trpc } from "@utils/trpc";
 
 interface Props {

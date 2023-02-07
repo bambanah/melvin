@@ -1,6 +1,5 @@
-import SupportItemPage from "@components/support-items/support-item-page";
 import Layout from "@components/shared/layout";
-import React from "react";
+import SupportItemPage from "@components/support-items/support-item-page";
 
 const Activity = () => {
 	return (

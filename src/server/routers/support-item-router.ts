@@ -1,3 +1,4 @@
+import { supportItemFormSchema } from "@components/support-items/support-item-form/schema";
 import { RateType } from "@prisma/client";
 import { authedProcedure, router } from "@server/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
@@ -88,7 +89,7 @@ export const supportItemRouter = router({
 	add: authedProcedure
 		.input(
 			z.object({
-				supportItem: defaultSupportItemCreate,
+				supportItem: supportItemFormSchema,
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
