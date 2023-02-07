@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [main, dev]
 
+env:
+  DATABASE_URL: mysql://root:Passw0rd@localhost:3309/melvin
+
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest
