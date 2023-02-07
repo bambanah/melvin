@@ -46,7 +46,7 @@ model User {
   emailVerified DateTime?
   image         String?
 
-  accounts Account[]
+  account  Account?
   sessions Session[]
 
   clients      Client[]

@@ -5,7 +5,6 @@ export default defineConfig({
 	use: {
 		baseURL: "http://localhost:3000",
 		storageState: "./e2e/setup/storage-state.json",
-		headless: false,
 	},
 	testDir: "./e2e",
 });

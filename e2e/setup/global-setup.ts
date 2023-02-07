@@ -1,52 +1,44 @@
 import { chromium } from "@playwright/test";
 import prisma from "@utils/prisma";
+import dayjs from "dayjs";
 import path from "node:path";
 
 async function globalSetup() {
 	const storagePath = path.resolve(__dirname, "storage-state.json");
 
-	const date = new Date();
+	const sessionToken = "e7e59d85-3421-442f-968f-0e7357c96914";
 
-	// This is a dummy random session token
-	const sessionToken = "04456e41-ec3b-4edf-92c1-48c14e57cacd2";
-
-	// 1. We make sure a test user exists in our local database, `upsert` will make sure we only have this user in our database
 	await prisma.user.upsert({
 		where: {
-			email: "e2e@e2e.com",
+			email: "test@user.com",
 		},
 		create: {
-			name: "e2e",
-			email: "e2e@e2e.com",
-			// 2. We need a session which is used by NextAuth and represents this `e2e@e2e.com` user login session
+			name: "test user",
+			email: "test@user.com",
 			sessions: {
 				create: {
-					// 2.1. Here we are just making sure the expiration is for a future date, to avoid NextAuth to invalidate our session during the tests
-					expires: new Date(date.getFullYear(), date.getMonth() + 1, 0),
+					expires: dayjs().add(1, "month").toDate(),
 					sessionToken,
 				},
 			},
-			// 3. Here we are binding our user with a "Github fake account", this is needed since we are using OAuth, we don't have to worry about this data since we are gonna intercept and mock the direct Github API calls
-			accounts: {
+			account: {
 				create: {
 					type: "oauth",
-					provider: "github",
-					providerAccountId: "2222222",
+					provider: "google",
+					providerAccountId: "123456789123456789123",
 					access_token: "ggg_zZl1pWIvKkf3UDynZ09zLvuyZsm1yC0YoRPt",
-					token_type: "bearer",
-					scope: "read:org,read:user,repo,user:email",
+					token_type: "Bearer",
+					scope:
+						"https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile",
 				},
 			},
 		},
 		update: {},
 	});
 
-	// 4. Finally we need to set up the authentication cookie into our test browser state
-	// This will guarantee you will have an authenticated user once you boot up your tests
 	const browser = await chromium.launch();
 	const context = await browser.newContext({ storageState: storagePath });
-	// 4.1. This cookie is what `NextAuth` will look after to validate if our user is authenticated
-	// Please note that the `value` of the cookie **must be the same** as the `sessionToken` we added in `step 2.`
+
 	await context.addCookies([
 		{
 			name: "next-auth.session-token",
