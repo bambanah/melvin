@@ -6,7 +6,7 @@
 		"build:1-migrate": "prisma generate",
 		"build:2-build": "next build",
 		"build": "run-s build:*",
-		"db-migrate-dev": "prisma migrate dev",
+		"db-migrate-dev": "prisma migrate dev --skip-seed",
 		"db-nuke": "docker-compose down --volumes --remove-orphans",
 		"db-reset": "run-s db-nuke db-up db-migrate-dev db-seed",
 		"db-seed": "prisma db seed",
