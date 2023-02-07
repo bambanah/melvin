@@ -7,4 +7,8 @@ export default defineConfig({
 		storageState: "./e2e/setup/storage-state.json",
 	},
 	testDir: "./e2e",
+	webServer: {
+		command: "yarn build && yarn start",
+		url: "http://localhost:3000",
+	},
 });
