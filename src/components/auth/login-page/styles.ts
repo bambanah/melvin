@@ -1,44 +1,4 @@
-import { lighten } from "polished";
 import styled from "styled-components";
-
-export const Container = styled.div`
-	display: flex;
-	justify-content: center;
-	align-items: center;
-
-	min-height: 100vh;
-`;
-
-export const Modal = styled.div`
-	display: flex;
-	flex-direction: column;
-	justify-content: stretch;
-	align-items: center;
-	gap: 1.9rem;
-	min-width: 26rem;
-
-	padding: 3rem;
-	/* background-color: ${({ theme }) =>
-		theme.type === "dark" ? lighten(0.1, theme.colors.bg) : "#fff"};
-
-	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12); */
-
-	span {
-		cursor: auto;
-	}
-
-	button {
-		width: 100%;
-
-		svg {
-			margin-right: 0.4rem;
-		}
-	}
-
-	p {
-		margin: 0;
-	}
-`;
 
 export const Separator = styled.div`
 	display: flex;
