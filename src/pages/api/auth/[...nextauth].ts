@@ -1,9 +1,9 @@
+import { env } from "@env/server";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@utils/prisma";
 import NextAuth from "next-auth";
 import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
-import { env } from "src/env/server";
 
 export default NextAuth({
 	adapter: PrismaAdapter(prisma),
