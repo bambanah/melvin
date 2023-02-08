@@ -40,7 +40,7 @@ export const invoiceRouter = router({
 			const limit = input.limit ?? 50;
 			const { cursor } = input;
 
-			const invoices = await prisma.invoice.findMany({
+			const invoices = await ctx.prisma.invoice.findMany({
 				select: {
 					...defaultInvoiceSelect,
 					_count: {
@@ -71,7 +71,7 @@ export const invoiceRouter = router({
 	byId: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			const invoice = await prisma.invoice.findFirst({
+			const invoice = await ctx.prisma.invoice.findFirst({
 				select: {
 					...defaultInvoiceSelect,
 					createdAt: true,
@@ -108,7 +108,7 @@ export const invoiceRouter = router({
 		.mutation(async ({ input, ctx }) => {
 			const { invoice, activities } = input;
 
-			const activity = await prisma.invoice.create({
+			const activity = await ctx.prisma.invoice.create({
 				data: {
 					...invoice,
 					date: invoice.date ?? new Date(),
@@ -132,8 +132,8 @@ export const invoiceRouter = router({
 		}),
 	modify: authedProcedure
 		.input(z.object({ id: z.string(), invoice: defaultInvoiceCreate }))
-		.mutation(async ({ input }) => {
-			const invoice = await prisma.invoice.update({
+		.mutation(async ({ ctx, input }) => {
+			const invoice = await ctx.prisma.invoice.update({
 				where: {
 					id: input.id,
 				},
@@ -148,8 +148,8 @@ export const invoiceRouter = router({
 		}),
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
-		.mutation(async ({ input }) => {
-			const invoice = await prisma.invoice.delete({
+		.mutation(async ({ ctx, input }) => {
+			const invoice = await ctx.prisma.invoice.delete({
 				where: {
 					id: input.id,
 				},

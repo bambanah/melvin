@@ -30,7 +30,7 @@ export const clientRouter = router({
 			const limit = input.limit ?? 50;
 			const { cursor } = input;
 
-			const clients = await prisma.client.findMany({
+			const clients = await ctx.prisma.client.findMany({
 				take: limit + 1,
 				select: {
 					...defaultClientSelect,
@@ -63,7 +63,7 @@ export const clientRouter = router({
 	byId: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
-			const client = await prisma.client.findFirst({
+			const client = await ctx.prisma.client.findFirst({
 				select: { ...defaultClientSelect, id: true },
 				where: {
 					ownerId: ctx.session.user.id,
@@ -79,7 +79,7 @@ export const clientRouter = router({
 		.query(async ({ input, ctx }) => {
 			const { clientId } = input;
 
-			const invoice = await prisma.invoice.findFirst({
+			const invoice = await ctx.prisma.invoice.findFirst({
 				where: { clientId, ownerId: ctx.session.user.id },
 				select: {
 					id: true,
@@ -98,7 +98,7 @@ export const clientRouter = router({
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
-			const client = await prisma.client.create({
+			const client = await ctx.prisma.client.create({
 				data: { ...input.client, ownerId: ctx.session.user.id },
 			});
 
@@ -117,8 +117,8 @@ export const clientRouter = router({
 				client: defaultClientCreate,
 			})
 		)
-		.mutation(async ({ input }) => {
-			const client = await prisma.client.update({
+		.mutation(async ({ input, ctx }) => {
+			const client = await ctx.prisma.client.update({
 				where: {
 					id: input.id,
 				},
@@ -135,8 +135,8 @@ export const clientRouter = router({
 		}),
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
-		.mutation(async ({ input }) => {
-			const client = await prisma.client.delete({
+		.mutation(async ({ input, ctx }) => {
+			const client = await ctx.prisma.client.delete({
 				where: {
 					id: input.id,
 				},

@@ -33,7 +33,7 @@ export const supportItemRouter = router({
 			const limit = input.limit ?? 50;
 			const { cursor } = input;
 
-			const supportItems = await prisma.supportItem.findMany({
+			const supportItems = await ctx.prisma.supportItem.findMany({
 				select: defaultSupportItemSelect,
 				take: limit + 1,
 				where: {
@@ -63,7 +63,7 @@ export const supportItemRouter = router({
 			})
 		)
 		.query(async ({ input, ctx }) => {
-			const activity = await prisma.supportItem.findFirst({
+			const activity = await ctx.prisma.supportItem.findFirst({
 				select: {
 					...defaultSupportItemSelect,
 					weeknightCode: true,
@@ -92,7 +92,7 @@ export const supportItemRouter = router({
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
-			const activity = await prisma.supportItem.create({
+			const activity = await ctx.prisma.supportItem.create({
 				data: { ...input.supportItem, ownerId: ctx.session.user.id },
 			});
 
@@ -109,8 +109,8 @@ export const supportItemRouter = router({
 				supportItem: defaultSupportItemCreate,
 			})
 		)
-		.mutation(async ({ input }) => {
-			const activity = await prisma.supportItem.update({
+		.mutation(async ({ ctx, input }) => {
+			const activity = await ctx.prisma.supportItem.update({
 				where: {
 					id: input.id,
 				},
@@ -125,8 +125,8 @@ export const supportItemRouter = router({
 		}),
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
-		.mutation(async ({ input }) => {
-			const activity = await prisma.supportItem.delete({
+		.mutation(async ({ ctx, input }) => {
+			const activity = await ctx.prisma.supportItem.delete({
 				where: {
 					id: input.id,
 				},
