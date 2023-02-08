@@ -43,7 +43,7 @@ model User {
   id        String   @id @default(cuid())
   email     String?  @unique
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
 
   name          String?
   emailVerified DateTime?
@@ -114,10 +114,10 @@ model Activity {
   transitDistance Int?
   itemDistance    Int?
 
-  ownerId       String
-  owner         User        @relation(fields: [ownerId], references: [id])
-  clientId      String
-  client        Client      @relation(fields: [clientId], references: [id])
+  ownerId       String?
+  owner         User?       @relation(fields: [ownerId], references: [id])
+  clientId      String?
+  client        Client?     @relation(fields: [clientId], references: [id])
   supportItemId String
   supportItem   SupportItem @relation(fields: [supportItemId], references: [id])
   invoiceId     String?

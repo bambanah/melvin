@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE `Activity` MODIFY `ownerId` VARCHAR(191) NULL,
+    MODIFY `clientId` VARCHAR(191) NULL;
+
+-- AlterTable
+ALTER TABLE `User` MODIFY `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
