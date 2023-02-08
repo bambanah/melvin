@@ -34,7 +34,7 @@ jobs:
           time: '15s'
 
       - name: Initialise database
-        run: yarn prisma:migrate
+        run: yarn prisma:dev
 
       - name: Run tests
         run: yarn test:e2e
