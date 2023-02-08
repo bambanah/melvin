@@ -6,8 +6,8 @@ on:
 
 env:
   DATABASE_URL: mysql://root:Passw0rd@localhost:3309/melvin
-  NEXTAUTH_URL: ""
-  NEXTAUTH_SECRET: ""
+  NEXTAUTH_URL: "http://localhost:3000"
+  NEXTAUTH_SECRET: "7893onvi808u7q1ounbv"
   GOOGLE_ID: ""
   GOOGLE_SECRET: ""
   EMAIL_SERVER: ""
