@@ -47,7 +47,9 @@ const SupportItemPage = () => {
 
 					<Button onClick={() => setEditing(true)}>Edit</Button>
 
-					<a href={`/clients/${activity.client.id}`}>{activity.client.name}</a>
+					<a href={`/clients/${activity.client?.id}`}>
+						{activity.client?.name}
+					</a>
 					<p>Start Time: {dayjs(activity.startTime).format("hh:mma")}</p>
 					<p>End Time: {dayjs(activity.endTime).format("hh:mma")}</p>
 				</Styles.Content>
