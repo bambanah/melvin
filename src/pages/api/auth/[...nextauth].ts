@@ -1,4 +1,3 @@
-import { env } from "@env/server";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@utils/prisma";
 import NextAuth from "next-auth";
@@ -16,12 +15,12 @@ export default NextAuth({
 	},
 	providers: [
 		EmailProvider({
-			server: env.EMAIL_SERVER,
-			from: env.EMAIL_FROM,
+			server: process.env.EMAIL_SERVER,
+			from: process.env.EMAIL_FROM,
 		}),
 		GoogleProvider({
-			clientId: env.GOOGLE_ID,
-			clientSecret: env.GOOGLE_SECRET,
+			clientId: process.env.GOOGLE_ID || "",
+			clientSecret: process.env.GOOGLE_SECRET || "",
 		}),
 	],
 	pages: {
