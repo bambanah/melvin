@@ -5,6 +5,7 @@ on:
     branches: [main, dev]
 
 env:
+  SKIP_ENV_VALIDATION: true
   DATABASE_URL: mysql://root:Passw0rd@localhost:3309/melvin
 
 jobs:

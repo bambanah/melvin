@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [main, dev]
 
+env:
+  SKIP_ENV_VALIDATION: true
+
 jobs:
   unit-tests:
     name: Run
