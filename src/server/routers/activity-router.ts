@@ -28,7 +28,7 @@ export const defaultActivityCreate = z.object({
 
 export const activityRouter = router({
 	list: authedProcedure.query(async ({ ctx }) => {
-		const activities = await prisma.activity.findMany({
+		const activities = await ctx.prisma.activity.findMany({
 			select: defaultActivitySelect,
 			where: {
 				ownerId: ctx.session.user.id,
@@ -45,7 +45,7 @@ export const activityRouter = router({
 	byId: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
-			const activity = await prisma.activity.findFirst({
+			const activity = await ctx.prisma.activity.findFirst({
 				select: defaultActivitySelect,
 				where: {
 					id: input.id,
@@ -62,7 +62,7 @@ export const activityRouter = router({
 	forInvoice: authedProcedure
 		.input(z.object({ invoiceId: z.string() }))
 		.query(async ({ input, ctx }) => {
-			const activities = await prisma.activity.findMany({
+			const activities = await ctx.prisma.activity.findMany({
 				select: defaultActivitySelect,
 				where: {
 					ownerId: ctx.session.user.id,
@@ -81,7 +81,7 @@ export const activityRouter = router({
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
-			const activity = await prisma.activity.create({
+			const activity = await ctx.prisma.activity.create({
 				data: { ...input.activity, ownerId: ctx.session.user.id },
 			});
 
@@ -98,8 +98,8 @@ export const activityRouter = router({
 				activity: defaultActivityCreate,
 			})
 		)
-		.mutation(async ({ input }) => {
-			const activity = await prisma.activity.update({
+		.mutation(async ({ ctx, input }) => {
+			const activity = await ctx.prisma.activity.update({
 				where: {
 					id: input.id,
 				},
@@ -114,8 +114,8 @@ export const activityRouter = router({
 		}),
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
-		.mutation(async ({ input }) => {
-			const activity = await prisma.activity.delete({
+		.mutation(async ({ ctx, input }) => {
+			const activity = await ctx.prisma.activity.delete({
 				where: {
 					id: input.id,
 				},

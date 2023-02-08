@@ -1,4 +1,4 @@
-name: "Tests: E2E"
+name: "E2E Tests"
 
 on:
   pull_request:
@@ -6,6 +6,12 @@ on:
 
 env:
   DATABASE_URL: mysql://root:Passw0rd@localhost:3309/melvin
+  NEXTAUTH_URL: "http://localhost:3000"
+  NEXTAUTH_SECRET: "7893onvi808u7q1ounbv"
+  GOOGLE_ID: ""
+  GOOGLE_SECRET: ""
+  EMAIL_SERVER: ""
+  EMAIL_FROM: ""
 
 jobs:
   e2e-tests:
@@ -26,7 +32,7 @@ jobs:
         run: npx playwright install
 
       - name: Spin up database docker
-        run: yarn db-up
+        run: yarn db:up
 
       - name: Sleep for 15 seconds
         uses: jakejarvis/wait-action@master
@@ -34,7 +40,7 @@ jobs:
           time: '15s'
 
       - name: Initialise database
-        run: yarn db-migrate-dev
+        run: yarn prisma:dev
 
       - name: Run tests
         run: yarn test:e2e

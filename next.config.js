@@ -1,5 +1,7 @@
 const path = require("node:path");
 
+!process.env.SKIP_ENV_VALIDATION && require("./src/env/server.js");
+
 module.exports = {
 	async redirects() {
 		return [

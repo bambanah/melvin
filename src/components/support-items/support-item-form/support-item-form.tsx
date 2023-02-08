@@ -1,12 +1,12 @@
 import Button from "@atoms/button";
-import ErrorMessage from "@components/forms/error-message";
+import ButtonGroup from "@atoms/button-group";
 import Form from "@atoms/form";
 import Heading from "@atoms/heading";
-import Input from "@components/forms/input";
 import Label from "@atoms/label";
-import Select from "@components/forms/select/select";
 import Subheading from "@atoms/subheading";
-import ButtonGroup from "@atoms/button-group";
+import ErrorMessage from "@components/forms/error-message";
+import Input from "@components/forms/input";
+import Select from "@components/forms/select/select";
 import { RateType, SupportItem } from "@prisma/client";
 import SupportItemValidationSchema from "@schema/support-item-validation-schema";
 import { errorIn } from "@utils/helpers";
@@ -217,7 +217,12 @@ const CreateSupportItemForm: React.FC<CreateActivityProps> = ({
 				modifySupportItemMutation
 					.mutateAsync({
 						id: initialValues.id,
-						supportItem: values,
+						supportItem: {
+							...values,
+							weeknightRate: values.weeknightRate || undefined,
+							saturdayRate: values.saturdayRate || undefined,
+							sundayRate: values.sundayRate || undefined,
+						},
 					})
 					.then(() => {
 						toast.success("Support Item Updated");
@@ -230,7 +235,12 @@ const CreateSupportItemForm: React.FC<CreateActivityProps> = ({
 			} else {
 				createSupportItemMutation
 					.mutateAsync({
-						supportItem: values,
+						supportItem: {
+							...values,
+							weeknightRate: values.weeknightRate || undefined,
+							saturdayRate: values.saturdayRate || undefined,
+							sundayRate: values.sundayRate || undefined,
+						},
 					})
 					.then(() => {
 						toast.success("Support Item Created");

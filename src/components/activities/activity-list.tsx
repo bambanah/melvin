@@ -1,10 +1,10 @@
+import EntityList, { EntityListItem } from "@components/shared/entity-list";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
 import {
 	faArrowRight,
 	faEdit,
 	faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import EntityList, { EntityListItem } from "@components/shared/entity-list";
 import { ActivityFetchAllOutput } from "@server/routers/activity-router";
 import { trpc } from "@utils/trpc";
 import dayjs from "dayjs";
@@ -23,7 +23,7 @@ const generateEntity = (activity?: ActivityFetchAllOutput): EntityListItem => ({
 			flex: "0 0 6em",
 		},
 		{
-			value: activity ? `${activity.client.name}` : <Skeleton />,
+			value: activity ? `${activity.client?.name}` : <Skeleton />,
 			type: "text",
 			flex: "0 0 8em",
 		},

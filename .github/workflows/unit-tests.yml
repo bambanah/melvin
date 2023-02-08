@@ -1,11 +1,15 @@
-name: "Tests: Unit"
+name: "Unit Tests"
 
 on:
   pull_request:
     branches: [main, dev]
 
+env:
+  SKIP_ENV_VALIDATION: true
+
 jobs:
   unit-tests:
+    name: Run
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

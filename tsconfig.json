@@ -20,7 +20,7 @@
 			"@atoms/*": ["src/components/atoms/*"],
 			"@components/*": ["src/components/*"],
 			"@context/*": ["src/context/*"],
-			"@hooks/*": ["src/hooks/*"],
+			"@env/*": ["src/env/*"],
 			"@pages/*": ["src/pages/*"],
 			"@schema/*": ["src/schema/*"],
 			"@server/*": ["src/server/*"],

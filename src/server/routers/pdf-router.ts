@@ -22,7 +22,7 @@ export const pdfRouter = router({
 				return new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			const { pdfString, fileName } = await generatePDF(invoices);
+			const { pdfString } = await generatePDF(invoices);
 
 			if (!pdfString) {
 				return new TRPCError({ code: "NOT_FOUND" });
