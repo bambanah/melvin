@@ -10,6 +10,7 @@
 		"db:nuke": "docker-compose down --volumes --remove-orphans",
 		"db:reset": "run-s db:nuke db:up prisma:dev prisma:seed",
 		"db:up": "docker-compose up -d",
+		"db:down": "docker-compose down",
 		"prisma:generate": "prisma generate",
 		"prisma:seed": "prisma db seed",
 		"prisma:dev": "prisma migrate dev --skip-seed",

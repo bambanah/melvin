@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model Account {
@@ -34,6 +35,8 @@ model Session {
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model User {
@@ -76,6 +79,8 @@ model Client {
 
   ownerId String
   owner   User   @relation(fields: [ownerId], references: [id])
+
+  @@index([ownerId])
 }
 
 model Invoice {
@@ -93,6 +98,9 @@ model Invoice {
   client   Client @relation(fields: [clientId], references: [id])
   ownerId  String
   owner    User   @relation(fields: [ownerId], references: [id])
+
+  @@index([clientId])
+  @@index([ownerId])
 }
 
 model Activity {
@@ -114,6 +122,11 @@ model Activity {
   supportItem   SupportItem @relation(fields: [supportItemId], references: [id])
   invoiceId     String?
   invoice       Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+
+  @@index([ownerId])
+  @@index([clientId])
+  @@index([supportItemId])
+  @@index([invoiceId])
 }
 
 model SupportItem {
@@ -135,6 +148,8 @@ model SupportItem {
 
   ownerId String
   owner   User   @relation(fields: [ownerId], references: [id])
+
+  @@index([ownerId])
 }
 
 enum InvoiceStatus {
