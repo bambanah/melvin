@@ -5,8 +5,13 @@ on:
     branches: [main, dev]
 
 env:
-  SKIP_ENV_VALIDATION: true
   DATABASE_URL: mysql://root:Passw0rd@localhost:3309/melvin
+  NEXTAUTH_URL: ""
+  NEXTAUTH_SECRET: ""
+  GOOGLE_ID: ""
+  GOOGLE_SECRET: ""
+  EMAIL_SERVER: ""
+  EMAIL_FROM: ""
 
 jobs:
   e2e-tests:
