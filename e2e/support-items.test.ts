@@ -5,14 +5,14 @@ test("Can create, update, and delete support items", async ({ page }) => {
 	await page.goto("/support-items");
 
 	await page.getByRole("link", { name: "Add New" }).click();
-	await page.goto("/support-items/create");
+	await expect(page).toHaveURL("/support-items/create");
 
 	const supportItem = new RandomSupportItem();
 	const newSupportItem = new RandomSupportItem();
 
-	await page.locator("input#description").fill(supportItem.description);
-	await page.locator("input#weekdayCode").fill(supportItem.weekdayCode);
-	await page.locator("input#weekdayRate").fill(supportItem.weekdayRate);
+	await page.locator('[name="description"]').fill(supportItem.description);
+	await page.locator('[name="weekdayCode"]').fill(supportItem.weekdayCode);
+	await page.locator('[name="weekdayRate"]').fill(supportItem.weekdayRate);
 
 	await page.getByRole("button", { name: "Create" }).click();
 
@@ -27,7 +27,7 @@ test("Can create, update, and delete support items", async ({ page }) => {
 		.locator("button:nth-child(1)")
 		.click();
 
-	await page.locator("input#description").fill(newSupportItem.description);
+	await page.locator('[name="description"]').fill(newSupportItem.description);
 	await page.getByRole("button", { name: "Update" }).click();
 	await expect(
 		page.getByRole("alert").filter({ hasText: "Support Item Updated" })

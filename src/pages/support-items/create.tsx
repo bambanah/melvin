@@ -1,11 +1,10 @@
 import Layout from "@components/shared/layout";
-import CreateActivityForm from "@components/support-items/support-item-form";
-import React from "react";
+import SupportItemForm from "@components/support-items/support-item-form/support-item-form";
 
 const CreateSupportItem = () => {
 	return (
 		<Layout>
-			<CreateActivityForm />
+			<SupportItemForm />
 		</Layout>
 	);
 };

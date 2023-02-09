@@ -23,7 +23,7 @@ export const InputRow = styled.div`
 	gap: 1rem;
 `;
 
-export const ActivityRow = styled.div`
+export const RateRow = styled.div`
 	display: flex;
 	flex: 1 1 auto;
 	gap: 1rem;

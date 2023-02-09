@@ -1,6 +1,5 @@
-import Select from "@components/forms/select";
+import Select from "@components/forms/select-formik";
 import { trpc } from "@utils/trpc";
-import React from "react";
 
 interface Props {
 	name: string;

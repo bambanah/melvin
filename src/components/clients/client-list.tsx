@@ -1,5 +1,4 @@
-import EntityList from "@components/shared/entity-list";
-import { EntityListItem } from "@components/shared/entity-list/entity-list";
+import EntityList, { EntityListItem } from "@components/shared/entity-list";
 import {
 	faEdit,
 	faIdCard,
@@ -9,7 +8,6 @@ import {
 import { ClientListOutput } from "@server/routers/client-router";
 import { trpc } from "@utils/trpc";
 import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
 import { toast } from "react-toastify";
 
 const ClientList = () => {
@@ -24,7 +22,7 @@ const ClientList = () => {
 	}
 
 	const generateEntity = (client?: ClientListOutput): EntityListItem => ({
-		id: client ? client?.id || "" : "loading",
+		id: client?.id || "",
 		fields: [
 			{
 				value: client ? client?.name || "N/A" : <Skeleton />,
@@ -58,7 +56,7 @@ const ClientList = () => {
 						value: "Edit",
 						type: "link",
 						icon: faEdit,
-						href: `/clients/${client.id}?edit=true`,
+						href: `/clients/${client.id}/edit`,
 					},
 					{
 						value: "Delete",
@@ -83,22 +81,15 @@ const ClientList = () => {
 			: [],
 	});
 
-	if (!clients)
-		return (
-			<EntityList
-				title="Clients"
-				route="/clients"
-				entities={
-					Array.from({ length: 3 }).fill(generateEntity()) as EntityListItem[]
-				}
-			/>
-		);
-
 	return (
 		<EntityList
 			title="Clients"
 			route="/clients"
-			entities={clients.map((client) => generateEntity(client))}
+			entities={
+				clients
+					? clients.map((client) => generateEntity(client))
+					: [generateEntity()]
+			}
 		/>
 	);
 };

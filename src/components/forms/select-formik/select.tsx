@@ -1,41 +1,44 @@
+import { useField } from "formik";
 import { lighten, shade } from "polished";
-import {
-	FieldValues,
-	useController,
-	UseControllerProps,
-} from "react-hook-form";
+import React from "react";
 import ReactSelect from "react-select";
 import { useTheme } from "styled-components";
 
-interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
-	options: {
-		value: string;
-		label: string;
-	}[];
+interface SelectProps {
+	error?: boolean;
+	handleChange?: () => void;
+	options: { value: string; label: string }[];
+	name: string;
 }
 
-function Select<T extends FieldValues>({ options, ...rest }: SelectProps<T>) {
-	const theme = useTheme();
+const Select = ({
+	name,
+	options,
+	error,
+}: React.HTMLProps<HTMLSelectElement> & SelectProps) => {
+	// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unused-vars
+	const [field, _meta, helpers] = useField(name);
 
-	const {
-		field: { onChange, value, name },
-		fieldState,
-	} = useController(rest);
+	const theme = useTheme();
 
 	return (
 		<ReactSelect
 			name={name}
 			className="react-select"
+			value={
+				options
+					? options.find((option) => option.value === field.value)
+					: undefined
+			}
 			options={options}
-			value={options.find((c) => c.value === value)}
-			onChange={(val) => onChange(val?.value)}
+			onChange={(option) => {
+				helpers.setValue(option?.value);
+			}}
+			onBlur={field.onBlur}
 			styles={{
 				control: (styles) => ({
 					...styles,
-					borderColor:
-						fieldState.error && fieldState.isTouched
-							? theme.colors.error
-							: styles.borderColor,
+					borderColor: error ? theme.colors.error : styles.borderColor,
 					cursor: "pointer",
 					borderRadius: 0,
 				}),
@@ -65,6 +68,6 @@ function Select<T extends FieldValues>({ options, ...rest }: SelectProps<T>) {
 			})}
 		/>
 	);
-}
+};
 
 export default Select;

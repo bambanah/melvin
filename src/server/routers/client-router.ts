@@ -1,3 +1,4 @@
+import { clientSchema } from "@schema/client-schema";
 import { authedProcedure, router } from "@server/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { baseListQueryInput } from "@utils/trpc";
@@ -15,13 +16,6 @@ const defaultClientSelect = {
 		},
 	},
 };
-
-export const defaultClientCreate = z.object({
-	id: z.string().optional(),
-	name: z.string(),
-	number: z.string().nullish(),
-	billTo: z.string().nullish(),
-});
 
 export const clientRouter = router({
 	list: authedProcedure
@@ -94,7 +88,7 @@ export const clientRouter = router({
 	create: authedProcedure
 		.input(
 			z.object({
-				client: defaultClientCreate,
+				client: clientSchema,
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
@@ -114,7 +108,7 @@ export const clientRouter = router({
 		.input(
 			z.object({
 				id: z.string(),
-				client: defaultClientCreate,
+				client: clientSchema,
 			})
 		)
 		.mutation(async ({ input, ctx }) => {

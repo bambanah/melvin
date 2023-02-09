@@ -13,12 +13,6 @@ export const Form = styled.form`
 		margin-top: 0.5rem;
 	}
 
-	div,
-	input {
-		background-color: ${({ theme }) =>
-			theme.type === "light" ? "white" : theme.colors.bg};
-	}
-
 	& > p {
 		margin-bottom: 1rem;
 	}

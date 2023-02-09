@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 interface ErrorProps {
 	error: string | undefined;
+	touched: boolean | undefined;
 }
 
 const StyledMessage = styled.p`
@@ -10,14 +11,21 @@ const StyledMessage = styled.p`
 	font-size: 0.8rem;
 	margin-top: 0.3rem;
 	margin-bottom: 0;
-	height: 1rem;
-	opacity: 1;
+	height: 0;
+	opacity: 0;
+
+	&.show {
+		height: 1rem;
+		opacity: 1;
+	}
 `;
 
-const ErrorMessage = ({ error }: ErrorProps) => {
-	if (!error) return <></>;
-
-	return <StyledMessage>{error}</StyledMessage>;
+const ErrorMessage = ({ error, touched }: ErrorProps) => {
+	return (
+		<StyledMessage className={error && touched ? "show" : ""}>
+			{error ?? " "}
+		</StyledMessage>
+	);
 };
 
 export default ErrorMessage;

@@ -5,13 +5,14 @@ test("Can create, edit, and delete clients", async ({ page }) => {
 	await page.goto("/clients");
 
 	await page.getByRole("link", { name: "Add New" }).click();
+	await expect(page).toHaveURL("/clients/create");
 
 	const client = new RandomClient();
 	const updatedClient = new RandomClient();
 
-	await page.locator("input#name").fill(client.name);
-	await page.locator("input#number").fill(client.number);
-	await page.locator("input#billTo").fill(client.billTo);
+	await page.locator('[name="name"]').fill(client.name);
+	await page.locator('[name="number"]').fill(client.number);
+	await page.locator('[name="billTo"]').fill(client.billTo);
 
 	await page.getByRole("button", { name: "Create" }).click();
 
@@ -27,7 +28,7 @@ test("Can create, edit, and delete clients", async ({ page }) => {
 		.click();
 	await page.getByRole("link", { name: "Edit" }).click();
 
-	await page.locator("input#name").fill(updatedClient.name);
+	await page.locator('[name="name"]').fill(updatedClient.name);
 	await page.getByRole("button", { name: "Update" }).click();
 	await expect(
 		page.getByRole("alert").filter({ hasText: "Client Updated" })

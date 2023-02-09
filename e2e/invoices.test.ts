@@ -10,7 +10,7 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 	await page.getByRole("link", { name: "Clients" }).click();
 	await expect(page).toHaveURL("/clients");
 	await page.getByRole("button", { name: "+ Add New" }).click();
-	await page.locator("#name").fill(randomClient.name);
+	await page.locator('[name="name"]').fill(randomClient.name);
 	await page.getByRole("button", { name: "Create" }).click();
 	await page.getByRole("alert").filter({ hasText: "Client created" }).click();
 
@@ -18,9 +18,15 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 	await page.getByRole("link", { name: "Support Items" }).click();
 	await expect(page).toHaveURL("/support-items");
 	await page.getByRole("button", { name: "+ Add New" }).click();
-	await page.locator("#description").fill(randomSupportItem.description);
-	await page.locator("#weekdayCode").fill(randomSupportItem.weekdayCode);
-	await page.locator("#weekdayRate").fill(randomSupportItem.weekdayRate);
+	await page
+		.locator('[name="description"]')
+		.fill(randomSupportItem.description);
+	await page
+		.locator('[name="weekdayCode"]')
+		.fill(randomSupportItem.weekdayCode);
+	await page
+		.locator('[name="weekdayRate"]')
+		.fill(randomSupportItem.weekdayRate);
 	await page.getByRole("button", { name: "Create" }).click();
 	await page
 		.getByRole("alert")
@@ -35,7 +41,7 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 	await page.locator(".react-select").click();
 	await page.getByText(randomClient.name, { exact: true }).click();
 
-	await page.locator("#invoiceNo").fill(randomInvoice.invoiceNo);
+	await page.locator('[name="invoiceNo"]').fill(randomInvoice.invoiceNo);
 	await page.getByRole("button", { name: "Confirm" }).click();
 	await page.locator(".react-select").nth(1).click();
 	await page.getByText(randomSupportItem.description, { exact: true }).click();

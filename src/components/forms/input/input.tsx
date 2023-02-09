@@ -1,25 +1,38 @@
-import React, { HTMLProps, ReactElement } from "react";
+import { HTMLProps, ReactElement } from "react";
+import {
+	FieldValues,
+	Path,
+	RegisterOptions,
+	UseFormRegister,
+} from "react-hook-form";
 import * as Styles from "./input.styles";
 
-interface InputProps {
+type InputProps<T extends FieldValues> = {
+	register: UseFormRegister<T>;
+	rules?: RegisterOptions;
+	name: Path<T>;
 	error?: boolean;
 	prefix?: string | ReactElement;
 	suffix?: string;
-}
+} & HTMLProps<HTMLInputElement>;
 
-const Input: React.FC<InputProps & HTMLProps<HTMLInputElement>> = ({
-	error,
+function Input<T extends Record<string, unknown>>({
+	register,
+	name,
+	rules,
 	prefix,
 	suffix,
-	...props
-}) => {
+	error,
+	id,
+	...rest
+}: InputProps<T>) {
 	return (
 		<Styles.Container error={error}>
 			<Styles.Prefix>{prefix}</Styles.Prefix>
-			<input {...props} />
+			<input {...register(name, rules)} id={id ?? name} {...rest} />
 			<Styles.Prefix>{suffix}</Styles.Prefix>
 		</Styles.Container>
 	);
-};
+}
 
 export default Input;
