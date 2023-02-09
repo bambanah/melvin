@@ -47,7 +47,7 @@ function SupportItemList() {
 						value: "Edit",
 						type: "link",
 						icon: faEdit,
-						href: `/support-items/${supportItem.id}?edit=true`,
+						href: `/support-items/${supportItem.id}/edit`,
 					},
 					{
 						value: "Delete",

@@ -41,7 +41,7 @@ export const BaseButton = styled.button`
 export const PrimaryButton = styled(BaseButton)`
 	border: none;
 	color: ${({ theme }) =>
-		theme.type === "light" ? theme.colors.fg : theme.colors.bg};
+		theme.type === "light" ? theme.colors.bg : theme.colors.bg};
 	background-color: ${({ theme }) => theme.colors.brand};
 
 	&.disabled {

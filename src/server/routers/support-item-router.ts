@@ -1,5 +1,4 @@
-import { supportItemFormSchema } from "@components/support-items/support-item-form/schema";
-import { RateType } from "@prisma/client";
+import { supportItemSchema } from "@schema/support-item-schema";
 import { authedProcedure, router } from "@server/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { baseListQueryInput } from "@utils/trpc";
@@ -12,20 +11,6 @@ const defaultSupportItemSelect = {
 	weekdayCode: true,
 	weekdayRate: true,
 };
-
-export const defaultSupportItemCreate = z.object({
-	id: z.string().optional(),
-	description: z.string(),
-	rateType: z.nativeEnum(RateType),
-	weekdayCode: z.string(),
-	weekdayRate: z.string(),
-	weeknightCode: z.string().optional(),
-	weeknightRate: z.string().optional(),
-	saturdayCode: z.string().optional(),
-	saturdayRate: z.string().optional(),
-	sundayCode: z.string().optional(),
-	sundayRate: z.string().optional(),
-});
 
 export const supportItemRouter = router({
 	list: authedProcedure
@@ -63,7 +48,7 @@ export const supportItemRouter = router({
 				id: z.string(),
 			})
 		)
-		.query(async ({ input, ctx }) => {
+		.query(async ({ ctx, input }) => {
 			const activity = await ctx.prisma.supportItem.findFirst({
 				select: {
 					...defaultSupportItemSelect,
@@ -89,10 +74,10 @@ export const supportItemRouter = router({
 	add: authedProcedure
 		.input(
 			z.object({
-				supportItem: supportItemFormSchema,
+				supportItem: supportItemSchema,
 			})
 		)
-		.mutation(async ({ input, ctx }) => {
+		.mutation(async ({ ctx, input }) => {
 			const activity = await ctx.prisma.supportItem.create({
 				data: { ...input.supportItem, ownerId: ctx.session.user.id },
 			});
@@ -106,14 +91,13 @@ export const supportItemRouter = router({
 	modify: authedProcedure
 		.input(
 			z.object({
-				id: z.string(),
-				supportItem: defaultSupportItemCreate,
+				supportItem: supportItemSchema.extend({ id: z.string() }),
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
 			const activity = await ctx.prisma.supportItem.update({
 				where: {
-					id: input.id,
+					id: input.supportItem.id,
 				},
 				data: { ...input.supportItem },
 			});

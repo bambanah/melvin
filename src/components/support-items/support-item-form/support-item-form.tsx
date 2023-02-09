@@ -1,29 +1,30 @@
+import { RateType } from ".prisma/client";
 import Button from "@atoms/button";
 import ButtonGroup from "@atoms/button-group";
+import Heading from "@atoms/heading";
 import Label from "@atoms/label";
 import Subheading from "@atoms/subheading";
+import { Form } from "@components/auth/login-form/styles";
 import ErrorMessage from "@components/forms/error-message";
 import Input from "@components/forms/input";
 import Select from "@components/forms/select";
-import { Form } from "@components/navigation/login-form/styles";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { SupportItemSchema } from "@schema/support-item-schema";
+import { supportItemSchema } from "@schema/support-item-schema";
+import { SupportItemByIdOutput } from "@server/routers/support-item-router";
 import { trpc } from "@utils/trpc";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { z } from "zod";
-import { supportItemFormSchema } from "./schema";
 import * as Styles from "./styles";
 
 interface Props {
-	purpose?: "create" | "update";
+	existingSupportItem?: SupportItemByIdOutput;
 }
 
-type FormData = z.infer<typeof supportItemFormSchema>;
-
-const SupportItemForm = ({ purpose }: Props) => {
-	const formPurpose = purpose ?? "create";
+const SupportItemForm = ({ existingSupportItem }: Props) => {
+	const formPurpose = existingSupportItem ? "update" : "create";
 
 	const router = useRouter();
 
@@ -33,28 +34,44 @@ const SupportItemForm = ({ purpose }: Props) => {
 	const {
 		register,
 		handleSubmit,
-		formState: { errors, isSubmitting },
+		formState: { errors, isSubmitting, isDirty },
 		control,
-	} = useForm<FormData>({ resolver: zodResolver(supportItemFormSchema) });
+	} = useForm<SupportItemSchema>({
+		resolver: zodResolver(supportItemSchema),
+		defaultValues: {
+			description: existingSupportItem?.description ?? "",
+			rateType: existingSupportItem?.rateType ?? RateType.HOUR,
+			weekdayCode: existingSupportItem?.weekdayCode ?? "",
+			weekdayRate: Number(existingSupportItem?.weekdayRate) || undefined,
+			weeknightCode: existingSupportItem?.weeknightCode ?? "",
+			weeknightRate: Number(existingSupportItem?.weeknightRate) || undefined,
+			saturdayCode: existingSupportItem?.saturdayCode ?? "",
+			saturdayRate: Number(existingSupportItem?.saturdayRate) || undefined,
+			sundayCode: existingSupportItem?.sundayCode ?? "",
+			sundayRate: Number(existingSupportItem?.sundayRate) || undefined,
+		},
+	});
 
-	const onSubmit = (data: FormData) => {
+	const onSubmit = (data: SupportItemSchema) => {
 		createSupportItemMutation
 			.mutateAsync({
 				supportItem: data,
 			})
 			.then(async () => {
-				toast.success("Support Item Created");
+				toast.success("Support Item created");
 
 				trpcContext.supportItem.list.invalidate();
-
-				await new Promise((r) => setTimeout(r, 2000));
-
 				router.push("/support-items");
 			});
 	};
 
 	return (
 		<Styles.CreateActivityContainer>
+			<Heading>
+				{existingSupportItem
+					? `Updating ${existingSupportItem.description}`
+					: "Create New Support Item"}
+			</Heading>
 			<Form onSubmit={handleSubmit(onSubmit)}>
 				<Styles.InputGroup>
 					<Styles.Heading>General</Styles.Heading>
@@ -80,10 +97,9 @@ const SupportItemForm = ({ purpose }: Props) => {
 							<Select
 								name="rateType"
 								control={control}
-								defaultValue="HOUR"
 								options={[
-									{ label: "per hour", value: "HOUR" },
-									{ label: "per km", value: "KM" },
+									{ label: "per hour", value: RateType.HOUR },
+									{ label: "per km", value: RateType.KM },
 								]}
 							/>
 							<ErrorMessage error={errors.rateType?.message} />
@@ -216,8 +232,13 @@ const SupportItemForm = ({ purpose }: Props) => {
 				</Styles.InputGroup>
 
 				<ButtonGroup>
-					<Button type="submit" variant="primary" disabled={isSubmitting}>
-						{formPurpose === "create" ? "Create" : "Update"}
+					<Button
+						type="submit"
+						variant="primary"
+						disabled={isSubmitting || !isDirty}
+						title={isDirty ? "" : "Nothing to update"}
+					>
+						{formPurpose.charAt(0).toUpperCase() + formPurpose.slice(1)}
 					</Button>
 					<Link href="/support-items">
 						<Button type="button">Cancel</Button>

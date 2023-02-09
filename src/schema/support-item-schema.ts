@@ -6,7 +6,7 @@ const zodItemCode = z
 	.string()
 	.regex(itemCodeRegex, "Must be in format XX_XXX_XXXX_X_X");
 
-export const supportItemFormSchema = z.object({
+export const supportItemSchema = z.object({
 	id: z.string().optional(),
 
 	description: z.string().min(1, "Required"),
@@ -34,3 +34,4 @@ export const supportItemFormSchema = z.object({
 		.step(0.01, "Can't be more than 2 decimal places (x.xx)")
 		.optional(),
 });
+export type SupportItemSchema = z.infer<typeof supportItemSchema>;

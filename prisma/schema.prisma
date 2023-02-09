@@ -134,7 +134,7 @@ model SupportItem {
   createdAt DateTime @default(now()) @map("created")
 
   description   String
-  rateType      RateType
+  rateType      RateType @default(HOUR)
   weekdayCode   String
   weeknightCode String?
   saturdayCode  String?
