@@ -12,16 +12,14 @@ const customJestConfig = {
 		"^src/(.*)$": "<rootDir>/src/$1",
 		"^@pages/(.*)$": "<rootDir>/src/pages/$1",
 		"^@atoms/(.*)$": "<rootDir>/src/atoms/$1",
+		"^@components/(.*)$": "<rootDir>/src/components/$1",
 		"^@context/(.*)$": "<rootDir>/src/context/$1",
 		"^@layouts/(.*)$": "<rootDir>/src/layouts/$1",
-		"^@molecules/(.*)$": "<rootDir>/src/molecules/$1",
-		"^@organisms/(.*)$": "<rootDir>/src/organisms/$1",
-		"^@hooks/(.*)$": "<rootDir>/src/hooks/$1",
 		"^@utils/(.*)$": "<rootDir>/src/utils/$1",
 		"^@schema/(.*)$": "<rootDir>/src/schema/$1",
 		"^@styles/(.*)$": "<rootDir>/src/styles/$1",
 	},
-	testMatch: ["<rootDir>/__tests__/**"],
+	testMatch: ["<rootDir>/**/*.test.ts"],
 };
 
 module.exports = createJestConfig(customJestConfig);
