@@ -1,13 +1,13 @@
 import { expect, test } from "@playwright/test";
-import { randomClient } from "./factories/client-factory";
+import { RandomClient } from "./random/random-client";
 
 test("Can create, edit, and delete clients", async ({ page }) => {
 	await page.goto("/clients");
 
 	await page.getByRole("link", { name: "Add New" }).click();
 
-	const client = randomClient();
-	const updatedClient = randomClient();
+	const client = new RandomClient();
+	const updatedClient = new RandomClient();
 
 	await page.locator("input#name").fill(client.name);
 	await page.locator("input#number").fill(client.number);
