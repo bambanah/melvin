@@ -112,7 +112,6 @@ export const EntityDetails = styled.div`
 	padding-right: 0;
 
 	gap: 1em;
-	transition: background 0.1s;
 
 	&.expand {
 		cursor: pointer;

@@ -76,23 +76,22 @@ const generateEntity = (activity?: ActivityFetchAllOutput): EntityListItem => ({
 });
 
 function ActivityList() {
-	const activities = trpc.activity.list.useQuery();
+	const { data: { activities } = {}, error } = trpc.activity.list.useQuery();
 
-	if (activities.error) {
-		console.error(activities.error);
+	if (error) {
+		console.error(error);
 		return <div>Error loading</div>;
 	}
-
-	if (!activities.data)
-		return <EntityList title="Activities" entities={[generateEntity()]} />;
 
 	return (
 		<EntityList
 			title="Activities"
 			route="/activities"
-			entities={activities.data.activities.map((activity) =>
-				generateEntity(activity)
-			)}
+			entities={
+				activities
+					? activities.map((activity) => generateEntity(activity))
+					: [generateEntity()]
+			}
 		/>
 	);
 }

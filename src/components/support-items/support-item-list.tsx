@@ -78,14 +78,15 @@ function SupportItemList() {
 		return <div>Error loading</div>;
 	}
 
-	if (!supportItems)
-		return <EntityList title="Support Items" entities={[generateEntity()]} />;
-
 	return (
 		<EntityList
 			title="Support Items"
 			route="/support-items"
-			entities={supportItems.map((supportItem) => generateEntity(supportItem))}
+			entities={
+				supportItems
+					? supportItems.map((supportItem) => generateEntity(supportItem))
+					: [generateEntity()]
+			}
 		/>
 	);
 }
