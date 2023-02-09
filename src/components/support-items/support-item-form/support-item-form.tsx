@@ -153,6 +153,9 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 									<Input
 										name={`${rateType}Rate`}
 										register={register}
+										rules={{
+											setValueAs: (v) => (v === "" ? "" : Number(v)),
+										}}
 										type="text"
 										prefix="$"
 										error={!!errors[`${rateType}Rate`]}
