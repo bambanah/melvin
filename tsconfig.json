@@ -44,6 +44,6 @@
 		".eslintrc.js",
 		"prisma/seed.ts",
 		"jest.setup.ts",
-		"lint-staged.config.js"
+		"lint-staged.config.mjs"
 	]
 }
