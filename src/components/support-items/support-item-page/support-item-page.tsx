@@ -1,3 +1,4 @@
+import Loading from "@atoms/loading";
 import { RateType } from "@prisma/client";
 import { trpc } from "@utils/trpc";
 import Head from "next/head";
@@ -7,17 +8,16 @@ import * as Styles from "./styles";
 
 const SupportItemPage = () => {
 	const router = useRouter();
-	const supportItemId = String(router.query.id);
 
 	const { data: supportItem, error } = trpc.supportItem.byId.useQuery({
-		id: supportItemId,
+		id: String(router.query.id),
 	});
 
 	if (error) {
 		console.error(error);
 		return <div>Error loading</div>;
 	}
-	if (!supportItem) return <div>loading...</div>;
+	if (!supportItem) return <Loading />;
 
 	const rateType = supportItem.rateType === RateType.HOUR ? "hr" : "km";
 
@@ -29,7 +29,7 @@ const SupportItemPage = () => {
 			<Styles.Content>
 				<Link href="/support-items">&lt; Back to Support Items</Link>
 				<h1>{supportItem.description}</h1>
-				<Link href={`/support-items/${supportItemId}/edit`}>Edit</Link>
+				<Link href={`/support-items/${supportItem.id}/edit`}>Edit</Link>
 				<p>
 					Weekday: {supportItem.weekdayCode || "N/A"}{" "}
 					{supportItem.weekdayRate

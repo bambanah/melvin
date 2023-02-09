@@ -58,7 +58,7 @@ const ClientList = () => {
 						value: "Edit",
 						type: "link",
 						icon: faEdit,
-						href: `/clients/${client.id}?edit=true`,
+						href: `/clients/${client.id}/edit`,
 					},
 					{
 						value: "Delete",

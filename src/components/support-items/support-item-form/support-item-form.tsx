@@ -1,10 +1,10 @@
 import { RateType } from ".prisma/client";
 import Button from "@atoms/button";
 import ButtonGroup from "@atoms/button-group";
+import Form from "@atoms/form";
 import Heading from "@atoms/heading";
 import Label from "@atoms/label";
 import Subheading from "@atoms/subheading";
-import { Form } from "@components/auth/login-form/styles";
 import ErrorMessage from "@components/forms/error-message";
 import Input from "@components/forms/input";
 import Select from "@components/forms/select";
@@ -29,12 +29,13 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 	const router = useRouter();
 
 	const trpcContext = trpc.useContext();
-	const createSupportItemMutation = trpc.supportItem.add.useMutation();
+	const createSupportItemMutation = trpc.supportItem.create.useMutation();
+	const updateSupportItemMutation = trpc.supportItem.update.useMutation();
 
 	const {
 		register,
 		handleSubmit,
-		formState: { errors, isSubmitting, isDirty },
+		formState: { errors, isSubmitting, isDirty, isValid },
 		control,
 	} = useForm<SupportItemSchema>({
 		resolver: zodResolver(supportItemSchema),
@@ -53,16 +54,27 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 	});
 
 	const onSubmit = (data: SupportItemSchema) => {
-		createSupportItemMutation
-			.mutateAsync({
-				supportItem: data,
-			})
-			.then(async () => {
-				toast.success("Support Item created");
+		if (existingSupportItem?.id) {
+			updateSupportItemMutation
+				.mutateAsync({ supportItem: { ...data, id: existingSupportItem.id } })
+				.then(() => {
+					toast.success("Support Item updated");
 
-				trpcContext.supportItem.list.invalidate();
-				router.push("/support-items");
-			});
+					trpcContext.supportItem.list.invalidate();
+					router.push("/support-items");
+				});
+		} else {
+			createSupportItemMutation
+				.mutateAsync({
+					supportItem: data,
+				})
+				.then(() => {
+					toast.success("Support Item created");
+
+					trpcContext.supportItem.list.invalidate();
+					router.push("/support-items");
+				});
+		}
 	};
 
 	return (
@@ -72,7 +84,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 					? `Updating ${existingSupportItem.description}`
 					: "Create New Support Item"}
 			</Heading>
-			<Form onSubmit={handleSubmit(onSubmit)}>
+			<Form onSubmit={handleSubmit(onSubmit)} flexDirection="column">
 				<Styles.InputGroup>
 					<Styles.Heading>General</Styles.Heading>
 					<Styles.InputRow>
@@ -235,8 +247,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 					<Button
 						type="submit"
 						variant="primary"
-						disabled={isSubmitting || !isDirty}
-						title={isDirty ? "" : "Nothing to update"}
+						disabled={isSubmitting || !isDirty || !isValid}
 					>
 						{formPurpose.charAt(0).toUpperCase() + formPurpose.slice(1)}
 					</Button>

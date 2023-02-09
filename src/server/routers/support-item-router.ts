@@ -71,7 +71,7 @@ export const supportItemRouter = router({
 
 			return activity;
 		}),
-	add: authedProcedure
+	create: authedProcedure
 		.input(
 			z.object({
 				supportItem: supportItemSchema,
@@ -88,7 +88,7 @@ export const supportItemRouter = router({
 
 			return activity;
 		}),
-	modify: authedProcedure
+	update: authedProcedure
 		.input(
 			z.object({
 				supportItem: supportItemSchema.extend({ id: z.string() }),

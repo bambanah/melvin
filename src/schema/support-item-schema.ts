@@ -1,7 +1,7 @@
 import { RateType } from "@prisma/client";
 import { z } from "zod";
 
-const itemCodeRegex = /^\d{2}_\d{3}_\d{4}_\d_\d$/;
+const itemCodeRegex = /^\d{2}_(?:\d{3}|\d{9})_\d{4}_\d_\d(?:_T)?$/;
 const zodItemCode = z
 	.string()
 	.regex(itemCodeRegex, "Must be in format XX_XXX_XXXX_X_X");
