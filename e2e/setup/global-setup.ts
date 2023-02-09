@@ -8,7 +8,7 @@ async function globalSetup() {
 
 	const sessionToken = "e7e59d85-3421-442f-968f-0e7357c96914";
 
-	await prisma.user.upsert({
+	const user = await prisma.user.upsert({
 		where: {
 			email: "test@user.com",
 		},
@@ -36,6 +36,11 @@ async function globalSetup() {
 		update: {},
 	});
 
+	await prisma.client.deleteMany({ where: { ownerId: user.id } });
+	await prisma.supportItem.deleteMany({ where: { ownerId: user.id } });
+	await prisma.invoice.deleteMany({ where: { ownerId: user.id } });
+	await prisma.activity.deleteMany({ where: { ownerId: user.id } });
+
 	const browser = await chromium.launch();
 	const context = await browser.newContext({ storageState: storagePath });
 
@@ -47,7 +52,7 @@ async function globalSetup() {
 			path: "/",
 			httpOnly: true,
 			sameSite: "Lax",
-			expires: 1_661_406_204,
+			expires: dayjs().add(1, "month").unix(),
 		},
 	]);
 	await context.storageState({ path: storagePath });

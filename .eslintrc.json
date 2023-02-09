@@ -36,14 +36,14 @@
 		"unicorn/prevent-abbreviations": "off"
 	},
 	"overrides": [
-		// Only uses Testing Library lint rules in test files
 		{
-			"files": [
-				"**/__tests__/**/*.[jt]s?(x)",
-				"**/?(*.)+(spec|test).[jt]s?(x)"
-			],
+			"files": ["**/*.unit.@(test|spec).[jt]s?(x)"],
 			"plugins": ["testing-library"],
 			"extends": ["plugin:testing-library/react"]
+		},
+		{
+			"files": ["**/e2e/**/*.@(test|spec).[jt]s?(x)"],
+			"extends": ["plugin:playwright/playwright-test"]
 		}
 	]
 }

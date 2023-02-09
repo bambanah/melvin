@@ -52,7 +52,7 @@ export const Content = styled.div`
 	}
 `;
 
-export const Entity = styled.div`
+export const Entity = styled.li`
 	margin-top: -1px;
 	flex: 0 0 auto;
 	width: 100%;

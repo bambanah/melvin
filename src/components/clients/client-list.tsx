@@ -1,11 +1,11 @@
+import EntityList from "@components/shared/entity-list";
+import { EntityListItem } from "@components/shared/entity-list/entity-list";
 import {
 	faEdit,
 	faIdCard,
 	faTrash,
 	faWallet,
 } from "@fortawesome/free-solid-svg-icons";
-import EntityList from "@components/shared/entity-list";
-import { EntityListItem } from "@components/shared/entity-list/entity-list";
 import { ClientListOutput } from "@server/routers/client-router";
 import { trpc } from "@utils/trpc";
 import Skeleton from "react-loading-skeleton";
@@ -71,7 +71,7 @@ const ClientList = () => {
 									{
 										onSuccess: () => {
 											utils.clients.list.invalidate();
-											toast.success("Client deleted");
+											toast.success("Client deleted2");
 										},
 										onError: (error) => toast.error(error.message),
 									}

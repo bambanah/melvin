@@ -1,10 +1,10 @@
 import Button from "@atoms/button";
-import ErrorMessage from "@components/forms/error-message";
+import ButtonGroup from "@atoms/button-group";
 import Form from "@atoms/form";
 import Heading from "@atoms/heading";
-import Input from "@components/forms/input";
 import Label from "@atoms/label";
-import ButtonGroup from "@atoms/button-group";
+import ErrorMessage from "@components/forms/error-message";
+import Input from "@components/forms/input";
 import { Client } from "@prisma/client";
 import ClientValidationSchema from "@schema/client-validation-schema";
 import { ClientByIdOutput } from "@server/routers/client-router";
@@ -133,8 +133,8 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 						onSuccess: () => {
 							toast.info("Client Updated");
 
+							utils.clients.list.invalidate();
 							returnFunction ? returnFunction() : router.push("/clients");
-							utils.clients.invalidate();
 						},
 						onError: (error) => {
 							toast.error("An unknown error occured. Refresh and try again.");
@@ -150,8 +150,8 @@ const ClientForm: FC<Props> = ({ initialValues, returnFunction }) => {
 						onSuccess: () => {
 							toast.success("Client Created");
 
+							utils.clients.list.invalidate();
 							router.push("/clients");
-							utils.clients.invalidate();
 						},
 						onError: (error) => {
 							toast.error("An unknown error occured. Refresh and try again.");
