@@ -46,9 +46,9 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 
 	await Promise.all(
 		invoice.activities.map(async (activity) => {
-			if (!activity || !activity.supportItem) return;
+			if (activity?.supportItem === null) return;
 
-			const [itemCode, rate] = await getRate(activity);
+			const [itemCode, rate] = getRate(activity);
 
 			let countString = "";
 			let totalCost = 0;

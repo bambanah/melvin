@@ -8,7 +8,7 @@
 		"build": "run-s build:*",
 		"build-ci": "run-s build:* prisma:push",
 		"db:nuke": "docker-compose down --volumes --remove-orphans",
-		"db:reset": "run-s db:nuke db:up prisma:dev prisma:seed",
+		"db:reset": "run-s db:nuke db:up prisma:dev",
 		"db:up": "docker-compose up -d",
 		"db:down": "docker-compose down",
 		"prisma:generate": "prisma generate",
@@ -28,6 +28,9 @@
 		"ts-node": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\"",
 		"postinstall": "prisma generate"
 	},
+	"prisma": {
+		"seed": "yarn ts-node prisma/seed.ts"
+	},
 	"browserslist": {
 		"production": [
 			">0.2%",
@@ -39,9 +42,6 @@
 			"last 1 firefox version",
 			"last 1 safari version"
 		]
-	},
-	"prisma": {
-		"seed": "yarn ts-node prisma/seed.ts"
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-svg-core": "^6.3.0",

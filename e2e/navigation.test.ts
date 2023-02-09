@@ -9,9 +9,6 @@ test("Root should redirect to invoices page", async ({ page }) => {
 test("Navbar buttons should work", async ({ page }) => {
 	await page.goto("/");
 
-	await page.getByRole("link", { name: "Activities" }).click();
-	await expect(page).toHaveURL("/activities");
-
 	await page.getByRole("link", { name: "Invoices" }).click();
 	await expect(page).toHaveURL("/invoices");
 
