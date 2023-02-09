@@ -71,7 +71,7 @@ const ClientList = () => {
 									{
 										onSuccess: () => {
 											utils.clients.list.invalidate();
-											toast.success("Client deleted2");
+											toast.success("Client deleted");
 										},
 										onError: (error) => toast.error(error.message),
 									}

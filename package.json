@@ -24,7 +24,7 @@
 		"test:unit": "jest",
 		"test:e2e": "playwright test",
 		"test": "run-s test:*",
-		"test:codegen": "playwright codegen http://localhost:3000 --load-storage=e2e/setup/storage-state.json",
+		"pw:codegen": "playwright codegen http://localhost:3000 --load-storage=e2e/setup/storage-state.json",
 		"ts-node": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\"",
 		"postinstall": "prisma generate"
 	},
