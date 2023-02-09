@@ -27,7 +27,7 @@ async function globalSetup() {
 
 	const sessionToken = "e7e59d85-3421-442f-968f-0e7357c96914";
 
-	await prisma.user.delete({ where: { email: "test@user.com" } });
+	await prisma.user.deleteMany({ where: { email: "test@user.com" } });
 	await prisma.user.create({
 		data: {
 			name: "test user",

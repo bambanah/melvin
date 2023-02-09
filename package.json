@@ -3,7 +3,7 @@
 	"private": true,
 	"scripts": {
 		"prepare": "husky install",
-		"build:1-migrate": "prisma generate",
+		"build:1-generate": "prisma generate",
 		"build:2-build": "next build",
 		"build": "run-s build:*",
 		"build-ci": "run-s build:* prisma:push",
