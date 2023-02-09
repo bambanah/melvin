@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-const itemCodeRegex = /^\d{2}_\d{3}_\d{4}_\d_\d$/;
+const itemCodeRegex = /^\d{2}_(?:\d{3}|\d{9})_\d{4}_\d_\d(?:_T)?$/;
 
 const SupportItemValidationSchema = yup.object().shape({
 	description: yup.string().required("Required"),
