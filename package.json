@@ -21,8 +21,9 @@
 		"lint": "next lint",
 		"lint:fix": "next lint --fix",
 		"lint:ts": "tsc --pretty --noEmit",
-		"test": "jest",
+		"test:unit": "jest",
 		"test:e2e": "playwright test",
+		"test": "run-s test:*",
 		"test:codegen": "playwright codegen http://localhost:3000 --load-storage=e2e/setup/storage-state.json",
 		"ts-node": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\"",
 		"postinstall": "prisma generate"
