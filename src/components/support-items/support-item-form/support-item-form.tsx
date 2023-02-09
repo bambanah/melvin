@@ -131,36 +131,34 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 					</Subheading>
 
 					{(["weekday", "weeknight", "saturday", "sunday"] as const).map(
-						(rateType) => (
-							<Styles.RateRow key={rateType}>
-								<Label required>
-									<span>
-										{rateType.charAt(0).toUpperCase() + rateType.slice(1)}
-									</span>
+						(day) => (
+							<Styles.RateRow key={day}>
+								<Label required={day === "weekday"}>
+									<span>{day.charAt(0).toUpperCase() + day.slice(1)}</span>
 								</Label>
 								<Styles.InputContainer>
 									<Input
-										name={`${rateType}Code`}
+										name={`${day}Code`}
 										register={register}
 										type="text"
 										placeholder="XX_XXX_XXXX_X_X"
-										error={!!errors[`${rateType}Code`]}
+										error={!!errors[`${day}Code`]}
 									/>
-									<ErrorMessage error={errors[`${rateType}Code`]?.message} />
+									<ErrorMessage error={errors[`${day}Code`]?.message} />
 								</Styles.InputContainer>
 
 								<Styles.InputContainer>
 									<Input
-										name={`${rateType}Rate`}
+										name={`${day}Rate`}
 										register={register}
 										rules={{
 											setValueAs: (v) => (v === "" ? "" : Number(v)),
 										}}
 										type="text"
 										prefix="$"
-										error={!!errors[`${rateType}Rate`]}
+										error={!!errors[`${day}Rate`]}
 									/>
-									<ErrorMessage error={errors[`${rateType}Rate`]?.message} />
+									<ErrorMessage error={errors[`${day}Rate`]?.message} />
 								</Styles.InputContainer>
 							</Styles.RateRow>
 						)
