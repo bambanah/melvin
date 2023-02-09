@@ -1,10 +1,29 @@
 import { chromium } from "@playwright/test";
 import prisma from "@utils/prisma";
 import dayjs from "dayjs";
+import fs from "node:fs";
 import path from "node:path";
 
 async function globalSetup() {
 	const storagePath = path.resolve(__dirname, "storage-state.json");
+	fs.access(storagePath, (err) => {
+		if (err) {
+			const emptyState = {
+				cookies: [],
+				origins: [],
+			};
+
+			fs.writeFile(
+				storagePath,
+				JSON.stringify(emptyState),
+				{ flag: "wx" },
+				() => {
+					// eslint-disable-next-line no-console
+					console.log("Created storage-state.json\n");
+				}
+			);
+		}
+	});
 
 	const sessionToken = "e7e59d85-3421-442f-968f-0e7357c96914";
 
