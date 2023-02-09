@@ -23,12 +23,13 @@ function Input<T extends Record<string, unknown>>({
 	prefix,
 	suffix,
 	error,
+	id,
 	...rest
 }: InputProps<T>) {
 	return (
 		<Styles.Container error={error}>
 			<Styles.Prefix>{prefix}</Styles.Prefix>
-			<input {...register(name, rules)} {...rest} />
+			<input {...register(name, rules)} id={id ?? name} {...rest} />
 			<Styles.Prefix>{suffix}</Styles.Prefix>
 		</Styles.Container>
 	);

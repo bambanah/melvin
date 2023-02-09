@@ -99,7 +99,7 @@ export const supportItemRouter = router({
 				where: {
 					id: input.supportItem.id,
 				},
-				data: { ...input.supportItem },
+				data: input.supportItem,
 			});
 
 			if (!activity) {

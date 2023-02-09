@@ -61,6 +61,9 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 					toast.success("Support Item updated");
 
 					trpcContext.supportItem.list.invalidate();
+					trpcContext.supportItem.byId.invalidate({
+						id: existingSupportItem.id,
+					});
 					router.push("/support-items");
 				});
 		} else {
@@ -99,6 +102,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 								register={register}
 								type="text"
 								placeholder="Description"
+								error={!!errors.description}
 							/>
 							<ErrorMessage error={errors.description?.message} />
 						</Label>
@@ -126,121 +130,38 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 						event of another rate not being entered
 					</Subheading>
 
-					<Styles.ActivityRow>
-						<Label required>
-							<span>Weekday</span>
-						</Label>
-						<Styles.InputContainer>
-							<Input
-								name="weekdayCode"
-								register={register}
-								type="text"
-								placeholder="XX_XXX_XXXX_X_X"
-							/>
-							<ErrorMessage error={errors.weekdayCode?.message} />
-						</Styles.InputContainer>
+					{(["weekday", "weeknight", "saturday", "sunday"] as const).map(
+						(rateType) => (
+							<Styles.RateRow key={rateType}>
+								<Label required>
+									<span>
+										{rateType.charAt(0).toUpperCase() + rateType.slice(1)}
+									</span>
+								</Label>
+								<Styles.InputContainer>
+									<Input
+										name={`${rateType}Code`}
+										register={register}
+										type="text"
+										placeholder="XX_XXX_XXXX_X_X"
+										error={!!errors[`${rateType}Code`]}
+									/>
+									<ErrorMessage error={errors[`${rateType}Code`]?.message} />
+								</Styles.InputContainer>
 
-						<Styles.InputContainer>
-							<Input
-								name="weekdayRate"
-								register={register}
-								rules={{
-									valueAsNumber: true,
-								}}
-								type="number"
-								step="0.01"
-								prefix="$"
-							/>
-							<ErrorMessage error={errors.weekdayRate?.message} />
-						</Styles.InputContainer>
-					</Styles.ActivityRow>
-
-					<Styles.ActivityRow>
-						<Label>
-							<span>Weeknight</span>
-						</Label>
-						<Styles.InputContainer>
-							<Input
-								name="weeknightCode"
-								register={register}
-								type="text"
-								placeholder="XX_XXX_XXXX_X_X"
-							/>
-							<ErrorMessage error={errors.weeknightCode?.message} />
-						</Styles.InputContainer>
-
-						<Styles.InputContainer>
-							<Input
-								name="weeknightRate"
-								register={register}
-								rules={{
-									setValueAs: (v) => (v === "" ? undefined : Number(v)),
-								}}
-								type="text"
-								step="0.01"
-								prefix="$"
-							/>
-							<ErrorMessage error={errors.weeknightRate?.message} />
-						</Styles.InputContainer>
-					</Styles.ActivityRow>
-
-					<Styles.ActivityRow>
-						<Label>
-							<span>Saturday</span>
-						</Label>
-						<Styles.InputContainer>
-							<Input
-								name="saturdayCode"
-								register={register}
-								type="text"
-								placeholder="XX_XXX_XXXX_X_X"
-							/>
-							<ErrorMessage error={errors.saturdayCode?.message} />
-						</Styles.InputContainer>
-
-						<Styles.InputContainer>
-							<Input
-								name="saturdayRate"
-								register={register}
-								rules={{
-									setValueAs: (v) => (v === "" ? undefined : Number(v)),
-								}}
-								type="number"
-								step="0.01"
-								prefix="$"
-							/>
-							<ErrorMessage error={errors.saturdayRate?.message} />
-						</Styles.InputContainer>
-					</Styles.ActivityRow>
-
-					<Styles.ActivityRow>
-						<Label>
-							<span>Sunday</span>
-						</Label>
-						<Styles.InputContainer>
-							<Input
-								name="sundayCode"
-								register={register}
-								type="text"
-								placeholder="XX_XXX_XXXX_X_X"
-							/>
-							<ErrorMessage error={errors.sundayCode?.message} />
-						</Styles.InputContainer>
-
-						<Styles.InputContainer>
-							<Input
-								name="sundayRate"
-								register={register}
-								rules={{
-									setValueAs: (v) => (v === "" ? undefined : Number(v)),
-								}}
-								type="number"
-								step="0.01"
-								prefix="$"
-							/>
-							<ErrorMessage error={errors.sundayRate?.message} />
-						</Styles.InputContainer>
-					</Styles.ActivityRow>
+								<Styles.InputContainer>
+									<Input
+										name={`${rateType}Rate`}
+										register={register}
+										type="text"
+										prefix="$"
+										error={!!errors[`${rateType}Rate`]}
+									/>
+									<ErrorMessage error={errors[`${rateType}Rate`]?.message} />
+								</Styles.InputContainer>
+							</Styles.RateRow>
+						)
+					)}
 				</Styles.InputGroup>
 
 				<ButtonGroup>
