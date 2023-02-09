@@ -21,8 +21,6 @@ const StyledLink = styled.a`
 
 	padding: 0.4em 0.8em;
 
-	font-family: "Poppins", "Inter", sans-serif;
-
 	transition: all 0.1s ease;
 
 	&:hover,
