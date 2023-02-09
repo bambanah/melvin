@@ -78,7 +78,7 @@ model Client {
   activities Activity[]
 
   ownerId String
-  owner   User   @relation(fields: [ownerId], references: [id])
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
 }
@@ -97,7 +97,7 @@ model Invoice {
   clientId String
   client   Client @relation(fields: [clientId], references: [id])
   ownerId  String
-  owner    User   @relation(fields: [ownerId], references: [id])
+  owner    User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([clientId])
   @@index([ownerId])
@@ -115,11 +115,11 @@ model Activity {
   itemDistance    Int?
 
   ownerId       String?
-  owner         User?       @relation(fields: [ownerId], references: [id])
+  owner         User?       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   clientId      String?
   client        Client?     @relation(fields: [clientId], references: [id])
   supportItemId String
-  supportItem   SupportItem @relation(fields: [supportItemId], references: [id])
+  supportItem   SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
   invoiceId     String?
   invoice       Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
 
@@ -147,7 +147,7 @@ model SupportItem {
   activities Activity[]
 
   ownerId String
-  owner   User   @relation(fields: [ownerId], references: [id])
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
 }

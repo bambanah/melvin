@@ -3,13 +3,13 @@ import styled from "styled-components";
 export const DropdownContainer = styled.div`
 	position: relative;
 
-	button:first-of-type {
+	& > button:first-of-type {
 		border-top-right-radius: 0;
 		border-bottom-right-radius: 0;
 		padding: 0.6em 0.7em;
 	}
 
-	button:last-of-type {
+	& > button:last-of-type {
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
 		padding: 0.6em 0.5em;
@@ -25,18 +25,22 @@ export const DropdownContent = styled.div`
 	right: 0;
 	z-index: 100;
 
-	a {
-		padding: 0.5em 1em;
+	a,
+	button {
+		text-align: left;
+		cursor: pointer;
+		font-size: 1rem;
+
 		min-width: 6.5em;
 		width: 100%;
-		background-color: ${({ theme }) => theme.colors.bg};
 
-		cursor: pointer;
+		margin-top: -0.1em;
+		padding: 0.5em 1em;
 
 		color: ${({ theme }) => theme.colors.fg};
-
+		background-color: ${({ theme }) => theme.colors.bg};
 		border: 0.1em solid ${({ theme }) => theme.colors.fg};
-		margin-top: -0.1em;
+
 		transition: all 0.1s ease;
 
 		&.primary {

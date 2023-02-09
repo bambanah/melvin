@@ -1,16 +1,16 @@
 import Button from "@atoms/button";
 import Display from "@atoms/display";
-import Dropdown from "@components/forms/dropdown";
 import Heading from "@atoms/heading";
+import Dropdown from "@components/forms/dropdown";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { breakpoints } from "@styles/themes";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FC, useState } from "react";
-import * as Styles from "./entity-list.styles";
 import { useMediaQuery } from "react-responsive";
-import { breakpoints } from "@styles/themes";
+import * as Styles from "./entity-list.styles";
 
 export interface EntityListItem {
 	id: string;

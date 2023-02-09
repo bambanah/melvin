@@ -1,9 +1,9 @@
 import Button from "@atoms/button";
 import Display from "@atoms/display";
+import NavAuth from "@components/auth/nav-auth";
 import NavLink from "@components/navigation/nav-link";
 import { faBars, faX } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import NavAuth from "@components/auth/nav-auth";
 import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -24,18 +24,11 @@ const Navbar = () => {
 			</Button>
 			<Styles.Content className={isExpanded ? "expanded" : ""}>
 				<Styles.Links className={`nav-links`}>
-					<NavLink href="/activities">
-						<span>Activities</span>
-					</NavLink>
-					<NavLink href="/invoices">
-						<span>Invoices</span>
-					</NavLink>
-					<NavLink href="/support-items">
-						<span>Support Items</span>
-					</NavLink>
-					<NavLink href="/clients">
-						<span>Clients</span>
-					</NavLink>
+					{/* TODO: Uncomment once activity creation is properly implemented */}
+					{/* <NavLink href="/activities">Activities</NavLink> */}
+					<NavLink href="/invoices">Invoices</NavLink>
+					<NavLink href="/support-items">Support Items</NavLink>
+					<NavLink href="/clients">Clients</NavLink>
 				</Styles.Links>
 
 				<Styles.Right>

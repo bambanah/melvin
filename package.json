@@ -3,12 +3,12 @@
 	"private": true,
 	"scripts": {
 		"prepare": "husky install",
-		"build:1-migrate": "prisma generate",
+		"build:1-generate": "prisma generate",
 		"build:2-build": "next build",
 		"build": "run-s build:*",
 		"build-ci": "run-s build:* prisma:push",
 		"db:nuke": "docker-compose down --volumes --remove-orphans",
-		"db:reset": "run-s db:nuke db:up prisma:dev prisma:seed",
+		"db:reset": "run-s db:nuke db:up prisma:dev",
 		"db:up": "docker-compose up -d",
 		"db:down": "docker-compose down",
 		"prisma:generate": "prisma generate",
@@ -21,10 +21,15 @@
 		"lint": "next lint",
 		"lint:fix": "next lint --fix",
 		"lint:ts": "tsc --pretty --noEmit",
-		"test": "jest",
+		"test:unit": "jest",
 		"test:e2e": "playwright test",
+		"test": "run-s test:*",
+		"pw:codegen": "playwright codegen http://localhost:3000 --load-storage=e2e/setup/storage-state.json",
 		"ts-node": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\"",
 		"postinstall": "prisma generate"
+	},
+	"prisma": {
+		"seed": "yarn ts-node prisma/seed.ts"
 	},
 	"browserslist": {
 		"production": [
@@ -37,9 +42,6 @@
 			"last 1 firefox version",
 			"last 1 safari version"
 		]
-	},
-	"prisma": {
-		"seed": "yarn ts-node prisma/seed.ts"
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-svg-core": "^6.3.0",
@@ -91,6 +93,7 @@
 		"@playwright/test": "^1.30.0",
 		"@testing-library/jest-dom": "^5.16.5",
 		"@testing-library/react": "^13.4.0",
+		"@types/eslint": "^8.21.0",
 		"@types/file-saver": "^2.0.5",
 		"@types/node": "^18.13.0",
 		"@types/react": "^18.0.25",
@@ -104,6 +107,7 @@
 		"eslint": "^8.33.0",
 		"eslint-config-next": "^13.1.6",
 		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-playwright": "^0.12.0",
 		"eslint-plugin-styled-components-a11y": "^1.0.0",
 		"eslint-plugin-testing-library": "^5.10.0",
 		"eslint-plugin-unicorn": "^45.0.2",

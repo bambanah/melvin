@@ -1,6 +1,6 @@
-import React from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
+import React from "react";
 import styled from "styled-components";
 
 interface Props {
@@ -21,8 +21,6 @@ const StyledLink = styled.a`
 
 	padding: 0.4em 0.8em;
 
-	font-family: "Poppins", "Inter", sans-serif;
-
 	transition: all 0.1s ease;
 
 	&:hover,
@@ -38,7 +36,9 @@ const Link = ({ href, children }: Props) => {
 		router.pathname.split("/")[1] === href.split("/")[1] ? "active" : "";
 	return (
 		<NextLink href={href} legacyBehavior>
-			<StyledLink className={className}>{children}</StyledLink>
+			<StyledLink className={className} role="link">
+				{children}
+			</StyledLink>
 		</NextLink>
 	);
 };

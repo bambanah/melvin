@@ -1,18 +1,21 @@
-{
-	"root": true,
-	"parser": "@typescript-eslint/parser",
-	"env": {
-		"browser": true,
-		"es2021": true
+// @ts-check
+
+/** @type {import('eslint').Linter.Config} */
+module.exports = {
+	root: true,
+	parser: "@typescript-eslint/parser",
+	env: {
+		browser: true,
+		es2021: true,
 	},
-	"extends": [
+	extends: [
 		"next/core-web-vitals",
 		"plugin:@typescript-eslint/recommended",
 		"plugin:unicorn/recommended",
 		"plugin:styled-components-a11y/recommended",
-		"prettier"
+		"prettier",
 	],
-	"rules": {
+	rules: {
 		"quote-props": ["error", "consistent-as-needed"],
 		"@typescript-eslint/no-var-requires": "off",
 		"@typescript-eslint/no-empty-interface": "warn",
@@ -23,8 +26,8 @@
 		"no-console": [
 			"error",
 			{
-				"allow": ["warn", "error"]
-			}
+				allow: ["warn", "error"],
+			},
 		],
 		"styled-components-a11y/anchor-is-valid": "off",
 		"jsx-a11y/anchor-is-valid": "off",
@@ -33,17 +36,20 @@
 		"unicorn/prefer-module": "off",
 		"unicorn/no-array-reduce": "off",
 		"unicorn/prefer-top-level-await": "off",
-		"unicorn/prevent-abbreviations": "off"
+		"unicorn/prevent-abbreviations": "off",
 	},
-	"overrides": [
-		// Only uses Testing Library lint rules in test files
+	overrides: [
 		{
-			"files": [
-				"**/__tests__/**/*.[jt]s?(x)",
-				"**/?(*.)+(spec|test).[jt]s?(x)"
-			],
-			"plugins": ["testing-library"],
-			"extends": ["plugin:testing-library/react"]
-		}
-	]
-}
+			files: ["**/*.unit.@(test|spec).[jt]s?(x)"],
+			plugins: ["testing-library"],
+			extends: ["plugin:testing-library/react"],
+		},
+		{
+			files: ["**/e2e/**/*.@(test|spec).[jt]s?(x)"],
+			extends: ["plugin:playwright/playwright-test"],
+			rules: {
+				"playwright/no-skipped-test": "off",
+			},
+		},
+	],
+};

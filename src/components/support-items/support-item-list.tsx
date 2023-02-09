@@ -1,10 +1,10 @@
+import EntityList, { EntityListItem } from "@components/shared/entity-list";
 import {
 	faDollarSign,
 	faEdit,
 	faIdCard,
 	faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import EntityList, { EntityListItem } from "@components/shared/entity-list";
 import { SupportItemFetchAllOutput } from "@server/routers/support-item-router";
 import { trpc } from "@utils/trpc";
 import Skeleton from "react-loading-skeleton";
@@ -63,7 +63,7 @@ function SupportItemList() {
 									.mutateAsync({ id: supportItem.id })
 									.then(() => {
 										utils.supportItem.list.invalidate();
-										toast.success("Activity deleted");
+										toast.success("Support Item deleted");
 									})
 									.catch((error) => toast.error(error));
 							}
