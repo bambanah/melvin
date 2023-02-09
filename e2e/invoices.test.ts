@@ -3,7 +3,7 @@ import { RandomClient } from "./random/random-client";
 import { RandomInvoice } from "./random/random-invoice";
 import { RandomSupportItem } from "./random/random-support-item";
 
-test("Can create, update, and delete support items", async ({ page }) => {
+test("Can create, update, and delete invoices", async ({ page }) => {
 	await page.goto("/");
 
 	const randomClient = new RandomClient();
@@ -60,9 +60,9 @@ test("Can create, update, and delete support items", async ({ page }) => {
 		.filter({ hasText: "Invoice created" })
 		.isVisible();
 	await expect(page).toHaveURL("/invoices");
-	await expect(page.getByRole("listitem").first()).toContainText(
-		randomInvoice.invoiceNo
-	);
+	await expect(
+		page.getByRole("listitem").filter({ hasText: randomInvoice.invoiceNo })
+	).toHaveCount(1);
 
 	await page.getByRole("button").nth(2).click();
 	await page.getByRole("link", { name: "Edit" }).click();
@@ -72,10 +72,11 @@ test("Can create, update, and delete support items", async ({ page }) => {
 		.getByRole("alert")
 		.filter({ hasText: "Invoice updated" })
 		.isVisible();
+	await expect(page).toHaveURL("/invoices");
 
-	await expect(page.getByRole("listitem").first()).toContainText(
-		"Invoice 20202"
-	);
+	await expect(
+		page.getByRole("listitem").filter({ hasText: "Invoice 20202" })
+	).toHaveCount(1);
 
 	await page.getByRole("button").nth(2).click();
 	page.once("dialog", (dialog) => dialog.accept());
