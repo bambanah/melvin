@@ -1,3 +1,4 @@
+import { activitySchema } from "@schema/activity-schema";
 import { authedProcedure, router } from "@server/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -13,18 +14,6 @@ const defaultActivitySelect = {
 	supportItem: true,
 	client: true,
 };
-
-export const defaultActivityCreate = z.object({
-	id: z.string().optional(),
-	supportItemId: z.string(),
-	clientId: z.string(),
-	date: z.date(),
-	startTime: z.date(),
-	endTime: z.date(),
-	itemDistance: z.number().nullish(),
-	transitDistance: z.number().nullish(),
-	transitDuration: z.number().nullish(),
-});
 
 export const activityRouter = router({
 	list: authedProcedure.query(async ({ ctx }) => {
@@ -77,7 +66,7 @@ export const activityRouter = router({
 	add: authedProcedure
 		.input(
 			z.object({
-				activity: defaultActivityCreate,
+				activity: activitySchema,
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
@@ -95,7 +84,7 @@ export const activityRouter = router({
 		.input(
 			z.object({
 				id: z.string(),
-				activity: defaultActivityCreate,
+				activity: activitySchema,
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -132,3 +121,7 @@ export const activityRouter = router({
 export type ActivityFetchAllOutput = inferRouterOutputs<
 	typeof activityRouter
 >["list"]["activities"][0];
+
+export type ActivityByIdOutput = inferRouterOutputs<
+	typeof activityRouter
+>["byId"];

@@ -59,7 +59,7 @@ const generateEntity = (activity?: ActivityFetchAllOutput): EntityListItem => ({
 					value: "Edit",
 					type: "link",
 					icon: faEdit,
-					href: `/activities/${activity.id}?edit=true`,
+					href: `/activities/${activity.id}/edit`,
 				},
 				{
 					value: "Delete",

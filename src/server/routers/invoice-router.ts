@@ -1,8 +1,8 @@
+import { activitySchema } from "@schema/activity-schema";
 import { authedProcedure, router } from "@server/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { baseListQueryInput } from "@utils/trpc";
 import { z } from "zod";
-import { defaultActivityCreate } from "./activity-router";
 
 const defaultInvoiceSelect = {
 	id: true,
@@ -102,7 +102,7 @@ export const invoiceRouter = router({
 		.input(
 			z.object({
 				invoice: defaultInvoiceCreate,
-				activities: z.array(defaultActivityCreate),
+				activities: z.array(activitySchema),
 			})
 		)
 		.mutation(async ({ input, ctx }) => {

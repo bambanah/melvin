@@ -1,12 +1,8 @@
-import Select from "@components/forms/select-formik";
+import Select from "@components/forms/select";
 import { trpc } from "@utils/trpc";
+import { FieldValues, UseControllerProps } from "react-hook-form";
 
-interface Props {
-	name: string;
-	error?: boolean;
-}
-
-const ClientSelect = ({ name, error: formError }: Props) => {
+function ClientSelect<T extends FieldValues>(props: UseControllerProps<T>) {
 	const { data: { clients } = {}, error } = trpc.clients.list.useQuery({});
 
 	let options = [];
@@ -22,7 +18,7 @@ const ClientSelect = ({ name, error: formError }: Props) => {
 		  }))
 		: [{ label: "Loading...", value: "" }];
 
-	return <Select name={name} error={formError} options={options} />;
-};
+	return <Select options={options} {...props} />;
+}
 
 export default ClientSelect;

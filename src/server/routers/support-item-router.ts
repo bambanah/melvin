@@ -43,11 +43,7 @@ export const supportItemRouter = router({
 			};
 		}),
 	byId: authedProcedure
-		.input(
-			z.object({
-				id: z.string(),
-			})
-		)
+		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
 			const activity = await ctx.prisma.supportItem.findFirst({
 				select: {

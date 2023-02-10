@@ -7,7 +7,7 @@ import Loading from "@atoms/loading";
 import Subheading from "@atoms/subheading";
 import Input from "@components/forms/input-formik";
 import Select from "@components/forms/select-formik";
-import TimePicker from "@components/forms/time-input";
+import TimePicker from "@components/forms/time-input-formik";
 import { faTrashAlt } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Invoice } from "@prisma/client";

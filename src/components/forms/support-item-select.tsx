@@ -1,12 +1,16 @@
-import Select from "@components/forms/select-formik";
+import Select from "@components/forms/select";
 import { trpc } from "@utils/trpc";
+import { Control, FieldValues, Path } from "react-hook-form";
 
-interface Props {
-	name: string;
-	error?: boolean;
+interface Props<T extends FieldValues> {
+	name: Path<T>;
+	control: Control<T>;
 }
 
-const SupportItemSelect = ({ name, error: formError }: Props) => {
+const SupportItemSelect = <T extends FieldValues>({
+	name,
+	control,
+}: Props<T>) => {
 	const { data: { supportItems } = {}, error } = trpc.supportItem.list.useQuery(
 		{}
 	);
@@ -24,7 +28,7 @@ const SupportItemSelect = ({ name, error: formError }: Props) => {
 		  }))
 		: [{ label: "Loading...", value: "" }];
 
-	return <Select name={name} error={formError} options={options} />;
+	return <Select options={options} name={name} control={control} />;
 };
 
 export default SupportItemSelect;

@@ -107,9 +107,9 @@ model Activity {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now()) @map("created")
 
-  date            DateTime
-  startTime       DateTime
-  endTime         DateTime
+  date            DateTime @db.Date()
+  startTime       DateTime @db.Time()
+  endTime         DateTime @db.Time()
   transitDuration Int?
   transitDistance Int?
   itemDistance    Int?
