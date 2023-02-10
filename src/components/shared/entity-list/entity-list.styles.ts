@@ -39,7 +39,7 @@ export const ExpandedComponent = styled.div`
 	transition: all 0.25s;
 `;
 
-export const Content = styled.div`
+export const Content = styled.ul`
 	flex: 1 0 auto;
 	display: flex;
 	flex-direction: column;

@@ -34,6 +34,8 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 		.click();
 
 	const randomInvoice = new RandomInvoice();
+	const newRandomInvoice = new RandomInvoice();
+
 	await page.getByRole("link", { name: "Invoices" }).click();
 	await expect(page).toHaveURL("/invoices");
 	await page.getByRole("button", { name: "+ Add New" }).click();
@@ -72,7 +74,7 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 
 	await page.getByRole("button").nth(2).click();
 	await page.getByRole("link", { name: "Edit" }).click();
-	await page.locator("#invoiceNo").fill("Invoice 20202");
+	await page.locator("#invoiceNo").fill(newRandomInvoice.invoiceNo);
 	await page.getByRole("button", { name: "Update" }).click();
 	await page
 		.getByRole("alert")
@@ -81,7 +83,7 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 	await expect(page).toHaveURL("/invoices");
 
 	await expect(
-		page.getByRole("listitem").filter({ hasText: "Invoice 20202" })
+		page.getByRole("listitem").filter({ hasText: newRandomInvoice.invoiceNo })
 	).toHaveCount(1);
 
 	await page.getByRole("button").nth(2).click();
