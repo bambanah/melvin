@@ -1,0 +1,36 @@
+import dayjs from "dayjs";
+import { pickRandomFrom } from "./utils";
+
+const BILL_TO = ["Corp Enterprises", "Enterprise Corp", "Company Two"];
+
+type Activity = {
+	supportItem: string;
+	date: string;
+	startTime: string;
+	endTime: string;
+	transitDistance: string;
+	transitDuration: string;
+};
+
+export class RandomInvoice {
+	invoiceNo: string;
+	billTo: string;
+	activities: Activity[];
+
+	constructor(invoiceNo?: string, billTo?: string, activities?: Activity[]) {
+		this.invoiceNo =
+			invoiceNo?.toString() ??
+			Math.floor(Math.random() * 999_999_999 + 1).toString();
+		this.billTo = billTo ?? pickRandomFrom(BILL_TO);
+		this.activities = activities ?? [
+			{
+				supportItem: "",
+				date: dayjs().format("DD/MM/YYYY"),
+				startTime: "13:00",
+				endTime: "14:00",
+				transitDistance: "10",
+				transitDuration: "20",
+			},
+		];
+	}
+}

@@ -1,7 +1,7 @@
 import generatePDF from "@utils/pdf-generation";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@utils/prisma";
-import Invoice from "types/invoice";
+import { InvoiceByIdOutput } from "@server/routers/invoice-router";
 
 export default async (request: NextApiRequest, response: NextApiResponse) => {
 	if (request.method === "GET") {
@@ -23,7 +23,7 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
 			return response.status(404).send("Not found");
 
 		const { pdfString, fileName } = await generatePDF(
-			invoice as unknown as Invoice
+			invoice as unknown as NonNullable<InvoiceByIdOutput>
 		);
 
 		if (!pdfString) {

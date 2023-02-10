@@ -1,25 +1,25 @@
-import LoginPage from "@layouts/login-page";
-import { GetServerSideProps } from "next";
-import { BuiltInProviderType } from "next-auth/providers";
-import {
-	ClientSafeProvider,
-	getProviders,
-	LiteralUnion,
-} from "next-auth/react";
-import React from "react";
+import LoginPage from "@components/auth/login-page";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { getProviders, getSession } from "next-auth/react";
 
-interface LoginProps {
-	providers: Record<
-		LiteralUnion<BuiltInProviderType, string>,
-		ClientSafeProvider
-	>;
-}
-
-export default function Login({ providers }: LoginProps) {
+export default function Login({
+	providers,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
 	return <LoginPage providers={providers} />;
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+	const session = await getSession(context);
+
+	if (session) {
+		return {
+			redirect: {
+				destination: "/invoices",
+				permanent: false,
+			},
+		};
+	}
+
 	const providers = await getProviders();
 
 	return {

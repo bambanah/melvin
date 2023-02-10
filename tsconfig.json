@@ -18,13 +18,12 @@
 		"noImplicitReturns": true,
 		"paths": {
 			"@atoms/*": ["src/components/atoms/*"],
-			"@layouts/*": ["src/components/layouts/*"],
-			"@molecules/*": ["src/components/molecules/*"],
-			"@organisms/*": ["src/components/organisms/*"],
+			"@components/*": ["src/components/*"],
 			"@context/*": ["src/context/*"],
-			"@hooks/*": ["src/hooks/*"],
+			"@env/*": ["src/env/*"],
 			"@pages/*": ["src/pages/*"],
 			"@schema/*": ["src/schema/*"],
+			"@server/*": ["src/server/*"],
 			"@styles/*": ["src/styles/*"],
 			"@utils/*": ["src/utils/*"]
 		},
@@ -33,6 +32,7 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
+		"strictNullChecks": true,
 		"target": "es2018",
 		"tsBuildInfoFile": ".next/cache/.tsbuildinfo"
 	},
@@ -43,6 +43,7 @@
 		"**/*.js",
 		".eslintrc.js",
 		"prisma/seed.ts",
-		"jest.setup.ts"
+		"jest.setup.ts",
+		"lint-staged.config.mjs"
 	]
 }

@@ -1,17 +1,15 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider             = "mysql"
-  url                  = env("DATABASE_URL")
-  referentialIntegrity = "prisma"
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model Account {
   id                 String  @id @default(cuid())
-  userId             String  @unique
   type               String
   provider           String
   providerAccountId  String
@@ -24,29 +22,40 @@ model Account {
   session_state      String?
   oauth_token_secret String?
   oauth_token        String?
-  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model Session {
   sessionToken String   @unique
-  userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model User {
-  id            String        @id @default(cuid())
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
   name          String?
-  email         String?       @unique
   emailVerified DateTime?
   image         String?
-  account       Account?
-  clients       Client[]
-  invoices      Invoice[]
-  sessions      Session[]
-  supportItems  SupportItem[]
+
+  account  Account?
+  sessions Session[]
+
+  clients      Client[]
+  invoices     Invoice[]
+  supportItems SupportItem[]
+  activities   Activity[]
 }
 
 model VerificationToken {
@@ -58,70 +67,89 @@ model VerificationToken {
 }
 
 model Client {
-  id       String    @id @default(cuid())
-  created  DateTime  @default(now())
-  number   String?
-  ownerId  String
-  name     String
-  billTo   String?
-  owner    User      @relation(fields: [ownerId], references: [id])
-  invoices Invoice[]
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created")
+
+  number String?
+  name   String
+  billTo String?
+
+  invoices   Invoice[]
+  activities Activity[]
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
 }
 
 model Invoice {
-  id         String        @id @default(cuid())
-  created    DateTime      @default(now())
-  invoiceNo  String
-  billTo     String
-  date       DateTime
-  clientId   String
-  ownerId    String
-  status     InvoiceStatus @default(CREATED)
-  client     Client        @relation(fields: [clientId], references: [id])
-  owner      User          @relation(fields: [ownerId], references: [id])
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created")
+
+  invoiceNo String
+  billTo    String
+  date      DateTime
+  status    InvoiceStatus @default(CREATED)
+
   activities Activity[]
-  templates  Template[]
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id])
+  ownerId  String
+  owner    User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([ownerId])
 }
 
 model Activity {
-  id              String      @id @default(cuid())
-  created         DateTime    @default(now())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created")
+
   date            DateTime
   startTime       DateTime
   endTime         DateTime
   transitDuration Int?
   transitDistance Int?
-  invoiceId       String?
-  supportItemId   String
   itemDistance    Int?
-  invoices        Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  supportItem     SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
+
+  ownerId       String?
+  owner         User?       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  clientId      String?
+  client        Client?     @relation(fields: [clientId], references: [id])
+  supportItemId String
+  supportItem   SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
+  invoiceId     String?
+  invoice       Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+
+  @@index([ownerId])
+  @@index([clientId])
+  @@index([supportItemId])
+  @@index([invoiceId])
 }
 
 model SupportItem {
-  id            String     @id @default(cuid())
-  created       DateTime   @default(now())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created")
+
   description   String
-  rateType      RateType
+  rateType      RateType @default(HOUR)
   weekdayCode   String
   weeknightCode String?
   saturdayCode  String?
   sundayCode    String?
-  ownerId       String
   weekdayRate   Decimal
   weeknightRate Decimal?
   saturdayRate  Decimal?
   sundayRate    Decimal?
-  owner         User       @relation(fields: [ownerId], references: [id])
-  activities    Activity[]
-}
 
-model Template {
-  id           String   @id @default(cuid())
-  created      DateTime @default(now())
-  templateName String
-  invoiceId    String
-  invoice      Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  activities Activity[]
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
 }
 
 enum InvoiceStatus {

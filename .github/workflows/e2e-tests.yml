@@ -1,0 +1,46 @@
+name: "E2E Tests"
+
+on:
+  pull_request:
+    branches: [main, dev]
+
+env:
+  DATABASE_URL: mysql://root:Passw0rd@localhost:3309/melvin
+  NEXTAUTH_URL: "http://localhost:3000"
+  NEXTAUTH_SECRET: "7893onvi808u7q1ounbv"
+  GOOGLE_ID: ""
+  GOOGLE_SECRET: ""
+  EMAIL_SERVER: ""
+  EMAIL_FROM: ""
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: "yarn"
+          cache-dependency-path: yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: npx playwright install
+
+      - name: Spin up database docker
+        run: yarn db:up
+
+      - name: Sleep for 15 seconds
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '15s'
+
+      - name: Initialise database
+        run: yarn prisma:dev
+
+      - name: Run tests
+        run: yarn test:e2e
