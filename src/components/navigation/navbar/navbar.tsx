@@ -24,8 +24,7 @@ const Navbar = () => {
 			</Button>
 			<Styles.Content className={isExpanded ? "expanded" : ""}>
 				<Styles.Links className={`nav-links`}>
-					{/* TODO: Uncomment once activity creation is properly implemented */}
-					{/* <NavLink href="/activities">Activities</NavLink> */}
+					<NavLink href="/activities">Activities</NavLink>
 					<NavLink href="/invoices">Invoices</NavLink>
 					<NavLink href="/support-items">Support Items</NavLink>
 					<NavLink href="/clients">Clients</NavLink>
