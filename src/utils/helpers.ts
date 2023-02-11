@@ -162,7 +162,7 @@ export const invoiceToValues = (invoice: InvoiceByIdOutput): FormValues => ({
 	activities: invoice.activities.map((activity) => ({
 		id: activity.id,
 		supportItemId: activity.supportItemId ?? "",
-		date: dayjs.utc(activity.date).format("DD/MM/YYYY"),
+		date: dayjs.utc(activity.date).format("YYYY-MM-DD"),
 		itemDistance: activity.itemDistance?.toString() ?? "",
 		transitDistance: activity.transitDistance?.toString() ?? "",
 		transitDuration: activity.transitDuration?.toString() ?? "",

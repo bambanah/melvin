@@ -84,7 +84,7 @@ async function main() {
 				activities: {
 					create: invoice.activities.map((activity) => ({
 						...activity,
-						date: dayjs(activity.date, "DD/MM/YYYY").toDate(),
+						date: dayjs(activity.date, "YYYY-MM-DD").toDate(),
 						startTime: dayjs(activity.startTime, "HH:mm").toDate(),
 						endTime: dayjs(activity.endTime, "HH:mm").toDate(),
 						transitDistance: Number(activity.transitDistance),

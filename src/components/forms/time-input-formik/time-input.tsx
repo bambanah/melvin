@@ -12,7 +12,7 @@ export default function TimePicker({ name, error }: Props) {
 	return (
 		<Styles.TimeInput
 			className={`input`}
-			error={error}
+			// error={error}
 			name={field.name}
 			type="time"
 		/>

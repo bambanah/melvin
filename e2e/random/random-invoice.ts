@@ -25,7 +25,7 @@ export const randomInvoice = ({
 			supportItemId: supportItemId ?? "",
 			ownerId: ownerId ?? "",
 			clientId: clientId ?? "",
-			date: dayjs().format("DD/MM/YYYY"),
+			date: dayjs().format("YYYY-MM-DD"),
 			startTime: "13:00",
 			endTime: "14:00",
 			transitDistance: "10",
