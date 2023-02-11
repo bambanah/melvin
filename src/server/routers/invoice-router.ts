@@ -1,3 +1,4 @@
+import { InvoiceStatus } from "@prisma/client";
 import { activitySchema } from "@schema/activity-schema";
 import { authedProcedure, router } from "@server/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
@@ -9,6 +10,7 @@ const defaultInvoiceSelect = {
 	billTo: true,
 	invoiceNo: true,
 	date: true,
+	status: true,
 	client: {
 		select: { name: true, number: true },
 	},
@@ -138,6 +140,22 @@ export const invoiceRouter = router({
 					id: input.id,
 				},
 				data: { ...input.invoice },
+			});
+
+			if (!invoice) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			return invoice;
+		}),
+	updateStatus: authedProcedure
+		.input(z.object({ id: z.string(), status: z.nativeEnum(InvoiceStatus) }))
+		.mutation(async ({ ctx, input }) => {
+			const invoice = await ctx.prisma.invoice.update({
+				where: {
+					id: input.id,
+				},
+				data: { status: input.status },
 			});
 
 			if (!invoice) {
