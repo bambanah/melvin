@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { RandomClient } from "./random/random-client";
+import { randomClient } from "./random/random-client";
 
 test("Can create, edit, and delete clients", async ({ page }) => {
 	await page.goto("/clients");
@@ -7,8 +7,8 @@ test("Can create, edit, and delete clients", async ({ page }) => {
 	await page.getByRole("link", { name: "Add New" }).click();
 	await expect(page).toHaveURL("/clients/create");
 
-	const client = new RandomClient();
-	const updatedClient = new RandomClient();
+	const client = randomClient();
+	const updatedClient = randomClient();
 
 	await page.locator('[name="name"]').fill(client.name);
 	await page.locator('[name="number"]').fill(client.number);

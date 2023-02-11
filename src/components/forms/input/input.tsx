@@ -7,7 +7,7 @@ import {
 } from "react-hook-form";
 import * as Styles from "./input.styles";
 
-type InputProps<T extends FieldValues> = {
+export type InputProps<T extends FieldValues> = {
 	register: UseFormRegister<T>;
 	rules?: RegisterOptions;
 	name: Path<T>;
@@ -16,7 +16,7 @@ type InputProps<T extends FieldValues> = {
 	suffix?: string;
 } & HTMLProps<HTMLInputElement>;
 
-function Input<T extends Record<string, unknown>>({
+function Input<T extends FieldValues>({
 	register,
 	name,
 	rules,

@@ -1,14 +1,13 @@
 import { FormValues } from "@components/invoices/invoice-form";
 import { InvoiceStatus, Prisma } from "@prisma/client";
 import { InvoiceByIdOutput } from "@server/routers/invoice-router";
-import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import { FormikErrors, FormikTouched, getIn } from "formik";
 import InvoiceType from "types/invoice";
-import { INPUT_DATE_FORMATS } from "./constants";
 
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -75,8 +74,15 @@ export const getNextInvoiceNo = (previousInvoiceNumbers: string[]): string => {
 	const invoicePrefix = latestInvoiceNo?.replace(/\d+$/, "") || "";
 
 	const matches = latestInvoiceNo?.match(/\d+$/);
+	const numberOfDigits = matches ? matches[0].length : 0;
 
-	return `${invoicePrefix}${matches ? Number.parseInt(matches[0]) + 1 : 1}`;
+	return `${invoicePrefix}${
+		matches
+			? (Number.parseInt(matches[0]) + 1)
+					.toString()
+					.padStart(numberOfDigits, "0")
+			: 1
+	}`;
 };
 
 export const getRate = (activity: {
@@ -156,7 +162,7 @@ export const invoiceToValues = (invoice: InvoiceByIdOutput): FormValues => ({
 	activities: invoice.activities.map((activity) => ({
 		id: activity.id,
 		supportItemId: activity.supportItemId ?? "",
-		date: dayjs.utc(activity.date).format("DD/MM/YYYY"),
+		date: dayjs.utc(activity.date).format("YYYY-MM-DD"),
 		itemDistance: activity.itemDistance?.toString() ?? "",
 		transitDistance: activity.transitDistance?.toString() ?? "",
 		transitDuration: activity.transitDuration?.toString() ?? "",
@@ -172,13 +178,13 @@ export const valuesToInvoice = (values: FormValues) => ({
 		clientId: values.clientId,
 		billTo: values.billTo,
 		date: values.date
-			? dayjs(values.date, INPUT_DATE_FORMATS).utc().toDate()
+			? dayjs.utc(values.date, "DD/MM/YYYY").toDate()
 			: new Date(),
 		status: InvoiceStatus.CREATED,
 	},
 	activities: values.activities.map((activity) => ({
 		id: activity.id,
-		date: dayjs(activity.date, INPUT_DATE_FORMATS).utc().toDate(),
+		date: dayjs.utc(activity.date, "YYYY-MM-DD").toDate(),
 		itemDistance: Number(activity.itemDistance) || undefined,
 		transitDistance: Number(activity.transitDistance) || undefined,
 		transitDuration: Number(activity.transitDuration) || undefined,

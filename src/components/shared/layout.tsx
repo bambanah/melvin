@@ -1,10 +1,10 @@
-import React, { FC } from "react";
-import styled from "styled-components";
+import Loading from "@atoms/loading";
 import Navbar from "@components/navigation/navbar";
+import { breakpoints } from "@styles/themes";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import Loading from "@atoms/loading";
-import { breakpoints } from "@styles/themes";
+import React from "react";
+import styled from "styled-components";
 
 const Container = styled.div`
 	display: flex;
@@ -36,26 +36,31 @@ const Content = styled.div`
 
 interface Props {
 	children: React.ReactNode;
+	isLoading?: boolean;
 }
 
-const Layout: FC<Props> = ({ children }) => {
+const Layout = ({ children, isLoading }: Props) => {
 	const session = useSession();
 	const router = useRouter();
 
-	if (session.status === "loading") {
-		return <Loading />;
-	}
+	let content: React.ReactNode;
 
 	if (session.status === "unauthenticated") {
 		router.push("/login");
-		return <p>Redirecting...</p>;
+		content = <p>Redirecting...</p>;
 	}
+
+	if (session.status === "loading" || isLoading) {
+		content = <Loading />;
+	}
+
+	content = children;
 
 	return (
 		<Container>
 			<Navbar />
 
-			<Content>{children}</Content>
+			<Content>{content}</Content>
 		</Container>
 	);
 };

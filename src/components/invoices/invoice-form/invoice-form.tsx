@@ -7,7 +7,7 @@ import Loading from "@atoms/loading";
 import Subheading from "@atoms/subheading";
 import Input from "@components/forms/input-formik";
 import Select from "@components/forms/select-formik";
-import TimePicker from "@components/forms/time-input";
+import TimePicker from "@components/forms/time-input-formik";
 import { faTrashAlt } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Invoice } from "@prisma/client";
@@ -286,7 +286,7 @@ const CreateInvoiceForm: FC<Props> = ({
 														<Label required>
 															<span>Date</span>
 															<Input
-																type="text"
+																type="date"
 																onChange={handleChange}
 																onBlur={handleBlur}
 																value={values.activities[index].date}
@@ -437,7 +437,6 @@ const CreateInvoiceForm: FC<Props> = ({
 		},
 		handleSubmit: (values, { setSubmitting }) => {
 			const data = valuesToInvoice(values);
-
 			if (initialValues?.id) {
 				axios
 					.post(`/api/invoices/${initialValues.id}`, {

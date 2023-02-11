@@ -1,9 +1,9 @@
 import { InvoiceStatus } from "@prisma/client";
+import { activitySchema } from "@schema/activity-schema";
 import { authedProcedure, router } from "@server/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { baseListQueryInput } from "@utils/trpc";
 import { z } from "zod";
-import { defaultActivityCreate } from "./activity-router";
 
 const defaultInvoiceSelect = {
 	id: true,
@@ -16,7 +16,6 @@ const defaultInvoiceSelect = {
 	},
 	activities: {
 		select: {
-			// TODO: Only return id, currently need the full activity for cost generation
 			startTime: true,
 			endTime: true,
 			transitDistance: true,
@@ -54,9 +53,14 @@ export const invoiceRouter = router({
 					ownerId: ctx.session.user.id,
 				},
 				cursor: cursor ? { id: cursor } : undefined,
-				orderBy: {
-					createdAt: "asc",
-				},
+				orderBy: [
+					{
+						status: "desc",
+					},
+					{
+						updatedAt: "asc",
+					},
+				],
 			});
 
 			let nextCursor: typeof cursor | undefined;
@@ -104,7 +108,7 @@ export const invoiceRouter = router({
 		.input(
 			z.object({
 				invoice: defaultInvoiceCreate,
-				activities: z.array(defaultActivityCreate),
+				activities: z.array(activitySchema),
 			})
 		)
 		.mutation(async ({ input, ctx }) => {

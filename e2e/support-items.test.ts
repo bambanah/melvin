@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { RandomSupportItem } from "./random/random-support-item";
+import { randomSupportItem } from "./random/random-support-item";
 
 test("Can create, update, and delete support items", async ({ page }) => {
 	await page.goto("/support-items");
@@ -7,8 +7,8 @@ test("Can create, update, and delete support items", async ({ page }) => {
 	await page.getByRole("link", { name: "Add New" }).click();
 	await expect(page).toHaveURL("/support-items/create");
 
-	const supportItem = new RandomSupportItem();
-	const newSupportItem = new RandomSupportItem();
+	const supportItem = randomSupportItem();
+	const newSupportItem = randomSupportItem();
 
 	await page.locator('[name="description"]').fill(supportItem.description);
 	await page.locator('[name="weekdayCode"]').fill(supportItem.weekdayCode);

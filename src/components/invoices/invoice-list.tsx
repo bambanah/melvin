@@ -22,12 +22,12 @@ import PdfDocument from "./pdf-document";
 
 const getBadgeColorFromStatus = (status: InvoiceStatus) => {
 	if (status === "PAID") {
-		return "success";
+		return "SUCCESS";
 	} else if (status === "SENT") {
-		return "warning";
+		return "WARNING";
 	}
 
-	return "info";
+	return "DEFAULT";
 };
 
 export default function InvoiceList() {

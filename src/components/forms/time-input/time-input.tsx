@@ -1,21 +1,24 @@
-import { useField } from "formik";
-import React from "react";
-import * as Styles from "./styles";
+import type { InputProps } from "@components/forms/input";
+import Input from "@components/forms/input";
 
-interface Props {
-	name: string;
-	error?: boolean;
-}
+import dayjs from "dayjs";
+import { FieldValues } from "react-hook-form";
+dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
-export default function TimePicker({ name, error }: Props) {
-	const [field] = useField(name);
-
+export default function TimeInput<T extends FieldValues>({
+	rules,
+	...rest
+}: InputProps<T>) {
 	return (
-		<Styles.TimeInput
-			className={`input`}
-			error={error}
-			name={field.name}
+		<Input
 			type="time"
+			rules={{
+				...rules,
+				setValueAs: (value) => {
+					return dayjs(value, "HH:mm").toDate();
+				},
+			}}
+			{...rest}
 		/>
 	);
 }
