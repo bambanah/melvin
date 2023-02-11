@@ -286,7 +286,7 @@ const CreateInvoiceForm: FC<Props> = ({
 														<Label required>
 															<span>Date</span>
 															<Input
-																type="text"
+																type="date"
 																onChange={handleChange}
 																onBlur={handleBlur}
 																value={values.activities[index].date}
@@ -437,7 +437,6 @@ const CreateInvoiceForm: FC<Props> = ({
 		},
 		handleSubmit: (values, { setSubmitting }) => {
 			const data = valuesToInvoice(values);
-
 			if (initialValues?.id) {
 				axios
 					.post(`/api/invoices/${initialValues.id}`, {

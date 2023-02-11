@@ -19,16 +19,18 @@ const USERS = [
 ];
 const BILL_TO = ["Corp Enterprises", "Enterprise Corp", "Company Two"];
 
-export class RandomClient {
-	name: string;
-	number: string;
-	billTo: string;
-
-	constructor(name?: string, number?: number, billTo?: string) {
-		this.name = name ?? pickRandomFrom(USERS);
-		this.number =
-			number?.toString() ??
-			Math.floor(Math.random() * 999_999_999 + 1).toString();
-		this.billTo = billTo ?? pickRandomFrom(BILL_TO);
-	}
-}
+export const randomClient = ({
+	name,
+	number,
+	billTo,
+}: {
+	name?: string;
+	number?: number;
+	billTo?: string;
+} = {}) => ({
+	name: name ?? pickRandomFrom(USERS),
+	number:
+		number?.toString() ??
+		Math.floor(Math.random() * 999_999_999 + 1).toString(),
+	billTo: billTo ?? pickRandomFrom(BILL_TO),
+});

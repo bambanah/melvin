@@ -128,6 +128,7 @@ describe("Helpers", () => {
 		);
 		expect(getNextInvoiceNo([])).toEqual("");
 		expect(getNextInvoiceNo(["Gawne1"])).toEqual("Gawne2");
+		expect(getNextInvoiceNo(["Gawne01", "Gawne02"])).toEqual("Gawne03");
 	});
 
 	it("Should round correctly", () => {
