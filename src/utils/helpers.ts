@@ -4,6 +4,7 @@ import { InvoiceByIdOutput } from "@server/routers/invoice-router";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { FormikErrors, FormikTouched, getIn } from "formik";
 import InvoiceType from "types/invoice";
+import supportItems from "../../public/ndis-support-catalogue-22-23.json";
 
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
@@ -275,8 +276,19 @@ export const getTotalCost = (
 	return round(grandTotal, 2);
 };
 
-// export const getTotalString = (invoiceId: string) =>
-// 	getTotalCost(invoiceId).then((cost) => `$${cost.toFixed(2)}`);
+export const getNonLabourTravelCode = (supportItemCode: string) => {
+	// Identical to regex in support-item-schema, except capturing the group number (third block)
+	const groupNumberMatch = supportItemCode.match(
+		/^\d{2}_(?:\d{3}|\d{9})_(\d{4})_\d_\d(?:_T)?$/
+	)?.[1];
+	const groupNumber = Number(groupNumberMatch);
+
+	const supportItem = supportItems.find(
+		(activity) => activity.registrationGroupNumber === groupNumber
+	);
+
+	return supportItem?.supportItemNumber;
+};
 
 export const errorIn = (
 	errors: FormikErrors<unknown>,
