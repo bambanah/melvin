@@ -21,6 +21,7 @@ export const DropdownContent = styled.div`
 	position: absolute;
 	display: flex;
 	flex-direction: column;
+	white-space: nowrap;
 	min-width: 100%;
 	right: 0;
 	z-index: 100;
@@ -31,15 +32,15 @@ export const DropdownContent = styled.div`
 		cursor: pointer;
 		font-size: 1rem;
 
-		min-width: 6.5em;
+		min-width: 6.5rem;
 		width: 100%;
 
-		margin-top: -0.1em;
-		padding: 0.5em 1em;
+		margin-top: -0.1rem;
+		padding: 0.5rem;
 
 		color: ${({ theme }) => theme.colors.fg};
 		background-color: ${({ theme }) => theme.colors.bg};
-		border: 0.1em solid ${({ theme }) => theme.colors.fg};
+		border: 0.1rem solid ${({ theme }) => theme.colors.fg};
 
 		transition: all 0.1s ease;
 
@@ -48,7 +49,8 @@ export const DropdownContent = styled.div`
 		}
 
 		svg {
-			margin-right: 0.2em;
+			margin-right: 0.2rem;
+			width: 18px;
 		}
 
 		&:hover {

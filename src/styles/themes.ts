@@ -8,10 +8,12 @@ export const light: DefaultTheme = {
 		bg: "#FCFBFC",
 		link: "#2374ab",
 		brand: "#669B3C",
-		success: "#ebfcf6",
 		gradientPink:
 			"linear-gradient(31deg, rgba(255,112,112,1) 0%, rgba(215,185,255,1) 100%)",
-		error: "#F14348",
+		info: "#BDDCF1",
+		success: "#D4FDD9",
+		warning: "#F7EEA0",
+		error: "#ff6961",
 	},
 };
 
@@ -23,9 +25,11 @@ export const dark: DefaultTheme = {
 		bg: "#161E27",
 		link: "#4dccbd",
 		brand: "#567568",
-		success: "ebfcf6",
 		gradientPink:
 			"linear-gradient(31deg, rgba(255,112,112,1) 0%, rgba(255,112,156,1) 100%)",
+		info: "#BDDCF1",
+		success: "#D4FDD9",
+		warning: "#F7EEA0",
 		error: "#ff6961",
 	},
 };
