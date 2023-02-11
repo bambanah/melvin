@@ -31,6 +31,7 @@ const getActivity = (
 		transitDuration: transitDuration,
 		transitDistance: transitDistance,
 		supportItem: {
+			description: "Support Item",
 			weekdayCode: "weekday",
 			weekdayRate: new Prisma.Decimal(55.47),
 			weeknightCode: "weeknight",

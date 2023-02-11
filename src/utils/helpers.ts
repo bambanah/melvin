@@ -241,6 +241,7 @@ export const getTotalCost = (
 		transitDuration: number | null;
 		transitDistance: number | null;
 		supportItem: {
+			description: string;
 			weekdayCode: string;
 			weekdayRate: Prisma.Decimal | string;
 			weeknightCode?: string | null;
@@ -262,7 +263,10 @@ export const getTotalCost = (
 			subTotal += round(duration * Number(rate), 2);
 
 			if (activity.transitDistance) {
-				subTotal += round(activity.transitDistance * 0.85, 2);
+				const isGroup =
+					activity.supportItem.description.includes("Group Activities");
+				const ratePerKm = isGroup ? 0.43 : 0.85;
+				subTotal += round(activity.transitDistance * ratePerKm, 2);
 			}
 
 			if (activity.transitDuration) {

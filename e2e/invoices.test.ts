@@ -76,6 +76,7 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 		.isVisible();
 	await expect(page).toHaveURL("/invoices");
 
+	// FIXME: Why is this so flaky? Is Formik really that shit??
 	await expect(
 		page.getByRole("listitem").filter({ hasText: newRandomInvoice.invoiceNo })
 	).toHaveCount(1);

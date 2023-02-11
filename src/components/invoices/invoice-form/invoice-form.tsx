@@ -67,6 +67,7 @@ const CreateInvoiceForm: FC<Props> = ({
 
 	const { data: { supportItems } = {}, error: supportItemError } =
 		trpc.supportItem.list.useQuery({});
+	const trpcContext = trpc.useContext();
 
 	if (clientError || supportItemError) return <div>An error occurred</div>;
 	if (!clients || !supportItems) return <Loading />;
@@ -447,6 +448,8 @@ const CreateInvoiceForm: FC<Props> = ({
 						toast.info("Invoice Updated");
 						setSubmitting(false);
 						mutate(`/api/invoices/${initialValues.id}`);
+						trpcContext.invoice.list.invalidate();
+						trpcContext.invoice.byId.invalidate({ id: initialValues.id });
 
 						returnFunction ? returnFunction() : router.push("/invoices");
 					})
@@ -461,6 +464,8 @@ const CreateInvoiceForm: FC<Props> = ({
 						toast.success("Invoice Created");
 						setSubmitting(false);
 						mutate("/api/invoices");
+						trpcContext.invoice.list.invalidate();
+
 						router.push("/invoices");
 					})
 					.catch((error) => {
