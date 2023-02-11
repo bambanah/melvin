@@ -69,6 +69,7 @@ model VerificationToken {
 model Client {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now()) @map("created")
+  updatedAt DateTime @default(now()) @updatedAt
 
   number String?
   name   String
@@ -86,6 +87,7 @@ model Client {
 model Invoice {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now()) @map("created")
+  updatedAt DateTime @default(now()) @updatedAt
 
   invoiceNo String
   billTo    String
@@ -106,6 +108,7 @@ model Invoice {
 model Activity {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now()) @map("created")
+  updatedAt DateTime @default(now()) @updatedAt
 
   date            DateTime @db.Date()
   startTime       DateTime @db.Time()
@@ -132,6 +135,7 @@ model Activity {
 model SupportItem {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now()) @map("created")
+  updatedAt DateTime @default(now()) @updatedAt
 
   description   String
   rateType      RateType @default(HOUR)

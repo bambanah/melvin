@@ -16,7 +16,6 @@ const defaultInvoiceSelect = {
 	},
 	activities: {
 		select: {
-			// TODO: Only return id, currently need the full activity for cost generation
 			startTime: true,
 			endTime: true,
 			transitDistance: true,
@@ -54,9 +53,14 @@ export const invoiceRouter = router({
 					ownerId: ctx.session.user.id,
 				},
 				cursor: cursor ? { id: cursor } : undefined,
-				orderBy: {
-					createdAt: "asc",
-				},
+				orderBy: [
+					{
+						status: "desc",
+					},
+					{
+						updatedAt: "asc",
+					},
+				],
 			});
 
 			let nextCursor: typeof cursor | undefined;
