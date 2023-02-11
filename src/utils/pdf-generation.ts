@@ -4,6 +4,7 @@ import jspdf from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
 import {
 	getDuration,
+	getNonLabourTravelCode,
 	getPrettyDuration,
 	getRate,
 	getTotalCost,
@@ -81,42 +82,41 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 
 			// Provider Travel - Labour Costs
 			if (activity.transitDuration) {
-				const providerTravel = [];
-
 				const travelTotal = round(
 					(Number(rate) / 60) * activity.transitDuration,
 					2
 				);
 
-				providerTravel.push(
+				activityStrings.push([
 					`Provider Travel - Labour Costs\n${itemCode}\n`,
 					`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 					`${activity.transitDuration} minutes\n`,
 					`$${rate.toFixed(2)}${`/${
 						activity.supportItem.rateType === RateType.HOUR ? "hr" : "km"
 					}`}\n`,
-					`$${travelTotal.toFixed(2)}\n`
-				);
-
-				activityStrings.push(providerTravel);
+					`$${travelTotal.toFixed(2)}\n`,
+				]);
 			}
 
 			// Provider Travel - Non Labour Costs
 			if (activity.transitDistance) {
-				const providerTravel = [];
+				// TODO: Better handle dynamic groups (groups other than 2)
+				const isGroup =
+					activity.supportItem.description.includes("Group Activities");
+				const ratePerKm = isGroup ? 0.43 : 0.85;
+				const travelTotal = ratePerKm * activity.transitDistance;
 
-				const travelTotal = 0.85 * activity.transitDistance;
-
-				providerTravel.push(
-					// `Provider Travel - Non Labour Costs\n${itemCode}\n`,
-					`Provider Travel - Non Labour Costs\n${"04_799_0125_6_1"}\n`,
-					`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
-					`${activity.transitDistance} km\n`,
-					"$0.85/km\n",
-					`$${travelTotal.toFixed(2)}\n`
+				const supportItemCode = getNonLabourTravelCode(
+					activity.supportItem.weekdayCode
 				);
 
-				activityStrings.push(providerTravel);
+				activityStrings.push([
+					`Provider Travel - Non Labour Costs\n${supportItemCode ?? ""}\n`,
+					`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
+					`${activity.transitDistance} km\n`,
+					`\$${ratePerKm}/km\n`,
+					`$${travelTotal.toFixed(2)}\n`,
+				]);
 			}
 		})
 	);
