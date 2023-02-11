@@ -10,6 +10,7 @@ const defaultInvoiceSelect = {
 	billTo: true,
 	invoiceNo: true,
 	date: true,
+	status: true,
 	client: {
 		select: { name: true, number: true },
 	},
