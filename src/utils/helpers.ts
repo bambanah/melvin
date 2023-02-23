@@ -288,7 +288,9 @@ export const getNonLabourTravelCode = (supportItemCode: string) => {
 	const groupNumber = Number(groupNumberMatch);
 
 	const supportItem = supportItems.find(
-		(activity) => activity.registrationGroupNumber === groupNumber
+		(activity) =>
+			activity.registrationGroupNumber === groupNumber &&
+			activity.supportItemName === "Provider travel - non-labour costs"
 	);
 
 	return supportItem?.supportItemNumber;

@@ -3,6 +3,7 @@ import {
 	getDuration,
 	getHighestInvoiceNo,
 	getNextInvoiceNo,
+	getNonLabourTravelCode,
 	getPrettyDuration,
 	getRate,
 	getTotalCost,
@@ -32,13 +33,13 @@ const getActivity = (
 		transitDistance: transitDistance,
 		supportItem: {
 			description: "Support Item",
-			weekdayCode: "weekday",
+			weekdayCode: "04_104_0125_6_1",
 			weekdayRate: new Prisma.Decimal(55.47),
-			weeknightCode: "weeknight",
+			weeknightCode: "04_103_0125_6_1",
 			weeknightRate: new Prisma.Decimal(61.05),
-			saturdayCode: "saturday",
+			saturdayCode: "04_105_0125_6_1",
 			saturdayRate: new Prisma.Decimal(77.81),
-			sundayCode: "sunday",
+			sundayCode: "04_106_0125_6_1",
 			sundayRate: new Prisma.Decimal(100.16),
 		},
 	};
@@ -248,5 +249,14 @@ describe("Helpers", () => {
 				getActivity("weekday", "09:30", "15:25", 15, 7),
 			])
 		).toEqual(2315.96);
+	});
+
+	it("Should return correct provider travel - non-labour costs code", () => {
+		expect(getNonLabourTravelCode("04_104_0125_6_1")).toEqual(
+			"04_799_0125_6_1"
+		);
+		expect(getNonLabourTravelCode("04_102_0136_6_1")).toEqual(
+			"04_799_0136_6_1"
+		);
 	});
 });
