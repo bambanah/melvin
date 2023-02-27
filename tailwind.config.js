@@ -12,6 +12,5 @@ module.exports = {
 		},
 	},
 	plugins: [],
-	// TODO: Remove this once styled components is gone
 	important: true,
 };

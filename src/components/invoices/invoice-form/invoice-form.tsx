@@ -98,6 +98,14 @@ const CreateInvoiceForm: FC<Props> = ({
 			"previous invoice" | "client information" | ""
 		>();
 
+		const getPreviousInvoiceNo = () => {
+			const client = clients.find((c) => c.id === values.clientId);
+
+			return client?.invoices?.length
+				? getHighestInvoiceNo(client?.invoices?.map((index) => index.invoiceNo))
+				: "";
+		};
+
 		useEffect(() => {
 			if (values.clientId) {
 				const client = clients.find((c) => c.id === values.clientId);
@@ -136,14 +144,6 @@ const CreateInvoiceForm: FC<Props> = ({
 			}
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [values.clientId]);
-
-		const getPreviousInvoiceNo = () => {
-			const client = clients.find((c) => c.id === values.clientId);
-
-			return client?.invoices?.length
-				? getHighestInvoiceNo(client?.invoices?.map((index) => index.invoiceNo))
-				: "";
-		};
 
 		return (
 			<Form onSubmit={handleSubmit}>
@@ -398,6 +398,7 @@ const CreateInvoiceForm: FC<Props> = ({
 								</Styles.ActivityContainer>
 							)}
 						/>
+
 						{values.activities.length > 0 && (
 							<ButtonGroup>
 								<Button

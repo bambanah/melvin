@@ -14,6 +14,7 @@ import {
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+import prisma from "./prisma";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -166,24 +167,46 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 				styles: { fontStyle: "bold" },
 			},
 		],
-		[{ content: "", colSpan: 5, styles: { fillColor: "#fff" } }],
-		[
-			{
-				content:
-					"Phoebe Nicholas\nABN: 71 105 617 976\nBank: Up Bank\nBSB: 633 123\nAccount Number: 177 757 663",
-				colSpan: 5,
-				rowSpan: 2,
-				styles: {
-					minCellHeight: 45,
-					halign: "left",
-					fillColor: "#FFF",
-					fontStyle: "bold",
-					lineWidth: 0.2,
-					lineColor: "#000",
-				},
-			},
-		]
+		[{ content: "", colSpan: 5, styles: { fillColor: "#fff" } }]
 	);
+
+	const user = await prisma.user.findUnique({ where: { id: invoice.ownerId } });
+
+	if (user) {
+		const content = [
+			user.name ?? "",
+			user.abn
+				? `ABN: ${user.abn.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}`
+				: "",
+			user.bankName ? `Bank: ${user.bankName}` : "",
+			user.bsb
+				? `BSB: ${user.bsb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "-")}`
+				: "",
+			user.bankNumber
+				? `Account Number: ${user.bankNumber
+						?.toString()
+						.replace(/\B(?=(\d{3})+(?!\d))/g, " ")}`
+				: "",
+		].filter((val) => val.length > 0);
+
+		if (content.length === 5) {
+			values.push([
+				{
+					content: content.join("\n"),
+					colSpan: 5,
+					rowSpan: 2,
+					styles: {
+						minCellHeight: 46,
+						halign: "left",
+						fillColor: "#FFF",
+						fontStyle: "bold",
+						lineWidth: 0.2,
+						lineColor: "#000",
+					},
+				},
+			]);
+		}
+	}
 
 	const startY =
 		35 + (invoice.billTo ? 5 : 0) + (invoice.client?.number ? 5 : 0);

@@ -10,12 +10,15 @@ import {
 	faTrash,
 	faUser,
 	faWalking,
+	faWarning,
 } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { InvoiceStatus } from "@prisma/client";
 import { InvoiceFetchAllOutput } from "@server/routers/invoice-router";
 import { getTotalCost } from "@utils/helpers";
 import { trpc } from "@utils/trpc";
 import dayjs from "dayjs";
+import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
 import { toast } from "react-toastify";
 import PdfDocument from "./pdf-document";
@@ -33,58 +36,17 @@ const getBadgeColorFromStatus = (status: InvoiceStatus) => {
 export default function InvoiceList() {
 	const { data: { invoices } = {}, error } = trpc.invoice.list.useQuery({});
 
+	const { data: userBankDetails, error: userBankDetailsError } =
+		trpc.user.getBankDetails.useQuery();
+
 	const utils = trpc.useContext();
 	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
 	const deleteInvoice = trpc.invoice.delete.useMutation();
 
-	if (error) {
+	if (error || userBankDetailsError) {
 		console.error(error);
 		return <div>Error loading</div>;
 	}
-
-	const markInvoiceAs = (id: string, status: InvoiceStatus) => {
-		markInvoiceAsMutation.mutateAsync({ id, status }).then(() => {
-			utils.invoice.list.invalidate();
-			utils.invoice.byId.invalidate({ id });
-		});
-	};
-
-	const getInvoiceStatusActions = (invoice: InvoiceFetchAllOutput) => {
-		const statusActions = [];
-
-		if (invoice.status !== InvoiceStatus.SENT) {
-			statusActions.push({
-				value: "Mark as Sent",
-				type: "button" as const,
-				icon: faEnvelope,
-				onClick: () => {
-					markInvoiceAs(invoice.id, InvoiceStatus.SENT);
-				},
-			});
-		}
-		if (invoice.status !== InvoiceStatus.PAID) {
-			statusActions.push({
-				value: "Mark as Paid",
-				type: "button" as const,
-				icon: faDollarSign,
-				onClick: () => {
-					markInvoiceAs(invoice.id, InvoiceStatus.PAID);
-				},
-			});
-		}
-		if (invoice.status !== InvoiceStatus.CREATED) {
-			statusActions.push({
-				value: "Mark as Created",
-				type: "button" as const,
-				icon: faFile,
-				onClick: () => {
-					markInvoiceAs(invoice.id, InvoiceStatus.CREATED);
-				},
-			});
-		}
-
-		return statusActions;
-	};
 
 	const generateEntity = (invoice?: InvoiceFetchAllOutput): EntityListItem => ({
 		id: invoice?.id ?? "",
@@ -182,16 +144,92 @@ export default function InvoiceList() {
 			: [],
 	});
 
+	if (!invoices || !userBankDetails) {
+		return (
+			<EntityList
+				title="Invoices"
+				route="/invoices"
+				shouldExpand={!!invoices}
+				entities={[generateEntity()]}
+			/>
+		);
+	}
+
+	const userHasIncompleteBankDetails =
+		Object.values(userBankDetails).includes(null);
+
+	const markInvoiceAs = (id: string, status: InvoiceStatus) => {
+		markInvoiceAsMutation.mutateAsync({ id, status }).then(() => {
+			utils.invoice.list.invalidate();
+			utils.invoice.byId.invalidate({ id });
+		});
+	};
+
+	const getInvoiceStatusActions = (invoice: InvoiceFetchAllOutput) => {
+		const statusActions = [];
+
+		if (invoice.status !== InvoiceStatus.SENT) {
+			statusActions.push({
+				value: "Mark as Sent",
+				type: "button" as const,
+				icon: faEnvelope,
+				onClick: () => {
+					markInvoiceAs(invoice.id, InvoiceStatus.SENT);
+				},
+			});
+		}
+		if (invoice.status !== InvoiceStatus.PAID) {
+			statusActions.push({
+				value: "Mark as Paid",
+				type: "button" as const,
+				icon: faDollarSign,
+				onClick: () => {
+					markInvoiceAs(invoice.id, InvoiceStatus.PAID);
+				},
+			});
+		}
+		if (invoice.status !== InvoiceStatus.CREATED) {
+			statusActions.push({
+				value: "Mark as Created",
+				type: "button" as const,
+				icon: faFile,
+				onClick: () => {
+					markInvoiceAs(invoice.id, InvoiceStatus.CREATED);
+				},
+			});
+		}
+
+		return statusActions;
+	};
+
 	return (
-		<EntityList
-			title="Invoices"
-			route="/invoices"
-			shouldExpand={!!invoices}
-			entities={
-				invoices
-					? invoices.map((invoice) => generateEntity(invoice))
-					: [generateEntity()]
-			}
-		/>
+		<>
+			{userHasIncompleteBankDetails && (
+				<div className="m-auto flex w-8/12 items-center justify-center gap-4 rounded-sm border border-yellow-500 bg-yellow-100 p-4 text-slate-800 outline-1">
+					<FontAwesomeIcon
+						icon={faWarning}
+						size="lg"
+						className="text-slate-600"
+					/>
+					<p>
+						These invoices won&#39;t contain payment information until you add
+						bank details to your account.
+						<br />
+						You can do that{" "}
+						<Link href="/account/edit" className="font-bold text-blue-600">
+							here
+						</Link>{" "}
+						or by clicking <b>Manage Account</b> in the dropdown at the top
+						right of the page.
+					</p>
+				</div>
+			)}
+			<EntityList
+				title="Invoices"
+				route="/invoices"
+				shouldExpand={!!invoices}
+				entities={invoices.map((invoice) => generateEntity(invoice))}
+			/>
+		</>
 	);
 }

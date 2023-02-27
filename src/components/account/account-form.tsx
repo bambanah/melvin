@@ -32,9 +32,9 @@ const AccountForm = ({ existingUser }: Props) => {
 		resolver: zodResolver(userSchema),
 		defaultValues: {
 			name: existingUser?.name ?? "",
-			abn: existingUser?.abn || undefined,
+			abn: Number(existingUser?.abn) || undefined,
 			bankName: existingUser?.bankName ?? "",
-			bankNumber: existingUser?.bankNumber || undefined,
+			bankNumber: Number(existingUser?.bankNumber) || undefined,
 			bsb: existingUser?.bsb || undefined,
 		},
 	});
@@ -80,7 +80,7 @@ const AccountForm = ({ existingUser }: Props) => {
 							type="text"
 							register={register}
 							rules={{
-								setValueAs: (v) => (v === "" ? undefined : Number(v)),
+								setValueAs: (v) => (v === "" ? null : Number(v)),
 							}}
 							error={!!errors.abn}
 							placeholder="12345678901"
@@ -109,7 +109,7 @@ const AccountForm = ({ existingUser }: Props) => {
 							type="text"
 							register={register}
 							rules={{
-								setValueAs: (v) => (v === "" ? undefined : Number(v)),
+								setValueAs: (v) => (v === "" ? null : Number(v)),
 							}}
 							error={!!errors.bankNumber}
 							placeholder="123456789"
@@ -123,7 +123,7 @@ const AccountForm = ({ existingUser }: Props) => {
 							type="text"
 							register={register}
 							rules={{
-								setValueAs: (v) => (v === "" ? undefined : Number(v)),
+								setValueAs: (v) => (v === "" ? null : Number(v)),
 							}}
 							error={!!errors.bsb}
 							placeholder="123-456"

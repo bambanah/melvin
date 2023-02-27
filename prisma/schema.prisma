@@ -57,9 +57,9 @@ model User {
   emailVerified DateTime?
   image         String?
 
-  abn        Int?
+  abn        BigInt?
   bankName   String?
-  bankNumber Int?
+  bankNumber BigInt?
   bsb        Int?
 
   account  Account?
