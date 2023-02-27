@@ -126,7 +126,7 @@ export const clientRouter = router({
 				});
 			}
 
-			return { activity: client };
+			return { client };
 		}),
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))

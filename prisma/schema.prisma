@@ -57,7 +57,10 @@ model User {
   emailVerified DateTime?
   image         String?
 
-  paymentDetails PaymentDetails[]
+  abn        Int?
+  bankName   String?
+  bankNumber Int?
+  bsb        Int?
 
   account  Account?
   sessions Session[]
@@ -66,22 +69,6 @@ model User {
   invoices     Invoice[]
   supportItems SupportItem[]
   activities   Activity[]
-}
-
-model PaymentDetails {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  abn        String?
-  bankName   String
-  bankNumber Int
-  bsb        String
-
-  User   User?   @relation(fields: [userId], references: [id])
-  userId String?
-
-  @@index([userId])
 }
 
 model Client {

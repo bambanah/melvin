@@ -2,20 +2,6 @@ import { breakpoints } from "@styles/themes";
 import styled from "styled-components";
 
 export const AuthDropdown = styled.div`
-	position: relative;
-	flex: 0 0 2rem;
-
-	margin-left: 1.5rem;
-
-	display: flex;
-	align-items: flex-end;
-	justify-content: flex-start;
-	flex-direction: column;
-
-	span {
-		margin-right: 0.3rem;
-	}
-
 	&:focus-within {
 		div:last-of-type {
 			display: flex;
