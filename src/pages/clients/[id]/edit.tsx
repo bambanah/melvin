@@ -29,18 +29,20 @@ const EditClient = () => {
 		);
 	}
 
+	if (!client) {
+		return (
+			<Layout>
+				<Loading />
+			</Layout>
+		);
+	}
+
 	return (
 		<Layout>
-			{client ? (
-				<>
-					<Head>
-						<title>Modifying {client.name} - Melvin</title>
-					</Head>
-					<ClientForm existingClient={client} />
-				</>
-			) : (
-				<Loading />
-			)}
+			<Head>
+				<title>{`Modifying ${client.name} - Melvin`}</title>
+			</Head>
+			<ClientForm existingClient={client} />
 		</Layout>
 	);
 };

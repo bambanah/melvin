@@ -67,12 +67,16 @@ export const getHighestInvoiceNo = (
 	return getNumber(highest) ? highest : undefined;
 };
 
-export const getNextInvoiceNo = (previousInvoiceNumbers: string[]): string => {
+export const getNextInvoiceNo = (
+	previousInvoiceNumbers: string[],
+	clientInvoicePrefix?: string | null
+): string => {
 	if (previousInvoiceNumbers.length === 0) return "";
 
 	const latestInvoiceNo = getHighestInvoiceNo(previousInvoiceNumbers);
 
-	const invoicePrefix = latestInvoiceNo?.replace(/\d+$/, "") || "";
+	const invoicePrefix =
+		clientInvoicePrefix || latestInvoiceNo?.replace(/\d+$/, "") || "";
 
 	const matches = latestInvoiceNo?.match(/\d+$/);
 	const numberOfDigits = matches ? matches[0].length : 0;

@@ -3,6 +3,7 @@ import ButtonGroup from "@atoms/button-group";
 import Form from "@atoms/form";
 import Heading from "@atoms/heading";
 import Label from "@atoms/label";
+import Subheading from "@atoms/subheading";
 import ErrorMessage from "@components/forms/error-message";
 import Input from "@components/forms/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,7 +15,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import * as Styles from "./styles";
 
 interface Props {
 	existingClient?: ClientByIdOutput;
@@ -33,6 +33,7 @@ const ClientForm = ({ existingClient }: Props) => {
 		register,
 		handleSubmit,
 		formState: { isDirty, isValid, isSubmitting, errors },
+		watch,
 	} = useForm<ClientSchema>({
 		resolver: zodResolver(clientSchema),
 		defaultValues: {
@@ -63,11 +64,15 @@ const ClientForm = ({ existingClient }: Props) => {
 	};
 
 	return (
-		<Styles.ClientContainer>
+		<div className="mb-8 flex max-w-xl flex-col items-center gap-8 self-center p-6">
 			<Heading>
 				{existingClient ? `Updating ${existingClient.name}` : "Add New Client"}
 			</Heading>
-			<Form onSubmit={handleSubmit(onSubmit)} flexDirection="column">
+			<p className="text-center">
+				All fields except <b>Participant Name</b> can be modified directly on an
+				Invoice.
+			</p>
+			<Form onSubmit={handleSubmit(onSubmit)}>
 				<Label htmlFor="name" required>
 					<span>Participant Name</span>
 					<Input
@@ -89,6 +94,21 @@ const ClientForm = ({ existingClient }: Props) => {
 						placeholder="123456789"
 					/>
 					<ErrorMessage error={errors.number?.message} />
+				</Label>
+				<Label htmlFor="invoiceNumberPrefix">
+					<span>Invoice Prefix</span>
+					<Subheading>
+						Default prefix to use for invoice numbers (
+						{watch("invoiceNumberPrefix") || "Smith-"}XX)
+					</Subheading>
+					<Input
+						name="invoiceNumberPrefix"
+						type="text"
+						register={register}
+						error={!!errors.invoiceNumberPrefix}
+						placeholder="Smith-"
+					/>
+					<ErrorMessage error={errors.invoiceNumberPrefix?.message} />
 				</Label>
 				<Label htmlFor="billTo">
 					<span>Bill To</span>
@@ -115,7 +135,7 @@ const ClientForm = ({ existingClient }: Props) => {
 					</Link>
 				</ButtonGroup>
 			</Form>
-		</Styles.ClientContainer>
+		</div>
 	);
 };
 

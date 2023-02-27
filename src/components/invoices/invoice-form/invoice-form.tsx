@@ -113,7 +113,8 @@ const CreateInvoiceForm: FC<Props> = ({
 						highestInvoiceNo === initialValues?.invoiceNo
 							? highestInvoiceNo ?? ""
 							: getNextInvoiceNo(
-									client.invoices?.map((index) => index.invoiceNo)
+									client.invoices?.map((index) => index.invoiceNo),
+									client.invoiceNumberPrefix
 							  );
 				}
 
@@ -145,7 +146,7 @@ const CreateInvoiceForm: FC<Props> = ({
 		};
 
 		return (
-			<Form onSubmit={handleSubmit} flexDirection="column">
+			<Form onSubmit={handleSubmit}>
 				<Styles.ClientSelect>
 					<Label
 						htmlFor="clientId"

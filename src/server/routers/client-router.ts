@@ -9,6 +9,7 @@ const defaultClientSelect = {
 	name: true,
 	number: true,
 	billTo: true,
+	invoiceNumberPrefix: true,
 	invoices: {
 		select: {
 			invoiceNo: true,

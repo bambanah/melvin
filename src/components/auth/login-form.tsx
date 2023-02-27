@@ -1,10 +1,10 @@
 import Button from "@atoms/button";
+import Form from "@atoms/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { z } from "zod";
-import * as Styles from "./styles";
 
 const StyledInput = styled.input`
 	color: ${({ theme }) => theme.colors.fg};
@@ -35,12 +35,12 @@ const LoginForm = () => {
 	};
 
 	return (
-		<Styles.Form onSubmit={handleSubmit(onSubmit)}>
+		<Form onSubmit={handleSubmit(onSubmit)}>
 			<StyledInput placeholder="Email Address" {...register("email")} />
 			<Button type="submit" variant="primary">
 				Continue
 			</Button>
-		</Styles.Form>
+		</Form>
 	);
 };
 

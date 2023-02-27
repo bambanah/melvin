@@ -39,6 +39,14 @@ model Session {
   @@index([userId])
 }
 
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String?  @unique
@@ -49,6 +57,8 @@ model User {
   emailVerified DateTime?
   image         String?
 
+  paymentDetails PaymentDetails[]
+
   account  Account?
   sessions Session[]
 
@@ -58,12 +68,20 @@ model User {
   activities   Activity[]
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+model PaymentDetails {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@unique([identifier, token])
+  abn        String?
+  bankName   String
+  bankNumber Int
+  bsb        String
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  @@index([userId])
 }
 
 model Client {
@@ -71,9 +89,10 @@ model Client {
   createdAt DateTime @default(now()) @map("created")
   updatedAt DateTime @default(now()) @updatedAt
 
-  number String?
-  name   String
-  billTo String?
+  number              String?
+  name                String
+  billTo              String?
+  invoiceNumberPrefix String?
 
   invoices   Invoice[]
   activities Activity[]
