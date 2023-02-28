@@ -17,7 +17,6 @@ const Button: React.FC<Props> = ({
 	variant,
 	children,
 	disabled,
-	onClick,
 	className,
 	...rest
 }) => {
@@ -48,7 +47,7 @@ const Button: React.FC<Props> = ({
 	return (
 		<ButtonComponent
 			className={`${disabled ? "disabled" : ""} ${className}`}
-			onClick={disabled ? undefined : onClick}
+			disabled={disabled}
 			{...rest}
 		>
 			{children}

@@ -90,8 +90,15 @@ const CreateInvoiceForm: FC<Props> = ({
 			: "Creating new invoice";
 
 	const BaseForm = (props: FormikProps<FormValues>) => {
-		const { values, touched, errors, handleChange, handleBlur, handleSubmit } =
-			props;
+		const {
+			values,
+			touched,
+			errors,
+			handleChange,
+			handleBlur,
+			handleSubmit,
+			dirty,
+		} = props;
 
 		const [invoiceNoConfirmed, confirmInvoiceNo] = useState(!!initialValues);
 		const [billToSource, setBillToSource] = useState<
@@ -403,7 +410,7 @@ const CreateInvoiceForm: FC<Props> = ({
 							<ButtonGroup>
 								<Button
 									type="submit"
-									disabled={!values.clientId}
+									disabled={!values.clientId || !dirty}
 									variant="primary"
 								>
 									{router.query.edit ? "Update" : "Create"}
