@@ -19,28 +19,29 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
       - uses: actions/setup-node@v3
         with:
           node-version: "16"
-          cache: "yarn"
-          cache-dependency-path: yarn.lock
-
+          cache: "pnpm"
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install
 
       - name: Install Playwright browsers
         run: npx playwright install
 
       - name: Spin up database docker
-        run: yarn db:up
+        run: pnpm db:up
 
       - name: Sleep for 15 seconds
         uses: jakejarvis/wait-action@master
         with:
-          time: '15s'
+          time: "15s"
 
       - name: Initialise database
-        run: yarn prisma:dev
+        run: pnpm prisma:dev
 
       - name: Run tests
-        run: yarn test:e2e
+        run: pnpm test:e2e

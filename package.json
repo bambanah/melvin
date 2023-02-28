@@ -2,6 +2,7 @@
 	"name": "melvin",
 	"private": true,
 	"scripts": {
+		"preinstall": "npx only-allow pnpm",
 		"prepare": "husky install",
 		"build:1-generate": "prisma generate",
 		"build:2-build": "next build",
@@ -25,11 +26,10 @@
 		"test:e2e": "playwright test",
 		"test": "run-s test:*",
 		"pw:codegen": "playwright codegen http://localhost:3000 --load-storage=e2e/setup/storage-state.json",
-		"ts-node": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\"",
 		"postinstall": "prisma generate"
 	},
 	"prisma": {
-		"seed": "yarn ts-node prisma/seed.ts"
+		"seed": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" prisma/seed.ts"
 	},
 	"browserslist": {
 		"production": [
@@ -97,6 +97,7 @@
 		"@testing-library/react": "^13.4.0",
 		"@types/eslint": "^8.21.0",
 		"@types/file-saver": "^2.0.5",
+		"@types/jest": "^29.4.0",
 		"@types/node": "^18.13.0",
 		"@types/react": "^18.0.25",
 		"@types/react-datepicker": "^4.8.0",
