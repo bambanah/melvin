@@ -1,11 +1,9 @@
 import Loading from "@atoms/loading";
 import { trpc } from "@utils/trpc";
 import { FC } from "react";
-import { Document as MyDocument, Page, pdfjs } from "react-pdf";
+import { Document as MyDocument, Page } from "react-pdf";
 import { SizeMe } from "react-sizeme";
 import * as Styles from "./styles";
-
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 interface PdfProps {
 	invoiceId: string;

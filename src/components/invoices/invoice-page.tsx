@@ -5,7 +5,6 @@ import { invoiceToValues } from "@utils/helpers";
 import { trpc } from "@utils/trpc";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import * as Styles from "./styles";
 
 const InvoicePage = () => {
 	const router = useRouter();
@@ -23,15 +22,17 @@ const InvoicePage = () => {
 	}
 	if (!invoice) return <Loading />;
 
-	return editing ? (
-		<Styles.Container>
-			<CreateInvoiceForm initialValues={invoiceToValues(invoice)} />
-		</Styles.Container>
-	) : (
-		<Styles.Container>
-			<p>This is a single invoice {invoice.invoiceNo}</p>
-			<Button onClick={() => setEditing(true)}>Edit</Button>
-		</Styles.Container>
+	return (
+		<div className="flex flex-col gap-4">
+			{editing ? (
+				<CreateInvoiceForm initialValues={invoiceToValues(invoice)} />
+			) : (
+				<>
+					<p>This is a single invoice {invoice.invoiceNo}</p>
+					<Button onClick={() => setEditing(true)}>Edit</Button>
+				</>
+			)}
+		</div>
 	);
 };
 
