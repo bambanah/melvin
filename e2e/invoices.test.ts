@@ -66,8 +66,9 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 		page.getByRole("listitem").filter({ hasText: invoice.invoiceNo })
 	).toHaveCount(1);
 
-	await page.getByRole("button").nth(2).click();
+	await page.getByRole("button").nth(3).click();
 	await page.getByRole("link", { name: "Edit" }).click();
+	await page.waitForTimeout(1000); // TODO: Remove after migration to RHF
 	await page.locator("#invoiceNo").fill(newRandomInvoice.invoiceNo);
 	await page.getByRole("button", { name: "Update" }).click();
 	await page
@@ -76,12 +77,11 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 		.isVisible();
 	await expect(page).toHaveURL("/invoices");
 
-	// FIXME: Why is this so flaky? Is Formik really that shit??
 	await expect(
 		page.getByRole("listitem").filter({ hasText: newRandomInvoice.invoiceNo })
 	).toHaveCount(1);
 
-	await page.getByRole("button").nth(2).click();
+	await page.getByRole("button").nth(3).click();
 	page.once("dialog", (dialog) => dialog.accept());
 	await page.getByText("Delete").click();
 	await page
