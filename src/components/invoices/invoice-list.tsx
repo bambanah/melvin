@@ -205,22 +205,18 @@ export default function InvoiceList() {
 	return (
 		<>
 			{userHasIncompleteBankDetails && (
-				<div className="m-auto flex w-8/12 items-center justify-center gap-4 rounded-sm border border-yellow-500 bg-yellow-100 p-4 text-slate-800 outline-1">
+				<div className="mb-8 flex w-full items-center justify-center gap-4 rounded-sm border border-yellow-500 bg-yellow-100 p-4 text-slate-800 outline-1 sm:w-auto md:mx-12 md:max-w-4xl lg:m-auto lg:mb-8">
 					<FontAwesomeIcon
 						icon={faWarning}
 						size="lg"
 						className="text-slate-600"
 					/>
 					<p>
-						These invoices won&#39;t contain payment information until you add
-						bank details to your account.
-						<br />
-						You can do that{" "}
+						Invoices won&#39;t contain payment information until you{" "}
 						<Link href="/account/edit" className="font-bold text-blue-600">
-							here
+							add bank details
 						</Link>{" "}
-						or by clicking <b>Manage Account</b> in the dropdown at the top
-						right of the page.
+						to your account.
 					</p>
 				</div>
 			)}
