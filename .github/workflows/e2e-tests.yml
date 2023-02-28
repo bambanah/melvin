@@ -41,7 +41,7 @@ jobs:
           time: "15s"
 
       - name: Initialise database
-        run: pnpm prisma:dev
+        run: pnpm prisma:migrate
 
       - name: Run tests
         run: pnpm test:e2e
