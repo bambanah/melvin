@@ -90,13 +90,28 @@ const CreateInvoiceForm: FC<Props> = ({
 			: "Creating new invoice";
 
 	const BaseForm = (props: FormikProps<FormValues>) => {
-		const { values, touched, errors, handleChange, handleBlur, handleSubmit } =
-			props;
+		const {
+			values,
+			touched,
+			errors,
+			handleChange,
+			handleBlur,
+			handleSubmit,
+			dirty,
+		} = props;
 
 		const [invoiceNoConfirmed, confirmInvoiceNo] = useState(!!initialValues);
 		const [billToSource, setBillToSource] = useState<
 			"previous invoice" | "client information" | ""
 		>();
+
+		const getPreviousInvoiceNo = () => {
+			const client = clients.find((c) => c.id === values.clientId);
+
+			return client?.invoices?.length
+				? getHighestInvoiceNo(client?.invoices?.map((index) => index.invoiceNo))
+				: "";
+		};
 
 		useEffect(() => {
 			if (values.clientId) {
@@ -113,7 +128,8 @@ const CreateInvoiceForm: FC<Props> = ({
 						highestInvoiceNo === initialValues?.invoiceNo
 							? highestInvoiceNo ?? ""
 							: getNextInvoiceNo(
-									client.invoices?.map((index) => index.invoiceNo)
+									client.invoices?.map((index) => index.invoiceNo),
+									client.invoiceNumberPrefix
 							  );
 				}
 
@@ -136,16 +152,8 @@ const CreateInvoiceForm: FC<Props> = ({
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [values.clientId]);
 
-		const getPreviousInvoiceNo = () => {
-			const client = clients.find((c) => c.id === values.clientId);
-
-			return client?.invoices?.length
-				? getHighestInvoiceNo(client?.invoices?.map((index) => index.invoiceNo))
-				: "";
-		};
-
 		return (
-			<Form onSubmit={handleSubmit} flexDirection="column">
+			<Form onSubmit={handleSubmit}>
 				<Styles.ClientSelect>
 					<Label
 						htmlFor="clientId"
@@ -397,11 +405,12 @@ const CreateInvoiceForm: FC<Props> = ({
 								</Styles.ActivityContainer>
 							)}
 						/>
+
 						{values.activities.length > 0 && (
 							<ButtonGroup>
 								<Button
 									type="submit"
-									disabled={!values.clientId}
+									disabled={!values.clientId || !dirty}
 									variant="primary"
 								>
 									{router.query.edit ? "Update" : "Create"}

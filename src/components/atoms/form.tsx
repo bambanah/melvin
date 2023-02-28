@@ -1,15 +1,21 @@
-import styled from "styled-components";
+import classNames from "classnames";
+import { HTMLProps } from "react";
 
-interface Props {
-	flexDirection?: "row" | "column";
+interface Props extends HTMLProps<HTMLFormElement> {
+	className?: string;
+	flex?: "row" | "col";
 }
 
-const Form = styled.form<Props>`
-	display: flex;
-	flex-wrap: wrap;
-	flex-direction: ${({ flexDirection }) => flexDirection || "row"};
-	align-items: stretch;
-	gap: 1.5rem;
-`;
+const Form = ({ className, flex = "col", children, ...rest }: Props) => (
+	<form
+		className={
+			className ??
+			classNames([`flex flex-wrap items-stretch gap-6 flex-${flex} w-full`])
+		}
+		{...rest}
+	>
+		{children}
+	</form>
+);
 
 export default Form;

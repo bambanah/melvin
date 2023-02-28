@@ -46,6 +46,7 @@ export const Header = styled.header`
 
 export const Content = styled.div`
 	box-sizing: border-box;
+	width: 100%;
 
 	display: flex;
 	align-items: center;
@@ -67,27 +68,6 @@ export const Content = styled.div`
 
 		&.expanded {
 			display: flex;
-		}
-	}
-`;
-
-export const Links = styled.div`
-	display: flex;
-	gap: 0.5em;
-	flex: 1 0 auto;
-	align-items: center;
-	justify-content: flex-end;
-
-	@media ${breakpoints.tablet} {
-		padding-top: 3rem;
-		gap: 3rem;
-		width: 100%;
-		flex-direction: column;
-		justify-content: flex-start;
-		font-size: 2rem;
-
-		a {
-			padding: 1.2rem;
 		}
 	}
 `;

@@ -1,6 +1,6 @@
 import Button from "@atoms/button";
 import ButtonGroup from "@atoms/button-group";
-import Heading from "@atoms/heading";
+import Form from "@atoms/form";
 import Label from "@atoms/label";
 import ClientSelect from "@components/forms/client-select";
 import ErrorMessage from "@components/forms/error-message";
@@ -14,7 +14,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import * as Styles from "./activity-form.styles";
 
 import TimeInput from "@components/forms/time-input";
 import dayjs from "dayjs";
@@ -23,6 +22,10 @@ dayjs.extend(require("dayjs/plugin/customParseFormat"));
 interface Props {
 	existingActivity?: ActivityByIdOutput;
 }
+
+const InputRow = ({ children }: { children: React.ReactNode }) => (
+	<div className="flex w-full max-w-full content-center gap-4">{children}</div>
+);
 
 const CreateActivityForm = ({ existingActivity }: Props) => {
 	const router = useRouter();
@@ -62,12 +65,12 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 	};
 
 	return (
-		<Styles.CreateActivityContainer>
-			<Heading>
+		<div className="flex flex-col items-center gap-12 self-center px-12">
+			<h2 className="m-0 flex-shrink flex-grow-0 basis-full text-2xl font-bold">
 				{existingActivity ? `Updating Activity` : "Create New Activity"}
-			</Heading>
-			<Styles.Form onSubmit={handleSubmit(onSubmit)} flexDirection="column">
-				<Styles.InputRow>
+			</h2>
+			<Form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl gap-12">
+				<InputRow>
 					<Label
 						htmlFor="clientId"
 						className="shrink-0 grow-0 basis-1/2"
@@ -86,9 +89,9 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 						<SupportItemSelect name="supportItemId" control={control} />
 						<ErrorMessage error={errors.supportItemId?.message} />
 					</Label>
-				</Styles.InputRow>
+				</InputRow>
 
-				<Styles.InputRow>
+				<InputRow>
 					<Label
 						htmlFor="description"
 						className="shrink-1 grow-1 basis-1/3"
@@ -130,7 +133,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 						/>
 						<ErrorMessage error={errors.endTime?.message} />
 					</Label>
-				</Styles.InputRow>
+				</InputRow>
 
 				<ButtonGroup>
 					<Button
@@ -142,8 +145,8 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					</Button>
 					<Link href="/activities">Cancel</Link>
 				</ButtonGroup>
-			</Styles.Form>
-		</Styles.CreateActivityContainer>
+			</Form>
+		</div>
 	);
 };
 

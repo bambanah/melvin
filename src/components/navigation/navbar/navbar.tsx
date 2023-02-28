@@ -4,7 +4,6 @@ import NavAuth from "@components/auth/nav-auth";
 import NavLink from "@components/navigation/nav-link";
 import { faBars, faX } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
@@ -23,16 +22,14 @@ const Navbar = () => {
 				<FontAwesomeIcon icon={isExpanded ? faX : faBars} />
 			</Button>
 			<Styles.Content className={isExpanded ? "expanded" : ""}>
-				<Styles.Links className={`nav-links`}>
+				<div className="flex h-full w-full flex-col gap-1 pt-12 text-2xl md:mt-2 md:flex-row md:content-end md:items-end md:gap-3 md:p-0 md:text-base">
 					<NavLink href="/activities">Activities</NavLink>
 					<NavLink href="/invoices">Invoices</NavLink>
 					<NavLink href="/support-items">Support Items</NavLink>
 					<NavLink href="/clients">Clients</NavLink>
-				</Styles.Links>
+				</div>
 
-				<Styles.Right>
-					<NavAuth user={session.data?.user as User} />
-				</Styles.Right>
+				<NavAuth user={session.data?.user} />
 			</Styles.Content>
 		</Styles.Header>
 	);

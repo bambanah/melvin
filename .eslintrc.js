@@ -33,6 +33,7 @@ module.exports = {
 		"jsx-a11y/anchor-is-valid": "off",
 		"jsx-a11y/no-static-element-interactions": "off",
 		"jsx-a11y/click-events-have-key-events": "off",
+		"unicorn/no-null": "off",
 		"unicorn/prefer-module": "off",
 		"unicorn/no-array-reduce": "off",
 		"unicorn/prefer-top-level-await": "off",

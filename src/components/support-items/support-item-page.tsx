@@ -4,7 +4,6 @@ import { trpc } from "@utils/trpc";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import * as Styles from "./styles";
 
 const SupportItemPage = () => {
 	const router = useRouter();
@@ -22,11 +21,11 @@ const SupportItemPage = () => {
 	const rateType = supportItem.rateType === RateType.HOUR ? "hr" : "km";
 
 	return (
-		<Styles.Container>
+		<div className="flex flex-col content-center items-center">
 			<Head>
 				<title>{supportItem.description} - Melvin</title>
 			</Head>
-			<Styles.Content>
+			<div className="flex flex-col content-center items-center px-12">
 				<Link href="/support-items">&lt; Back to Support Items</Link>
 				<h1>{supportItem.description}</h1>
 				<Link href={`/support-items/${supportItem.id}/edit`}>Edit</Link>
@@ -54,8 +53,8 @@ const SupportItemPage = () => {
 						? `\$${supportItem.sundayRate}/${rateType}`
 						: "N/A"}
 				</p>
-			</Styles.Content>
-		</Styles.Container>
+			</div>
+		</div>
 	);
 };
 

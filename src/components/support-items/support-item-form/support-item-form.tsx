@@ -87,7 +87,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 					? `Updating ${existingSupportItem.description}`
 					: "Create New Support Item"}
 			</Heading>
-			<Form onSubmit={handleSubmit(onSubmit)} flexDirection="column">
+			<Form onSubmit={handleSubmit(onSubmit)}>
 				<Styles.InputGroup>
 					<Styles.Heading>General</Styles.Heading>
 					<Styles.InputRow>
