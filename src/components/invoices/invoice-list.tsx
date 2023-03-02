@@ -205,7 +205,7 @@ export default function InvoiceList() {
 	return (
 		<>
 			{userHasIncompleteBankDetails && (
-				<div className="mb-8 flex w-full items-center justify-center gap-4 rounded-sm border border-yellow-500 bg-yellow-100 p-4 text-slate-800 outline-1 sm:w-auto md:mx-12 md:max-w-4xl lg:m-auto lg:mb-8">
+				<div className="mb-8 flex w-full items-center justify-center gap-4 rounded-sm border border-yellow-500 bg-yellow-100 p-4 text-slate-800 outline-1 sm:w-auto md:mx-12 md:max-w-4xl lg:mx-auto lg:mb-6">
 					<FontAwesomeIcon
 						icon={faWarning}
 						size="lg"
