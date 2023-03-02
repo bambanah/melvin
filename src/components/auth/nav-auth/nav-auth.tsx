@@ -1,4 +1,8 @@
-import { faCaretDown, faUserCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+	faCaretDown,
+	faExternalLink,
+	faUserCircle,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Menu, Transition } from "@headlessui/react";
 import classNames from "classnames";
@@ -37,13 +41,16 @@ const NavAuth = ({ user }: NavAuthProps) => {
 				<Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-300 bg-slate-50 p-2 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 					<div className="flex flex-col">
 						<Menu.Item>
-							<Link href="/account" className="w-full p-2 text-gray-900">
+							<Link
+								href="/account"
+								className="w-full overflow-clip text-ellipsis p-2 text-gray-900"
+							>
 								<p className="text-sm">Signed in as</p>
 								{user && <span className="font-semibold">{user.email}</span>}
 							</Link>
 						</Menu.Item>
 					</div>
-					<div className="flex flex-col gap-1 py-2">
+					<div className="flex flex-col gap-2 py-4">
 						<Menu.Item>
 							{({ active }) => (
 								<Link
@@ -61,17 +68,20 @@ const NavAuth = ({ user }: NavAuthProps) => {
 							{({ active }) => (
 								<a
 									href="/price-guide-3-21.pdf"
+									target="_blank"
 									className={classNames([
 										sharedItemClass,
 										active && activeItemClass,
+										"gap-1",
 									])}
 								>
 									Price Guide
+									<FontAwesomeIcon icon={faExternalLink} size="xs" />
 								</a>
 							)}
 						</Menu.Item>
 					</div>
-					<div className="flex flex-col gap-1 pt-2">
+					<div className="flex flex-col gap-1 pt-4">
 						<Menu.Item>
 							{({ active }) => (
 								<button
