@@ -1,4 +1,4 @@
-import { RateType } from ".prisma/client";
+import { RateType } from "@prisma/client";
 import Button from "@atoms/button";
 import ButtonGroup from "@atoms/button-group";
 import Form from "@atoms/form";
