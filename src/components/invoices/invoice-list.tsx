@@ -38,7 +38,7 @@ export default function InvoiceList() {
 	}
 
 	return (
-		<div className="flex flex-col gap-4">
+		<div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
 			<Heading className="medium pl-4">Invoices</Heading>
 
 			<div className="flex w-full">
@@ -69,15 +69,15 @@ export default function InvoiceList() {
 					<Link key={idx} href={`/invoices/${invoice.id}`}>
 						<div className="flex justify-between py-4 px-4 text-sm text-zinc-900">
 							<div className="flex flex-col gap-2">
-								<span className="font-medium">
+								<span className="font-medium sm:text-lg">
 									{invoice.invoiceNo}: {invoice.client.name}
 								</span>
-								<span className="text-sm">
+								<span className="text-sm sm:text-base">
 									{dayjs(invoice.date).format("DD MMM.")}
 								</span>
 							</div>
 							<div className="flex basis-10 flex-col gap-2 text-right">
-								<span>
+								<span className="sm:text-lg">
 									{getTotalCost(invoice.activities).toLocaleString(undefined, {
 										style: "currency",
 										currency: "AUD",
