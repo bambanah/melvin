@@ -1,5 +1,4 @@
 import Badge from "@atoms/badge";
-import Button from "@atoms/button";
 import Heading from "@atoms/heading";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -41,13 +40,13 @@ export default function InvoiceList() {
 	}
 
 	return (
-		<div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
-			<div className="flex items-center justify-between p-4">
+		<div className="mx-auto flex w-full max-w-4xl flex-col gap-2">
+			<div className="flex items-center justify-between px-4 py-2">
 				<Heading className="">Invoices</Heading>
 
 				<Link
 					href={`/invoices/create`}
-					className="fixed bottom-6 right-6 flex h-12 w-12 items-center justify-center rounded-md bg-indigo-700 text-2xl leading-none text-zinc-50 md:relative md:inset-0 md:h-10 md:w-28 md:gap-2 md:text-base hover:md:bg-indigo-600"
+					className="fixed bottom-32 right-6 flex h-12 w-12 items-center justify-center rounded-md bg-indigo-700 text-2xl leading-none text-zinc-50 md:relative md:inset-0 md:h-10 md:w-28 md:gap-2 md:text-base hover:md:bg-indigo-600"
 				>
 					<FontAwesomeIcon icon={faPlus} />{" "}
 					<span className="hidden md:inline"> Add New</span>
