@@ -1,5 +1,8 @@
 import Badge from "@atoms/badge";
+import Button from "@atoms/button";
 import Heading from "@atoms/heading";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { InvoiceStatus } from "@prisma/client";
 import { getTotalCost } from "@utils/helpers";
 import { trpc } from "@utils/trpc";
@@ -39,7 +42,17 @@ export default function InvoiceList() {
 
 	return (
 		<div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
-			<Heading className="medium pl-4">Invoices</Heading>
+			<div className="flex items-center justify-between p-4">
+				<Heading className="">Invoices</Heading>
+
+				<Link
+					href={`/invoices/create`}
+					className="fixed bottom-6 right-6 flex h-12 w-12 items-center justify-center rounded-md bg-indigo-700 text-2xl leading-none text-zinc-50 md:relative md:inset-0 md:h-10 md:w-28 md:gap-2 md:text-base hover:md:bg-indigo-600"
+				>
+					<FontAwesomeIcon icon={faPlus} />{" "}
+					<span className="hidden md:inline"> Add New</span>
+				</Link>
+			</div>
 
 			<div className="flex w-full">
 				<button
@@ -67,7 +80,7 @@ export default function InvoiceList() {
 			<div className="flex flex-col divide-y">
 				{invoices.map((invoice, idx) => (
 					<Link key={idx} href={`/invoices/${invoice.id}`}>
-						<div className="flex justify-between py-4 px-4 text-sm text-zinc-900">
+						<div className="flex justify-between py-4 px-4 text-sm text-zinc-900 hover:bg-zinc-100">
 							<div className="flex flex-col gap-2">
 								<span className="font-medium sm:text-lg">
 									{invoice.invoiceNo}: {invoice.client.name}
