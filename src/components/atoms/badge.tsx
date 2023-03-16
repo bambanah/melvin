@@ -19,7 +19,7 @@ const Badge = ({ children, variant = "DEFAULT" }: Props) => {
 	return (
 		<div
 			className={classNames(
-				"bg-b rounded-[5px] py-0.5 px-1 text-[11px] font-bold",
+				"bg-b rounded-[5px] py-0.5 px-1 text-center text-[11px] font-bold",
 				variantStyles[variant]
 			)}
 		>

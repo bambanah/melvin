@@ -36,10 +36,14 @@ const defaultInvoiceCreate = z.object({
 
 export const invoiceRouter = router({
 	list: authedProcedure
-		.input(baseListQueryInput)
+		.input(
+			baseListQueryInput.extend({
+				status: z.nativeEnum(InvoiceStatus).array().optional(),
+			})
+		)
 		.query(async ({ ctx, input }) => {
 			const limit = input.limit ?? 50;
-			const { cursor } = input;
+			const { cursor, status } = input;
 
 			const invoices = await ctx.prisma.invoice.findMany({
 				select: {
@@ -51,6 +55,7 @@ export const invoiceRouter = router({
 				take: limit + 1,
 				where: {
 					ownerId: ctx.session.user.id,
+					status: { in: status },
 				},
 				cursor: cursor ? { id: cursor } : undefined,
 				orderBy: [
