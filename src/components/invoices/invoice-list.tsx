@@ -1,13 +1,11 @@
 import Badge from "@atoms/badge";
-import Heading from "@atoms/heading";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Loading from "@atoms/loading";
+import ListPage from "@components/shared/list-page";
 import { InvoiceStatus } from "@prisma/client";
 import { getTotalCost } from "@utils/helpers";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import dayjs from "dayjs";
-import Link from "next/link";
 import { useState } from "react";
 
 const getBadgeColorFromStatus = (status: InvoiceStatus) => {
@@ -35,24 +33,8 @@ export default function InvoiceList() {
 		return <div>Error loading</div>;
 	}
 
-	if (!invoices) {
-		return <div>Loading</div>;
-	}
-
 	return (
-		<div className="mx-auto flex w-full max-w-4xl flex-col gap-2">
-			<div className="flex items-center justify-between px-4 py-2">
-				<Heading className="">Invoices</Heading>
-
-				<Link
-					href={`/invoices/create`}
-					className="fixed bottom-32 right-6 flex h-12 w-12 items-center justify-center rounded-md bg-indigo-700 text-2xl leading-none text-zinc-50 md:relative md:inset-0 md:h-10 md:w-28 md:gap-2 md:text-base hover:md:bg-indigo-600"
-				>
-					<FontAwesomeIcon icon={faPlus} />{" "}
-					<span className="hidden md:inline"> Add New</span>
-				</Link>
-			</div>
-
+		<ListPage title="Invoices" createHref="/invoices/create">
 			<div className="flex w-full">
 				{(["UNPAID", "PAID"] as const).map((status) => (
 					<button
@@ -68,11 +50,10 @@ export default function InvoiceList() {
 					</button>
 				))}
 			</div>
-
-			<div className="flex flex-col divide-y">
-				{invoices.map((invoice, idx) => (
-					<Link key={idx} href={`/invoices/${invoice.id}`}>
-						<div className="flex justify-between py-4 px-4 text-sm text-zinc-900 hover:bg-zinc-100">
+			<ListPage.Items>
+				{invoices ? (
+					invoices.map((invoice) => (
+						<ListPage.Item key={invoice.id} href={`/invoices/${invoice.id}`}>
 							<div className="flex flex-col gap-2">
 								<span className="font-medium sm:text-lg">
 									{invoice.invoiceNo}: {invoice.client.name}
@@ -92,10 +73,12 @@ export default function InvoiceList() {
 									{invoice.status}
 								</Badge>
 							</div>
-						</div>
-					</Link>
-				))}
-			</div>
-		</div>
+						</ListPage.Item>
+					))
+				) : (
+					<Loading />
+				)}
+			</ListPage.Items>
+		</ListPage>
 	);
 }

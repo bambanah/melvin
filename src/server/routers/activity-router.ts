@@ -15,22 +15,43 @@ const defaultActivitySelect = {
 	client: true,
 };
 
-export const activityRouter = router({
-	list: authedProcedure.query(async ({ ctx }) => {
-		const activities = await ctx.prisma.activity.findMany({
-			select: defaultActivitySelect,
-			where: {
-				ownerId: ctx.session.user.id,
-			},
-			orderBy: {
-				createdAt: "desc",
-			},
-		});
+function getInvoiceIdWhereCondition(invoiceIdAssigned?: boolean) {
+	if (invoiceIdAssigned === undefined) return;
 
-		return {
-			activities,
-		};
-	}),
+	return invoiceIdAssigned ? { not: null } : { equals: null };
+}
+
+export const activityRouter = router({
+	list: authedProcedure
+		.input(z.object({ assigned: z.boolean().optional() }))
+		.query(async ({ ctx, input }) => {
+			const { assigned } = input;
+
+			const activities = await ctx.prisma.activity.findMany({
+				select: {
+					...defaultActivitySelect,
+					invoice: {
+						select: { id: true, invoiceNo: true },
+					},
+				},
+				where: {
+					ownerId: ctx.session.user.id,
+					invoiceId: getInvoiceIdWhereCondition(assigned),
+				},
+				orderBy: [
+					{
+						date: "asc",
+					},
+					{
+						startTime: "asc",
+					},
+				],
+			});
+
+			return {
+				activities,
+			};
+		}),
 	byId: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
