@@ -5,13 +5,13 @@ import Link from "next/link";
 import React, { ReactNode } from "react";
 
 const Items = ({ children }: { children: ReactNode }) => {
-	return <div className="flex flex-col divide-y bg-neutral-50">{children}</div>;
+	return <div className="flex flex-col divide-y">{children}</div>;
 };
 
 const Item = ({ children, href }: { children: ReactNode; href: string }) => (
 	<Link
 		href={href}
-		className="flex w-full justify-between gap-4 bg-neutral-50 p-4 text-sm text-zinc-900 hover:bg-zinc-100"
+		className="flex w-full justify-between gap-4 p-4 text-sm text-zinc-900 hover:bg-zinc-100"
 	>
 		{children}
 	</Link>
@@ -25,8 +25,8 @@ interface PageComponentProps {
 }
 const PageComponent = ({ title, createHref, children }: PageComponentProps) => {
 	return (
-		<div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col bg-neutral-100 pb-32">
-			<div className="flex items-center justify-between bg-neutral-50 px-4 py-2 ">
+		<div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col pb-32">
+			<div className="flex items-center justify-between  px-4 py-2 ">
 				<Heading>{title}</Heading>
 
 				{createHref && (

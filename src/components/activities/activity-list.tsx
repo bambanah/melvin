@@ -45,7 +45,7 @@ function ActivityList() {
 
 	return (
 		<ListPage title="Activities" createHref="/activities/create">
-			<div className="mb-4 flex w-full bg-neutral-50">
+			<div className="mb-4 flex w-full">
 				{[false, true].map((status, idx) => (
 					<button
 						key={idx}
@@ -65,7 +65,7 @@ function ActivityList() {
 				Object.keys(groupedActivities).map((group) => (
 					<div key={group} className="mb-4">
 						<button
-							className="w-full cursor-pointer border-b bg-neutral-50 px-4 py-2 text-left text-lg"
+							className="w-full cursor-pointer border-b px-4 py-2 text-left text-lg"
 							type="button"
 							onClick={() => toggleGroupHidden(group)}
 						>
