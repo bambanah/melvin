@@ -305,3 +305,18 @@ export const errorIn = (
 	touched: FormikTouched<unknown>,
 	value: string
 ): boolean => getIn(errors, value) !== undefined && getIn(touched, value);
+
+export function groupBy<T>(arr: T[], keyGetter: (item: T) => string) {
+	const groupedObj: { [key: string]: T[] } = {};
+
+	for (const item of arr) {
+		const key = keyGetter(item);
+		const arr = (groupedObj[key] || []) as T[];
+
+		arr.push(item);
+
+		groupedObj[key] = arr;
+	}
+
+	return groupedObj;
+}

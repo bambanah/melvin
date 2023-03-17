@@ -5,9 +5,27 @@ import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { groupBy } from "@utils/helpers";
+import { ActivityFetchAllOutput } from "@server/routers/activity-router";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
 function ActivityList() {
 	const [assignedFilter, setAssignedFilter] = useState<boolean>(false);
+	const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+		new Set()
+	);
+
+	const toggleGroupHidden = (group: string) => {
+		const newSet = new Set(collapsedGroups);
+		if (collapsedGroups.has(group)) {
+			newSet.delete(group);
+		} else {
+			newSet.add(group);
+		}
+
+		setCollapsedGroups(newSet);
+	};
 
 	const { data: { activities } = {}, error } = trpc.activity.list.useQuery({
 		assigned: assignedFilter,
@@ -18,9 +36,16 @@ function ActivityList() {
 		return <div>Error loading</div>;
 	}
 
+	const groupedActivities: { [key: string]: ActivityFetchAllOutput[] } =
+		activities
+			? groupBy(activities, (activity) =>
+					dayjs(activity.date).format("dddd DD MMM.")
+			  )
+			: {};
+
 	return (
 		<ListPage title="Activities" createHref="/activities/create">
-			<div className="flex w-full">
+			<div className="mb-4 flex w-full bg-neutral-50">
 				{[false, true].map((status, idx) => (
 					<button
 						key={idx}
@@ -35,38 +60,66 @@ function ActivityList() {
 					</button>
 				))}
 			</div>
-			<ListPage.Items>
-				{activities ? (
-					activities.map((activity) => (
-						<ListPage.Item
-							href={`/activities/${activity.id}`}
-							key={activity.id}
+
+			{Object.keys(groupedActivities).length > 0 ? (
+				Object.keys(groupedActivities).map((group) => (
+					<div key={group} className="mb-4">
+						<button
+							className="w-full cursor-pointer border-b bg-neutral-50 px-4 py-2 text-left text-lg"
+							type="button"
+							onClick={() => toggleGroupHidden(group)}
 						>
-							<div className="flex flex-col gap-2 overflow-hidden">
-								<span className="font-semibold">{activity.client?.name}</span>
-								<p className="truncate">{activity.supportItem.description}</p>
-								<p>
-									{dayjs(activity.startTime).format("h:mma")}-
-									{dayjs(activity.endTime).format("h:mma")} (
-									{round(getDuration(activity.startTime, activity.endTime), 1)}
-									h)
-								</p>
-							</div>
-							<div className="flex flex-col items-end justify-between gap-2">
-								<span className="font-semibold">
-									{getTotalCost([activity]).toLocaleString(undefined, {
-										style: "currency",
-										currency: "AUD",
-									})}
-								</span>
-								<span>${Number(activity.supportItem.weekdayRate)}/hr</span>
-							</div>
-						</ListPage.Item>
-					))
-				) : (
-					<Loading />
-				)}
-			</ListPage.Items>
+							<FontAwesomeIcon
+								icon={faChevronDown}
+								className={classNames([
+									collapsedGroups.has(group) ? "-rotate-90" : "",
+									"mr-2 transition-transform",
+								])}
+							/>{" "}
+							{group}
+						</button>
+						{!collapsedGroups.has(group) && (
+							<ListPage.Items>
+								{groupedActivities[group].map((activity) => (
+									<ListPage.Item
+										href={`/activities/${activity.id}`}
+										key={activity.id}
+									>
+										<div className="flex flex-col gap-2 overflow-hidden">
+											<span className="font-semibold">
+												{activity.client?.name}
+											</span>
+											<p className="truncate">
+												{activity.supportItem.description}
+											</p>
+											<span>{dayjs(activity.date).format("dddd DD MMM")}</span>
+										</div>
+										<div className="flex flex-col items-end justify-between gap-2">
+											<p>
+												{dayjs(activity.startTime).format("h:mma")}-
+												{dayjs(activity.endTime).format("h:mma")} (
+												{round(
+													getDuration(activity.startTime, activity.endTime),
+													1
+												)}
+												h)
+											</p>
+											<span className="font-semibold">
+												{getTotalCost([activity]).toLocaleString(undefined, {
+													style: "currency",
+													currency: "AUD",
+												})}
+											</span>
+										</div>
+									</ListPage.Item>
+								))}
+							</ListPage.Items>
+						)}
+					</div>
+				))
+			) : (
+				<Loading />
+			)}
 		</ListPage>
 	);
 }
