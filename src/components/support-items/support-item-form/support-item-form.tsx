@@ -1,6 +1,4 @@
-import { RateType } from "@prisma/client";
 import Button from "@atoms/button";
-import ButtonGroup from "@atoms/button-group";
 import Form from "@atoms/form";
 import Heading from "@atoms/heading";
 import Label from "@atoms/label";
@@ -9,6 +7,7 @@ import ErrorMessage from "@components/forms/error-message";
 import Input from "@components/forms/input";
 import Select from "@components/forms/select";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { RateType } from "@prisma/client";
 import type { SupportItemSchema } from "@schema/support-item-schema";
 import { supportItemSchema } from "@schema/support-item-schema";
 import { SupportItemByIdOutput } from "@server/routers/support-item-router";
@@ -165,7 +164,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 					)}
 				</Styles.InputGroup>
 
-				<ButtonGroup>
+				<div className="btn-group">
 					<Button
 						type="submit"
 						variant="primary"
@@ -176,7 +175,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 					<Link href="/support-items">
 						<Button type="button">Cancel</Button>
 					</Link>
-				</ButtonGroup>
+				</div>
 			</Form>
 		</Styles.CreateActivityContainer>
 	);

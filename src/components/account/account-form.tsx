@@ -1,5 +1,4 @@
 import Button from "@atoms/button";
-import ButtonGroup from "@atoms/button-group";
 import Form from "@atoms/form";
 import Heading from "@atoms/heading";
 import Label from "@atoms/label";
@@ -132,7 +131,7 @@ const AccountForm = ({ existingUser }: Props) => {
 					</Label>
 				</div>
 
-				<ButtonGroup className="mt-4">
+				<div className="btn-group mt-4">
 					<Button
 						type="submit"
 						variant="primary"
@@ -143,7 +142,7 @@ const AccountForm = ({ existingUser }: Props) => {
 					<Link href="/invoices">
 						<Button type="button">Cancel</Button>
 					</Link>
-				</ButtonGroup>
+				</div>
 			</Form>
 		</div>
 	);

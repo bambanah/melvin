@@ -54,26 +54,19 @@ export default function InvoiceList() {
 			</div>
 
 			<div className="flex w-full">
-				<button
-					type="button"
-					onClick={() => setStatusFilter("UNPAID")}
-					className={classNames([
-						"basis-1/2 border-b-[3px] px-4 py-2 text-center transition-all",
-						statusFilter === "UNPAID" && "border-indigo-700 text-indigo-700",
-					])}
-				>
-					UNPAID
-				</button>
-				<button
-					type="button"
-					onClick={() => setStatusFilter("PAID")}
-					className={classNames([
-						"basis-1/2 border-b-[3px] px-4 py-2 text-center transition-all",
-						statusFilter === "PAID" && "border-indigo-700 text-indigo-700",
-					])}
-				>
-					PAID
-				</button>
+				{(["UNPAID", "PAID"] as const).map((status) => (
+					<button
+						key={status}
+						type="button"
+						onClick={() => setStatusFilter(status)}
+						className={classNames([
+							"basis-1/2 border-b-[3px] px-4 py-2 text-center transition-all",
+							statusFilter === status && "border-indigo-700 text-indigo-700",
+						])}
+					>
+						{status}
+					</button>
+				))}
 			</div>
 
 			<div className="flex flex-col divide-y">

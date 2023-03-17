@@ -4,7 +4,7 @@ module.exports = {
 	theme: {
 		extend: {
 			boxShadow: {
-				top: "0 -2px 10px 1px rgb(0 0 0 / 0.1)",
+				top: "0 0px 10px 1px rgb(0 0 0 / 0.1)",
 			},
 			colors: {
 				fg: "#1A1A0F",

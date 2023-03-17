@@ -1,5 +1,4 @@
 import Button from "@atoms/button";
-import ButtonGroup from "@atoms/button-group";
 import Form from "@atoms/form";
 import Label from "@atoms/label";
 import ClientSelect from "@components/forms/client-select";
@@ -135,7 +134,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					</Label>
 				</InputRow>
 
-				<ButtonGroup>
+				<div className="btn-group">
 					<Button
 						type="submit"
 						variant="primary"
@@ -144,7 +143,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 						{existingActivity ? "Update" : "Create"}
 					</Button>
 					<Link href="/activities">Cancel</Link>
-				</ButtonGroup>
+				</div>
 			</Form>
 		</div>
 	);

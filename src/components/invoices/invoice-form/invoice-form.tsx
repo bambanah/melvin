@@ -1,5 +1,4 @@
 import Button from "@atoms/button";
-import ButtonGroup from "@atoms/button-group";
 import Form from "@atoms/form";
 import Heading from "@atoms/heading";
 import Label from "@atoms/label";
@@ -407,7 +406,7 @@ const CreateInvoiceForm: FC<Props> = ({
 						/>
 
 						{values.activities.length > 0 && (
-							<ButtonGroup>
+							<div className="btn-group">
 								<Button
 									type="submit"
 									disabled={!values.clientId || !dirty}
@@ -426,7 +425,7 @@ const CreateInvoiceForm: FC<Props> = ({
 								>
 									Cancel
 								</Button>
-							</ButtonGroup>
+							</div>
 						)}
 					</>
 				)}

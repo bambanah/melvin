@@ -10,4 +10,8 @@
 	.btn-raised {
 		@apply -translate-x-1 -translate-y-1 shadow-[0.2rem_0.2rem_#000];
 	}
+
+	.btn-group {
+		@apply flex items-center justify-center gap-6;
+	}
 }

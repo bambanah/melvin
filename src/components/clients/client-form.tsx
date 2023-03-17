@@ -1,5 +1,4 @@
 import Button from "@atoms/button";
-import ButtonGroup from "@atoms/button-group";
 import Form from "@atoms/form";
 import Heading from "@atoms/heading";
 import Label from "@atoms/label";
@@ -122,7 +121,7 @@ const ClientForm = ({ existingClient }: Props) => {
 					<ErrorMessage error={errors.billTo?.message} />
 				</Label>
 
-				<ButtonGroup>
+				<div className="btn-group">
 					<Button
 						type="submit"
 						variant="primary"
@@ -133,7 +132,7 @@ const ClientForm = ({ existingClient }: Props) => {
 					<Link href="/clients">
 						<Button type="button">Cancel</Button>
 					</Link>
-				</ButtonGroup>
+				</div>
 			</Form>
 		</div>
 	);

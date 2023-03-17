@@ -3,22 +3,7 @@ import Form from "@atoms/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
-import styled from "styled-components";
 import { z } from "zod";
-
-const StyledInput = styled.input`
-	color: ${({ theme }) => theme.colors.fg};
-	background-color: ${({ theme }) => theme.colors.bg};
-
-	flex-grow: 1;
-
-	outline: none;
-	padding: 0.85rem 1.4rem;
-	border: 0.01rem solid
-		${({ theme }) => {
-			return `${theme.colors.fg}88`;
-		}};
-`;
 
 const loginFormSchema = z.object({
 	email: z.string().email(),
@@ -36,7 +21,11 @@ const LoginForm = () => {
 
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
-			<StyledInput placeholder="Email Address" {...register("email")} />
+			<input
+				className="grow border bg-neutral-50 py-3 px-6 text-fg"
+				placeholder="Email Address"
+				{...register("email")}
+			/>
 			<Button type="submit" variant="primary">
 				Continue
 			</Button>
