@@ -20,7 +20,7 @@ const NavAuth = ({ user }: NavAuthProps) => {
 	const activeItemClass = "btn-raised";
 
 	return (
-		<Menu as="div" className="relative hidden text-left md:inline-block">
+		<Menu as="div" className="relative z-50 hidden text-left md:inline-block">
 			<div>
 				<Menu.Button>
 					<div className="whitespace-nowrap p-3 text-gray-700 hover:text-fg">
