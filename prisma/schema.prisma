@@ -103,7 +103,7 @@ model Invoice {
   activities Activity[]
 
   clientId String
-  client   Client @relation(fields: [clientId], references: [id])
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
   ownerId  String
   owner    User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
@@ -126,7 +126,7 @@ model Activity {
   ownerId       String?
   owner         User?       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   clientId      String?
-  client        Client?     @relation(fields: [clientId], references: [id])
+  client        Client?     @relation(fields: [clientId], references: [id], onDelete: Cascade)
   supportItemId String
   supportItem   SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
   invoiceId     String?
