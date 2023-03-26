@@ -1,77 +1,39 @@
-import EntityList, { EntityListItem } from "@components/shared/entity-list";
-import {
-	faDollarSign,
-	faEdit,
-	faIdCard,
-	faTrash,
-} from "@fortawesome/free-solid-svg-icons";
-import { SupportItemFetchAllOutput } from "@server/routers/support-item-router";
+import Loading from "@atoms/loading";
+import ListPage from "@components/shared/list-page";
+import { Prisma } from "@prisma/client";
 import { trpc } from "@utils/trpc";
-import Skeleton from "react-loading-skeleton";
-import { toast } from "react-toastify";
+
+const ItemCode = ({
+	descriptor,
+	code,
+	rate,
+}: {
+	descriptor: string;
+	code: string | null;
+	rate: Prisma.Decimal | null;
+}) => {
+	if (!code) return null;
+	return (
+		<div className="flex flex-nowrap gap-1 whitespace-nowrap">
+			<p className="font-semibold">{descriptor}:</p> {code}{" "}
+			{rate && (
+				<>
+					(
+					{Number(rate).toLocaleString(undefined, {
+						style: "currency",
+						currency: "AUD",
+					})}
+					/hr)
+				</>
+			)}
+		</div>
+	);
+};
 
 function SupportItemList() {
-	const utils = trpc.useContext();
-	const deleteMutation = trpc.supportItem.delete.useMutation();
-
 	const { data: { supportItems } = {}, error } = trpc.supportItem.list.useQuery(
 		{}
 	);
-
-	const generateEntity = (
-		supportItem?: SupportItemFetchAllOutput
-	): EntityListItem => ({
-		id: supportItem?.id || "",
-		fields: [
-			{
-				value: supportItem ? supportItem.description : <Skeleton />,
-				type: "label",
-				flex: "1 1 auto",
-			},
-			{
-				value: supportItem ? supportItem.weekdayCode : <Skeleton />,
-				icon: faIdCard,
-				type: "text",
-				flex: "0 0 9.5em",
-			},
-			{
-				value: supportItem ? `${supportItem.weekdayRate}` : <Skeleton />,
-				icon: faDollarSign,
-				type: "text",
-				flex: "0 0 5em",
-			},
-		],
-		actions: supportItem
-			? [
-					{
-						value: "Edit",
-						type: "link",
-						icon: faEdit,
-						href: `/support-items/${supportItem.id}/edit`,
-					},
-					{
-						value: "Delete",
-						type: "button",
-						icon: faTrash,
-						onClick: () => {
-							if (
-								confirm(
-									`Are you sure you want to delete ${supportItem.description}?`
-								)
-							) {
-								deleteMutation
-									.mutateAsync({ id: supportItem.id })
-									.then(() => {
-										utils.supportItem.list.invalidate();
-										toast.success("Support Item deleted");
-									})
-									.catch((error) => toast.error(error));
-							}
-						},
-					},
-			  ]
-			: [],
-	});
 
 	if (error) {
 		console.error(error);
@@ -79,15 +41,46 @@ function SupportItemList() {
 	}
 
 	return (
-		<EntityList
-			title="Support Items"
-			route="/support-items"
-			entities={
-				supportItems
-					? supportItems.map((supportItem) => generateEntity(supportItem))
-					: [generateEntity()]
-			}
-		/>
+		<ListPage title="Support Items">
+			<ListPage.Items>
+				{supportItems ? (
+					supportItems.map((supportItem) => (
+						<ListPage.Item
+							key={supportItem.id}
+							href={`/support-items/${supportItem.id}`}
+						>
+							<div className="flex flex-col gap-4">
+								<p className="font-semibold sm:text-lg">
+									{supportItem.description}
+								</p>
+								<ItemCode
+									descriptor="Base (Weekday)"
+									code={supportItem.weekdayCode}
+									rate={supportItem.weekdayRate}
+								/>
+								<ItemCode
+									descriptor="Weeknight"
+									code={supportItem.weeknightCode}
+									rate={supportItem.weeknightRate}
+								/>
+								<ItemCode
+									descriptor="Saturday"
+									code={supportItem.saturdayCode}
+									rate={supportItem.saturdayRate}
+								/>
+								<ItemCode
+									descriptor="Sunday"
+									code={supportItem.sundayCode}
+									rate={supportItem.sundayRate}
+								/>
+							</div>
+						</ListPage.Item>
+					))
+				) : (
+					<Loading />
+				)}
+			</ListPage.Items>
+		</ListPage>
 	);
 }
 

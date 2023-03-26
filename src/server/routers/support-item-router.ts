@@ -10,6 +10,12 @@ const defaultSupportItemSelect = {
 	rateType: true,
 	weekdayCode: true,
 	weekdayRate: true,
+	weeknightCode: true,
+	weeknightRate: true,
+	saturdayCode: true,
+	saturdayRate: true,
+	sundayCode: true,
+	sundayRate: true,
 };
 
 export const supportItemRouter = router({
