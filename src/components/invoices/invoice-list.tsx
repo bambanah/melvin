@@ -50,7 +50,6 @@ export default function InvoiceList({
 		invoices?: InvoiceFetchAllOutput[];
 	}) => {
 		if (!invoices) {
-			// TODO: Skeleton
 			return <Loading />;
 		}
 
@@ -98,6 +97,7 @@ export default function InvoiceList({
 		<ListPage
 			title="Invoices"
 			createHref={`/invoices/create${clientId ? `?clientId=${clientId}` : ""}`}
+			collapseCreateButton={false}
 		>
 			{groupByAssignedStatus && (
 				<div className="flex w-full">

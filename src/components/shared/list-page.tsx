@@ -1,6 +1,6 @@
-import Heading from "@atoms/heading";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import classNames from "classnames";
 import Link from "next/link";
 import React, { ReactNode } from "react";
 
@@ -22,20 +22,45 @@ interface PageComponentProps {
 	createHref?: string;
 	filterComponent?: React.ReactNode;
 	children: React.ReactNode;
+	className?: string;
+	collapseCreateButton?: boolean;
 }
-const PageComponent = ({ title, createHref, children }: PageComponentProps) => {
+const PageComponent = ({
+	title,
+	createHref,
+	children,
+	className,
+	collapseCreateButton = true,
+}: PageComponentProps) => {
 	return (
-		<div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col pb-32">
-			<div className="flex items-center justify-between  px-4 py-2 ">
-				<Heading>{title}</Heading>
+		<div
+			className={classNames([
+				"mx-auto flex min-h-screen w-full max-w-4xl flex-col pb-32",
+				className,
+			])}
+		>
+			<div className="flex items-center justify-between py-2 ">
+				<h2 className="px-4 text-2xl font-bold">{title}</h2>
 
 				{createHref && (
 					<Link
 						href={createHref}
-						className="fixed bottom-32 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-md bg-indigo-700 text-2xl leading-none text-zinc-50 md:relative md:inset-0 md:h-10 md:w-28 md:gap-2 md:text-base hover:md:bg-indigo-600"
+						className={classNames([
+							"flex items-center justify-center rounded-md bg-indigo-700 leading-none text-zinc-50 md:relative md:inset-0 md:h-10 md:w-28 md:gap-2 md:text-base hover:md:bg-indigo-600",
+							collapseCreateButton
+								? "fixed bottom-32 right-6 z-40 h-12 w-12 text-2xl"
+								: "h-9 w-24 gap-2 text-sm",
+						])}
 					>
 						<FontAwesomeIcon icon={faPlus} />{" "}
-						<span className="hidden md:inline"> Add New</span>
+						<span
+							className={classNames([
+								collapseCreateButton && "hidden md:inline",
+							])}
+						>
+							{" "}
+							Add New
+						</span>
 					</Link>
 				)}
 			</div>

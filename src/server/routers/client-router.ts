@@ -59,7 +59,7 @@ export const clientRouter = router({
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
 			const client = await ctx.prisma.client.findFirst({
-				select: { ...defaultClientSelect, id: true },
+				select: { ...defaultClientSelect, invoiceNumberPrefix: true },
 				where: {
 					ownerId: ctx.session.user.id,
 					id: input.id,

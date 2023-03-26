@@ -23,8 +23,8 @@ const NavAuth = ({ user }: NavAuthProps) => {
 		<Menu as="div" className="relative z-50 hidden text-left md:inline-block">
 			<div>
 				<Menu.Button>
-					<div className="whitespace-nowrap p-3 text-gray-700 hover:text-fg">
-						<FontAwesomeIcon icon={faUserCircle} size="xl" title="Account" />{" "}
+					<div className="flex items-center gap-1 whitespace-nowrap p-3 text-gray-700 hover:text-fg">
+						<FontAwesomeIcon icon={faUserCircle} size="xl" />
 						<FontAwesomeIcon icon={faCaretDown} size="xs" />
 					</div>
 				</Menu.Button>
