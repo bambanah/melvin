@@ -320,3 +320,18 @@ export function groupBy<T>(arr: T[], keyGetter: (item: T) => string) {
 
 	return groupedObj;
 }
+
+// TODO: Implement dynamic holidays
+// (e.g. Easter occurs on the Sunday after the first full moon following the vernal equinox)
+const HOLIDAYS = new Set([
+	dayjs().date(1).month(0).format("DD/MM/YYYY"),
+	dayjs().date(26).month(0).format("DD/MM/YYYY"),
+	dayjs().date(25).month(3).format("DD/MM/YYYY"),
+	dayjs().date(24).month(11).format("DD/MM/YYYY"),
+	dayjs().date(25).month(11).format("DD/MM/YYYY"),
+	dayjs().date(26).month(11).format("DD/MM/YYYY"),
+]);
+
+export function isHoliday(date: Date | string) {
+	return HOLIDAYS.has(dayjs(date).format("DD/MM/YYYY"));
+}
