@@ -2,6 +2,7 @@ import Badge from "@atoms/badge";
 import Loading from "@atoms/loading";
 import ListPage from "@components/shared/list-page";
 import { InvoiceStatus } from "@prisma/client";
+import { InvoiceFetchAllOutput } from "@server/routers/invoice-router";
 import { getTotalCost } from "@utils/helpers";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
@@ -18,14 +19,24 @@ const getBadgeColorFromStatus = (status: InvoiceStatus) => {
 	return "DEFAULT";
 };
 
-export default function InvoiceList() {
+interface Props {
+	clientId?: string;
+	groupByAssignedStatus?: boolean;
+}
+
+export default function InvoiceList({
+	clientId,
+	groupByAssignedStatus = true,
+}: Props) {
 	const [statusFilter, setStatusFilter] = useState<"UNPAID" | "PAID">("UNPAID");
 
 	const { data: { invoices } = {}, error } = trpc.invoice.list.useQuery({
-		status:
-			statusFilter === "UNPAID"
+		status: groupByAssignedStatus
+			? statusFilter === "UNPAID"
 				? [InvoiceStatus.CREATED, InvoiceStatus.SENT]
-				: [InvoiceStatus.PAID],
+				: [InvoiceStatus.PAID]
+			: undefined,
+		clientId,
 	});
 
 	if (error) {
@@ -33,26 +44,20 @@ export default function InvoiceList() {
 		return <div>Error loading</div>;
 	}
 
-	return (
-		<ListPage title="Invoices" createHref="/invoices/create">
-			<div className="flex w-full">
-				{(["UNPAID", "PAID"] as const).map((status) => (
-					<button
-						key={status}
-						type="button"
-						onClick={() => setStatusFilter(status)}
-						className={classNames([
-							"basis-1/2 border-b-[3px] px-4 py-2 text-center transition-all",
-							statusFilter === status && "border-indigo-700 text-indigo-700",
-						])}
-					>
-						{status}
-					</button>
-				))}
-			</div>
-			<ListPage.Items>
-				{invoices ? (
-					invoices.map((invoice) => (
+	const InvoiceListItems = ({
+		invoices,
+	}: {
+		invoices?: InvoiceFetchAllOutput[];
+	}) => {
+		if (!invoices) {
+			// TODO: Skeleton
+			return <Loading />;
+		}
+
+		if (invoices.length > 0) {
+			return (
+				<ListPage.Items>
+					{invoices.map((invoice) => (
 						<ListPage.Item key={invoice.id} href={`/invoices/${invoice.id}`}>
 							<div className="flex flex-col gap-2">
 								<div className="font-medium sm:text-lg">
@@ -75,11 +80,43 @@ export default function InvoiceList() {
 								</Badge>
 							</div>
 						</ListPage.Item>
-					))
-				) : (
-					<Loading />
-				)}
+					))}
+				</ListPage.Items>
+			);
+		}
+
+		return (
+			<ListPage.Items>
+				<div className="py-8 text-center text-neutral-600">
+					There&#39;s nothing here...
+				</div>
 			</ListPage.Items>
+		);
+	};
+
+	return (
+		<ListPage
+			title="Invoices"
+			createHref={`/invoices/create${clientId ? `?clientId=${clientId}` : ""}`}
+		>
+			{groupByAssignedStatus && (
+				<div className="flex w-full">
+					{(["UNPAID", "PAID"] as const).map((status) => (
+						<button
+							key={status}
+							type="button"
+							onClick={() => setStatusFilter(status)}
+							className={classNames([
+								"basis-1/2 border-b-[3px] px-4 py-2 text-center transition-all",
+								statusFilter === status && "border-indigo-700 text-indigo-700",
+							])}
+						>
+							{status}
+						</button>
+					))}
+				</div>
+			)}
+			<InvoiceListItems invoices={invoices} />
 		</ListPage>
 	);
 }

@@ -39,11 +39,12 @@ export const invoiceRouter = router({
 		.input(
 			baseListQueryInput.extend({
 				status: z.nativeEnum(InvoiceStatus).array().optional(),
+				clientId: z.string().optional(),
 			})
 		)
 		.query(async ({ ctx, input }) => {
 			const limit = input.limit ?? 50;
-			const { cursor, status } = input;
+			const { cursor, status, clientId } = input;
 
 			const invoices = await ctx.prisma.invoice.findMany({
 				select: {
@@ -56,6 +57,7 @@ export const invoiceRouter = router({
 				where: {
 					ownerId: ctx.session.user.id,
 					status: { in: status },
+					clientId,
 				},
 				cursor: cursor ? { id: cursor } : undefined,
 				orderBy: [
