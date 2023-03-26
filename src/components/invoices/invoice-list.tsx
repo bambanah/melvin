@@ -55,10 +55,10 @@ export default function InvoiceList() {
 					invoices.map((invoice) => (
 						<ListPage.Item key={invoice.id} href={`/invoices/${invoice.id}`}>
 							<div className="flex flex-col gap-2">
-								<p className="font-medium sm:text-lg">
+								<div className="font-medium sm:text-lg">
 									<span className="font-semibold">{invoice.invoiceNo}</span>:{" "}
 									{invoice.client.name}
-								</p>
+								</div>
 								<span className="text-sm sm:text-base">
 									{dayjs(invoice.date).format("DD MMM.")}
 								</span>

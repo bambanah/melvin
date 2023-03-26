@@ -31,7 +31,7 @@ export const clientRouter = router({
 					...defaultClientSelect,
 					invoices: {
 						take: 1,
-						select: { id: true, invoiceNo: true, billTo: true },
+						select: { id: true, invoiceNo: true, billTo: true, date: true },
 						orderBy: {
 							createdAt: "desc",
 						},
