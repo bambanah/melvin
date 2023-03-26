@@ -1,16 +1,18 @@
 import Loading from "@atoms/loading";
 import ListPage from "@components/shared/list-page";
-import { Prisma } from "@prisma/client";
+import { Prisma, RateType } from "@prisma/client";
 import { trpc } from "@utils/trpc";
 
 const ItemCode = ({
 	descriptor,
 	code,
 	rate,
+	rateType,
 }: {
 	descriptor: string;
 	code: string | null;
 	rate: Prisma.Decimal | null;
+	rateType?: RateType;
 }) => {
 	if (!code) return null;
 	return (
@@ -18,12 +20,12 @@ const ItemCode = ({
 			<p className="font-semibold">{descriptor}:</p> {code}{" "}
 			{rate && (
 				<>
-					(
+					<span className="font-semibold text-neutral-400">{"// "}</span>
 					{Number(rate).toLocaleString(undefined, {
 						style: "currency",
 						currency: "AUD",
 					})}
-					/hr)
+					/{rateType === "KM" ? "km" : "hr"}
 				</>
 			)}
 		</div>
@@ -41,7 +43,7 @@ function SupportItemList() {
 	}
 
 	return (
-		<ListPage title="Support Items">
+		<ListPage title="Support Items" createHref={`/support-items/create`}>
 			<ListPage.Items>
 				{supportItems ? (
 					supportItems.map((supportItem) => (
@@ -54,24 +56,28 @@ function SupportItemList() {
 									{supportItem.description}
 								</p>
 								<ItemCode
-									descriptor="Base (Weekday)"
+									descriptor="Base"
 									code={supportItem.weekdayCode}
 									rate={supportItem.weekdayRate}
+									rateType={supportItem.rateType}
 								/>
 								<ItemCode
 									descriptor="Weeknight"
 									code={supportItem.weeknightCode}
 									rate={supportItem.weeknightRate}
+									rateType={supportItem.rateType}
 								/>
 								<ItemCode
 									descriptor="Saturday"
 									code={supportItem.saturdayCode}
 									rate={supportItem.saturdayRate}
+									rateType={supportItem.rateType}
 								/>
 								<ItemCode
 									descriptor="Sunday"
 									code={supportItem.sundayCode}
 									rate={supportItem.sundayRate}
+									rateType={supportItem.rateType}
 								/>
 							</div>
 						</ListPage.Item>
