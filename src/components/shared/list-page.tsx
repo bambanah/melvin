@@ -32,7 +32,7 @@ const PageComponent = ({ title, createHref, children }: PageComponentProps) => {
 				{createHref && (
 					<Link
 						href={createHref}
-						className="fixed bottom-32 right-6 flex h-12 w-12 items-center justify-center rounded-md bg-indigo-700 text-2xl leading-none text-zinc-50 md:relative md:inset-0 md:h-10 md:w-28 md:gap-2 md:text-base hover:md:bg-indigo-600"
+						className="fixed bottom-32 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-md bg-indigo-700 text-2xl leading-none text-zinc-50 md:relative md:inset-0 md:h-10 md:w-28 md:gap-2 md:text-base hover:md:bg-indigo-600"
 					>
 						<FontAwesomeIcon icon={faPlus} />{" "}
 						<span className="hidden md:inline"> Add New</span>
