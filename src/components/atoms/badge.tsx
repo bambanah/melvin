@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { InvoiceStatus } from "@prisma/client";
 
 type Variant = "DEFAULT" | "INFO" | "SUCCESS" | "WARNING" | "ERROR";
 
@@ -14,6 +15,20 @@ interface Props {
 	children: string;
 	variant?: Variant;
 }
+
+export const InvoiceStatusBadge = ({
+	invoiceStatus,
+}: {
+	invoiceStatus: InvoiceStatus;
+}) => {
+	let variant: Variant;
+
+	if (invoiceStatus === "PAID") variant = "SUCCESS";
+	else if (invoiceStatus === "SENT") variant = "WARNING";
+	else variant = "DEFAULT";
+
+	return <Badge variant={variant}>{invoiceStatus}</Badge>;
+};
 
 const Badge = ({ children, variant = "DEFAULT" }: Props) => {
 	return (

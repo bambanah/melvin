@@ -4,8 +4,8 @@ type Variant = "XSMALL" | "SMALL" | "MEDIUM" | "LARGE" | "XLARGE";
 
 const variantStyles: Record<Variant, string> = {
 	XSMALL: "text-lg",
-	SMALL: "text-xl",
-	MEDIUM: "text-2xl",
+	SMALL: "text-2xl",
+	MEDIUM: "text-3xl",
 	LARGE: "text-4xl",
 	XLARGE: "text-6xl",
 };

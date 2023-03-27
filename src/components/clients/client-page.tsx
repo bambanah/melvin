@@ -1,10 +1,10 @@
 import ConfirmDialog from "@atoms/confirm-dialog";
+import Dropdown from "@atoms/dropdown";
 import Heading from "@atoms/heading";
 import Loading from "@atoms/loading";
 import InvoiceList from "@components/invoices/invoice-list";
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Menu } from "@headlessui/react";
 import { trpc } from "@utils/trpc";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -57,20 +57,21 @@ const ClientPage = () => {
 					<Heading className="medium text-lg sm:text-2xl">
 						{client.name}
 					</Heading>
-					<Menu as="div" className="relative inline-block">
-						<Menu.Button className="py-2 px-4 text-xl hover:bg-neutral-100">
+
+					<Dropdown>
+						<Dropdown.Button>
 							<FontAwesomeIcon icon={faEllipsisV} />
-						</Menu.Button>
-						<Menu.Items className="absolute right-0 flex w-40 origin-top-right flex-col bg-slate-50 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-							<Menu.Item>
+						</Dropdown.Button>
+						<Dropdown.Items>
+							<Dropdown.Item>
 								<Link
 									href={`/clients/${client.id}/edit`}
 									className="px-3 py-4 text-neutral-900 hover:bg-neutral-100 sm:py-2"
 								>
 									Edit
 								</Link>
-							</Menu.Item>
-							<Menu.Item>
+							</Dropdown.Item>
+							<Dropdown.Item>
 								<button
 									type="button"
 									className="px-3 py-4 text-left text-neutral-900 hover:bg-neutral-100 sm:py-2"
@@ -78,9 +79,9 @@ const ClientPage = () => {
 								>
 									Delete
 								</button>
-							</Menu.Item>
-						</Menu.Items>
-					</Menu>
+							</Dropdown.Item>
+						</Dropdown.Items>
+					</Dropdown>
 				</div>
 
 				<div className="flex flex-col">

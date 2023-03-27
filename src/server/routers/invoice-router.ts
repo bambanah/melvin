@@ -12,7 +12,7 @@ const defaultInvoiceSelect = {
 	date: true,
 	status: true,
 	client: {
-		select: { name: true, number: true },
+		select: { name: true, number: true, id: true },
 	},
 	activities: {
 		select: {

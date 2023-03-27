@@ -23,9 +23,14 @@ function getInvoiceIdWhereCondition(invoiceIdAssigned?: boolean) {
 
 export const activityRouter = router({
 	list: authedProcedure
-		.input(z.object({ assigned: z.boolean().optional() }))
+		.input(
+			z.object({
+				assigned: z.boolean().optional(),
+				invoiceId: z.string().optional(),
+			})
+		)
 		.query(async ({ ctx, input }) => {
-			const { assigned } = input;
+			const { assigned, invoiceId } = input;
 
 			const activities = await ctx.prisma.activity.findMany({
 				select: {
@@ -36,7 +41,10 @@ export const activityRouter = router({
 				},
 				where: {
 					ownerId: ctx.session.user.id,
-					invoiceId: getInvoiceIdWhereCondition(assigned),
+					invoiceId:
+						assigned === undefined
+							? invoiceId
+							: getInvoiceIdWhereCondition(assigned),
 				},
 				orderBy: [
 					{

@@ -8,11 +8,17 @@ import classNames from "classnames";
 import dayjs from "dayjs";
 import { useState } from "react";
 
-function ActivityList() {
+interface Props {
+	invoiceId?: string;
+	groupByAssignedStatus?: boolean;
+}
+
+function ActivityList({ invoiceId, groupByAssignedStatus = true }: Props) {
 	const [assignedFilter, setAssignedFilter] = useState<boolean>(false);
 
 	const { data: { activities } = {}, error } = trpc.activity.list.useQuery({
-		assigned: assignedFilter,
+		assigned: groupByAssignedStatus ? assignedFilter : undefined,
+		invoiceId,
 	});
 
 	if (error) {
@@ -27,21 +33,24 @@ function ActivityList() {
 
 	return (
 		<ListPage title="Activities" createHref="/activities/create">
-			<div className="mb-4 flex w-full">
-				{[false, true].map((status, idx) => (
-					<button
-						key={idx}
-						type="button"
-						onClick={() => setAssignedFilter(status)}
-						className={classNames([
-							"basis-1/2 border-b-[3px] px-4 py-2 text-center transition-all",
-							assignedFilter === status && "border-indigo-700 text-indigo-700",
-						])}
-					>
-						{status ? "ASSIGNED" : "UNASSIGNED"}
-					</button>
-				))}
-			</div>
+			{groupByAssignedStatus && (
+				<div className="mb-4 flex w-full">
+					{[false, true].map((status, idx) => (
+						<button
+							key={idx}
+							type="button"
+							onClick={() => setAssignedFilter(status)}
+							className={classNames([
+								"basis-1/2 border-b-[3px] px-4 py-2 text-center transition-all",
+								assignedFilter === status &&
+									"border-indigo-700 text-indigo-700",
+							])}
+						>
+							{status ? "ASSIGNED" : "UNASSIGNED"}
+						</button>
+					))}
+				</div>
+			)}
 
 			{Object.keys(groupedActivities).length > 0 ? (
 				Object.keys(groupedActivities).map((group) => (

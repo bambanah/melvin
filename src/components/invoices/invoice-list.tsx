@@ -1,4 +1,4 @@
-import Badge from "@atoms/badge";
+import { InvoiceStatusBadge } from "@atoms/badge";
 import Loading from "@atoms/loading";
 import ListPage from "@components/shared/list-page";
 import { InvoiceStatus } from "@prisma/client";
@@ -6,18 +6,11 @@ import { InvoiceFetchAllOutput } from "@server/routers/invoice-router";
 import { getTotalCost } from "@utils/helpers";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
-import dayjs from "dayjs";
 import { useState } from "react";
 
-const getBadgeColorFromStatus = (status: InvoiceStatus) => {
-	if (status === "PAID") {
-		return "SUCCESS";
-	} else if (status === "SENT") {
-		return "WARNING";
-	}
-
-	return "DEFAULT";
-};
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 interface Props {
 	clientId?: string;
@@ -64,7 +57,7 @@ export default function InvoiceList({
 									{invoice.client.name}
 								</div>
 								<span className="text-sm sm:text-base">
-									{dayjs(invoice.date).format("DD MMM.")}
+									{dayjs.utc(invoice.date).format("DD MMM.")}
 								</span>
 							</div>
 							<div className="flex basis-10 flex-col gap-2 text-right">
@@ -74,9 +67,7 @@ export default function InvoiceList({
 										currency: "AUD",
 									})}
 								</span>
-								<Badge variant={getBadgeColorFromStatus(invoice.status)}>
-									{invoice.status}
-								</Badge>
+								<InvoiceStatusBadge invoiceStatus={invoice.status} />
 							</div>
 						</ListPage.Item>
 					))}

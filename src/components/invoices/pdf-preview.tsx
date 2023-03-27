@@ -1,16 +1,26 @@
 import Loading from "@atoms/loading";
 import { trpc } from "@utils/trpc";
-import { FC } from "react";
-import { Document as MyDocument, Page } from "react-pdf";
+import { FC, useState } from "react";
+import { Document, Page } from "react-pdf";
 import { SizeMe } from "react-sizeme";
 
 interface PdfProps {
 	invoiceId: string;
+	className?: string;
 }
 
-const PdfPreview: FC<PdfProps> = ({ invoiceId }) => {
-	const pdf = trpc.pdf.forInvoice.useQuery({ invoiceId, returnBase64: true });
+const PdfPreview: FC<PdfProps> = ({ invoiceId, className }) => {
+	const [numPages, setNumPages] = useState<number | null>(null);
 
+	const onDocumentLoadSuccess = ({
+		numPages: nextNumPages,
+	}: {
+		numPages: number;
+	}) => {
+		setNumPages(nextNumPages);
+	};
+
+	const pdf = trpc.pdf.forInvoice.useQuery({ invoiceId, returnBase64: true });
 	if (pdf.error) {
 		console.error(pdf.error);
 		return <div>Error loading</div>;
@@ -19,12 +29,21 @@ const PdfPreview: FC<PdfProps> = ({ invoiceId }) => {
 	if (!pdf.data) return <Loading />;
 
 	return (
-		<div className="[.react-pdf__Page__svg]:m-auto [.react-pdf__Page__svg]:w-full">
-			<SizeMe refreshRate={128} refreshMode={"debounce"}>
+		<div className={className}>
+			<SizeMe>
 				{({ size }) => (
-					<MyDocument file={pdf.data}>
-						<Page pageNumber={1} width={size.width ?? 800} />
-					</MyDocument>
+					<Document file={pdf.data} onLoadSuccess={onDocumentLoadSuccess}>
+						{numPages &&
+							Array.from({ length: numPages }, (_, index) => (
+								<Page
+									key={index}
+									pageNumber={index + 1}
+									width={size.width ?? 800}
+									renderTextLayer={false}
+									renderAnnotationLayer={false}
+								/>
+							))}
+					</Document>
 				)}
 			</SizeMe>
 		</div>
