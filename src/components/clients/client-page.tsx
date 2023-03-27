@@ -93,13 +93,15 @@ const ClientPage = () => {
 					<p>{client.billTo ?? "Not Set"}</p>
 				</div>
 
-				<div className="flex flex-col">
-					<h3 className="font-semibold">Invoice Prefix</h3>
-					<p>
-						{client.invoiceNumberPrefix}
-						<span className="text-gray-500">##</span>
-					</p>
-				</div>
+				{client.invoiceNumberPrefix && (
+					<div className="flex flex-col">
+						<h3 className="font-semibold">Invoice Prefix</h3>
+						<p>
+							{client.invoiceNumberPrefix}
+							<span className="text-gray-500">##</span>
+						</p>
+					</div>
+				)}
 			</div>
 
 			<InvoiceList clientId={client.id} groupByAssignedStatus={false} />
