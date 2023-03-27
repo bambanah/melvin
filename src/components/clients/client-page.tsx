@@ -104,11 +104,7 @@ const ClientPage = () => {
 				)}
 			</div>
 
-			<InvoiceList
-				clientId={client.id}
-				groupByAssignedStatus={false}
-				collapseCreateButton={false}
-			/>
+			<InvoiceList clientId={client.id} groupByAssignedStatus={false} />
 		</div>
 	);
 };

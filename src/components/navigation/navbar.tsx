@@ -3,10 +3,12 @@ import NavAuth from "@components/auth/nav-auth";
 import NavLink from "@components/navigation/nav-link";
 import {
 	faFile,
+	faPenToSquare,
 	faRunning,
 	faShoePrints,
 	faUsers,
 } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 
@@ -19,18 +21,25 @@ const Navbar = () => {
 				<Display className="xsmall brand">melvin</Display>
 			</Link>
 			<div className="flex w-full items-center justify-evenly md:mt-2 md:flex-row md:content-end md:items-end md:justify-start md:gap-3 md:p-0">
-				<NavLink href="/clients" icon={faUsers}>
+				<NavLink href="/clients" icon={faUsers} className="order-1">
 					Clients
 				</NavLink>
-				<NavLink href="/invoices" icon={faFile}>
+				<NavLink href="/invoices" icon={faFile} className="order-2">
 					Invoices
 				</NavLink>
-				<NavLink href="/activities" icon={faRunning}>
+				<NavLink href="/activities" icon={faRunning} className="order-4">
 					Activities
 				</NavLink>
-				<NavLink href="/support-items" icon={faShoePrints}>
+				<NavLink href="/support-items" icon={faShoePrints} className="order-5">
 					Items
 				</NavLink>
+				<Link
+					href="/activities/create"
+					className="order-3 mb-2 flex h-14 w-14 items-center justify-center gap-2 rounded-full bg-gray-900 text-2xl text-gray-50 shadow-lg hover:bg-gray-800 md:order-6 md:ml-auto md:h-auto md:w-auto md:rounded-md md:px-3 md:py-1.5 md:text-sm md:hover:text-gray-50"
+				>
+					<FontAwesomeIcon icon={faPenToSquare} />
+					<span className="hidden md:inline">LOG</span>
+				</Link>
 			</div>
 
 			<NavAuth user={session.data?.user} />

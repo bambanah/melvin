@@ -51,14 +51,14 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					trpcContext.activity.byId.invalidate({ id: existingActivity.id });
 
 					toast.success("Activity updated");
-					router.push("/activities");
+					router.back();
 				});
 		} else {
 			createActivityMutation.mutateAsync({ activity: data }).then(() => {
 				trpcContext.activity.list.invalidate();
 
 				toast.success("Activity created");
-				router.push("/activities");
+				router.back();
 			});
 		}
 	};
@@ -66,7 +66,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 	return (
 		<div className="flex flex-col items-center gap-12 self-center px-12">
 			<h2 className="m-0 flex-shrink flex-grow-0 basis-full text-2xl font-bold">
-				{existingActivity ? `Updating Activity` : "Create New Activity"}
+				{existingActivity ? `Update Activity` : "Log Activity"}
 			</h2>
 			<Form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl gap-12">
 				<InputRow>
@@ -142,7 +142,9 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					>
 						{existingActivity ? "Update" : "Create"}
 					</Button>
-					<Link href="/activities">Cancel</Link>
+					<Button type="button" onClick={() => router.back()}>
+						Cancel
+					</Button>
 				</div>
 			</Form>
 		</div>

@@ -9,9 +9,10 @@ interface Props {
 	href: string;
 	icon?: IconDefinition;
 	children: React.ReactNode;
+	className?: string;
 }
 
-const Link = ({ href, icon, children }: Props) => {
+const Link = ({ href, icon, children, className }: Props) => {
 	const active = useRouter().pathname.split("/")[1] === href.split("/")[1];
 
 	return (
@@ -20,6 +21,7 @@ const Link = ({ href, icon, children }: Props) => {
 			className={classNames([
 				active ? "text-indigo-700" : "text-neutral-600",
 				"flex flex-col gap-1 whitespace-nowrap p-2 text-xs hover:text-brand md:text-base md:font-semibold",
+				className,
 			])}
 		>
 			{icon && <FontAwesomeIcon icon={icon} size="lg" className="md:hidden" />}
