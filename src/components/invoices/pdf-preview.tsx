@@ -3,13 +3,12 @@ import { trpc } from "@utils/trpc";
 import { FC } from "react";
 import { Document as MyDocument, Page } from "react-pdf";
 import { SizeMe } from "react-sizeme";
-import * as Styles from "./styles";
 
 interface PdfProps {
 	invoiceId: string;
 }
 
-const PdfDocument: FC<PdfProps> = ({ invoiceId }) => {
+const PdfPreview: FC<PdfProps> = ({ invoiceId }) => {
 	const pdf = trpc.pdf.forInvoice.useQuery({ invoiceId, returnBase64: true });
 
 	if (pdf.error) {
@@ -20,7 +19,7 @@ const PdfDocument: FC<PdfProps> = ({ invoiceId }) => {
 	if (!pdf.data) return <Loading />;
 
 	return (
-		<Styles.Container>
+		<div className="[.react-pdf__Page__svg]:m-auto [.react-pdf__Page__svg]:w-full">
 			<SizeMe refreshRate={128} refreshMode={"debounce"}>
 				{({ size }) => (
 					<MyDocument file={pdf.data}>
@@ -28,8 +27,8 @@ const PdfDocument: FC<PdfProps> = ({ invoiceId }) => {
 					</MyDocument>
 				)}
 			</SizeMe>
-		</Styles.Container>
+		</div>
 	);
 };
 
-export default PdfDocument;
+export default PdfPreview;

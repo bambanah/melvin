@@ -9,7 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { activitySchema, ActivitySchema } from "@schema/activity-schema";
 import { ActivityByIdOutput } from "@server/routers/activity-router";
 import { trpc } from "@utils/trpc";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";

@@ -1,9 +1,9 @@
-import Display from "@atoms/display";
+import Heading from "@atoms/heading";
 
 const Dashboard = () => {
 	return (
 		<div>
-			<Display className="small">Welcome to Melvin!</Display>
+			<Heading variant="SMALL">Welcome to Melvin!</Heading>
 			<p>This is the dashboard</p>
 		</div>
 	);

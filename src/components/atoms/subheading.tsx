@@ -1,9 +1,13 @@
-import styled from "styled-components";
+import classNames from "classnames";
 
-const Subheading = styled.p`
-	font-size: 0.9rem;
-	color: ${({ theme }) => theme.colors.fg}CC;
-	margin: 0;
-`;
+const Subheading = ({
+	children,
+	className,
+	...rest
+}: React.HTMLAttributes<HTMLParagraphElement>) => (
+	<p className={classNames(["m-0 text-sm text-gray-700", className])} {...rest}>
+		{children}
+	</p>
+);
 
 export default Subheading;

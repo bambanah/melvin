@@ -1,5 +1,5 @@
 import Button from "@atoms/button";
-import Display from "@atoms/display";
+import Logo from "@atoms/logo";
 import LoginForm from "@components/auth/login-form";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -24,7 +24,7 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 
 	return (
 		<AuthModal>
-			<Display>melvin</Display>
+			<Logo variant="MEDIUM">melvin</Logo>
 			<p>Sign in to continue</p>
 
 			<LoginForm />
