@@ -22,11 +22,13 @@ const getBadgeColorFromStatus = (status: InvoiceStatus) => {
 interface Props {
 	clientId?: string;
 	groupByAssignedStatus?: boolean;
+	collapseCreateButton?: boolean;
 }
 
 export default function InvoiceList({
 	clientId,
 	groupByAssignedStatus = true,
+	collapseCreateButton = true,
 }: Props) {
 	const [statusFilter, setStatusFilter] = useState<"UNPAID" | "PAID">("UNPAID");
 
@@ -97,7 +99,7 @@ export default function InvoiceList({
 		<ListPage
 			title="Invoices"
 			createHref={`/invoices/create${clientId ? `?clientId=${clientId}` : ""}`}
-			collapseCreateButton={false}
+			collapseCreateButton={collapseCreateButton}
 		>
 			{groupByAssignedStatus && (
 				<div className="flex w-full">
