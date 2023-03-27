@@ -39,15 +39,17 @@ const ClientForm = ({ existingClient }: Props) => {
 			name: existingClient?.name ?? "",
 			number: existingClient?.number ?? "",
 			billTo: existingClient?.billTo ?? "",
+			invoiceNumberPrefix: existingClient?.invoiceNumberPrefix ?? "",
 		},
 	});
 
 	const submitCallback = (successMessage: string) => {
+		trpcContext.clients.list.invalidate();
 		toast.success(successMessage);
 
-		trpcContext.clients.list.invalidate();
-		router.push("/clients");
+		router.back();
 	};
+
 	const onSubmit = (data: ClientSchema) => {
 		if (existingClient?.id) {
 			updateClientMutation
