@@ -69,7 +69,7 @@ const ActivityPage = () => {
 				/>
 
 				<div className="my-2 flex items-center justify-between">
-					<Heading>{activity.supportItem.description}</Heading>
+					<Heading size="small">{activity.supportItem.description}</Heading>
 
 					<Dropdown>
 						<Dropdown.Button>

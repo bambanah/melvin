@@ -60,7 +60,7 @@ const AccountForm = ({ existingUser }: Props) => {
 				className="flex w-full flex-col gap-8"
 			>
 				<div className="flex flex-col gap-4">
-					<Heading className="-mb-2" variant="SMALL">
+					<Heading className="-mb-2" size="small">
 						Account Details
 					</Heading>
 					<Label htmlFor="name">
@@ -91,7 +91,7 @@ const AccountForm = ({ existingUser }: Props) => {
 				</div>
 
 				<div className="flex flex-col gap-4">
-					<Heading className="-mb-2" variant="SMALL">
+					<Heading className="-mb-2" size="small">
 						Bank Details
 					</Heading>
 					<Label htmlFor="bankName">
