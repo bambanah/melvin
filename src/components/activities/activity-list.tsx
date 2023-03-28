@@ -1,10 +1,16 @@
 import Badge from "@atoms/badge";
 import Loading from "@atoms/loading";
 import ListPage from "@components/shared/list-page";
+import {
+	faClock,
+	faMoneyBillWave,
+	faUser,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ActivityListOutput } from "@server/api/routers/activity-router";
+import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { isHoliday as isDateHoliday } from "@utils/date-utils";
 import { groupBy } from "@utils/generic-utils";
-import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import dayjs from "dayjs";
@@ -66,29 +72,44 @@ function ActivityList({ invoiceId, groupByAssignedStatus = true }: Props) {
 								<ListPage.Item
 									href={`/activities/${activity.id}`}
 									key={activity.id}
+									className="flex-col md:flex-row"
 								>
 									<div className="flex flex-col gap-2 overflow-hidden">
-										<span className="font-semibold">
-											{activity.client?.name}
-										</span>
-										<p className="truncate">
+										<p className="truncate text-lg font-semibold">
 											{activity.supportItem.description}
 										</p>
-									</div>
-									<div className="flex flex-col items-end justify-between gap-2">
-										<p className="whitespace-nowrap">
-											{dayjs(activity.startTime).format("HH:mm")}-
+										<div className="flex items-center gap-2 whitespace-nowrap">
+											<FontAwesomeIcon
+												icon={faClock}
+												className="w-4 text-gray-600"
+											/>
+											{dayjs(activity.startTime).format("HH:mm")} -{" "}
 											{dayjs(activity.endTime).format("HH:mm")}
-										</p>
-										<span className="font-semibold">
-											{getTotalCostOfActivities([activity]).toLocaleString(
-												undefined,
-												{
-													style: "currency",
-													currency: "AUD",
-												}
-											)}
-										</span>
+										</div>
+									</div>
+									<div className="flex flex-col items-start justify-between gap-2 md:items-end">
+										<div className="flex items-center gap-2 md:flex-row-reverse md:font-semibold">
+											<FontAwesomeIcon
+												icon={faUser}
+												className="w-4 text-gray-600"
+											/>
+											<span>{activity.client?.name}</span>
+										</div>
+										<div className="flex items-center gap-2 md:flex-row-reverse">
+											<FontAwesomeIcon
+												icon={faMoneyBillWave}
+												className="w-4 text-gray-600"
+											/>
+											<span>
+												{getTotalCostOfActivities([activity]).toLocaleString(
+													undefined,
+													{
+														style: "currency",
+														currency: "AUD",
+													}
+												)}
+											</span>
+										</div>
 									</div>
 								</ListPage.Item>
 							))}
