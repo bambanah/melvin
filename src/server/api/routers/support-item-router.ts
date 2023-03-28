@@ -1,5 +1,5 @@
 import { supportItemSchema } from "@schema/support-item-schema";
-import { authedProcedure, router } from "@server/trpc";
+import { authedProcedure, router } from "@server/api/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { baseListQueryInput } from "@utils/trpc";
 import { z } from "zod";
@@ -127,7 +127,7 @@ export const supportItemRouter = router({
 		}),
 });
 
-export type SupportItemFetchAllOutput = inferRouterOutputs<
+export type SupportItemListOutput = inferRouterOutputs<
 	typeof supportItemRouter
 >["list"]["supportItems"][0];
 

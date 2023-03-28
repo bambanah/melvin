@@ -1,7 +1,7 @@
 import Badge from "@atoms/badge";
 import Loading from "@atoms/loading";
 import ListPage from "@components/shared/list-page";
-import { ActivityFetchAllOutput } from "@server/routers/activity-router";
+import { ActivityListOutput } from "@server/api/routers/activity-router";
 import { isHoliday as isDateHoliday } from "@utils/date-utils";
 import { groupBy } from "@utils/generic-utils";
 import { getTotalCostOfActivities } from "@utils/activity-utils";
@@ -28,10 +28,9 @@ function ActivityList({ invoiceId, groupByAssignedStatus = true }: Props) {
 		return <div>Error loading</div>;
 	}
 
-	const groupedActivities: { [key: string]: ActivityFetchAllOutput[] } =
-		activities
-			? groupBy(activities, (activity) => dayjs(activity.date).toString())
-			: {};
+	const groupedActivities: { [key: string]: ActivityListOutput[] } = activities
+		? groupBy(activities, (activity) => dayjs(activity.date).toString())
+		: {};
 
 	return (
 		<ListPage title="Activities" createHref="/activities/create">

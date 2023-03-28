@@ -1,5 +1,5 @@
 import { userSchema } from "@schema/user-schema";
-import { authedProcedure, router } from "@server/trpc";
+import { authedProcedure, router } from "@server/api/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { z } from "zod";
 

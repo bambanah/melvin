@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { RateType } from "@prisma/client";
 import type { SupportItemSchema } from "@schema/support-item-schema";
 import { supportItemSchema } from "@schema/support-item-schema";
-import { SupportItemByIdOutput } from "@server/routers/support-item-router";
+import { SupportItemByIdOutput } from "@server/api/routers/support-item-router";
 import { trpc } from "@utils/trpc";
 import Link from "next/link";
 import { useRouter } from "next/router";

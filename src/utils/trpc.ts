@@ -1,4 +1,4 @@
-import { AppRouter } from "@server/app-router";
+import { AppRouter } from "@server/api/app-router";
 import { httpBatchLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import superjson from "superjson";

@@ -2,7 +2,7 @@ import { InvoiceStatusBadge } from "@atoms/badge";
 import Loading from "@atoms/loading";
 import ListPage from "@components/shared/list-page";
 import { InvoiceStatus } from "@prisma/client";
-import { InvoiceFetchAllOutput } from "@server/routers/invoice-router";
+import { InvoiceListOutput } from "@server/api/routers/invoice-router";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import { useState } from "react";
@@ -40,7 +40,7 @@ export default function InvoiceList({
 	const InvoiceListItems = ({
 		invoices,
 	}: {
-		invoices?: InvoiceFetchAllOutput[];
+		invoices?: InvoiceListOutput[];
 	}) => {
 		if (!invoices) {
 			return <Loading />;

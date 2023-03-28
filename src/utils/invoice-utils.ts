@@ -1,4 +1,4 @@
-import InvoiceType from "types/invoice";
+import { InvoiceByIdOutput } from "@server/api/routers/invoice-router";
 
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -58,7 +58,7 @@ export const getHighestInvoiceNo = (
 	return getNumber(highest) ? highest : undefined;
 };
 
-export const getInvoiceFileName = (invoice: InvoiceType) => {
+export const getInvoiceFileName = (invoice: InvoiceByIdOutput) => {
 	let earliestDate = invoice.activities[0].date;
 	let latestDate = invoice.activities[0].date;
 	for (const { date } of invoice.activities) {

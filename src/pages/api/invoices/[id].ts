@@ -1,5 +1,5 @@
 import { Activity, Invoice } from "@prisma/client";
-import prisma from "@utils/prisma";
+import prisma from "@server/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 

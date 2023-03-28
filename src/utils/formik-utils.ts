@@ -1,6 +1,6 @@
 import { FormValues } from "@components/invoices/invoice-form";
 import { InvoiceStatus } from "@prisma/client";
-import { InvoiceByIdOutput } from "@server/routers/invoice-router";
+import { InvoiceByIdOutput } from "@server/api/routers/invoice-router";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { FormikErrors, FormikTouched, getIn } from "formik";
 

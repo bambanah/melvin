@@ -1,20 +1,19 @@
 import { Prisma } from "@prisma/client";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import { getDuration } from "./date-utils";
 import { round } from "./generic-utils";
-dayjs.extend(customParseFormat);
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
-export const getRate = (activity: {
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+
+interface Activity {
 	date: Date;
 	startTime: Date;
 	endTime: Date;
+	transitDistance?: number | null;
+	transitDuration?: number | null;
 	supportItem: {
+		description?: string;
 		weekdayCode: string;
 		weekdayRate: Prisma.Decimal | string;
 		weeknightCode?: string | null;
@@ -24,7 +23,9 @@ export const getRate = (activity: {
 		sundayCode?: string | null;
 		sundayRate?: Prisma.Decimal | null;
 	};
-}): [code: string, rate: number] => {
+}
+
+export const getRate = (activity: Activity): [code: string, rate: number] => {
 	let rate = new Prisma.Decimal(0);
 	let itemCode = "";
 
@@ -55,7 +56,7 @@ export const getRate = (activity: {
 		activity.endTime &&
 		activity.supportItem.weeknightCode?.length &&
 		activity.supportItem.weeknightRate &&
-		dayjs.utc(activity.endTime).isAfter(dayjs.utc("1970-01-01T19:59"))
+		dayjs.utc(activity.endTime).hour() >= 19
 	) {
 		// Day is a weekday and it's after 8pm
 		rate =
@@ -75,26 +76,7 @@ export const getRate = (activity: {
 	return [itemCode, Number(rate)];
 };
 
-export const getTotalCostOfActivities = (
-	activities: {
-		date: Date;
-		startTime: Date;
-		endTime: Date;
-		transitDuration: number | null;
-		transitDistance: number | null;
-		supportItem: {
-			description: string;
-			weekdayCode: string;
-			weekdayRate: Prisma.Decimal | string;
-			weeknightCode?: string | null;
-			weeknightRate: Prisma.Decimal | null;
-			saturdayCode?: string | null;
-			saturdayRate: Prisma.Decimal | null;
-			sundayCode?: string | null;
-			sundayRate: Prisma.Decimal | null;
-		};
-	}[]
-) => {
+export const getTotalCostOfActivities = (activities: Activity[]) => {
 	const grandTotal = activities
 		.map((activity) => {
 			const [, rate] = getRate(activity);
@@ -106,7 +88,7 @@ export const getTotalCostOfActivities = (
 
 			if (activity.transitDistance) {
 				const isGroup =
-					activity.supportItem.description.includes("Group Activities");
+					activity.supportItem.description?.includes("Group Activities");
 				const ratePerKm = isGroup ? 0.43 : 0.85;
 				subTotal += round(activity.transitDistance * ratePerKm, 2);
 			}

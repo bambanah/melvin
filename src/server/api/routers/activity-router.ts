@@ -1,5 +1,5 @@
 import { activitySchema } from "@schema/activity-schema";
-import { authedProcedure, router } from "@server/trpc";
+import { authedProcedure, router } from "@server/api/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -147,7 +147,7 @@ export const activityRouter = router({
 		}),
 });
 
-export type ActivityFetchAllOutput = inferRouterOutputs<
+export type ActivityListOutput = inferRouterOutputs<
 	typeof activityRouter
 >["list"]["activities"][0];
 

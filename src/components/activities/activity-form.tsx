@@ -7,7 +7,7 @@ import Input from "@components/forms/input";
 import SupportItemSelect from "@components/forms/support-item-select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { activitySchema, ActivitySchema } from "@schema/activity-schema";
-import { ActivityByIdOutput } from "@server/routers/activity-router";
+import { ActivityByIdOutput } from "@server/api/routers/activity-router";
 import { trpc } from "@utils/trpc";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";

@@ -6,7 +6,7 @@ import ErrorMessage from "@components/forms/error-message";
 import Input from "@components/forms/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserSchema, userSchema } from "@schema/user-schema";
-import { UserFetchOutput } from "@server/routers/user-router";
+import { UserFetchOutput } from "@server/api/routers/user-router";
 import { trpc } from "@utils/trpc";
 import Link from "next/link";
 import { useRouter } from "next/router";

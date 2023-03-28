@@ -1,4 +1,4 @@
-import { authedProcedure, router } from "@server/trpc";
+import { authedProcedure, router } from "@server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import generatePDF from "@utils/pdf-generation";
 import { z } from "zod";

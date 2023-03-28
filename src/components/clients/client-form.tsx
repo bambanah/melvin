@@ -8,7 +8,7 @@ import Input from "@components/forms/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ClientSchema } from "@schema/client-schema";
 import { clientSchema } from "@schema/client-schema";
-import { ClientByIdOutput } from "@server/routers/client-router";
+import { ClientByIdOutput } from "@server/api/routers/client-router";
 import { trpc } from "@utils/trpc";
 import Link from "next/link";
 import { useRouter } from "next/router";
