@@ -3,11 +3,11 @@ import classNames from "classnames";
 type Variant = "XSMALL" | "SMALL" | "MEDIUM" | "LARGE" | "XLARGE";
 
 const variantStyles: Record<Variant, string> = {
-	XSMALL: "text-lg",
-	SMALL: "text-2xl",
-	MEDIUM: "text-3xl",
-	LARGE: "text-4xl",
-	XLARGE: "text-6xl",
+	XSMALL: "text-base md:text-lg",
+	SMALL: "text-lg md:text-2xl",
+	MEDIUM: "text-xl md:text-3xl",
+	LARGE: "text-2xl md:text-4xl",
+	XLARGE: "text-4xl md:text-6xl",
 };
 
 interface Props {
