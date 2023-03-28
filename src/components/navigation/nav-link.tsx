@@ -24,7 +24,11 @@ const Link = ({ href, icon, children, className }: Props) => {
 				className,
 			])}
 		>
-			{icon && <FontAwesomeIcon icon={icon} size="lg" className="md:hidden" />}
+			{icon && (
+				<span className="text-center md:hidden">
+					<FontAwesomeIcon icon={icon} size="lg" />
+				</span>
+			)}
 			{children}
 		</NextLink>
 	);
