@@ -34,11 +34,18 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 	return (
 		<main
 			className={classNames([
-				"font-sans transition-colors",
+				"transition-colors",
 				inter.variable,
 				patuaOne.variable,
 			])}
 		>
+			<style jsx global>{`
+				:root {
+					--font-inter: ${inter.style.fontFamily};
+					--font-patua-one: ${patuaOne.style.fontFamily};
+				}
+			`}</style>
+
 			<SessionProvider session={session}>
 				<AppContextProvider>
 					<Head>

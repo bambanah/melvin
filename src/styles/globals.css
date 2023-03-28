@@ -22,6 +22,10 @@ body {
 	@apply bg-bg;
 }
 
+* {
+	@apply font-sans;
+}
+
 *,
 *::before,
 *::after {
