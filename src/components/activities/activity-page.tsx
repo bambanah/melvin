@@ -17,7 +17,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-const SupportItemPage = () => {
+const ActivityPage = () => {
 	const router = useRouter();
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -69,9 +69,7 @@ const SupportItemPage = () => {
 				/>
 
 				<div className="mb-2 flex items-center justify-between">
-					<Heading className="medium text-lg sm:text-2xl">
-						{activity.supportItem.description}
-					</Heading>
+					<Heading>{activity.supportItem.description}</Heading>
 
 					<Dropdown>
 						<Dropdown.Button>
@@ -132,4 +130,4 @@ const SupportItemPage = () => {
 	);
 };
 
-export default SupportItemPage;
+export default ActivityPage;
