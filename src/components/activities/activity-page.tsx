@@ -49,7 +49,7 @@ const ActivityPage = () => {
 	if (!activity) return <div>loading...</div>;
 
 	return (
-		<div className="flex flex-col items-center justify-center px-8">
+		<div className="flex flex-col items-center justify-center px-5">
 			<Head>
 				<title>
 					{`${activity.supportItem.description} - ${dayjs(activity.date).format(
@@ -57,7 +57,7 @@ const ActivityPage = () => {
 					)} | Melvin`}
 				</title>
 			</Head>
-			<div className="flex w-full max-w-4xl flex-col gap-4 px-3">
+			<div className="flex w-full max-w-4xl flex-col gap-4">
 				<ConfirmDialog
 					title="Are you sure you want to delete this activity?"
 					description="This cannot be undone."
@@ -68,7 +68,7 @@ const ActivityPage = () => {
 					confirmAction={deleteActivity}
 				/>
 
-				<div className="mb-2 flex items-center justify-between">
+				<div className="my-2 flex items-center justify-between">
 					<Heading>{activity.supportItem.description}</Heading>
 
 					<Dropdown>

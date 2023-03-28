@@ -1,7 +1,7 @@
 import ConfirmDialog from "@atoms/confirm-dialog";
 import Dropdown from "@atoms/dropdown";
 import Heading from "@atoms/heading";
-import { faEllipsisV, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { trpc } from "@utils/trpc";
 import Head from "next/head";
@@ -58,7 +58,7 @@ const SupportItemPage = () => {
 					confirmAction={deletesupportItem}
 				/>
 
-				<div className="mb-2 flex items-center justify-between px-3 pt-5">
+				<div className="my-5 mb-2 flex items-center justify-between px-5">
 					<Heading>{supportItem.description}</Heading>
 
 					<Dropdown>
@@ -87,7 +87,7 @@ const SupportItemPage = () => {
 					</Dropdown>
 				</div>
 
-				<table className="w-full table-auto border-collapse text-sm md:text-base [&_td]:border-t [&_td]:p-2 [&_th]:px-2 [&_th]:py-1">
+				<table className="mt-8 w-full table-auto border-collapse text-sm md:text-base [&_td]:border-t [&_td]:p-2 [&_th]:px-2 [&_th]:py-1">
 					<thead className="text-left text-lg md:text-xl">
 						<tr>
 							<th>Period</th>

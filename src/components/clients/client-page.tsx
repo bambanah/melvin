@@ -54,9 +54,7 @@ const ClientPage = () => {
 
 			<div className="my-2 flex w-full flex-col gap-2 px-4 sm:my-8">
 				<div className="mb-2 flex items-center justify-between">
-					<Heading className="medium text-lg sm:text-2xl">
-						{client.name}
-					</Heading>
+					<Heading>{client.name}</Heading>
 
 					<Dropdown>
 						<Dropdown.Button>

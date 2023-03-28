@@ -112,7 +112,7 @@ const InvoicePage = () => {
 				<div className="mx-auto flex w-full max-w-4xl flex-col gap-2 px-4">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2">
-							<Heading variant="SMALL">{invoice.invoiceNo}</Heading>
+							<Heading>{invoice.invoiceNo}</Heading>
 							<InvoiceStatusBadge invoiceStatus={invoice.status} />
 						</div>
 						<Dropdown>
