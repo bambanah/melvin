@@ -15,3 +15,25 @@
 		@apply flex items-center justify-center gap-6;
 	}
 }
+
+html,
+body {
+	@apply text-fg;
+	@apply bg-bg;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+a {
+	cursor: pointer;
+	text-decoration: none;
+	@apply text-blue-700;
+
+	&:hover {
+		@apply text-fg;
+	}
+}

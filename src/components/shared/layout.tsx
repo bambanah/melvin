@@ -27,7 +27,7 @@ const Layout = ({ children, isLoading }: Props) => {
 	content = children;
 
 	return (
-		<div className="flex h-full min-h-screen w-screen flex-col">
+		<div className="flex h-full min-h-screen w-full flex-col">
 			<Navbar />
 
 			<div className="mb-12 flex flex-auto flex-col py-2 md:mb-0 md:p-12">
