@@ -3,13 +3,13 @@ import Loading from "@atoms/loading";
 import ListPage from "@components/shared/list-page";
 import { InvoiceStatus } from "@prisma/client";
 import { InvoiceFetchAllOutput } from "@server/routers/invoice-router";
-import { getTotalCost } from "@utils/helpers";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import { useState } from "react";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { getTotalCostOfActivities } from "@utils/activity-utils";
 dayjs.extend(utc);
 
 interface Props {
@@ -62,10 +62,13 @@ export default function InvoiceList({
 							</div>
 							<div className="flex basis-10 flex-col gap-2 text-right">
 								<span className="sm:text-lg">
-									{getTotalCost(invoice.activities).toLocaleString(undefined, {
-										style: "currency",
-										currency: "AUD",
-									})}
+									{getTotalCostOfActivities(invoice.activities).toLocaleString(
+										undefined,
+										{
+											style: "currency",
+											currency: "AUD",
+										}
+									)}
 								</span>
 								<InvoiceStatusBadge invoiceStatus={invoice.status} />
 							</div>

@@ -2,7 +2,9 @@ import Badge from "@atoms/badge";
 import Loading from "@atoms/loading";
 import ListPage from "@components/shared/list-page";
 import { ActivityFetchAllOutput } from "@server/routers/activity-router";
-import { getTotalCost, groupBy, isHoliday } from "@utils/helpers";
+import { isHoliday as isDateHoliday } from "@utils/date-utils";
+import { groupBy } from "@utils/generic-utils";
+import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import dayjs from "dayjs";
@@ -57,7 +59,7 @@ function ActivityList({ invoiceId, groupByAssignedStatus = true }: Props) {
 					<div key={group} className="mb-4 overflow-hidden">
 						<div className="flex w-full items-center gap-2 border-b bg-neutral-50 px-4 py-2 text-left">
 							{dayjs(group).format("dddd DD MMM.")}
-							{isHoliday(group) && <Badge variant="INFO">Holiday</Badge>}
+							{isDateHoliday(group) && <Badge variant="INFO">Holiday</Badge>}
 						</div>
 
 						<ListPage.Items>
@@ -80,10 +82,13 @@ function ActivityList({ invoiceId, groupByAssignedStatus = true }: Props) {
 											{dayjs(activity.endTime).format("HH:mm")}
 										</p>
 										<span className="font-semibold">
-											{getTotalCost([activity]).toLocaleString(undefined, {
-												style: "currency",
-												currency: "AUD",
-											})}
+											{getTotalCostOfActivities([activity]).toLocaleString(
+												undefined,
+												{
+													style: "currency",
+													currency: "AUD",
+												}
+											)}
 										</span>
 									</div>
 								</ListPage.Item>

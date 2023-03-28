@@ -1,11 +1,15 @@
+import { InvoiceStatusBadge } from "@atoms/badge";
+import ConfirmDialog from "@atoms/confirm-dialog";
+import Dropdown from "@atoms/dropdown";
 import Heading from "@atoms/heading";
 import Loading from "@atoms/loading";
+import ActivityList from "@components/activities/activity-list";
 import {
+	faClock,
 	faEllipsisV,
 	faMagnifyingGlassPlus,
-	faClock,
-	faUser,
 	faRunning,
+	faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog, Transition } from "@headlessui/react";
@@ -13,15 +17,11 @@ import { trpc } from "@utils/trpc";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
-import PdfPreview from "./pdf-preview";
-import Dropdown from "@atoms/dropdown";
-import ConfirmDialog from "@atoms/confirm-dialog";
 import { toast } from "react-toastify";
-import { InvoiceStatusBadge } from "@atoms/badge";
+import PdfPreview from "./pdf-preview";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import ActivityList from "@components/activities/activity-list";
 dayjs.extend(utc);
 
 const InvoicePage = () => {
@@ -141,7 +141,7 @@ const InvoicePage = () => {
 						</Dropdown>
 					</div>
 
-					<div className="flex flex-col gap-3">
+					<div className="flex flex-grow flex-col justify-center gap-3">
 						<div className="flex items-center gap-2">
 							<FontAwesomeIcon icon={faClock} />
 							<p>{dayjs.utc(invoice.date).format("DD/MM/YYYY")}</p>
@@ -160,6 +160,7 @@ const InvoicePage = () => {
 					</div>
 				</div>
 			</div>
+
 			<div className="hidden md:block">
 				<ActivityList groupByAssignedStatus={false} invoiceId={invoice.id} />
 			</div>

@@ -11,16 +11,10 @@ import { faTrashAlt } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Invoice } from "@prisma/client";
 import InvoiceValidationSchema from "@schema/invoice-validation-schema";
-import {
-	errorIn,
-	getHighestInvoiceNo,
-	getNextInvoiceNo,
-	valuesToInvoice,
-} from "@utils/helpers";
+import { errorIn, valuesToInvoice } from "@utils/formik-utils";
+import { getHighestInvoiceNo, getNextInvoiceNo } from "@utils/invoice-utils";
 import { trpc } from "@utils/trpc";
 import axios from "axios";
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
 import { FieldArray, FormikProps, withFormik } from "formik";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -28,6 +22,9 @@ import { FC, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useSWRConfig } from "swr";
 import * as Styles from "./styles";
+
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 
 export type FormActivity = {

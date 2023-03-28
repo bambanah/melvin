@@ -1,16 +1,14 @@
 import { Prisma } from "@prisma/client";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import { getRate, getTotalCostOfActivities } from "./activity-utils";
+import { getDuration, formatDuration } from "./date-utils";
+import { round } from "./generic-utils";
 import {
-	getDuration,
 	getHighestInvoiceNo,
 	getNextInvoiceNo,
 	getNonLabourTravelCode,
-	getPrettyDuration,
-	getRate,
-	getTotalCost,
-	round,
-} from "@utils/helpers";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
+} from "./invoice-utils";
 dayjs.extend(utc);
 
 const getActivity = (
@@ -47,6 +45,7 @@ const getActivity = (
 
 const dateFromTime = (time: string) => dayjs.utc(`1970-01-01T${time}`).toDate();
 
+// TODO: Break this up into individual util test files
 describe("Helpers", () => {
 	it("Should get duration", () => {
 		expect(getDuration(dateFromTime("12:00"), dateFromTime("13:00"))).toEqual(
@@ -68,45 +67,31 @@ describe("Helpers", () => {
 
 	it("Should get pretty duration", () => {
 		expect(
-			getPrettyDuration(
-				getDuration(dateFromTime("12:00"), dateFromTime("13:00"))
-			)
+			formatDuration(getDuration(dateFromTime("12:00"), dateFromTime("13:00")))
 		).toEqual("1 hour");
 
 		expect(
-			getPrettyDuration(
-				getDuration(dateFromTime("12:00"), dateFromTime("13:01"))
-			)
+			formatDuration(getDuration(dateFromTime("12:00"), dateFromTime("13:01")))
 		).toEqual("1 hour, 1 min");
 
 		expect(
-			getPrettyDuration(
-				getDuration(dateFromTime("13:00"), dateFromTime("15:00"))
-			)
+			formatDuration(getDuration(dateFromTime("13:00"), dateFromTime("15:00")))
 		).toEqual("2 hours");
 
 		expect(
-			getPrettyDuration(
-				getDuration(dateFromTime("13:00"), dateFromTime("15:30"))
-			)
+			formatDuration(getDuration(dateFromTime("13:00"), dateFromTime("15:30")))
 		).toEqual("2 hours, 30 mins");
 
 		expect(
-			getPrettyDuration(
-				getDuration(dateFromTime("01:20"), dateFromTime("15:00"))
-			)
+			formatDuration(getDuration(dateFromTime("01:20"), dateFromTime("15:00")))
 		).toEqual("13 hours, 40 mins");
 
 		expect(
-			getPrettyDuration(
-				getDuration(dateFromTime("09:12"), dateFromTime("13:34"))
-			)
+			formatDuration(getDuration(dateFromTime("09:12"), dateFromTime("13:34")))
 		).toEqual("4 hours, 22 mins");
 
 		expect(
-			getPrettyDuration(
-				getDuration(dateFromTime("09:00"), dateFromTime("09:14"))
-			)
+			formatDuration(getDuration(dateFromTime("09:00"), dateFromTime("09:14")))
 		).toEqual("14 mins");
 	});
 
@@ -196,42 +181,48 @@ describe("Helpers", () => {
 
 	it("Should return correct total", () => {
 		expect(
-			getTotalCost([getActivity("weekday", "16:00", "17:00", 0, 0)])
+			getTotalCostOfActivities([getActivity("weekday", "16:00", "17:00", 0, 0)])
 		).toEqual(55.47);
 
 		expect(
-			getTotalCost([getActivity("weekday", "15:00", "17:00", 7, 15)])
+			getTotalCostOfActivities([
+				getActivity("weekday", "15:00", "17:00", 7, 15),
+			])
 		).toEqual(130.16);
 
 		expect(
-			getTotalCost([
+			getTotalCostOfActivities([
 				getActivity("weekday", "15:00", "17:00", 7, 15),
 				getActivity("weekday", "15:00", "21:00", 7, 15),
 			])
 		).toEqual(516.33);
 
 		expect(
-			getTotalCost([getActivity("saturday", "15:00", "17:00", 7, 15)])
+			getTotalCostOfActivities([
+				getActivity("saturday", "15:00", "17:00", 7, 15),
+			])
 		).toEqual(177.45);
 
 		expect(
-			getTotalCost([getActivity("saturday", "19:00", "21:00", 7, 15)])
+			getTotalCostOfActivities([
+				getActivity("saturday", "19:00", "21:00", 7, 15),
+			])
 		).toEqual(177.45);
 
 		expect(
-			getTotalCost([getActivity("weekday", "09:30", "15:00", 0, 0)])
+			getTotalCostOfActivities([getActivity("weekday", "09:30", "15:00", 0, 0)])
 		).toEqual(305.09);
 
 		expect(
-			getTotalCost([getActivity("weekday", "09:30", "15:10", 0, 0)])
+			getTotalCostOfActivities([getActivity("weekday", "09:30", "15:10", 0, 0)])
 		).toEqual(314.33);
 
 		expect(
-			getTotalCost([getActivity("weekday", "16:10", "20:10", 0, 0)])
+			getTotalCostOfActivities([getActivity("weekday", "16:10", "20:10", 0, 0)])
 		).toEqual(244.2);
 
 		expect(
-			getTotalCost([
+			getTotalCostOfActivities([
 				getActivity("weekday", "09:30", "15:00", 15, 7),
 				getActivity("weekday", "09:30", "15:10", 15, 7),
 				getActivity("weekday", "09:30", "15:23", 15, 7),
@@ -239,7 +230,7 @@ describe("Helpers", () => {
 		).toEqual(1005.23);
 
 		expect(
-			getTotalCost([
+			getTotalCostOfActivities([
 				getActivity("weekday", "09:30", "15:00", 15, 7),
 				getActivity("weekday", "09:30", "15:00", 15, 7),
 				getActivity("weekday", "09:30", "15:00", 15, 7),

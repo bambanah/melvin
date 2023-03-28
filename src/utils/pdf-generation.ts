@@ -2,19 +2,15 @@ import { RateType } from "@prisma/client";
 import { InvoiceByIdOutput } from "@server/routers/invoice-router";
 import jspdf from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
-import {
-	getDuration,
-	getNonLabourTravelCode,
-	getPrettyDuration,
-	getRate,
-	getTotalCost,
-	round,
-} from "./helpers";
+import { getRate, getTotalCostOfActivities } from "./activity-utils";
+import { formatDuration, getDuration } from "./date-utils";
+import { round } from "./generic-utils";
+import { getNonLabourTravelCode } from "./invoice-utils";
+import prisma from "./prisma";
 
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import prisma from "./prisma";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -58,7 +54,7 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 				const duration = getDuration(activity.startTime, activity.endTime);
 				totalCost = round(Number(rate) * duration, 2);
 
-				const prettyDuration = getPrettyDuration(duration);
+				const prettyDuration = formatDuration(duration);
 
 				countString = `${dayjs.utc(activity.startTime).format("HH:mm")}-${dayjs
 					.utc(activity.endTime)
@@ -152,7 +148,7 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 	// Activities only allows strings - need to allow strings and CellDef
 	const values: (CellDef | string)[][] = activityStrings;
 
-	const totalCost = getTotalCost(invoice.activities);
+	const totalCost = getTotalCostOfActivities(invoice.activities);
 
 	// Bottom section
 	values.push(
