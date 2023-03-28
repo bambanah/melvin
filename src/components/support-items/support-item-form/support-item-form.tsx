@@ -172,9 +172,9 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 					>
 						{formPurpose.charAt(0).toUpperCase() + formPurpose.slice(1)}
 					</Button>
-					<Link href="/support-items">
-						<Button type="button">Cancel</Button>
-					</Link>
+					<Button type="button" onClick={() => router.back()}>
+						Cancel
+					</Button>
 				</div>
 			</Form>
 		</Styles.CreateActivityContainer>
