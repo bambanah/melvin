@@ -1,17 +1,25 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
-import Link from "next/link";
+import Link, { LinkProps } from "next/link";
 import React, { ReactNode } from "react";
 
 const Items = ({ children }: { children: ReactNode }) => {
 	return <div className="flex flex-col divide-y">{children}</div>;
 };
 
-const Item = ({ children, href }: { children: ReactNode; href: string }) => (
+const Item = ({
+	children,
+	className,
+	...rest
+}: Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps> &
+	LinkProps) => (
 	<Link
-		href={href}
-		className="flex w-full justify-between gap-4 p-4 text-sm text-zinc-900 hover:bg-zinc-100"
+		className={classNames([
+			"flex w-full justify-between gap-2 p-4 text-sm text-zinc-900 hover:bg-zinc-100",
+			className,
+		])}
+		{...rest}
 	>
 		{children}
 	</Link>

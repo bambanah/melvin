@@ -13,6 +13,11 @@ const defaultActivitySelect = {
 	date: true,
 	supportItem: true,
 	client: true,
+	invoice: {
+		select: {
+			invoiceNo: true,
+		},
+	},
 };
 
 function getInvoiceIdWhereCondition(invoiceIdAssigned?: boolean) {

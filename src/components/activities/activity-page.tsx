@@ -6,6 +6,7 @@ import {
 	faUser,
 	faClock,
 	faCalendar,
+	faFileAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { trpc } from "@utils/trpc";
@@ -111,12 +112,21 @@ const SupportItemPage = () => {
 					</p>
 				</div>
 
-				<p className="flex items-center gap-2">
+				<div className="flex items-center gap-2">
 					<FontAwesomeIcon icon={faUser} />
 					<Link href={`/clients/${activity.client?.id}`}>
 						{activity.client?.name}
 					</Link>
-				</p>
+				</div>
+
+				{activity.invoice && (
+					<div className="flex items-center gap-2">
+						<FontAwesomeIcon icon={faFileAlt} />
+						<Link href={`/clients/${activity.client?.id}`}>
+							{activity.invoice.invoiceNo}
+						</Link>
+					</div>
+				)}
 			</div>
 		</div>
 	);
