@@ -83,8 +83,8 @@ function ActivityList({ invoiceId, groupByAssignedStatus = true }: Props) {
 												icon={faClock}
 												className="w-4 text-gray-600"
 											/>
-											{dayjs(activity.startTime).format("HH:mm")} -{" "}
-											{dayjs(activity.endTime).format("HH:mm")}
+											{dayjs.utc(activity.startTime).format("HH:mm")} -{" "}
+											{dayjs.utc(activity.endTime).format("HH:mm")}
 										</div>
 									</div>
 									<div className="flex flex-col items-start justify-between gap-2 md:items-end">

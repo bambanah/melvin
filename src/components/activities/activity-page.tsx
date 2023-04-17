@@ -99,14 +99,14 @@ const ActivityPage = () => {
 
 				<div className="flex items-center gap-2">
 					<FontAwesomeIcon icon={faCalendar} />
-					<p>{dayjs(activity.date).format("DD/MM/YY")}</p>
+					<p>{dayjs.utc(activity.date).format("DD/MM/YY")}</p>
 				</div>
 
 				<div className="flex items-center gap-2">
 					<FontAwesomeIcon icon={faClock} />
 					<p>
-						{dayjs(activity.startTime).format("hh:mma")} -{" "}
-						{dayjs(activity.endTime).format("hh:mma")}
+						{dayjs.utc(activity.startTime).format("hh:mma")} -{" "}
+						{dayjs.utc(activity.endTime).format("hh:mma")}
 					</p>
 				</div>
 
