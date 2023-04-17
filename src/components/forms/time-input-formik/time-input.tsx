@@ -6,7 +6,7 @@ interface Props {
 	error?: boolean;
 }
 
-export default function TimePicker({ name, error }: Props) {
+export default function TimePicker({ name }: Props) {
 	const [field] = useField(name);
 
 	return (

@@ -1,4 +1,5 @@
 import { InvoiceStatusBadge } from "@atoms/badge";
+import Button from "@atoms/button";
 import ConfirmDialog from "@atoms/confirm-dialog";
 import Heading from "@atoms/heading";
 import Loading from "@atoms/loading";
@@ -10,8 +11,14 @@ import {
 	faPaperPlane,
 	faUser,
 } from "@fortawesome/free-regular-svg-icons";
+import {
+	faMagnifyingGlassPlus,
+	faRunning,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog, Transition } from "@headlessui/react";
+import { InvoiceStatus } from "@prisma/client";
+import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { trpc } from "@utils/trpc";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -19,15 +26,8 @@ import { Fragment, useState } from "react";
 import { toast } from "react-toastify";
 import PdfPreview from "./pdf-preview";
 
-import Button from "@atoms/button";
-import { getTotalCostOfActivities } from "@utils/activity-utils";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import {
-	faMagnifyingGlassPlus,
-	faRunning,
-} from "@fortawesome/free-solid-svg-icons";
-import { InvoiceStatus } from "@prisma/client";
 dayjs.extend(utc);
 
 const InvoicePage = () => {
@@ -62,6 +62,7 @@ const InvoicePage = () => {
 		markInvoiceAsMutation
 			.mutateAsync({ id: invoiceId, status: invoiceStatus })
 			.then(() => {
+				trpcContext.invoice.byId.invalidate({ id: invoiceId });
 				trpcContext.invoice.list.invalidate();
 			});
 	};
@@ -147,15 +148,27 @@ const InvoicePage = () => {
 					</div>
 
 					<div className="mt-4 flex flex-grow flex-col justify-center gap-4">
-						<Button
-							onClick={() => {
-								markInvoiceAs("SENT");
-							}}
-							variant="success"
-							className="font-semibold"
-						>
-							Send <FontAwesomeIcon icon={faPaperPlane} />
-						</Button>
+						{invoice.status === InvoiceStatus.SENT ||
+							(invoice.status === InvoiceStatus.PAID && (
+								<Button
+									onClick={() => {
+										markInvoiceAs("CREATED");
+									}}
+								>
+									Mark as Created
+								</Button>
+							))}
+						{invoice.status === InvoiceStatus.CREATED && (
+							<Button
+								onClick={() => {
+									markInvoiceAs("SENT");
+								}}
+								variant="success"
+								className="font-semibold"
+							>
+								Send <FontAwesomeIcon icon={faPaperPlane} />
+							</Button>
+						)}
 					</div>
 				</div>
 			</div>
