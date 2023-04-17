@@ -5,7 +5,6 @@ export const BaseButton = styled.button`
 	display: inline-block;
 
 	font-size: 1rem;
-	font-weight: bold;
 
 	cursor: pointer;
 	padding: 0.4em 1.3em;
