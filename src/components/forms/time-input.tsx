@@ -1,8 +1,8 @@
 import type { InputProps } from "@components/forms/input";
 import Input from "@components/forms/input";
+import { FieldValues } from "react-hook-form";
 
 import dayjs from "dayjs";
-import { FieldValues } from "react-hook-form";
 dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
 export default function TimeInput<T extends FieldValues>({
