@@ -8,8 +8,6 @@ dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-import supportItems from "../../public/ndis-support-catalogue-22-23.json";
-
 const getNumber = (invoiceNo: string): number | undefined => {
 	const matches = invoiceNo.match(/\d+$/);
 
@@ -77,20 +75,4 @@ export const getInvoiceFileName = (invoice: InvoiceByIdOutput) => {
 	).format("YYYY")}.pdf`;
 
 	return fileName;
-};
-
-export const getNonLabourTravelCode = (supportItemCode: string) => {
-	// Identical to regex in support-item-schema, except capturing the group number (third block)
-	const groupNumberMatch = supportItemCode.match(
-		/^\d{2}_(?:\d{3}|\d{9})_(\d{4})_\d_\d(?:_T)?$/
-	)?.[1];
-	const groupNumber = Number(groupNumberMatch);
-
-	const supportItem = supportItems.find(
-		(activity) =>
-			activity.registrationGroupNumber === groupNumber &&
-			activity.supportItemName === "Provider travel - non-labour costs"
-	);
-
-	return supportItem?.supportItemNumber;
 };

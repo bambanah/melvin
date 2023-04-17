@@ -4,11 +4,8 @@ import utc from "dayjs/plugin/utc";
 import { getRate, getTotalCostOfActivities } from "./activity-utils";
 import { getDuration, formatDuration } from "./date-utils";
 import { round } from "./generic-utils";
-import {
-	getHighestInvoiceNo,
-	getNextInvoiceNo,
-	getNonLabourTravelCode,
-} from "./invoice-utils";
+import { getHighestInvoiceNo, getNextInvoiceNo } from "./invoice-utils";
+import { getNonLabourTravelCode } from "./support-item-utils";
 dayjs.extend(utc);
 
 const getActivity = (

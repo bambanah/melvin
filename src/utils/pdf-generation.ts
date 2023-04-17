@@ -6,7 +6,8 @@ import autoTable, { CellDef } from "jspdf-autotable";
 import { getRate, getTotalCostOfActivities } from "./activity-utils";
 import { formatDuration, getDuration } from "./date-utils";
 import { round } from "./generic-utils";
-import { getInvoiceFileName, getNonLabourTravelCode } from "./invoice-utils";
+import { getInvoiceFileName } from "./invoice-utils";
+import { getNonLabourTravelCode } from "./support-item-utils";
 
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
