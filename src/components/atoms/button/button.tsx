@@ -18,6 +18,7 @@ const Button: React.FC<Props> = ({
 	children,
 	disabled,
 	className,
+	type = "button",
 	...rest
 }) => {
 	let ButtonComponent: StyledComponent<"button", DefaultTheme>;
@@ -48,6 +49,7 @@ const Button: React.FC<Props> = ({
 		<ButtonComponent
 			className={`${disabled ? "disabled" : ""} ${className}`}
 			disabled={disabled}
+			type={type}
 			{...rest}
 		>
 			{children}

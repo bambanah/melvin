@@ -59,6 +59,55 @@ export const userRouter = router({
 
 			return { user: user };
 		}),
+	reset: authedProcedure.mutation(async ({ ctx }) => {
+		const userId = ctx.session.user.id;
+
+		if (!userId) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "Can't find a signed in user",
+			});
+		}
+
+		// Deleting client will cascade delete invoices and activities
+		await ctx.prisma.client.deleteMany({
+			where: {
+				ownerId: userId,
+			},
+		});
+
+		// In case there are any orphaned invoices or activities, delete those too
+		await ctx.prisma.invoice.deleteMany({
+			where: {
+				ownerId: userId,
+			},
+		});
+
+		await ctx.prisma.activity.deleteMany({
+			where: {
+				ownerId: userId,
+			},
+		});
+
+		await ctx.prisma.supportItem.deleteMany({
+			where: {
+				ownerId: userId,
+			},
+		});
+
+		await ctx.prisma.user.update({
+			where: {
+				id: userId,
+			},
+			data: {
+				abn: null,
+				name: null,
+				bankName: null,
+				bankNumber: null,
+				bsb: null,
+			},
+		});
+	}),
 });
 
 export type UserFetchOutput = inferRouterOutputs<typeof userRouter>["fetch"];
