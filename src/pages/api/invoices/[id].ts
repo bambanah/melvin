@@ -42,9 +42,13 @@ export default async (request: ApiRequest, response: NextApiResponse) => {
 					where: { id: activity.id ?? "" },
 					update: {
 						...activity,
+						ownerId: session.user.id,
+						clientId: request.body.invoice?.clientId,
 					},
 					create: {
 						...activity,
+						ownerId: session.user.id,
+						clientId: request.body.invoice?.clientId,
 						invoiceId,
 					},
 				})
