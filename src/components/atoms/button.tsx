@@ -25,7 +25,7 @@ const Button = ({
 	return (
 		<button
 			className={classNames([
-				"flex cursor-pointer items-center gap-2 border border-fg py-2 px-4 transition-all duration-100 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[0.25rem_0.25rem_#000]",
+				"flex cursor-pointer items-center justify-center gap-2 border border-fg py-2 px-4 transition-all duration-100 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[0.25rem_0.25rem_#000]",
 				variantStyles[variant],
 				className,
 			])}

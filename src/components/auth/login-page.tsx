@@ -40,6 +40,7 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 						<Button
 							onClick={() => signIn(provider.id, { callbackUrl })}
 							key={provider.id}
+							className="w-full"
 						>
 							<FontAwesomeIcon icon={faGoogle} />
 							Sign in with {provider.name}
