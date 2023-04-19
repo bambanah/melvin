@@ -15,7 +15,6 @@ import { trpc } from "@utils/trpc";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import * as Styles from "./styles";
 
 interface Props {
 	existingSupportItem?: SupportItemByIdOutput;
@@ -79,16 +78,16 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 	};
 
 	return (
-		<Styles.CreateActivityContainer>
+		<div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-8 px-4 py-6">
 			<Heading>
 				{existingSupportItem
 					? `Updating ${existingSupportItem.description}`
 					: "Create New Support Item"}
 			</Heading>
 			<Form onSubmit={handleSubmit(onSubmit)}>
-				<Styles.InputGroup>
-					<Styles.Heading>General</Styles.Heading>
-					<Styles.InputRow>
+				<div className="flex shrink flex-col gap-4">
+					<Heading size="small">General</Heading>
+					<div className="flex gap-4">
 						<Label htmlFor="description" required>
 							<span>Description</span>
 							<Subheading>
@@ -118,11 +117,11 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 							/>
 							<ErrorMessage error={errors.rateType?.message} />
 						</Label>
-					</Styles.InputRow>
-				</Styles.InputGroup>
+					</div>
+				</div>
 
-				<Styles.InputGroup>
-					<Styles.Heading>Rates</Styles.Heading>
+				<div className="flex flex-col gap-4">
+					<Heading size="small">Rates</Heading>
 					<Subheading>
 						Only the weekday information is required, and will be used in the
 						event of another rate not being entered
@@ -130,22 +129,22 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 
 					{(["weekday", "weeknight", "saturday", "sunday"] as const).map(
 						(day) => (
-							<Styles.RateRow key={day}>
-								<Label required={day === "weekday"}>
-									<span>{day.charAt(0).toUpperCase() + day.slice(1)}</span>
-								</Label>
-								<Styles.InputContainer>
+							<div className="flex items-center gap-4" key={day}>
+								<p className="flex w-16 shrink-0 gap-1 text-sm font-semibold md:w-24 md:text-base">
+									{day.charAt(0).toUpperCase() + day.slice(1)}{" "}
+									<span className="text-red-500">
+										{day === "weekday" && "*"}
+									</span>
+								</p>
+								<div className="flex gap-2">
 									<Input
 										name={`${day}Code`}
 										register={register}
 										type="text"
 										placeholder="XX_XXX_XXXX_X_X"
 										error={!!errors[`${day}Code`]}
+										className=""
 									/>
-									<ErrorMessage error={errors[`${day}Code`]?.message} />
-								</Styles.InputContainer>
-
-								<Styles.InputContainer>
 									<Input
 										name={`${day}Rate`}
 										register={register}
@@ -155,13 +154,13 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 										type="text"
 										prefix="$"
 										error={!!errors[`${day}Rate`]}
+										className="grow basis-28"
 									/>
-									<ErrorMessage error={errors[`${day}Rate`]?.message} />
-								</Styles.InputContainer>
-							</Styles.RateRow>
+								</div>
+							</div>
 						)
 					)}
-				</Styles.InputGroup>
+				</div>
 
 				<div className="btn-group">
 					<Button
@@ -176,7 +175,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 					</Button>
 				</div>
 			</Form>
-		</Styles.CreateActivityContainer>
+		</div>
 	);
 };
 
