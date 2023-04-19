@@ -3,6 +3,10 @@ import { authedProcedure, router } from "@server/api/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+
 const defaultActivitySelect = {
 	id: true,
 	startTime: true,
@@ -32,10 +36,11 @@ export const activityRouter = router({
 			z.object({
 				assigned: z.boolean().optional(),
 				invoiceId: z.string().optional(),
+				clientId: z.string().optional(),
 			})
 		)
 		.query(async ({ ctx, input }) => {
-			const { assigned, invoiceId } = input;
+			const { assigned, invoiceId, clientId } = input;
 
 			const activities = await ctx.prisma.activity.findMany({
 				select: {
@@ -50,6 +55,7 @@ export const activityRouter = router({
 						assigned === undefined
 							? invoiceId
 							: getInvoiceIdWhereCondition(assigned),
+					clientId,
 				},
 				orderBy: [
 					{
@@ -62,7 +68,7 @@ export const activityRouter = router({
 			});
 
 			return {
-				activities,
+				activities: activities,
 			};
 		}),
 	byId: authedProcedure

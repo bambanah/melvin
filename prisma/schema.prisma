@@ -96,7 +96,7 @@ model Invoice {
   updatedAt DateTime @default(now()) @updatedAt
 
   invoiceNo String
-  billTo    String
+  billTo    String?
   date      DateTime
   status    InvoiceStatus @default(CREATED)
 

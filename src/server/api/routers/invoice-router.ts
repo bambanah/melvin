@@ -1,8 +1,10 @@
-import { InvoiceStatus } from "@prisma/client";
+import { Invoice, InvoiceStatus } from "@prisma/client";
 import { activitySchema } from "@schema/activity-schema";
+import { invoiceSchema } from "@schema/invoice-schema";
 import { authedProcedure, router } from "@server/api/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { baseListQueryInput } from "@utils/trpc";
+import dayjs from "dayjs";
 import { z } from "zod";
 
 const defaultInvoiceSelect = {
@@ -27,12 +29,14 @@ const defaultInvoiceSelect = {
 	},
 };
 
-const defaultInvoiceCreate = z.object({
-	date: z.date().optional(),
-	clientId: z.string(),
-	billTo: z.string(),
-	invoiceNo: z.string(),
-});
+function parseInvoice<T extends Partial<Invoice>>(
+	invoice: T
+): Omit<T, "date"> & { date?: string } {
+	return {
+		...invoice,
+		date: dayjs(invoice.date).format("YYYY-MM-DD"),
+	};
+}
 
 export const invoiceRouter = router({
 	list: authedProcedure
@@ -77,7 +81,7 @@ export const invoiceRouter = router({
 			}
 
 			return {
-				invoices: invoices.reverse(),
+				invoices: invoices.map((invoice) => parseInvoice(invoice)).reverse(),
 				nextCursor,
 			};
 		}),
@@ -109,55 +113,69 @@ export const invoiceRouter = router({
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			return invoice;
+			return parseInvoice(invoice);
 		}),
 	create: authedProcedure
 		.input(
 			z.object({
-				invoice: defaultInvoiceCreate,
-				activities: z.array(activitySchema),
+				invoice: invoiceSchema,
+				activities: z.array(activitySchema).optional(),
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
-			const { invoice, activities } = input;
+			const { invoice: inputInvoice, activities } = input;
 
-			const activity = await ctx.prisma.invoice.create({
+			const invoice = await ctx.prisma.invoice.create({
 				data: {
-					...invoice,
-					date: invoice.date ?? new Date(),
+					...inputInvoice,
+					date: inputInvoice.date ? new Date(inputInvoice.date) : new Date(),
 					ownerId: ctx.session.user.id,
-					activities: {
-						createMany: {
-							data: activities.map((activity) => ({
-								...activity,
-								ownerId: ctx.session.user.id,
-							})),
-						},
-					},
+					activities: activities
+						? {
+								createMany: {
+									data: activities.map((activity) => ({
+										...activity,
+										ownerId: ctx.session.user.id,
+									})),
+								},
+						  }
+						: undefined,
 				},
-			});
-
-			if (!activity) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
-
-			return activity;
-		}),
-	modify: authedProcedure
-		.input(z.object({ id: z.string(), invoice: defaultInvoiceCreate }))
-		.mutation(async ({ ctx, input }) => {
-			const invoice = await ctx.prisma.invoice.update({
-				where: {
-					id: input.id,
-				},
-				data: { ...input.invoice },
 			});
 
 			if (!invoice) {
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			return invoice;
+			return parseInvoice(invoice);
+		}),
+	modify: authedProcedure
+		.input(
+			z.object({
+				id: z.string(),
+				invoice: invoiceSchema,
+				activities: z.array(activitySchema).optional(),
+			})
+		)
+		.mutation(async ({ ctx, input }) => {
+			const invoice = await ctx.prisma.invoice.update({
+				where: {
+					id: input.id,
+				},
+				data: { ...input.invoice },
+				select: {
+					date: true,
+					invoiceNo: true,
+				},
+			});
+
+			if (!invoice) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			return {
+				invoice: parseInvoice(invoice),
+			};
 		}),
 	updateStatus: authedProcedure
 		.input(z.object({ id: z.string(), status: z.nativeEnum(InvoiceStatus) }))
@@ -173,7 +191,7 @@ export const invoiceRouter = router({
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			return invoice;
+			return parseInvoice(invoice);
 		}),
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))

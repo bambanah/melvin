@@ -1,83 +1,30 @@
+import CreateInvoiceForm from "@components/invoices/invoice-form";
 import Layout from "@components/shared/layout";
-import CreateInvoiceForm, {
-	FormValues,
-} from "@components/invoices/invoice-form";
-import prisma from "@server/prisma";
-import { GetServerSideProps } from "next";
-import { invoiceToValues } from "@utils/formik-utils";
-import { getNextInvoiceNo } from "@utils/invoice-utils";
+import { InvoiceSchema } from "@schema/invoice-schema";
+import { trpc } from "@utils/trpc";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 
-interface Props {
-	initialValues?: FormValues;
-	copiedFrom?: string;
-}
+const CreateInvoice = () => {
+	const router = useRouter();
 
-const CreateInvoice = ({ initialValues, copiedFrom }: Props) => {
-	return (
-		<Layout>
-			<CreateInvoiceForm
-				initialValues={initialValues}
-				copiedFrom={copiedFrom}
-			/>
-		</Layout>
-	);
-};
+	const trpcContext = trpc.useContext();
+	const createInvoiceMutation = trpc.invoice.create.useMutation();
 
-export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-	const invoiceId = query.copyFrom;
+	function onSubmit(invoiceData: InvoiceSchema) {
+		createInvoiceMutation.mutateAsync({ invoice: invoiceData }).then(() => {
+			trpcContext.invoice.list.invalidate();
 
-	if (invoiceId) {
-		const invoice = await prisma.invoice.findUnique({
-			where: {
-				id: String(invoiceId),
-			},
-			include: {
-				activities: {
-					include: {
-						supportItem: true,
-					},
-				},
-				client: true,
-			},
+			toast.success("Invoice created");
+			router.back();
 		});
-
-		if (invoice) {
-			const invoiceNumbers = await prisma.invoice.findMany({
-				where: {
-					ownerId: invoice.ownerId,
-				},
-				select: {
-					invoiceNo: true,
-				},
-			});
-
-			const initialValues = invoiceToValues(invoice);
-
-			initialValues.invoiceNo = getNextInvoiceNo(
-				invoiceNumbers.map((i) => i.invoiceNo)
-			);
-
-			initialValues.activities = initialValues.activities.map((activity) => {
-				// eslint-disable-next-line @typescript-eslint/no-unused-vars
-				const { id, date, ...rest } = activity;
-
-				return rest;
-			});
-
-			delete initialValues.id;
-			delete initialValues.date;
-
-			return {
-				props: {
-					initialValues,
-				},
-			};
-		}
 	}
 
-	return {
-		props: {},
-	};
+	return (
+		<Layout>
+			<CreateInvoiceForm onSubmit={onSubmit} />
+		</Layout>
+	);
 };
 
 export default CreateInvoice;
