@@ -114,7 +114,7 @@ const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
 				<div className="btn-group">
 					<Button
 						type="submit"
-						variant="primary"
+						variant="success"
 						disabled={!isDirty || !isValid || isSubmitting}
 					>
 						Create

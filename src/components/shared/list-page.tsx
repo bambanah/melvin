@@ -1,3 +1,4 @@
+import Button from "@atoms/button";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
@@ -49,15 +50,11 @@ const PageComponent = ({
 				<h2 className="text-2xl font-bold">{title}</h2>
 
 				{createHref && (
-					<Link
-						href={createHref}
-						className={classNames([
-							"flex items-center justify-center rounded-md bg-indigo-600 leading-none text-gray-50 hover:text-gray-50 md:relative md:inset-0 md:h-10 md:w-28 md:gap-2 md:text-base hover:md:bg-indigo-700",
-							"gap-2 px-2 py-3 text-sm",
-						])}
-					>
-						<FontAwesomeIcon icon={faPlus} />
-						<span>Add New</span>
+					<Link href={createHref}>
+						<Button variant="primary">
+							<FontAwesomeIcon icon={faPlus} />
+							<span>Add New</span>
+						</Button>
 					</Link>
 				)}
 			</div>

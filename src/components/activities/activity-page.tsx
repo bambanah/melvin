@@ -2,20 +2,23 @@ import ConfirmDialog from "@atoms/confirm-dialog";
 import Dropdown from "@atoms/dropdown";
 import Heading from "@atoms/heading";
 import {
-	faEllipsisV,
-	faUser,
-	faClock,
 	faCalendar,
+	faClock,
+	faEllipsisV,
 	faFileAlt,
+	faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { trpc } from "@utils/trpc";
-import dayjs from "dayjs";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "react-toastify";
+
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 const ActivityPage = () => {
 	const router = useRouter();
