@@ -92,7 +92,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 							<span>Description</span>
 							<Subheading>
 								The official description from the{" "}
-								<a href="/price-guide-3-21.pdf">Price Guide</a>
+								<a href="/price-guide-22-23.pdf">Price Guide</a>
 							</Subheading>
 							<Input
 								name="description"

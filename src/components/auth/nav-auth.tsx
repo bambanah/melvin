@@ -67,7 +67,7 @@ const NavAuth = ({ user }: NavAuthProps) => {
 						<Menu.Item>
 							{({ active }) => (
 								<a
-									href="/price-guide-3-21.pdf"
+									href="/price-guide-22-23.pdf"
 									target="_blank"
 									className={classNames([
 										sharedItemClass,
