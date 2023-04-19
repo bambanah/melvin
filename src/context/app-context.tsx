@@ -5,8 +5,6 @@ import React, {
 	useEffect,
 	useState,
 } from "react";
-import { ThemeProvider } from "styled-components";
-import * as themes from "@styles/themes";
 
 interface AppContextState {
 	theme: [string, Dispatch<string>];
@@ -42,9 +40,7 @@ export const AppContextProvider: React.FC<Props> = ({ children }) => {
 
 	return (
 		<AppContext.Provider value={{ theme: [theme, setTheme] }}>
-			<ThemeProvider theme={theme === "light" ? themes.light : themes.dark}>
-				{children}
-			</ThemeProvider>
+			{children}
 		</AppContext.Provider>
 	);
 };
