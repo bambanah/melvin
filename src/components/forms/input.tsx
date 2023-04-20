@@ -30,7 +30,7 @@ function Input<T extends FieldValues>({
 	return (
 		<div
 			className={classNames([
-				"flex items-center overflow-hidden border bg-bg pl-3 text-fg shadow-sm focus-within:border-blue-500",
+				"flex items-center overflow-hidden rounded-md border bg-white pl-3 text-fg shadow-md focus-within:border-indigo-500",
 				error && "border-red-600",
 				className,
 			])}
@@ -41,7 +41,7 @@ function Input<T extends FieldValues>({
 				id={id ?? name}
 				{...rest}
 				className={classNames([
-					"w-full border-none bg-bg px-1 py-3 text-fg outline-none",
+					"w-full border-none px-1 py-3 text-fg outline-none",
 				])}
 			/>
 			{suffix && (
