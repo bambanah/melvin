@@ -2,9 +2,10 @@ import Button from "@atoms/button";
 import Form from "@atoms/form";
 import Label from "@atoms/label";
 import ClientSelect from "@components/forms/client-select";
+import DatePicker from "@components/forms/date-picker";
 import ErrorMessage from "@components/forms/error-message";
-import Input from "@components/forms/input";
 import SupportItemSelect from "@components/forms/support-item-select";
+import TimeInput from "@components/forms/time-input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { activitySchema, ActivitySchema } from "@schema/activity-schema";
 import { ActivityByIdOutput } from "@server/api/routers/activity-router";
@@ -13,7 +14,6 @@ import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-import TimeInput from "@components/forms/time-input";
 import dayjs from "dayjs";
 dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
@@ -96,13 +96,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 						required
 					>
 						<span>Date</span>
-						<Input
-							name="date"
-							type="date"
-							register={register}
-							rules={{ valueAsDate: true }}
-							error={!!errors.date}
-						/>
+						<DatePicker name="date" register={register} error={!!errors.date} />
 						<ErrorMessage error={errors.date?.message} />
 					</Label>
 					<Label

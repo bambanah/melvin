@@ -4,6 +4,7 @@ import Heading from "@atoms/heading";
 import Label from "@atoms/label";
 import Subheading from "@atoms/subheading";
 import ClientSelect from "@components/forms/client-select";
+import DatePicker from "@components/forms/date-picker";
 import ErrorMessage from "@components/forms/error-message";
 import Input from "@components/forms/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -80,17 +81,7 @@ const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
 					<Label className="basis-1/2">
 						<span>Date</span>
 						<Subheading>Date to display on invoice</Subheading>
-						<Input
-							name="date"
-							type="date"
-							register={register}
-							rules={
-								{
-									// setValueAs: (value) => (value === "" ? null : new Date(value)),
-								}
-							}
-							error={!!errors.date}
-						/>
+						<DatePicker name="date" register={register} error={!!errors.date} />
 						<ErrorMessage error={errors.date?.message} />
 					</Label>
 				</div>
