@@ -16,7 +16,7 @@ const Navbar = () => {
 	const session = useSession();
 
 	return (
-		<div className="fixed bottom-0 flex h-14 w-full items-center gap-8 border-t bg-zinc-50 shadow-top md:relative md:mx-auto md:h-20 md:max-w-7xl md:px-10 md:shadow-none">
+		<div className="fixed bottom-0 flex h-14 w-full items-center gap-8 border-t bg-bg shadow-top md:relative md:mx-auto md:h-20 md:max-w-7xl md:px-10 md:shadow-none">
 			<Link href="/invoices" className="hidden md:inline-block">
 				<Logo>melvin</Logo>
 			</Link>
