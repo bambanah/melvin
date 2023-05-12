@@ -50,18 +50,34 @@ const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
 	});
 
 	const clientId = watch("clientId");
-	const { data: billTo } = trpc.clients.getBillTo.useQuery({
-		id: clientId,
-	});
-	const { data: { nextInvoiceNo, latestInvoiceNo } = {} } =
-		trpc.clients.getNextInvoiceNo.useQuery({
+	const { data: billTo, refetch: refetchBillTo } =
+		trpc.clients.getBillTo.useQuery(
+			{
+				id: clientId,
+			},
+			{ enabled: false }
+		);
+	const {
+		data: { nextInvoiceNo, latestInvoiceNo } = {},
+		refetch: refetchNextInvoiceNo,
+	} = trpc.clients.getNextInvoiceNo.useQuery(
+		{
 			id: clientId,
-		});
+		},
+		{ enabled: false }
+	);
+
+	useEffect(() => {
+		if (clientId) {
+			refetchBillTo();
+			refetchNextInvoiceNo();
+		}
+	}, [clientId, refetchBillTo, refetchNextInvoiceNo]);
 
 	useEffect(() => {
 		setValue("invoiceNo", nextInvoiceNo ?? "");
-		setValue("billTo", billTo ?? "");
-	}, [clientId, setValue, billTo, nextInvoiceNo, latestInvoiceNo]);
+		setValue("billTo", billTo ?? "", { shouldValidate: true });
+	}, [billTo, nextInvoiceNo, setValue]);
 
 	const { data: { activities } = {} } = trpc.activity.list.useQuery({
 		clientId: watch("clientId"),
