@@ -1,45 +1,45 @@
 import classNames from "classnames";
-import { ButtonHTMLAttributes } from "react";
 
-type Variant = "primary" | "secondary" | "success" | "danger" | "default";
+type Variant =
+	| "primary"
+	| "secondary"
+	| "success"
+	| "danger"
+	| "info"
+	| "default";
 
 const variantStyles: Record<Variant, string> = {
-	primary:
-		"bg-blue_pastel text-fg border-none font-semibold disabled:bg-blue-200 disabled:text-gray-400",
-	secondary:
-		"bg-fg text-bg font-semibold disabled:bg-gray-200 disabled:text-gray-400",
-	success:
-		"bg-green_pastel font-semibold disabled:bg-green-50 disabled:text-gray-400",
-	danger:
-		"bg-red-500 font-semibold disabled:bg-gray-200 disabled:text-gray-400",
-	default: "bg-bg text-fg disabled:bg-gray-200 disabled:text-gray-400",
+	primary: "btn-primary",
+	secondary: "btn-secondary",
+	success: "btn-success",
+	danger: "btn-danger",
+	info: "btn-info",
+	default: "btn-default",
 };
 
-interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface Props<T extends React.ElementType> {
+	as?: T;
 	variant?: Variant;
+	children?: React.ReactNode;
 }
 
-const Button = ({
-	children,
+const Button = <T extends React.ElementType>({
 	className,
+	as,
 	variant = "default",
-	type = "button",
 	...rest
-}: Props) => {
+}: Props<T> & Omit<React.ComponentPropsWithoutRef<T>, keyof Props<T>>) => {
+	const Component = as || "button";
+
 	return (
-		<button
+		<Component
 			className={classNames([
-				"flex cursor-pointer items-center justify-center gap-2 border border-fg px-4 py-2 transition-all duration-100",
-				"hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[0.25rem_0.25rem_#000]",
-				"disabled:cursor-default disabled:border-gray-400 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-none",
+				`btn-base hover:btn-raised`,
 				variantStyles[variant],
 				className,
 			])}
-			type={type}
 			{...rest}
-		>
-			{children}
-		</button>
+		/>
 	);
 };
 

@@ -1,5 +1,6 @@
 import { Dialog } from "@headlessui/react";
 import { Dispatch, SetStateAction } from "react";
+import Button from "./button";
 
 interface Props {
 	isOpen: boolean;
@@ -35,23 +36,19 @@ const ConfirmDialog = ({
 						)}
 
 						<div className="flex gap-4 pt-2">
-							<button
+							<Button
 								type="button"
+								variant="danger"
 								onClick={() => {
 									confirmAction();
 									setIsOpen(false);
 								}}
-								className="rounded bg-red-100 py-2 px-6 text-red-700 hover:bg-red-200"
 							>
 								{confirmText ?? "Yes"}
-							</button>
-							<button
-								type="button"
-								onClick={() => setIsOpen(false)}
-								className="rounded bg-gray-200 py-2 px-6 hover:bg-gray-300"
-							>
+							</Button>
+							<Button type="button" onClick={() => setIsOpen(false)}>
 								{cancelText ?? "No"}
-							</button>
+							</Button>
 						</div>
 					</Dialog.Panel>
 				</div>

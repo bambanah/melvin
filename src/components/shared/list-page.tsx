@@ -46,16 +46,14 @@ const PageComponent = ({
 				className,
 			])}
 		>
-			<div className="flex items-center justify-between py-2 px-4">
+			<div className="flex items-center justify-between px-4 py-2">
 				<h2 className="text-2xl font-bold">{title}</h2>
 
 				{createHref && (
-					<Link href={createHref}>
-						<Button variant="primary">
-							<FontAwesomeIcon icon={faPlus} />
-							<span>Add New</span>
-						</Button>
-					</Link>
+					<Button as={Link} href={createHref} variant="primary">
+						<FontAwesomeIcon icon={faPlus} />
+						<span>Add New</span>
+					</Button>
 				)}
 			</div>
 

@@ -4,11 +4,31 @@
 
 @layer components {
 	.btn-base {
-		@apply inline-block cursor-pointer border border-solid border-slate-900 bg-slate-100 px-7 pt-2 text-base font-bold transition-all;
+		@apply flex cursor-pointer items-center justify-center gap-2 border border-fg px-4 py-2 text-fg transition-all duration-100;
+		@apply disabled:pointer-events-none disabled:cursor-default disabled:border-gray-400;
 	}
 
 	.btn-raised {
-		@apply -translate-x-1 -translate-y-1 shadow-[0.2rem_0.2rem_#000];
+		@apply -translate-x-1 -translate-y-1 shadow-[0.25rem_0.25rem_#000];
+	}
+
+	.btn-primary {
+		@apply border-none bg-blue_pastel font-semibold text-fg disabled:bg-blue-200 disabled:text-gray-400;
+	}
+	.btn-secondary {
+		@apply bg-fg font-semibold text-bg disabled:bg-gray-200 disabled:text-gray-400;
+	}
+	.btn-success {
+		@apply bg-green_pastel font-semibold disabled:bg-green-50 disabled:text-gray-400;
+	}
+	.btn-danger {
+		@apply bg-red-300 font-semibold  disabled:bg-gray-200 disabled:text-gray-400;
+	}
+	.btn-info {
+		@apply bg-blue-200 font-semibold disabled:bg-blue-100 disabled:text-gray-400;
+	}
+	.btn-default {
+		@apply bg-bg text-fg disabled:bg-gray-200 disabled:text-gray-400;
 	}
 
 	.btn-group {

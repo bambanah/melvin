@@ -1,3 +1,4 @@
+import Button from "@atoms/button";
 import {
 	faCaretDown,
 	faExternalLink,
@@ -53,48 +54,41 @@ const NavAuth = ({ user }: NavAuthProps) => {
 					<div className="flex flex-col gap-2 py-4">
 						<Menu.Item>
 							{({ active }) => (
-								<Link
+								<Button
+									as={Link}
 									href="/account/edit"
-									className={classNames([
-										sharedItemClass,
-										active && activeItemClass,
-									])}
+									className={classNames(["btn-base", active && "btn-raised"])}
 								>
 									Manage Account
-								</Link>
+								</Button>
 							)}
 						</Menu.Item>
 						<Menu.Item>
 							{({ active }) => (
-								<a
+								<Button
+									as="a"
 									href="/price-guide-22-23.pdf"
 									target="_blank"
-									className={classNames([
-										sharedItemClass,
-										active && activeItemClass,
-										"gap-1",
-									])}
+									className={classNames(["btn-base", active && "btn-raised"])}
 								>
 									Price Guide
 									<FontAwesomeIcon icon={faExternalLink} size="xs" />
-								</a>
+								</Button>
 							)}
 						</Menu.Item>
 					</div>
 					<div className="flex flex-col gap-1 pt-4">
 						<Menu.Item>
 							{({ active }) => (
-								<button
+								<Button
+									type="button"
 									onClick={() => {
 										signOut();
 									}}
-									className={classNames([
-										sharedItemClass,
-										active && activeItemClass,
-									])}
+									className={classNames(["btn-base", active && "btn-raised"])}
 								>
 									Log Out
-								</button>
+								</Button>
 							)}
 						</Menu.Item>
 					</div>

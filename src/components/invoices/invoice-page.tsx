@@ -119,8 +119,8 @@ const InvoicePage = () => {
 					<div className="mx-auto w-8/12 basis-1/2 ">
 						<PdfPreview invoiceId={invoice.id} className="shadow-xl" />
 					</div>
-					<div className="absolute top-0 right-0 flex h-full w-full items-center justify-center">
-						<div className="flex items-center justify-center gap-2 rounded-full bg-gray-900 bg-opacity-90 px-4 py-3 text-gray-50 transition-transform group-hover:scale-110 md:py-2 md:px-3 md:text-lg">
+					<div className="absolute right-0 top-0 flex h-full w-full items-center justify-center">
+						<div className="flex items-center justify-center gap-2 rounded-full bg-gray-900 bg-opacity-90 px-4 py-3 text-gray-50 transition-transform group-hover:scale-110 md:px-3 md:py-2 md:text-lg">
 							<FontAwesomeIcon icon={faMagnifyingGlassPlus} />
 							Preview
 						</div>
@@ -198,27 +198,30 @@ const InvoicePage = () => {
 				<div className="flex basis-1/2 flex-col px-4 pb-4 md:gap-2">
 					<p className="font-semibold">Payment</p>
 					<Button
-						className="mt-2 w-full border p-2 text-center text-blue-700 md:m-0"
+						className="mt-2 md:m-0"
 						type="button"
+						variant="info"
 						onClick={() => markInvoiceAs(InvoiceStatus.PAID)}
 					>
 						Mark as Fully Paid
 					</Button>
 					<p className="pt-4 font-semibold md:p-0">More</p>
-					<a
-						className="flex w-full items-center gap-4 p-2 text-left text-fg hover:bg-gray-200 md:border md:border-black"
+					<Button
+						as="a"
+						className="justify-start"
 						href={`/invoices/create?copyFrom=${invoiceId}`}
 					>
 						<FontAwesomeIcon icon={faCopy} />
 						Copy
-					</a>
-					<a
-						className="flex w-full items-center gap-4 p-2 text-left text-fg hover:bg-gray-200 md:border md:border-black"
+					</Button>
+					<Button
+						as="a"
+						className="justify-start"
 						href={`/api/invoices/generate-pdf/${invoiceId}`}
 					>
 						<FontAwesomeIcon icon={faFilePdf} />
 						Export as PDF
-					</a>
+					</Button>
 				</div>
 			</div>
 
