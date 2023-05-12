@@ -17,8 +17,9 @@ const getNumber = (invoiceNo: string): number | undefined => {
 export const getNextInvoiceNo = (
 	previousInvoiceNumbers: string[],
 	clientInvoicePrefix?: string | null
-): string => {
-	if (previousInvoiceNumbers.length === 0) return "";
+) => {
+	if (previousInvoiceNumbers.length === 0)
+		return { nextInvoiceNo: "", latestInvoiceNo: "" };
 
 	const latestInvoiceNo = getHighestInvoiceNo(previousInvoiceNumbers);
 
@@ -28,13 +29,15 @@ export const getNextInvoiceNo = (
 	const matches = latestInvoiceNo?.match(/\d+$/);
 	const numberOfDigits = matches ? matches[0].length : 0;
 
-	return `${invoicePrefix}${
+	const nextInvoiceNo = `${invoicePrefix}${
 		matches
 			? (Number.parseInt(matches[0]) + 1)
 					.toString()
 					.padStart(numberOfDigits, "0")
 			: 1
 	}`;
+
+	return { nextInvoiceNo, latestInvoiceNo };
 };
 
 export const getHighestInvoiceNo = (

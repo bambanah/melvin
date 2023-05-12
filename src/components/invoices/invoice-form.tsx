@@ -14,6 +14,7 @@ import { InvoiceByIdOutput } from "@server/api/routers/invoice-router";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import dayjs from "dayjs";
@@ -48,6 +49,20 @@ const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
 		},
 	});
 
+	const clientId = watch("clientId");
+	const { data: billTo } = trpc.clients.getBillTo.useQuery({
+		id: clientId,
+	});
+	const { data: { nextInvoiceNo, latestInvoiceNo } = {} } =
+		trpc.clients.getNextInvoiceNo.useQuery({
+			id: clientId,
+		});
+
+	useEffect(() => {
+		setValue("invoiceNo", nextInvoiceNo ?? "");
+		setValue("billTo", billTo ?? "");
+	}, [clientId, setValue, billTo, nextInvoiceNo, latestInvoiceNo]);
+
 	const { data: { activities } = {} } = trpc.activity.list.useQuery({
 		clientId: watch("clientId"),
 		assigned: false,
@@ -67,7 +82,15 @@ const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
 
 					<Label className="basis-1/2" required>
 						<span>Invoice Number</span>
-						<Subheading>Previous invoice was XXX</Subheading>
+						{
+							<Subheading>
+								{latestInvoiceNo ? (
+									<>Previous invoice was {latestInvoiceNo}</>
+								) : (
+									<br />
+								)}
+							</Subheading>
+						}
 						<Input
 							name="invoiceNo"
 							placeholder={"Smith-XX"}
@@ -79,7 +102,9 @@ const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
 				<div className="flex flex-col gap-6 md:flex-row">
 					<Label className="basis-1/2">
 						<span>Bill To</span>
-						<Subheading>Loaded from client information</Subheading>
+						<Subheading>
+							{billTo ? "Loaded from client information" : <br />}
+						</Subheading>
 						<Input name="billTo" register={register} />
 						<ErrorMessage error={errors.billTo?.message} />
 					</Label>

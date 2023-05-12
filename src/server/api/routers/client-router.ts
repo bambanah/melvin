@@ -1,6 +1,7 @@
 import { clientSchema } from "@schema/client-schema";
 import { authedProcedure, router } from "@server/api/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
+import { getNextInvoiceNo } from "@utils/invoice-utils";
 import { baseListQueryInput } from "@utils/trpc";
 import { z } from "zod";
 
@@ -68,6 +69,56 @@ export const clientRouter = router({
 
 			if (client) return client;
 			else throw new TRPCError({ code: "NOT_FOUND" });
+		}),
+	getBillTo: authedProcedure
+		.input(z.object({ id: z.string() }))
+		.query(async ({ input, ctx }) => {
+			const client = await ctx.prisma.client.findFirst({
+				select: {
+					billTo: true,
+				},
+				where: {
+					id: input.id,
+				},
+			});
+
+			if (!client) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			return client.billTo;
+		}),
+	getNextInvoiceNo: authedProcedure
+		.input(z.object({ id: z.string() }))
+		.query(async ({ input, ctx }) => {
+			const client = await ctx.prisma.client.findFirst({
+				select: {
+					invoices: {
+						take: 20,
+						select: {
+							invoiceNo: true,
+						},
+						orderBy: {
+							createdAt: "asc",
+						},
+					},
+					invoiceNumberPrefix: true,
+				},
+				where: {
+					id: input.id,
+				},
+			});
+
+			if (!client) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			const nextInvoiceNo = getNextInvoiceNo(
+				client.invoices.map((i) => i.invoiceNo),
+				client.invoiceNumberPrefix
+			);
+
+			return nextInvoiceNo;
 		}),
 	latestInvoice: authedProcedure
 		.input(z.object({ clientId: z.string() }))
