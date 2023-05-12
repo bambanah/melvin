@@ -2,9 +2,11 @@ import Button from "@atoms/button";
 import Form from "@atoms/form";
 import Heading from "@atoms/heading";
 import Label from "@atoms/label";
+import Subheading from "@atoms/subheading";
 import ClientSelect from "@components/forms/client-select";
 import DatePicker from "@components/forms/date-picker";
 import ErrorMessage from "@components/forms/error-message";
+import Input from "@components/forms/input";
 import SupportItemSelect from "@components/forms/support-item-select";
 import TimeInput from "@components/forms/time-input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,8 +38,22 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 		formState: { errors, isDirty, isSubmitting, isValid },
 	} = useForm<ActivitySchema>({
 		resolver: zodResolver(activitySchema),
+		mode: "onBlur",
 		defaultValues: {
-			date: dayjs().format("YYYY-MM-DD"),
+			date: (existingActivity?.date
+				? dayjs.utc(existingActivity?.date)
+				: dayjs()
+			).format("YYYY-MM-DD"),
+			supportItemId: existingActivity?.supportItem.id ?? "",
+			clientId: existingActivity?.client?.id ?? "",
+			startTime: existingActivity?.startTime
+				? dayjs.utc(existingActivity?.startTime).format("HH:mm")
+				: "",
+			endTime: existingActivity?.startTime
+				? dayjs.utc(existingActivity?.endTime).format("HH:mm")
+				: "",
+			transitDistance: existingActivity?.transitDistance ?? undefined,
+			transitDuration: existingActivity?.transitDuration ?? undefined,
 		},
 	});
 
@@ -119,6 +135,47 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 						/>
 						<ErrorMessage error={errors.endTime?.message} />
 					</Label>
+				</div>
+				<hr className="w-full" />
+
+				<div className="flex flex-col items-center gap-1">
+					<Heading size="xsmall">Provider Travel</Heading>
+
+					{true && <p>Autofilled from previous invoice</p>}
+
+					<div className="mt-4 flex w-full gap-4">
+						<Label
+							htmlFor="transitDistance"
+							className="w-full shrink grow basis-1/2"
+						>
+							<span>Transit Distance</span>
+							<Subheading>Distance to client&#39;s house</Subheading>
+							<Input
+								name="transitDistance"
+								register={register}
+								suffix="km"
+								rules={{
+									setValueAs: (value) => (value === "" ? null : Number(value)),
+								}}
+								error={!!errors.transitDistance}
+							/>
+							<ErrorMessage error={errors.transitDistance?.message} />
+						</Label>
+						<Label htmlFor="transitDuration" className="shrink grow basis-1/2">
+							<span>Transit Duration</span>
+							<Subheading>Duration of drive</Subheading>
+							<Input
+								name="transitDuration"
+								register={register}
+								suffix="mins"
+								rules={{
+									setValueAs: (value) => (value === "" ? null : Number(value)),
+								}}
+								error={!!errors.transitDuration}
+							/>
+							<ErrorMessage error={errors.transitDuration?.message} />
+						</Label>
+					</div>
 				</div>
 
 				<div className="btn-group">

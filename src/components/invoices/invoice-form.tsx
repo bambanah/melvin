@@ -124,20 +124,16 @@ const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
 					</Label>
 					<Label className="basis-1/2" required>
 						<span>Invoice Number</span>
-						{
-							<Subheading
-								className={classNames([
-									"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
-									billTo ? "max-h-5" : "max-h-0",
-								])}
-							>
-								{latestInvoiceNo ? (
-									<>Previous invoice was {latestInvoiceNo}</>
-								) : (
-									<br />
-								)}
-							</Subheading>
-						}
+
+						<Subheading
+							className={classNames([
+								"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
+								billTo ? "max-h-5" : "max-h-0",
+							])}
+						>
+							Previous invoice was {latestInvoiceNo}
+						</Subheading>
+
 						<Input
 							name="invoiceNo"
 							placeholder={"Smith-XX"}

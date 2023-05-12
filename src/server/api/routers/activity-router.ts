@@ -5,7 +5,9 @@ import { z } from "zod";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(utc);
+dayjs.extend(customParseFormat);
 
 const defaultActivitySelect = {
 	id: true,
@@ -113,6 +115,8 @@ export const activityRouter = router({
 			const activity = await ctx.prisma.activity.create({
 				data: {
 					...input.activity,
+					startTime: dayjs.utc(input.activity.startTime, "HH:mm").toDate(),
+					endTime: dayjs.utc(input.activity.endTime, "HH:mm").toDate(),
 					date: new Date(input.activity.date),
 					ownerId: ctx.session.user.id,
 				},
@@ -136,7 +140,12 @@ export const activityRouter = router({
 				where: {
 					id: input.id,
 				},
-				data: { ...input.activity },
+				data: {
+					...input.activity,
+					date: dayjs.utc(input.activity.date, "YYYY-MM-DD").toDate(),
+					startTime: dayjs.utc(input.activity.startTime, "HH:mm").toDate(),
+					endTime: dayjs.utc(input.activity.endTime, "HH:mm").toDate(),
+				},
 			});
 
 			if (!activity) {

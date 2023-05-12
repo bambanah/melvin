@@ -15,9 +15,6 @@ export default function TimeInput<T extends FieldValues>({
 			type="time"
 			rules={{
 				...rules,
-				setValueAs: (value) => {
-					return dayjs.utc(value, "HH:mm").toDate();
-				},
 			}}
 			{...rest}
 		/>
