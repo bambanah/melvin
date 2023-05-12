@@ -34,7 +34,7 @@
 	}
 
 	.btn-group {
-		@apply flex items-center justify-center gap-6;
+		@apply mt-10 flex items-center justify-center gap-6;
 	}
 }
 
