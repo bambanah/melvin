@@ -1,4 +1,4 @@
-import Button from "@atoms/button";
+import Button, { ButtonVariant } from "@atoms/button";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
@@ -32,12 +32,14 @@ interface PageComponentProps {
 	filterComponent?: React.ReactNode;
 	children: React.ReactNode;
 	className?: string;
+	buttonVariant?: ButtonVariant;
 }
 const PageComponent = ({
 	title,
 	createHref,
 	children,
 	className,
+	buttonVariant = "primary",
 }: PageComponentProps) => {
 	return (
 		<div
@@ -50,7 +52,7 @@ const PageComponent = ({
 				<h2 className="text-2xl font-bold">{title}</h2>
 
 				{createHref && (
-					<Button as={Link} href={createHref} variant="primary">
+					<Button as={Link} href={createHref} variant={buttonVariant}>
 						<FontAwesomeIcon icon={faPlus} />
 						<span>Add New</span>
 					</Button>

@@ -18,10 +18,15 @@ import { useState } from "react";
 
 interface Props {
 	invoiceId?: string;
+	displayCreateButton?: boolean;
 	groupByAssignedStatus?: boolean;
 }
 
-function ActivityList({ invoiceId, groupByAssignedStatus = true }: Props) {
+function ActivityList({
+	invoiceId,
+	displayCreateButton = true,
+	groupByAssignedStatus = true,
+}: Props) {
 	const [assignedFilter, setAssignedFilter] = useState<boolean>(false);
 
 	const { data: { activities } = {}, error } = trpc.activity.list.useQuery({
@@ -39,7 +44,10 @@ function ActivityList({ invoiceId, groupByAssignedStatus = true }: Props) {
 		: {};
 
 	return (
-		<ListPage title="Activities" createHref="/activities/create">
+		<ListPage
+			title="Activities"
+			createHref={displayCreateButton ? "/activities/create" : undefined}
+		>
 			{groupByAssignedStatus && (
 				<div className="mb-4 flex w-full">
 					{[false, true].map((status, idx) => (
@@ -62,7 +70,7 @@ function ActivityList({ invoiceId, groupByAssignedStatus = true }: Props) {
 			{Object.keys(groupedActivities).length > 0 ? (
 				Object.keys(groupedActivities).map((group) => (
 					<div key={group} className="mb-4 overflow-hidden">
-						<div className="flex w-full items-center gap-2 border-b bg-neutral-50 px-4 py-2 text-left">
+						<div className="flex w-full items-center gap-2 border-b px-4 py-2 text-left">
 							{dayjs(group).format("dddd DD MMM.")}
 							{isDateHoliday(group) && <Badge variant="INFO">Holiday</Badge>}
 						</div>

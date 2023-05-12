@@ -12,8 +12,10 @@ import {
 	faUser,
 } from "@fortawesome/free-regular-svg-icons";
 import {
+	faDollarSign,
 	faMagnifyingGlassPlus,
 	faRunning,
+	faUndo,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog, Transition } from "@headlessui/react";
@@ -147,28 +149,19 @@ const InvoicePage = () => {
 						<InvoiceStatusBadge invoiceStatus={invoice.status} />
 					</div>
 
-					<div className="mt-4 flex flex-grow flex-col justify-center gap-4">
-						{invoice.status === InvoiceStatus.SENT ||
-							(invoice.status === InvoiceStatus.PAID && (
-								<Button
-									onClick={() => {
-										markInvoiceAs("CREATED");
-									}}
-								>
-									Mark as Created
-								</Button>
-							))}
+					<div className="flex flex-grow flex-col justify-center gap-4">
 						{invoice.status === InvoiceStatus.CREATED && (
 							<Button
 								onClick={() => {
 									markInvoiceAs("SENT");
 								}}
-								variant="success"
+								variant="primary"
 								className="font-semibold"
 							>
 								Send <FontAwesomeIcon icon={faPaperPlane} />
 							</Button>
 						)}
+						{invoice.status === InvoiceStatus.SENT && <p>Sent on: TODO</p>}
 					</div>
 				</div>
 			</div>
@@ -195,17 +188,35 @@ const InvoicePage = () => {
 					</div>
 				</div>
 
-				<div className="flex basis-1/2 flex-col px-4 pb-4 md:gap-2">
+				<div className="flex basis-1/2 flex-col gap-2 px-4 pb-4">
 					<p className="font-semibold">Payment</p>
-					<Button
-						className="mt-2 md:m-0"
-						type="button"
-						variant="info"
-						onClick={() => markInvoiceAs(InvoiceStatus.PAID)}
-					>
-						Mark as Fully Paid
-					</Button>
-					<p className="pt-4 font-semibold md:p-0">More</p>
+					{invoice.status === "PAID" ? (
+						// TODO: Save payment date
+						<>
+							<div>
+								<span className="font-semibold">Received:</span> (TODO)
+							</div>
+							<Button
+								onClick={() => {
+									markInvoiceAs("CREATED");
+								}}
+								className="justify-start"
+							>
+								<FontAwesomeIcon icon={faUndo} />
+								Revert to Created
+							</Button>
+						</>
+					) : (
+						<Button
+							type="button"
+							className="justify-start"
+							onClick={() => markInvoiceAs(InvoiceStatus.PAID)}
+						>
+							<FontAwesomeIcon icon={faDollarSign} />
+							Payment Received
+						</Button>
+					)}
+					<p className="font-semibold">More</p>
 					<Button
 						as="a"
 						className="justify-start"
@@ -226,7 +237,11 @@ const InvoicePage = () => {
 			</div>
 
 			<div className="hidden md:mt-8 md:block">
-				<ActivityList groupByAssignedStatus={false} invoiceId={invoice.id} />
+				<ActivityList
+					groupByAssignedStatus={false}
+					invoiceId={invoice.id}
+					displayCreateButton={false}
+				/>
 			</div>
 		</div>
 	);

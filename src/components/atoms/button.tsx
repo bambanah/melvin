@@ -1,6 +1,6 @@
 import classNames from "classnames";
 
-type Variant =
+export type ButtonVariant =
 	| "primary"
 	| "secondary"
 	| "success"
@@ -8,7 +8,7 @@ type Variant =
 	| "info"
 	| "default";
 
-const variantStyles: Record<Variant, string> = {
+const variantStyles: Record<ButtonVariant, string> = {
 	primary: "btn-primary",
 	secondary: "btn-secondary",
 	success: "btn-success",
@@ -19,7 +19,7 @@ const variantStyles: Record<Variant, string> = {
 
 interface Props<T extends React.ElementType> {
 	as?: T;
-	variant?: Variant;
+	variant?: ButtonVariant;
 	children?: React.ReactNode;
 }
 

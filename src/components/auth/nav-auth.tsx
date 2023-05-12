@@ -16,10 +16,6 @@ interface NavAuthProps {
 }
 
 const NavAuth = ({ user }: NavAuthProps) => {
-	const sharedItemClass =
-		"flex w-full items-center p-2 btn-base text-slate-900 bg-slate-50";
-	const activeItemClass = "btn-raised";
-
 	return (
 		<Menu as="div" className="relative z-50 hidden text-left md:inline-block">
 			<div>
@@ -39,7 +35,7 @@ const NavAuth = ({ user }: NavAuthProps) => {
 				leaveFrom="transform opacity-100 scale-100"
 				leaveTo="transform opacity-0 scale-95"
 			>
-				<Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-300 bg-slate-50 p-2 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+				<Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-300 bg-bg p-2 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 					<div className="flex flex-col">
 						<Menu.Item>
 							<Link
