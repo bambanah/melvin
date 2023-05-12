@@ -6,19 +6,7 @@ import dayjs from "dayjs";
 dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
 export default function DatePicker<T extends FieldValues>({
-	rules,
 	...rest
 }: InputProps<T>) {
-	return (
-		<Input
-			type="date"
-			rules={{
-				...rules,
-				valueAsDate: true,
-				valueAsNumber: false,
-				pattern: undefined,
-			}}
-			{...rest}
-		/>
-	);
+	return <Input type="date" {...rest} />;
 }

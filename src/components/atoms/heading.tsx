@@ -3,7 +3,7 @@ import classNames from "classnames";
 type Size = "xsmall" | "small" | "medium" | "large" | "xlarge";
 
 const variantStyles: Record<Size, string> = {
-	xsmall: "text-base md:text-lg",
+	xsmall: "text-base md:text-xl",
 	small: "text-lg md:text-2xl",
 	medium: "text-xl md:text-3xl",
 	large: "text-2xl md:text-4xl",

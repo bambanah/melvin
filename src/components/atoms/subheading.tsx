@@ -5,7 +5,10 @@ const Subheading = ({
 	className,
 	...rest
 }: React.HTMLAttributes<HTMLParagraphElement>) => (
-	<p className={classNames(["m-0 text-sm text-gray-700", className])} {...rest}>
+	<p
+		className={classNames(["m-0 -mt-1 text-sm text-gray-700", className])}
+		{...rest}
+	>
 		{children}
 	</p>
 );

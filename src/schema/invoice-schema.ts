@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { activitySchema } from "./activity-schema";
 
 export const invoiceSchema = z.object({
 	date: z
@@ -9,12 +8,6 @@ export const invoiceSchema = z.object({
 	clientId: z.string().min(1, "Client is required"),
 	billTo: z.string().nullish(),
 	invoiceNo: z.string().min(1, "Invoice number is required"),
+	activityIds: z.array(z.string()).optional(),
 });
 export type InvoiceSchema = z.infer<typeof invoiceSchema>;
-
-export const invoiceWithActivitiesSchema = invoiceSchema.extend({
-	activities: z.array(activitySchema).optional(),
-});
-export type InvoiceWithActivitiesSchema = z.infer<
-	typeof invoiceWithActivitiesSchema
->;

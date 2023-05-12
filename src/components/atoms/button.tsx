@@ -9,7 +9,7 @@ const variantStyles: Record<Variant, string> = {
 	secondary:
 		"bg-fg text-bg font-semibold disabled:bg-gray-200 disabled:text-gray-400",
 	success:
-		"bg-green-pastel font-semibold disabled:bg-green-50 disabled:text-gray-400",
+		"bg-green_pastel font-semibold disabled:bg-green-50 disabled:text-gray-400",
 	danger:
 		"bg-red-500 font-semibold disabled:bg-gray-200 disabled:text-gray-400",
 	default: "bg-bg text-fg disabled:bg-gray-200 disabled:text-gray-400",

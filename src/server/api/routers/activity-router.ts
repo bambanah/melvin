@@ -111,7 +111,11 @@ export const activityRouter = router({
 		)
 		.mutation(async ({ input, ctx }) => {
 			const activity = await ctx.prisma.activity.create({
-				data: { ...input.activity, ownerId: ctx.session.user.id },
+				data: {
+					...input.activity,
+					date: new Date(input.activity.date),
+					ownerId: ctx.session.user.id,
+				},
 			});
 
 			if (!activity) {

@@ -119,27 +119,20 @@ export const invoiceRouter = router({
 		.input(
 			z.object({
 				invoice: invoiceSchema,
-				activities: z.array(activitySchema).optional(),
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
-			const { invoice: inputInvoice, activities } = input;
-
+			const { invoice: inputInvoice } = input;
 			const invoice = await ctx.prisma.invoice.create({
 				data: {
-					...inputInvoice,
+					invoiceNo: inputInvoice.invoiceNo,
+					billTo: inputInvoice.billTo,
+					clientId: inputInvoice.clientId,
 					date: inputInvoice.date ? new Date(inputInvoice.date) : new Date(),
 					ownerId: ctx.session.user.id,
-					activities: activities
-						? {
-								createMany: {
-									data: activities.map((activity) => ({
-										...activity,
-										ownerId: ctx.session.user.id,
-									})),
-								},
-						  }
-						: undefined,
+					activities: {
+						connect: inputInvoice.activityIds?.map((id) => ({ id })),
+					},
 				},
 			});
 
