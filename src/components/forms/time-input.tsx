@@ -3,6 +3,7 @@ import Input from "@components/forms/input";
 import { FieldValues } from "react-hook-form";
 
 import dayjs from "dayjs";
+dayjs.extend(require("dayjs/plugin/utc"));
 dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
 export default function TimeInput<T extends FieldValues>({
@@ -15,7 +16,7 @@ export default function TimeInput<T extends FieldValues>({
 			rules={{
 				...rules,
 				setValueAs: (value) => {
-					return dayjs(value, "HH:mm").toDate();
+					return dayjs.utc(value, "HH:mm").toDate();
 				},
 			}}
 			{...rest}
