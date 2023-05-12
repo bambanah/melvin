@@ -1,5 +1,6 @@
 import Button from "@atoms/button";
 import Form from "@atoms/form";
+import Heading from "@atoms/heading";
 import Label from "@atoms/label";
 import ClientSelect from "@components/forms/client-select";
 import DatePicker from "@components/forms/date-picker";
@@ -21,10 +22,6 @@ interface Props {
 	existingActivity?: ActivityByIdOutput;
 }
 
-const InputRow = ({ children }: { children: React.ReactNode }) => (
-	<div className="flex w-full max-w-full content-center gap-4">{children}</div>
-);
-
 const CreateActivityForm = ({ existingActivity }: Props) => {
 	const router = useRouter();
 
@@ -39,6 +36,9 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 		formState: { errors, isDirty, isSubmitting, isValid },
 	} = useForm<ActivitySchema>({
 		resolver: zodResolver(activitySchema),
+		defaultValues: {
+			date: dayjs().format("YYYY-MM-DD"),
+		},
 	});
 
 	const onSubmit = (data: ActivitySchema) => {
@@ -57,51 +57,48 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 				trpcContext.activity.list.invalidate();
 
 				toast.success("Activity created");
-				router.back();
+				router.push("/activities");
 			});
 		}
 	};
 
 	return (
-		<div className="flex flex-col items-center gap-12 self-center px-12">
-			<h2 className="m-0 flex-shrink flex-grow-0 basis-full text-2xl font-bold">
+		<div className="mx-auto flex w-full max-w-md flex-col items-center gap-12 p-3">
+			<Heading className="">
 				{existingActivity ? `Update Activity` : "Log Activity"}
-			</h2>
-			<Form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl gap-12">
-				<InputRow>
-					<Label
-						htmlFor="clientId"
-						className="shrink-0 grow-0 basis-1/2"
-						required
-					>
+			</Heading>
+			<Form
+				onSubmit={handleSubmit(onSubmit)}
+				className="flex w-full flex-col items-center gap-5"
+			>
+				<div className="w-full">
+					<Label htmlFor="supportItemId" className="shrink grow" required>
+						<span>Support Item</span>
+						<SupportItemSelect name="supportItemId" control={control} />
+						<ErrorMessage error={errors.supportItemId?.message} />
+					</Label>
+				</div>
+				<div className="flex w-full gap-4">
+					<Label htmlFor="clientId" className="shrink grow basis-1/2" required>
 						<span>Client</span>
 						<ClientSelect name="clientId" control={control} />
 						<ErrorMessage error={errors.clientId?.message} />
 					</Label>
 					<Label
-						htmlFor="supportItemId"
-						className="shrink-0 grow-0 basis-1/2"
-						required
-					>
-						<span>Support Item</span>
-						<SupportItemSelect name="supportItemId" control={control} />
-						<ErrorMessage error={errors.supportItemId?.message} />
-					</Label>
-				</InputRow>
-
-				<InputRow>
-					<Label
 						htmlFor="description"
-						className="shrink-1 grow-1 basis-1/3"
+						className="shrink grow basis-1/2"
 						required
 					>
 						<span>Date</span>
 						<DatePicker name="date" register={register} error={!!errors.date} />
 						<ErrorMessage error={errors.date?.message} />
 					</Label>
+				</div>
+
+				<div className="flex w-full gap-4">
 					<Label
 						htmlFor="startTime"
-						className="grow-1 shrink-1 basis-1/3"
+						className="w-full shrink grow basis-1/2"
 						required
 					>
 						<span>Start Time</span>
@@ -109,14 +106,11 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 							name="startTime"
 							register={register}
 							error={!!errors.startTime}
+							className="w-full"
 						/>
 						<ErrorMessage error={errors.startTime?.message} />
 					</Label>
-					<Label
-						htmlFor="endTime"
-						className="grow-1 shrink-1 basis-1/3"
-						required
-					>
+					<Label htmlFor="endTime" className="shrink grow basis-1/2" required>
 						<span>End Time</span>
 						<TimeInput
 							name="endTime"
@@ -125,7 +119,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 						/>
 						<ErrorMessage error={errors.endTime?.message} />
 					</Label>
-				</InputRow>
+				</div>
 
 				<div className="btn-group">
 					<Button
