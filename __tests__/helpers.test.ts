@@ -1,11 +1,12 @@
 import { Prisma } from "@prisma/client";
+import { getRate, getTotalCostOfActivities } from "@utils/activity-utils";
+import { formatDuration, getDuration } from "@utils/date-utils";
+import { round } from "@utils/generic-utils";
+import { getHighestInvoiceNo, getNextInvoiceNo } from "@utils/invoice-utils";
+import { getNonLabourTravelCode } from "@utils/support-item-utils";
+
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { getRate, getTotalCostOfActivities } from "./activity-utils";
-import { getDuration, formatDuration } from "./date-utils";
-import { round } from "./generic-utils";
-import { getHighestInvoiceNo, getNextInvoiceNo } from "./invoice-utils";
-import { getNonLabourTravelCode } from "./support-item-utils";
 dayjs.extend(utc);
 
 const getActivity = (
