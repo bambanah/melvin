@@ -96,10 +96,41 @@ const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
 						<ErrorMessage error={errors.clientId?.message} />
 					</Label>
 
+					<Label className="basis-1/2">
+						<span>Date</span>
+						<Subheading>Date to display on invoice</Subheading>
+						<Input
+							name="date"
+							type="date"
+							register={register}
+							error={!!errors.date}
+						/>
+						<ErrorMessage error={errors.date?.message} />
+					</Label>
+				</div>
+				<div className="flex flex-col gap-6 md:flex-row">
+					<Label className="basis-1/2">
+						<span>Bill To</span>
+						<Subheading
+							className={classNames([
+								"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
+								billTo ? "max-h-5" : "max-h-0",
+							])}
+						>
+							{billTo ? "Loaded from client information" : <br />}
+						</Subheading>
+						<Input name="billTo" register={register} />
+						<ErrorMessage error={errors.billTo?.message} />
+					</Label>
 					<Label className="basis-1/2" required>
 						<span>Invoice Number</span>
 						{
-							<Subheading>
+							<Subheading
+								className={classNames([
+									"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
+									billTo ? "max-h-5" : "max-h-0",
+								])}
+							>
 								{latestInvoiceNo ? (
 									<>Previous invoice was {latestInvoiceNo}</>
 								) : (
@@ -113,27 +144,6 @@ const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
 							register={register}
 						/>
 						<ErrorMessage error={errors.invoiceNo?.message} />
-					</Label>
-				</div>
-				<div className="flex flex-col gap-6 md:flex-row">
-					<Label className="basis-1/2">
-						<span>Bill To</span>
-						<Subheading>
-							{billTo ? "Loaded from client information" : <br />}
-						</Subheading>
-						<Input name="billTo" register={register} />
-						<ErrorMessage error={errors.billTo?.message} />
-					</Label>
-					<Label className="basis-1/2">
-						<span>Date</span>
-						<Subheading>Date to display on invoice</Subheading>
-						<Input
-							name="date"
-							type="date"
-							register={register}
-							error={!!errors.date}
-						/>
-						<ErrorMessage error={errors.date?.message} />
 					</Label>
 				</div>
 
