@@ -4,7 +4,7 @@
 
 @layer components {
 	.btn-base {
-		@apply flex cursor-pointer items-center justify-center gap-2 rounded-md px-4 py-2 text-fg shadow-md transition-all duration-75;
+		@apply flex cursor-pointer items-center justify-center gap-2 rounded-md px-4 py-2 shadow-md transition-all duration-75;
 		@apply disabled:pointer-events-none disabled:cursor-default disabled:border-gray-400;
 	}
 
@@ -14,7 +14,7 @@
 	}
 	.btn-secondary {
 		@apply bg-fg text-bg disabled:bg-gray-200 disabled:text-gray-400;
-		@apply hover:bg-slate-700;
+		@apply hover:bg-slate-700 hover:text-bg;
 	}
 	.btn-success {
 		@apply bg-green-300 disabled:bg-green-50 disabled:text-gray-400;
