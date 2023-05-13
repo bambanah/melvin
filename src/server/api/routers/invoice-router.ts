@@ -151,7 +151,9 @@ export const invoiceRouter = router({
 					invoiceNo: inputInvoice.invoiceNo,
 					billTo: inputInvoice.billTo,
 					clientId: inputInvoice.clientId,
-					date: inputInvoice.date ? new Date(inputInvoice.date) : new Date(),
+					date: inputInvoice.date
+						? dayjs.utc(inputInvoice.date).toDate()
+						: new Date(),
 					ownerId: ctx.session.user.id,
 					activities: {
 						connect: inputInvoice.activityIds?.map((id) => ({ id })),
@@ -174,11 +176,22 @@ export const invoiceRouter = router({
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
+			const { id, invoice: inputInvoice } = input;
 			const invoice = await ctx.prisma.invoice.update({
 				where: {
-					id: input.id,
+					id,
 				},
-				data: { ...input.invoice },
+				data: {
+					invoiceNo: inputInvoice.invoiceNo,
+					billTo: inputInvoice.billTo,
+					clientId: inputInvoice.clientId,
+					date: inputInvoice.date
+						? dayjs.utc(inputInvoice.date).toDate()
+						: new Date(),
+					activities: {
+						connect: inputInvoice.activityIds?.map((id) => ({ id })),
+					},
+				},
 				select: {
 					date: true,
 					invoiceNo: true,

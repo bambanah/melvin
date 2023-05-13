@@ -63,6 +63,7 @@ export const getHighestInvoiceNo = (
 };
 
 export const getInvoiceFileName = (invoice: InvoiceByIdOutput) => {
+	// FIXME: This will error if the invoice has no activities
 	let earliestDate = invoice.activities[0].date;
 	let latestDate = invoice.activities[0].date;
 	for (const { date } of invoice.activities) {
