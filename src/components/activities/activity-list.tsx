@@ -39,6 +39,8 @@ function ActivityList({
 		return <div>Error loading</div>;
 	}
 
+	// TODO: Display something other than "Loading..." when there are no activities
+
 	const groupedActivities: { [key: string]: ActivityListOutput[] } = activities
 		? groupBy(activities, (activity) => dayjs(activity.date).toString())
 		: {};

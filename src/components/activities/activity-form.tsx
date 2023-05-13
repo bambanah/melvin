@@ -141,6 +141,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 				<div className="flex flex-col items-center gap-1">
 					<Heading size="xsmall">Provider Travel</Heading>
 
+					{/* TODO: Autofill from previous invoice */}
 					{true && <p>Autofilled from previous invoice</p>}
 
 					<div className="mt-4 flex w-full gap-4">

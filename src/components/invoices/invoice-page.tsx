@@ -176,7 +176,8 @@ const InvoicePage = () => {
 								Send <FontAwesomeIcon icon={faPaperPlane} />
 							</Button>
 						)}
-						{invoice.status === InvoiceStatus.SENT && <p>Sent on: TODO</p>}
+						{/* TODO: Save invoice sent date */}
+						{/* {invoice.status === InvoiceStatus.SENT && <p>Sent on: TODO</p>} */}
 					</div>
 				</div>
 			</div>
@@ -206,11 +207,11 @@ const InvoicePage = () => {
 				<div className="flex basis-1/2 flex-col gap-2 px-4 pb-4">
 					<p className="font-semibold">Payment</p>
 					{invoice.status === "PAID" ? (
-						// TODO: Save payment date
 						<>
+							{/* TODO: Save payment date
 							<div>
 								<span className="font-semibold">Received:</span> (TODO)
-							</div>
+							</div> */}
 							<Button
 								onClick={() => {
 									markInvoiceAs("CREATED");
