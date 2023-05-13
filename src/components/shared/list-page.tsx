@@ -44,7 +44,7 @@ const PageComponent = ({
 	return (
 		<div
 			className={classNames([
-				"mx-auto flex min-h-screen w-full max-w-4xl flex-col pb-16",
+				"mx-auto flex h-full w-full max-w-4xl flex-col pb-16",
 				className,
 			])}
 		>
