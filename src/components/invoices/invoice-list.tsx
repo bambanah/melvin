@@ -32,8 +32,6 @@ export default function InvoiceList({
 		clientId,
 	});
 
-	const { data: totalOwing } = trpc.invoice.getTotalOwing.useQuery();
-
 	if (error) {
 		console.error(error);
 		return <div>Error loading</div>;
@@ -114,14 +112,6 @@ export default function InvoiceList({
 					</div>
 				</div>
 			)}
-
-			{statusFilter === "UNPAID" &&
-				totalOwing !== undefined &&
-				totalOwing > 0 && (
-					<p className="p-4 pb-0 text-right text-slate-600">
-						Total Outstanding: ${totalOwing}
-					</p>
-				)}
 
 			<InvoiceListItems invoices={invoices} />
 		</ListPage>
