@@ -23,10 +23,10 @@ dayjs.extend(utc);
 
 interface Props {
 	onSubmit: (invoiceData: InvoiceSchema) => void;
-	initialValues?: InvoiceByIdOutput;
+	existingInvoice?: InvoiceByIdOutput;
 }
 
-const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
+const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 	const router = useRouter();
 
 	const {
@@ -40,12 +40,12 @@ const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
 	} = useForm<InvoiceSchema>({
 		resolver: zodResolver(invoiceSchema),
 		defaultValues: {
-			...initialValues,
-			clientId: initialValues?.clientId ?? "",
-			date: initialValues?.date ?? dayjs().format("YYYY-MM-DD"),
-			invoiceNo: initialValues?.invoiceNo ?? "",
-			billTo: initialValues?.billTo ?? "",
-			activityIds: initialValues?.activities.map((a) => a.id) ?? [],
+			...existingInvoice,
+			clientId: existingInvoice?.clientId ?? "",
+			date: existingInvoice?.date ?? dayjs().format("YYYY-MM-DD"),
+			invoiceNo: existingInvoice?.invoiceNo ?? "",
+			billTo: existingInvoice?.billTo ?? "",
+			activityIds: existingInvoice?.activities.map((a) => a.id) ?? [],
 		},
 	});
 
@@ -75,9 +75,10 @@ const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
 	}, [clientId, refetchBillTo, refetchNextInvoiceNo]);
 
 	useEffect(() => {
-		setValue("invoiceNo", nextInvoiceNo ?? "");
+		if (nextInvoiceNo && !existingInvoice)
+			setValue("invoiceNo", nextInvoiceNo, { shouldValidate: true });
 		setValue("billTo", billTo ?? "", { shouldValidate: true });
-	}, [billTo, nextInvoiceNo, setValue]);
+	}, [billTo, existingInvoice, nextInvoiceNo, setValue]);
 
 	const { data: { activities } = {} } = trpc.activity.list.useQuery({
 		clientId: watch("clientId"),
@@ -86,7 +87,11 @@ const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
 
 	return (
 		<div className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-3">
-			<Heading className="border-b pb-4">Create Invoice</Heading>
+			<Heading className="border-b pb-4">
+				{existingInvoice
+					? `Updating ${existingInvoice.invoiceNo}`
+					: "Create Invoice"}
+			</Heading>
 			<Form onSubmit={handleSubmit(onSubmit)}>
 				<div className="flex flex-col gap-6 md:flex-row">
 					<Label className="basis-1/2" required>
@@ -217,7 +222,7 @@ const InvoiceForm = ({ initialValues, onSubmit }: Props) => {
 						variant="primary"
 						disabled={!isDirty || !isValid || isSubmitting}
 					>
-						Create
+						{existingInvoice ? "Update" : "Create"}
 					</Button>
 					<Button type="button" onClick={() => router.back()}>
 						Cancel
