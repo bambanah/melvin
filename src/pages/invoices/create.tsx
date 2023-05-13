@@ -1,20 +1,28 @@
+import CreateInvoiceForm from "@components/invoices/invoice-form";
 import Layout from "@components/shared/layout";
-import CreateInvoiceForm, {
-	FormValues,
-} from "@components/invoices/invoice-form";
+import { InvoiceSchema } from "@schema/invoice-schema";
+import { trpc } from "@utils/trpc";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 
-interface Props {
-	initialValues?: FormValues;
-	copiedFrom?: string;
-}
+const CreateInvoice = () => {
+	const router = useRouter();
 
-const CreateInvoice = ({ initialValues, copiedFrom }: Props) => {
+	const trpcContext = trpc.useContext();
+	const createInvoiceMutation = trpc.invoice.create.useMutation();
+
+	function onSubmit(invoiceData: InvoiceSchema) {
+		createInvoiceMutation.mutateAsync({ invoice: invoiceData }).then(() => {
+			trpcContext.invoice.list.invalidate();
+
+			toast.success("Invoice created");
+			router.back();
+		});
+	}
+
 	return (
 		<Layout>
-			<CreateInvoiceForm
-				initialValues={initialValues}
-				copiedFrom={copiedFrom}
-			/>
+			<CreateInvoiceForm onSubmit={onSubmit} />
 		</Layout>
 	);
 };

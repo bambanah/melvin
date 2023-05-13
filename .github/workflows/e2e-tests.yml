@@ -5,7 +5,7 @@ on:
     branches: [main, dev]
 
 env:
-  DATABASE_URL: mysql://root:Passw0rd@localhost:3309/melvin
+  DATABASE_URL: mysql://root@localhost:3309/melvin
   NEXTAUTH_URL: "http://localhost:3000"
   NEXTAUTH_SECRET: "7893onvi808u7q1ounbv"
   GOOGLE_ID: ""
@@ -19,21 +19,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 7
       - uses: actions/setup-node@v3
         with:
           node-version: "16"
-          cache: "pnpm"
+          cache: "yarn"
+          cache-dependency-path: yarn.lock
+
       - name: Install dependencies
-        run: pnpm install
+        run: yarn install --frozen-lockfile
 
       - name: Install Playwright browsers
         run: npx playwright install
 
       - name: Spin up database docker
-        run: pnpm db:up
+        run: yarn db:up
 
       - name: Sleep for 15 seconds
         uses: jakejarvis/wait-action@master
@@ -41,7 +40,7 @@ jobs:
           time: "15s"
 
       - name: Initialise database
-        run: pnpm prisma:migrate
+        run: yarn prisma:migrate
 
       - name: Run tests
-        run: pnpm test:e2e
+        run: yarn test:e2e

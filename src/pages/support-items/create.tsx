@@ -1,5 +1,5 @@
 import Layout from "@components/shared/layout";
-import SupportItemForm from "@components/support-items/support-item-form/support-item-form";
+import SupportItemForm from "@components/support-items/support-item-form";
 
 const CreateSupportItem = () => {
 	return (

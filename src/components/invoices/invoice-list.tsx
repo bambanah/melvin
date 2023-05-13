@@ -1,231 +1,119 @@
-import Badge from "@atoms/badge";
-import EntityList, { EntityListItem } from "@components/shared/entity-list";
-import { faFile } from "@fortawesome/free-regular-svg-icons";
-import {
-	faCopy,
-	faDollarSign,
-	faDownload,
-	faEdit,
-	faEnvelope,
-	faTrash,
-	faUser,
-	faWalking,
-	faWarning,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { InvoiceStatusBadge } from "@atoms/badge";
+import Loading from "@atoms/loading";
+import ListPage from "@components/shared/list-page";
 import { InvoiceStatus } from "@prisma/client";
-import { InvoiceFetchAllOutput } from "@server/routers/invoice-router";
-import { getTotalCost } from "@utils/helpers";
+import { InvoiceListOutput } from "@server/api/routers/invoice-router";
 import { trpc } from "@utils/trpc";
+import classNames from "classnames";
+import { useState } from "react";
+import { getTotalCostOfActivities } from "@utils/activity-utils";
+
 import dayjs from "dayjs";
-import Link from "next/link";
-import Skeleton from "react-loading-skeleton";
-import { toast } from "react-toastify";
-import PdfDocument from "./pdf-document";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
-const getBadgeColorFromStatus = (status: InvoiceStatus) => {
-	if (status === "PAID") {
-		return "SUCCESS";
-	} else if (status === "SENT") {
-		return "WARNING";
-	}
+interface Props {
+	clientId?: string;
+	groupByAssignedStatus?: boolean;
+}
 
-	return "DEFAULT";
-};
+export default function InvoiceList({
+	clientId,
+	groupByAssignedStatus = true,
+}: Props) {
+	const [statusFilter, setStatusFilter] = useState<"UNPAID" | "PAID">("UNPAID");
 
-export default function InvoiceList() {
-	const { data: { invoices } = {}, error } = trpc.invoice.list.useQuery({});
+	const { data: { invoices } = {}, error } = trpc.invoice.list.useQuery({
+		status: groupByAssignedStatus
+			? statusFilter === "UNPAID"
+				? [InvoiceStatus.CREATED, InvoiceStatus.SENT]
+				: [InvoiceStatus.PAID]
+			: undefined,
+		clientId,
+	});
 
-	const { data: userBankDetails, error: userBankDetailsError } =
-		trpc.user.getBankDetails.useQuery();
-
-	const utils = trpc.useContext();
-	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
-	const deleteInvoice = trpc.invoice.delete.useMutation();
-
-	if (error || userBankDetailsError) {
+	if (error) {
 		console.error(error);
 		return <div>Error loading</div>;
 	}
 
-	const generateEntity = (invoice?: InvoiceFetchAllOutput): EntityListItem => ({
-		id: invoice?.id ?? "",
-		ExpandedComponent: invoices
-			? (index: number) => <PdfDocument invoiceId={invoices[index].id} />
-			: undefined,
-		fields: [
-			{
-				value: invoice ? dayjs(invoice.date).format("DD/MM/YY") : <Skeleton />,
-				type: "text",
-				flex: "0 0 4.5em",
-			},
-			{
-				type: "text",
-				value: invoice ? (
-					<Badge variant={getBadgeColorFromStatus(invoice.status)}>
-						{invoice.status}
-					</Badge>
-				) : (
-					<Skeleton />
-				),
-			},
-			{
-				value: invoice ? invoice.invoiceNo : <Skeleton />,
-				type: "label",
-				flex: "1 0 7em",
-			},
-			{
-				value: invoice ? invoice.client?.name || "" : <Skeleton />,
-				icon: faUser,
-				type: "text",
-				align: "left",
-				flex: "1 1 100%",
-			},
-			{
-				value: invoice ? invoice._count.activities.toString() : <Skeleton />,
-				icon: faWalking,
-				type: "text",
-				flex: "0 0 2em",
-			},
-			{
-				value: invoice ? (
-					getTotalCost(invoice.activities).toLocaleString(undefined, {
-						minimumFractionDigits: 2,
-					})
-				) : (
-					<Skeleton />
-				),
-				icon: faDollarSign,
-				type: "text",
-				flex: "0 0 5.4em",
-			},
-		],
-		actions: invoice
-			? [
-					{
-						value: "Download",
-						type: "link",
-						icon: faDownload,
-						href: `/api/invoices/generate-pdf/${invoice.id}`,
-					},
-					...getInvoiceStatusActions(invoice),
-					{
-						value: "Edit",
-						type: "link",
-						icon: faEdit,
-						href: `/invoices/${invoice.id}?edit=true`,
-					},
-					{
-						value: "Copy",
-						type: "link",
-						icon: faCopy,
-						href: `/invoices/create?copyFrom=${invoice.id}`,
-					},
-					{
-						value: "Delete",
-						type: "button",
-						icon: faTrash,
-						onClick: () => {
-							if (
-								confirm(`Are you sure you want to delete ${invoice.invoiceNo}?`)
-							) {
-								deleteInvoice
-									.mutateAsync({ id: invoice.id })
-									.then(() => {
-										utils.invoice.invalidate();
+	const InvoiceListItems = ({
+		invoices,
+	}: {
+		invoices?: InvoiceListOutput[];
+	}) => {
+		if (!invoices) {
+			return <Loading />;
+		}
 
-										toast.success("Invoice deleted");
-									})
-									.catch((error) => toast.error(error));
-							}
-						},
-					},
-			  ]
-			: [],
-	});
+		if (invoices.length > 0) {
+			return (
+				<ListPage.Items>
+					{invoices.map((invoice) => (
+						<ListPage.Item key={invoice.id} href={`/invoices/${invoice.id}`}>
+							<div className="flex flex-col gap-2">
+								<div className="font-medium sm:text-lg">
+									<span className="font-semibold">{invoice.invoiceNo}</span>:{" "}
+									{invoice.client.name}
+								</div>
+								<span className="text-sm sm:text-base">
+									{dayjs.utc(invoice.date).format("DD MMM.")}
+								</span>
+							</div>
+							<div className="flex basis-10 flex-col gap-2 text-right">
+								<span className="sm:text-lg">
+									{getTotalCostOfActivities(invoice.activities).toLocaleString(
+										undefined,
+										{
+											style: "currency",
+											currency: "AUD",
+										}
+									)}
+								</span>
+								<InvoiceStatusBadge invoiceStatus={invoice.status} />
+							</div>
+						</ListPage.Item>
+					))}
+				</ListPage.Items>
+			);
+		}
 
-	if (!invoices || !userBankDetails) {
 		return (
-			<EntityList
-				title="Invoices"
-				route="/invoices"
-				shouldExpand={!!invoices}
-				entities={[generateEntity()]}
-			/>
+			<ListPage.Items>
+				<div className="py-8 text-center text-neutral-600">
+					There&#39;s nothing here...
+				</div>
+			</ListPage.Items>
 		);
-	}
-
-	const userHasIncompleteBankDetails =
-		Object.values(userBankDetails).includes(null);
-
-	const markInvoiceAs = (id: string, status: InvoiceStatus) => {
-		markInvoiceAsMutation.mutateAsync({ id, status }).then(() => {
-			utils.invoice.list.invalidate();
-			utils.invoice.byId.invalidate({ id });
-		});
-	};
-
-	const getInvoiceStatusActions = (invoice: InvoiceFetchAllOutput) => {
-		const statusActions = [];
-
-		if (invoice.status !== InvoiceStatus.SENT) {
-			statusActions.push({
-				value: "Mark as Sent",
-				type: "button" as const,
-				icon: faEnvelope,
-				onClick: () => {
-					markInvoiceAs(invoice.id, InvoiceStatus.SENT);
-				},
-			});
-		}
-		if (invoice.status !== InvoiceStatus.PAID) {
-			statusActions.push({
-				value: "Mark as Paid",
-				type: "button" as const,
-				icon: faDollarSign,
-				onClick: () => {
-					markInvoiceAs(invoice.id, InvoiceStatus.PAID);
-				},
-			});
-		}
-		if (invoice.status !== InvoiceStatus.CREATED) {
-			statusActions.push({
-				value: "Mark as Created",
-				type: "button" as const,
-				icon: faFile,
-				onClick: () => {
-					markInvoiceAs(invoice.id, InvoiceStatus.CREATED);
-				},
-			});
-		}
-
-		return statusActions;
 	};
 
 	return (
-		<>
-			{userHasIncompleteBankDetails && (
-				<div className="mb-8 flex w-full items-center justify-center gap-4 rounded-sm border border-yellow-500 bg-yellow-100 p-4 text-slate-800 outline-1 sm:w-auto md:mx-12 md:max-w-4xl lg:mx-auto lg:mb-6">
-					<FontAwesomeIcon
-						icon={faWarning}
-						size="lg"
-						className="text-slate-600"
-					/>
-					<p>
-						Invoices won&#39;t contain payment information until you{" "}
-						<Link href="/account/edit" className="font-bold text-blue-600">
-							add bank details
-						</Link>{" "}
-						to your account.
-					</p>
+		<ListPage
+			title="Invoices"
+			createHref={`/invoices/create${clientId ? `?clientId=${clientId}` : ""}`}
+		>
+			{groupByAssignedStatus && (
+				<div className="w-full border-b">
+					<div className="-mb-[1px] flex w-full md:max-w-xs">
+						{(["UNPAID", "PAID"] as const).map((status) => (
+							<button
+								key={status}
+								type="button"
+								onClick={() => setStatusFilter(status)}
+								className={classNames([
+									"basis-1/2 border-b px-4 py-2 text-center transition-all",
+									statusFilter === status &&
+										"border-indigo-700 text-indigo-700",
+								])}
+							>
+								{status}
+							</button>
+						))}
+					</div>
 				</div>
 			)}
-			<EntityList
-				title="Invoices"
-				route="/invoices"
-				shouldExpand={!!invoices}
-				entities={invoices.map((invoice) => generateEntity(invoice))}
-			/>
-		</>
+
+			<InvoiceListItems invoices={invoices} />
+		</ListPage>
 	);
 }

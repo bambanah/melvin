@@ -1,38 +1,8 @@
 import Loading from "@atoms/loading";
 import Navbar from "@components/navigation/navbar";
-import { breakpoints } from "@styles/themes";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React from "react";
-import styled from "styled-components";
-
-const Container = styled.div`
-	display: flex;
-	flex-direction: column;
-	width: 100vw;
-	min-height: 100vh;
-
-	@media ${breakpoints.tablet} {
-		flex-direction: column;
-		height: 100%;
-	}
-`;
-
-const Content = styled.div`
-	flex: 1 1 auto;
-	display: flex;
-	flex-direction: column;
-
-	padding: 3rem;
-
-	@media ${breakpoints.laptop} {
-		padding: 3rem 0;
-	}
-
-	@media ${breakpoints.tablet} {
-		padding: 0.5rem 0;
-	}
-`;
 
 interface Props {
 	children: React.ReactNode;
@@ -57,11 +27,13 @@ const Layout = ({ children, isLoading }: Props) => {
 	content = children;
 
 	return (
-		<Container>
+		<div className="flex h-full min-h-screen w-full flex-col">
 			<Navbar />
 
-			<Content>{content}</Content>
-		</Container>
+			<div className="mb-12 flex flex-auto flex-col pb-2 md:mb-0 md:p-12">
+				{content}
+			</div>
+		</div>
 	);
 };
 

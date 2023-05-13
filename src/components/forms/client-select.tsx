@@ -3,20 +3,16 @@ import { trpc } from "@utils/trpc";
 import { FieldValues, UseControllerProps } from "react-hook-form";
 
 function ClientSelect<T extends FieldValues>(props: UseControllerProps<T>) {
-	const { data: { clients } = {}, error } = trpc.clients.list.useQuery({});
+	const { data: { clients } = {} } = trpc.clients.list.useQuery({});
 
-	let options = [];
-
-	if (error) {
-		options = [{ label: "An error occured", value: "" }];
+	if (!clients) {
+		return <Select options={[{ label: "Loading...", value: "" }]} {...props} />;
 	}
 
-	options = clients
-		? clients.map((client) => ({
-				label: client.name,
-				value: client.id,
-		  }))
-		: [{ label: "Loading...", value: "" }];
+	const options = clients.map((client) => ({
+		label: client.name,
+		value: client.id,
+	}));
 
 	return <Select options={options} {...props} />;
 }

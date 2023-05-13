@@ -1,5 +1,4 @@
 import Button from "@atoms/button";
-import ButtonGroup from "@atoms/button-group";
 import Form from "@atoms/form";
 import Heading from "@atoms/heading";
 import Label from "@atoms/label";
@@ -7,61 +6,62 @@ import ErrorMessage from "@components/forms/error-message";
 import Input from "@components/forms/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserSchema, userSchema } from "@schema/user-schema";
-import { UserFetchOutput } from "@server/routers/user-router";
+import { UserFetchOutput } from "@server/api/routers/user-router";
 import { trpc } from "@utils/trpc";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 
 interface Props {
 	existingUser: UserFetchOutput;
 }
 
 const AccountForm = ({ existingUser }: Props) => {
-	const router = useRouter();
-
 	const trpcContext = trpc.useContext();
 	const updateUserMutation = trpc.user.update.useMutation();
 
-	const {
-		register,
-		handleSubmit,
-		formState: { isDirty, isValid, isSubmitting, errors },
-	} = useForm<UserSchema>({
-		resolver: zodResolver(userSchema),
-		defaultValues: {
+	const existingUserWithDefaults = useMemo(
+		() => ({
 			name: existingUser?.name ?? "",
 			abn: Number(existingUser?.abn) || undefined,
 			bankName: existingUser?.bankName ?? "",
 			bankNumber: Number(existingUser?.bankNumber) || undefined,
-			bsb: existingUser?.bsb || undefined,
-		},
+			bsb: existingUser?.bsb ?? undefined,
+		}),
+		[existingUser]
+	);
+
+	const {
+		register,
+		handleSubmit,
+		reset,
+		formState: { isDirty, isValid, isSubmitting, errors },
+	} = useForm<UserSchema>({
+		resolver: zodResolver(userSchema),
+		defaultValues: existingUserWithDefaults,
 	});
 
-	const submitCallback = (successMessage: string) => {
-		toast.success(successMessage);
-
-		trpcContext.user.fetch.invalidate();
-		router.push("/invoices");
-	};
+	useEffect(() => {
+		reset(existingUserWithDefaults);
+	}, [existingUser, existingUserWithDefaults, reset]);
 
 	const onSubmit = (data: UserSchema) => {
 		if (isDirty) {
 			updateUserMutation
 				.mutateAsync({ user: data })
-				.then(() => submitCallback("User updated"));
+				.then(() => trpcContext.user.fetch.invalidate());
 		}
 	};
 
 	return (
-		<div className="mb-8 flex w-80 flex-col items-center self-center">
+		<div className="mb-8 flex w-full flex-col items-center self-center">
 			<Form
 				onSubmit={handleSubmit(onSubmit)}
 				className="flex w-full flex-col gap-8"
 			>
 				<div className="flex flex-col gap-4">
-					<Heading className="-mb-2 text-xl">Account Details</Heading>
+					<Heading className="-mb-2" size="small">
+						Account Details
+					</Heading>
 					<Label htmlFor="name">
 						<span>Name</span>
 						<Input
@@ -90,7 +90,9 @@ const AccountForm = ({ existingUser }: Props) => {
 				</div>
 
 				<div className="flex flex-col gap-4">
-					<Heading className="-mb-2 text-xl">Bank Details</Heading>
+					<Heading className="-mb-2" size="small">
+						Bank Details
+					</Heading>
 					<Label htmlFor="bankName">
 						<span>Bank Name</span>
 						<Input
@@ -132,18 +134,15 @@ const AccountForm = ({ existingUser }: Props) => {
 					</Label>
 				</div>
 
-				<ButtonGroup className="mt-4">
+				<div className="btn-group">
 					<Button
 						type="submit"
-						variant="primary"
+						variant="secondary"
 						disabled={isSubmitting || !isDirty || !isValid}
 					>
-						Update
+						Save
 					</Button>
-					<Link href="/invoices">
-						<Button type="button">Cancel</Button>
-					</Link>
-				</ButtonGroup>
+				</div>
 			</Form>
 		</div>
 	);

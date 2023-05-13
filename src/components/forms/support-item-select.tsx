@@ -11,22 +11,22 @@ const SupportItemSelect = <T extends FieldValues>({
 	name,
 	control,
 }: Props<T>) => {
-	const { data: { supportItems } = {}, error } = trpc.supportItem.list.useQuery(
-		{}
-	);
+	const { data: { supportItems } = {} } = trpc.supportItem.list.useQuery({});
 
-	let options = [];
-
-	if (error) {
-		options = [{ label: "An error occured", value: "" }];
+	if (!supportItems) {
+		return (
+			<Select
+				options={[{ label: "Loading...", value: "" }]}
+				name={name}
+				control={control}
+			/>
+		);
 	}
 
-	options = supportItems
-		? supportItems.map((supportItem) => ({
-				label: supportItem.description,
-				value: supportItem.id,
-		  }))
-		: [{ label: "Loading...", value: "" }];
+	const options = supportItems.map((supportItem) => ({
+		label: supportItem.description,
+		value: supportItem.id,
+	}));
 
 	return <Select options={options} name={name} control={control} />;
 };

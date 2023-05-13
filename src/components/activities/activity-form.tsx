@@ -1,31 +1,28 @@
 import Button from "@atoms/button";
-import ButtonGroup from "@atoms/button-group";
 import Form from "@atoms/form";
+import Heading from "@atoms/heading";
 import Label from "@atoms/label";
+import Subheading from "@atoms/subheading";
 import ClientSelect from "@components/forms/client-select";
+import DatePicker from "@components/forms/date-picker";
 import ErrorMessage from "@components/forms/error-message";
 import Input from "@components/forms/input";
 import SupportItemSelect from "@components/forms/support-item-select";
+import TimeInput from "@components/forms/time-input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { activitySchema, ActivitySchema } from "@schema/activity-schema";
-import { ActivityByIdOutput } from "@server/routers/activity-router";
+import { ActivityByIdOutput } from "@server/api/routers/activity-router";
 import { trpc } from "@utils/trpc";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-import TimeInput from "@components/forms/time-input";
 import dayjs from "dayjs";
 dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
 interface Props {
 	existingActivity?: ActivityByIdOutput;
 }
-
-const InputRow = ({ children }: { children: React.ReactNode }) => (
-	<div className="flex w-full max-w-full content-center gap-4">{children}</div>
-);
 
 const CreateActivityForm = ({ existingActivity }: Props) => {
 	const router = useRouter();
@@ -41,6 +38,23 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 		formState: { errors, isDirty, isSubmitting, isValid },
 	} = useForm<ActivitySchema>({
 		resolver: zodResolver(activitySchema),
+		mode: "onBlur",
+		defaultValues: {
+			date: (existingActivity?.date
+				? dayjs.utc(existingActivity?.date)
+				: dayjs()
+			).format("YYYY-MM-DD"),
+			supportItemId: existingActivity?.supportItem.id ?? "",
+			clientId: existingActivity?.client?.id ?? "",
+			startTime: existingActivity?.startTime
+				? dayjs.utc(existingActivity?.startTime).format("HH:mm")
+				: "",
+			endTime: existingActivity?.startTime
+				? dayjs.utc(existingActivity?.endTime).format("HH:mm")
+				: "",
+			transitDistance: existingActivity?.transitDistance ?? undefined,
+			transitDuration: existingActivity?.transitDuration ?? undefined,
+		},
 	});
 
 	const onSubmit = (data: ActivitySchema) => {
@@ -52,7 +66,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					trpcContext.activity.byId.invalidate({ id: existingActivity.id });
 
 					toast.success("Activity updated");
-					router.push("/activities");
+					router.back();
 				});
 		} else {
 			createActivityMutation.mutateAsync({ activity: data }).then(() => {
@@ -65,51 +79,42 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 	};
 
 	return (
-		<div className="flex flex-col items-center gap-12 self-center px-12">
-			<h2 className="m-0 flex-shrink flex-grow-0 basis-full text-2xl font-bold">
-				{existingActivity ? `Updating Activity` : "Create New Activity"}
-			</h2>
-			<Form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl gap-12">
-				<InputRow>
-					<Label
-						htmlFor="clientId"
-						className="shrink-0 grow-0 basis-1/2"
-						required
-					>
+		<div className="mx-auto flex w-full max-w-md flex-col items-center gap-12 p-3">
+			<Heading className="">
+				{existingActivity ? `Update Activity` : "Log Activity"}
+			</Heading>
+			<Form
+				onSubmit={handleSubmit(onSubmit)}
+				className="flex w-full flex-col items-center gap-5"
+			>
+				<div className="w-full">
+					<Label htmlFor="supportItemId" className="shrink grow" required>
+						<span>Support Item</span>
+						<SupportItemSelect name="supportItemId" control={control} />
+						<ErrorMessage error={errors.supportItemId?.message} />
+					</Label>
+				</div>
+				<div className="flex w-full gap-4">
+					<Label htmlFor="clientId" className="shrink grow basis-1/2" required>
 						<span>Client</span>
 						<ClientSelect name="clientId" control={control} />
 						<ErrorMessage error={errors.clientId?.message} />
 					</Label>
 					<Label
-						htmlFor="supportItemId"
-						className="shrink-0 grow-0 basis-1/2"
-						required
-					>
-						<span>Support Item</span>
-						<SupportItemSelect name="supportItemId" control={control} />
-						<ErrorMessage error={errors.supportItemId?.message} />
-					</Label>
-				</InputRow>
-
-				<InputRow>
-					<Label
 						htmlFor="description"
-						className="shrink-1 grow-1 basis-1/3"
+						className="shrink grow basis-1/2"
 						required
 					>
 						<span>Date</span>
-						<Input
-							name="date"
-							type="date"
-							register={register}
-							rules={{ valueAsDate: true }}
-							error={!!errors.date}
-						/>
+						<DatePicker name="date" register={register} error={!!errors.date} />
 						<ErrorMessage error={errors.date?.message} />
 					</Label>
+				</div>
+
+				<div className="flex w-full gap-4">
 					<Label
 						htmlFor="startTime"
-						className="grow-1 shrink-1 basis-1/3"
+						className="w-full shrink grow basis-1/2"
 						required
 					>
 						<span>Start Time</span>
@@ -117,14 +122,11 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 							name="startTime"
 							register={register}
 							error={!!errors.startTime}
+							className="w-full"
 						/>
 						<ErrorMessage error={errors.startTime?.message} />
 					</Label>
-					<Label
-						htmlFor="endTime"
-						className="grow-1 shrink-1 basis-1/3"
-						required
-					>
+					<Label htmlFor="endTime" className="shrink grow basis-1/2" required>
 						<span>End Time</span>
 						<TimeInput
 							name="endTime"
@@ -133,9 +135,50 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 						/>
 						<ErrorMessage error={errors.endTime?.message} />
 					</Label>
-				</InputRow>
+				</div>
+				<hr className="w-full" />
 
-				<ButtonGroup>
+				<div className="flex flex-col items-center gap-1">
+					<Heading size="xsmall">Provider Travel</Heading>
+
+					{true && <p>Autofilled from previous invoice</p>}
+
+					<div className="mt-4 flex w-full gap-4">
+						<Label
+							htmlFor="transitDistance"
+							className="w-full shrink grow basis-1/2"
+						>
+							<span>Transit Distance</span>
+							<Subheading>Distance to client&#39;s house</Subheading>
+							<Input
+								name="transitDistance"
+								register={register}
+								suffix="km"
+								rules={{
+									setValueAs: (value) => (value === "" ? null : Number(value)),
+								}}
+								error={!!errors.transitDistance}
+							/>
+							<ErrorMessage error={errors.transitDistance?.message} />
+						</Label>
+						<Label htmlFor="transitDuration" className="shrink grow basis-1/2">
+							<span>Transit Duration</span>
+							<Subheading>Duration of drive</Subheading>
+							<Input
+								name="transitDuration"
+								register={register}
+								suffix="mins"
+								rules={{
+									setValueAs: (value) => (value === "" ? null : Number(value)),
+								}}
+								error={!!errors.transitDuration}
+							/>
+							<ErrorMessage error={errors.transitDuration?.message} />
+						</Label>
+					</div>
+				</div>
+
+				<div className="btn-group">
 					<Button
 						type="submit"
 						variant="primary"
@@ -143,8 +186,10 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					>
 						{existingActivity ? "Update" : "Create"}
 					</Button>
-					<Link href="/activities">Cancel</Link>
-				</ButtonGroup>
+					<Button type="button" onClick={() => router.back()}>
+						Cancel
+					</Button>
+				</div>
 			</Form>
 		</div>
 	);

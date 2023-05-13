@@ -1,5 +1,5 @@
 import { Activity, Invoice } from "@prisma/client";
-import prisma from "@utils/prisma";
+import prisma from "@server/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 
@@ -42,9 +42,13 @@ export default async (request: ApiRequest, response: NextApiResponse) => {
 					where: { id: activity.id ?? "" },
 					update: {
 						...activity,
+						ownerId: session.user.id,
+						clientId: request.body.invoice?.clientId,
 					},
 					create: {
 						...activity,
+						ownerId: session.user.id,
+						clientId: request.body.invoice?.clientId,
 						invoiceId,
 					},
 				})

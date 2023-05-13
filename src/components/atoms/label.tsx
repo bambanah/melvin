@@ -1,19 +1,27 @@
-import styled from "styled-components";
+/* eslint-disable jsx-a11y/label-has-for */
+/* eslint-disable jsx-a11y/label-has-associated-control */
+import classNames from "classnames";
+import { DetailedHTMLProps, LabelHTMLAttributes } from "react";
 
-interface LabelProps {
-	required?: boolean;
-}
-
-const Label = styled.label<LabelProps>`
-	display: flex;
-	flex-direction: column;
-	flex: 1 0 auto;
-	gap: 0.6rem;
-
-	& > span::after {
-		color: red;
-		content: ${({ required }) => (required ? '" *"' : '" "')};
-	}
-`;
+const Label = ({
+	children,
+	className,
+	required,
+	...rest
+}: DetailedHTMLProps<
+	LabelHTMLAttributes<HTMLLabelElement>,
+	HTMLLabelElement
+> & { required?: boolean }) => (
+	<label
+		className={classNames([
+			"flex flex-auto flex-col gap-2",
+			required && "[&>span]:after:text-red-600 [&>span]:after:content-['_*']",
+			className,
+		])}
+		{...rest}
+	>
+		{children}
+	</label>
+);
 
 export default Label;

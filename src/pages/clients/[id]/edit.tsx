@@ -40,7 +40,7 @@ const EditClient = () => {
 	return (
 		<Layout>
 			<Head>
-				<title>{`Modifying ${client.name} - Melvin`}</title>
+				<title>Modifying {client.name} - Melvin</title>
 			</Head>
 			<ClientForm existingClient={client} />
 		</Layout>

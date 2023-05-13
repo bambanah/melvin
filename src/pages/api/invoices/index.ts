@@ -1,4 +1,5 @@
-import prisma from "@utils/prisma";
+import { Activity } from "@prisma/client";
+import prisma from "@server/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 
@@ -17,7 +18,11 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
 				ownerId: session.user.id,
 				activities: {
 					createMany: {
-						data: request.body.activities,
+						data: request.body.activities.map((activity: Activity) => ({
+							...activity,
+							ownerId: session.user.id,
+							clientId: request.body.invoice.clientId,
+						})),
 					},
 				},
 			},

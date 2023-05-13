@@ -1,96 +1,73 @@
-import EntityList, { EntityListItem } from "@components/shared/entity-list";
+import Loading from "@atoms/loading";
+import ListPage from "@components/shared/list-page";
 import {
-	faEdit,
-	faIdCard,
-	faTrash,
-	faWallet,
+	faBuilding,
+	faClock,
+	faFileAlt,
+	faPenToSquare,
+	faUser,
 } from "@fortawesome/free-solid-svg-icons";
-import { ClientListOutput } from "@server/routers/client-router";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { trpc } from "@utils/trpc";
-import Skeleton from "react-loading-skeleton";
-import { toast } from "react-toastify";
+import dayjs from "dayjs";
 
 const ClientList = () => {
-	const utils = trpc.useContext();
-
 	const { data: { clients } = {}, error } = trpc.clients.list.useQuery({});
-	const deleteClientMutation = trpc.clients.delete.useMutation();
 
 	if (error) {
 		console.error(error);
 		return <div>Error loading</div>;
 	}
 
-	const generateEntity = (client?: ClientListOutput): EntityListItem => ({
-		id: client?.id || "",
-		fields: [
-			{
-				value: client ? client?.name || "N/A" : <Skeleton />,
-				type: "label",
-				flex: "1 1 100%",
-			},
-			{
-				value: client ? client?.number || "N/A" : <Skeleton />,
-				icon: faIdCard,
-				type: "text",
-				flex: "1 0 7.2em",
-			},
-			{
-				value: client ? client?.billTo || "N/A" : <Skeleton />,
-				icon: faWallet,
-				type: "text",
-				flex: "0 0 9.7em",
-			},
-		],
-		actions: client
-			? [
-					{
-						value: "New Invoice",
-						type: "link",
-						href:
-							client.invoices.length > 0
-								? `/invoices/create?copyFrom=${client.invoices[0].id}`
-								: `/invoices/create?for=${client.id}`,
-					},
-					{
-						value: "Edit",
-						type: "link",
-						icon: faEdit,
-						href: `/clients/${client.id}/edit`,
-					},
-					{
-						value: "Delete",
-						type: "button",
-						icon: faTrash,
-						onClick: () => {
-							if (confirm(`Are you sure you want to delete ${client.name}?`)) {
-								deleteClientMutation.mutateAsync(
-									{ id: client.id },
-									{
-										onSuccess: () => {
-											utils.clients.list.invalidate();
-											toast.success("Client deleted");
-										},
-										onError: (error) => toast.error(error.message),
-									}
-								);
-							}
-						},
-					},
-			  ]
-			: [],
-	});
-
 	return (
-		<EntityList
-			title="Clients"
-			route="/clients"
-			entities={
-				clients
-					? clients.map((client) => generateEntity(client))
-					: [generateEntity()]
-			}
-		/>
+		<ListPage title="Clients" createHref="/clients/create">
+			<ListPage.Items>
+				{clients ? (
+					clients.map((client) => (
+						<ListPage.Item href={`/clients/${client.id}`} key={client.id}>
+							<div className="flex min-h-[2.5rem] flex-col gap-2">
+								<h3 className="font-semibold sm:text-lg">{client.name}</h3>
+								{client.invoices.length > 0 && (
+									<>
+										<span className="flex items-center gap-2 text-gray-600">
+											<FontAwesomeIcon icon={faFileAlt} size="sm" />
+											{client.invoices.length}
+										</span>
+										<div className="flex items-center gap-2 text-gray-600">
+											<FontAwesomeIcon icon={faClock} size="sm" />
+											<span>
+												{dayjs(client.invoices[0].date).format("DD/MM")} -
+											</span>
+											{client.invoices[0].invoiceNo}
+										</div>
+									</>
+								)}
+							</div>
+							<div className="flex flex-col items-end gap-2 pt-[0.5rem] text-gray-600">
+								<span className="flex items-center gap-2">
+									{client.number}
+									<FontAwesomeIcon icon={faUser} size="sm" />
+								</span>
+								{client.billTo && (
+									<span className="flex items-center gap-2">
+										{client.billTo}
+										<FontAwesomeIcon icon={faBuilding} size="sm" />
+									</span>
+								)}
+								{client.invoiceNumberPrefix && (
+									<span className="flex items-center gap-2">
+										{client.invoiceNumberPrefix}##
+										<FontAwesomeIcon icon={faPenToSquare} size="sm" />
+									</span>
+								)}
+							</div>
+						</ListPage.Item>
+					))
+				) : (
+					<Loading />
+				)}
+			</ListPage.Items>
+		</ListPage>
 	);
 };
 

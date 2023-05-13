@@ -1,20 +1,17 @@
 import { RateType } from "@prisma/client";
-import { InvoiceByIdOutput } from "@server/routers/invoice-router";
+import { InvoiceByIdOutput } from "@server/api/routers/invoice-router";
+import prisma from "@server/prisma";
 import jspdf from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
-import {
-	getDuration,
-	getNonLabourTravelCode,
-	getPrettyDuration,
-	getRate,
-	getTotalCost,
-	round,
-} from "./helpers";
+import { getRate, getTotalCostOfActivities } from "./activity-utils";
+import { formatDuration, getDuration } from "./date-utils";
+import { round } from "./generic-utils";
+import { getInvoiceFileName } from "./invoice-utils";
+import { getNonLabourTravelCode } from "./support-item-utils";
 
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import prisma from "./prisma";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -58,7 +55,7 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 				const duration = getDuration(activity.startTime, activity.endTime);
 				totalCost = round(Number(rate) * duration, 2);
 
-				const prettyDuration = getPrettyDuration(duration);
+				const prettyDuration = formatDuration(duration);
 
 				countString = `${dayjs.utc(activity.startTime).format("HH:mm")}-${dayjs
 					.utc(activity.endTime)
@@ -152,7 +149,7 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 	// Activities only allows strings - need to allow strings and CellDef
 	const values: (CellDef | string)[][] = activityStrings;
 
-	const totalCost = getTotalCost(invoice.activities);
+	const totalCost = getTotalCostOfActivities(invoice.activities);
 
 	// Bottom section
 	values.push(
@@ -248,22 +245,7 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 		},
 	});
 
-	let earliestDate = invoice.activities[0].date;
-	let latestDate = invoice.activities[0].date;
-	for (const { date } of invoice.activities) {
-		if (dayjs(date).isBefore(dayjs(earliestDate))) earliestDate = date;
-		if (dayjs(date).isAfter(dayjs(latestDate))) latestDate = date;
-	}
-
-	const dateRangeFormatted = dayjs(earliestDate).isSame(latestDate)
-		? dayjs(earliestDate).format("DD-MM")
-		: `(${dayjs(earliestDate).format("DD-MM")})-(${dayjs(latestDate).format(
-				"DD-MM"
-		  )})`;
-
-	const fileName = `${invoice.invoiceNo}_${dateRangeFormatted}-${dayjs(
-		invoice.date
-	).format("YYYY")}.pdf`;
+	const fileName = getInvoiceFileName(invoice);
 
 	return {
 		pdfString: document_

@@ -1,32 +1,33 @@
-import styled from "styled-components";
+import classNames from "classnames";
 
-const Heading = styled.h1`
-	font-size: 28px;
-	font-weight: 600;
-	line-height: 1.125;
-	color: ${({ theme }) => theme.colors.fg};
-	word-break: break-word;
-	margin: 0;
+type Size = "xsmall" | "small" | "medium" | "large" | "xlarge";
 
-	&.xlarge {
-		font-size: 40px;
-	}
+const variantStyles: Record<Size, string> = {
+	xsmall: "text-base md:text-xl",
+	small: "text-lg md:text-2xl",
+	medium: "text-xl md:text-3xl",
+	large: "text-2xl md:text-4xl",
+	xlarge: "text-4xl md:text-6xl",
+};
 
-	&.large {
-		font-size: 36px;
-	}
+interface Props {
+	children: string;
+	size?: Size;
+	className?: string;
+}
 
-	&.medium {
-		font-size: 28px;
-	}
-
-	&.small {
-		font-size: 24px;
-	}
-
-	&.xsmall {
-		font-size: 20px;
-	}
-`;
+const Heading = ({ children, className, size = "medium" }: Props) => {
+	return (
+		<h2
+			className={classNames(
+				"m-0 break-words font-semibold text-fg",
+				variantStyles[size],
+				className
+			)}
+		>
+			{children}
+		</h2>
+	);
+};
 
 export default Heading;

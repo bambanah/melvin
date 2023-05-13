@@ -1,5 +1,4 @@
 import Button from "@atoms/button";
-import ButtonGroup from "@atoms/button-group";
 import Form from "@atoms/form";
 import Heading from "@atoms/heading";
 import Label from "@atoms/label";
@@ -9,7 +8,7 @@ import Input from "@components/forms/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ClientSchema } from "@schema/client-schema";
 import { clientSchema } from "@schema/client-schema";
-import { ClientByIdOutput } from "@server/routers/client-router";
+import { ClientByIdOutput } from "@server/api/routers/client-router";
 import { trpc } from "@utils/trpc";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -40,15 +39,17 @@ const ClientForm = ({ existingClient }: Props) => {
 			name: existingClient?.name ?? "",
 			number: existingClient?.number ?? "",
 			billTo: existingClient?.billTo ?? "",
+			invoiceNumberPrefix: existingClient?.invoiceNumberPrefix ?? "",
 		},
 	});
 
 	const submitCallback = (successMessage: string) => {
+		trpcContext.clients.list.invalidate();
 		toast.success(successMessage);
 
-		trpcContext.clients.list.invalidate();
-		router.push("/clients");
+		router.back();
 	};
+
 	const onSubmit = (data: ClientSchema) => {
 		if (existingClient?.id) {
 			updateClientMutation
@@ -122,7 +123,7 @@ const ClientForm = ({ existingClient }: Props) => {
 					<ErrorMessage error={errors.billTo?.message} />
 				</Label>
 
-				<ButtonGroup>
+				<div className="btn-group">
 					<Button
 						type="submit"
 						variant="primary"
@@ -133,7 +134,7 @@ const ClientForm = ({ existingClient }: Props) => {
 					<Link href="/clients">
 						<Button type="button">Cancel</Button>
 					</Link>
-				</ButtonGroup>
+				</div>
 			</Form>
 		</div>
 	);

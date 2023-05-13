@@ -1,8 +1,10 @@
 import { AppContextProvider } from "@context/app-context";
-import GlobalStyle from "@styles/global-style";
+import "@styles/globals.css";
 import { trpc } from "@utils/trpc";
+import classNames from "classnames";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
+import { Inter, Patua_One, Roboto_Mono, Space_Mono } from "next/font/google";
 import Head from "next/head";
 
 import { pdfjs } from "react-pdf";
@@ -17,18 +19,45 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 config.autoAddCss = false;
 
-import "@styles/globals.css";
+// Google fonts
+const inter = Inter({
+	subsets: ["latin"],
+	variable: "--font-inter",
+});
+const patuaOne = Patua_One({
+	subsets: ["latin"],
+	variable: "--font-patua-one",
+	weight: "400",
+});
+const robotoMono = Roboto_Mono({
+	subsets: ["latin"],
+	variable: "--font-roboto-mono",
+	weight: "400",
+});
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 	return (
-		<main>
+		<main
+			className={classNames([
+				"transition-colors",
+				inter.variable,
+				patuaOne.variable,
+			])}
+		>
+			<style jsx global>{`
+				:root {
+					--font-inter: ${inter.style.fontFamily};
+					--font-patua-one: ${patuaOne.style.fontFamily};
+					--font-roboto-mono: ${robotoMono.style.fontFamily};
+				}
+			`}</style>
+
 			<SessionProvider session={session}>
 				<AppContextProvider>
 					<Head>
 						<title>Melvin</title>
 						<link rel="shortcut icon" type="image/png" href="/melvin.png" />
 					</Head>
-					<GlobalStyle />
 					<Component {...pageProps} />
 
 					<ToastContainer />

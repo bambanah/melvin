@@ -12,7 +12,7 @@ export const userSchema = z.object({
 	bsb: z
 		.number()
 		.min(100_000, "Must be 6 digits")
-		.max(999_999, "Must be six digits")
+		.max(999_999, "Must be 6 digits")
 		.nullish(),
 });
 export type UserSchema = z.infer<typeof userSchema>;
