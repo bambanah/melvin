@@ -13,15 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 7
       - uses: actions/setup-node@v3
         with:
           node-version: "16"
-          cache: "pnpm"
+          cache: "yarn"
+          cache-dependency-path: yarn.lock
+
       - name: Install dependencies
-        run: pnpm install
+        run: yarn install --frozen-lockfile
 
       - name: Run tests
-        run: pnpm test:unit
+        run: yarn test:unit
