@@ -4,7 +4,7 @@ import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
-import { Inter, Patua_One, Space_Mono } from "next/font/google";
+import { Inter, Patua_One, Roboto_Mono, Space_Mono } from "next/font/google";
 import Head from "next/head";
 
 import { pdfjs } from "react-pdf";
@@ -29,9 +29,9 @@ const patuaOne = Patua_One({
 	variable: "--font-patua-one",
 	weight: "400",
 });
-const spaceMono = Space_Mono({
+const robotoMono = Roboto_Mono({
 	subsets: ["latin"],
-	variable: "--font-space-mono",
+	variable: "--font-roboto-mono",
 	weight: "400",
 });
 
@@ -48,7 +48,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 				:root {
 					--font-inter: ${inter.style.fontFamily};
 					--font-patua-one: ${patuaOne.style.fontFamily};
-					--font-space-mono: ${spaceMono.style.fontFamily};
+					--font-roboto-mono: ${robotoMono.style.fontFamily};
 				}
 			`}</style>
 
