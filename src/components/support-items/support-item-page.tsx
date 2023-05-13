@@ -44,7 +44,7 @@ const SupportItemPage = () => {
 	return (
 		<div className="flex flex-col items-center justify-center">
 			<Head>
-				<title>{`${supportItem.description} | Melvin`}</title>
+				<title>{supportItem.description} | Melvin</title>
 			</Head>
 
 			<div className="flex w-full max-w-4xl flex-col gap-4 md:gap-8">

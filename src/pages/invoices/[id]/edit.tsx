@@ -49,9 +49,11 @@ const EditInvoice = () => {
 	return (
 		<Layout>
 			<Head>
-				<title>{invoice.invoiceNo} - Melvin</title>
+				<title>
+					{invoice.invoiceNo ? `${invoice.invoiceNo} - Melvin` : "Melvin"}
+				</title>
 			</Head>
-			<InvoiceForm initialValues={invoice} onSubmit={onSubmit} />
+			<InvoiceForm existingInvoice={invoice} onSubmit={onSubmit} />
 		</Layout>
 	);
 };

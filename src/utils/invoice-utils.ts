@@ -19,7 +19,10 @@ export const getNextInvoiceNo = (
 	clientInvoicePrefix?: string | null
 ) => {
 	if (previousInvoiceNumbers.length === 0)
-		return { nextInvoiceNo: "", latestInvoiceNo: "" };
+		return {
+			nextInvoiceNo: clientInvoicePrefix ? `${clientInvoicePrefix}1` : "",
+			latestInvoiceNo: "",
+		};
 
 	const latestInvoiceNo = getHighestInvoiceNo(previousInvoiceNumbers);
 

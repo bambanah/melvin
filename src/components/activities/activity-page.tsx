@@ -55,9 +55,8 @@ const ActivityPage = () => {
 		<div className="flex flex-col items-center justify-center px-5">
 			<Head>
 				<title>
-					{`${activity.supportItem.description} - ${dayjs(activity.date).format(
-						"DD/MM h:mm"
-					)} | Melvin`}
+					{activity.supportItem.description} -{" "}
+					{dayjs(activity.date).format("DD/MM h:mm")} | Melvin
 				</title>
 			</Head>
 			<div className="flex w-full max-w-4xl flex-col gap-4">
