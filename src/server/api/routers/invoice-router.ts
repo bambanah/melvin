@@ -3,6 +3,7 @@ import { activitySchema } from "@schema/activity-schema";
 import { invoiceSchema } from "@schema/invoice-schema";
 import { authedProcedure, router } from "@server/api/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
+import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { baseListQueryInput } from "@utils/trpc";
 import dayjs from "dayjs";
 import { z } from "zod";
@@ -85,6 +86,28 @@ export const invoiceRouter = router({
 				nextCursor,
 			};
 		}),
+	getTotalOwing: authedProcedure.query(async ({ ctx }) => {
+		const invoices = await ctx.prisma.invoice.findMany({
+			select: {
+				activities: {
+					include: {
+						supportItem: true,
+					},
+				},
+			},
+			where: {
+				status: "SENT",
+			},
+		});
+
+		const totalOwing = invoices.reduce(
+			(total, invoice) =>
+				(total += getTotalCostOfActivities(invoice.activities)),
+			0
+		);
+
+		return totalOwing;
+	}),
 	byId: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {

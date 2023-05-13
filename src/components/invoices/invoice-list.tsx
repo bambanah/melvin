@@ -6,10 +6,10 @@ import { InvoiceListOutput } from "@server/api/routers/invoice-router";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import { useState } from "react";
+import { getTotalCostOfActivities } from "@utils/activity-utils";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { getTotalCostOfActivities } from "@utils/activity-utils";
 dayjs.extend(utc);
 
 interface Props {
@@ -31,6 +31,8 @@ export default function InvoiceList({
 			: undefined,
 		clientId,
 	});
+
+	const { data: totalOwing } = trpc.invoice.getTotalOwing.useQuery();
 
 	if (error) {
 		console.error(error);
@@ -93,22 +95,34 @@ export default function InvoiceList({
 			createHref={`/invoices/create${clientId ? `?clientId=${clientId}` : ""}`}
 		>
 			{groupByAssignedStatus && (
-				<div className="flex w-full">
-					{(["UNPAID", "PAID"] as const).map((status) => (
-						<button
-							key={status}
-							type="button"
-							onClick={() => setStatusFilter(status)}
-							className={classNames([
-								"basis-1/2 border-b-[3px] px-4 py-2 text-center transition-all",
-								statusFilter === status && "border-indigo-700 text-indigo-700",
-							])}
-						>
-							{status}
-						</button>
-					))}
+				<div className="w-full border-b">
+					<div className="-mb-[1px] flex w-full md:max-w-xs">
+						{(["UNPAID", "PAID"] as const).map((status) => (
+							<button
+								key={status}
+								type="button"
+								onClick={() => setStatusFilter(status)}
+								className={classNames([
+									"basis-1/2 border-b px-4 py-2 text-center transition-all",
+									statusFilter === status &&
+										"border-indigo-700 text-indigo-700",
+								])}
+							>
+								{status}
+							</button>
+						))}
+					</div>
 				</div>
 			)}
+
+			{statusFilter === "UNPAID" &&
+				totalOwing !== undefined &&
+				totalOwing > 0 && (
+					<p className="p-4 pb-0 text-right text-slate-600">
+						Total Outstanding: ${totalOwing}
+					</p>
+				)}
+
 			<InvoiceListItems invoices={invoices} />
 		</ListPage>
 	);
