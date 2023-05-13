@@ -27,10 +27,15 @@ export const randomClient = ({
 	name?: string;
 	number?: number;
 	billTo?: string;
-} = {}) => ({
-	name: name ?? pickRandomFrom(USERS),
-	number:
-		number?.toString() ??
-		Math.floor(Math.random() * 999_999_999 + 1).toString(),
-	billTo: billTo ?? pickRandomFrom(BILL_TO),
-});
+} = {}) => {
+	const clientName = name ?? pickRandomFrom(USERS);
+
+	return {
+		name: clientName,
+		number:
+			number?.toString() ??
+			Math.floor(Math.random() * 999_999_999 + 1).toString(),
+		invoiceNumberPrefix: `${clientName.split(" ").slice(-1)}-`,
+		billTo: billTo ?? pickRandomFrom(BILL_TO),
+	};
+};

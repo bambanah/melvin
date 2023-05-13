@@ -57,7 +57,7 @@ const ClientPage = () => {
 					<Heading>{client.name}</Heading>
 
 					<Dropdown>
-						<Dropdown.Button>
+						<Dropdown.Button id="options-dropdown">
 							<FontAwesomeIcon icon={faEllipsisV} />
 						</Dropdown.Button>
 						<Dropdown.Items>
