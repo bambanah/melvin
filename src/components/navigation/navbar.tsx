@@ -20,7 +20,7 @@ const Navbar = () => {
 			<Link href="/invoices" className="hidden md:inline-block">
 				<Logo>melvin</Logo>
 			</Link>
-			<div className="flex w-full items-center justify-evenly md:mt-2 md:flex-row md:content-end md:items-end md:justify-start md:gap-3 md:p-0">
+			<div className="flex w-full items-center justify-evenly md:mt-2 md:flex-row md:content-end md:justify-start md:gap-3 md:p-0">
 				<NavLink href="/clients" icon={faUsers} className="order-1">
 					Clients
 				</NavLink>
