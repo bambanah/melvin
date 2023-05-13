@@ -5,7 +5,7 @@ on:
     branches: [main, dev]
 
 env:
-  DATABASE_URL: mysql://root:Passw0rd@localhost:3309/melvin
+  DATABASE_URL: mysql://root@localhost:3309/melvin
   NEXTAUTH_URL: "http://localhost:3000"
   NEXTAUTH_SECRET: "7893onvi808u7q1ounbv"
   GOOGLE_ID: ""
