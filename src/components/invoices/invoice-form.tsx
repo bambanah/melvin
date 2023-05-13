@@ -202,8 +202,8 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 												</span>
 												<span className="basis-1/2">
 													<FontAwesomeIcon icon={faClock} />{" "}
-													{dayjs(activity.startTime).format("h:mma")}-
-													{dayjs(activity.endTime).format("h:mma")}
+													{dayjs.utc(activity.startTime).format("h:mma")}-
+													{dayjs.utc(activity.endTime).format("h:mma")}
 												</span>
 											</div>
 										</div>

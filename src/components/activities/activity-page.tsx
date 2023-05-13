@@ -56,7 +56,7 @@ const ActivityPage = () => {
 			<Head>
 				<title>
 					{activity.supportItem.description} -{" "}
-					{dayjs(activity.date).format("DD/MM h:mm")} | Melvin
+					{dayjs.utc(activity.date).format("DD/MM")} | Melvin
 				</title>
 			</Head>
 			<div className="flex w-full max-w-4xl flex-col gap-4">
