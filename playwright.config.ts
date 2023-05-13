@@ -9,7 +9,7 @@ export default defineConfig({
 	},
 	testDir: "./e2e",
 	webServer: {
-		command: "yarn build && yarn start",
+		command: "yarn dev",
 		url: "http://localhost:3000",
 		reuseExistingServer: !process.env.CI,
 	},
