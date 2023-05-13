@@ -49,21 +49,23 @@ function ActivityList({
 			createHref={displayCreateButton ? "/activities/create" : undefined}
 		>
 			{groupByAssignedStatus && (
-				<div className="mb-4 flex w-full">
-					{[false, true].map((status, idx) => (
-						<button
-							key={idx}
-							type="button"
-							onClick={() => setAssignedFilter(status)}
-							className={classNames([
-								"basis-1/2 border-b-[3px] px-4 py-2 text-center transition-all",
-								assignedFilter === status &&
-									"border-indigo-700 text-indigo-700",
-							])}
-						>
-							{status ? "ASSIGNED" : "UNASSIGNED"}
-						</button>
-					))}
+				<div className="mb-4 w-full border-b">
+					<div className="-mb-[1px] flex w-full md:max-w-xs">
+						{[false, true].map((status, idx) => (
+							<button
+								key={idx}
+								type="button"
+								onClick={() => setAssignedFilter(status)}
+								className={classNames([
+									"basis-1/2 border-b px-4 py-2 text-center transition-all",
+									assignedFilter === status &&
+										"border-indigo-700 text-indigo-700",
+								])}
+							>
+								{status ? "ASSIGNED" : "UNASSIGNED"}
+							</button>
+						))}
+					</div>
 				</div>
 			)}
 
