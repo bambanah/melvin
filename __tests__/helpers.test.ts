@@ -104,16 +104,20 @@ describe("Helpers", () => {
 	});
 
 	it("Should get next invoice number", () => {
-		expect(getNextInvoiceNo(["Gawne1", "Gawne2", "Gawne3"])).toEqual("Gawne4");
-		expect(getNextInvoiceNo(["Client-1", "Client-2", "Client-3"])).toEqual(
-			"Client-4"
+		expect(
+			getNextInvoiceNo(["Gawne1", "Gawne2", "Gawne3"]).nextInvoiceNo
+		).toEqual("Gawne4");
+		expect(
+			getNextInvoiceNo(["Client-1", "Client-2", "Client-3"]).nextInvoiceNo
+		).toEqual("Client-4");
+		expect(
+			getNextInvoiceNo(["Gawne1", "Gawne2", "Gawne-3"]).nextInvoiceNo
+		).toEqual("Gawne-4");
+		expect(getNextInvoiceNo([]).nextInvoiceNo).toEqual("");
+		expect(getNextInvoiceNo(["Gawne1"]).nextInvoiceNo).toEqual("Gawne2");
+		expect(getNextInvoiceNo(["Gawne01", "Gawne02"]).nextInvoiceNo).toEqual(
+			"Gawne03"
 		);
-		expect(getNextInvoiceNo(["Gawne1", "Gawne2", "Gawne-3"])).toEqual(
-			"Gawne-4"
-		);
-		expect(getNextInvoiceNo([])).toEqual("");
-		expect(getNextInvoiceNo(["Gawne1"])).toEqual("Gawne2");
-		expect(getNextInvoiceNo(["Gawne01", "Gawne02"])).toEqual("Gawne03");
 	});
 
 	it("Should round correctly", () => {
