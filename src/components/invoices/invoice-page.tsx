@@ -22,6 +22,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { InvoiceStatus } from "@prisma/client";
 import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { trpc } from "@utils/trpc";
+import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
@@ -113,20 +114,34 @@ const InvoicePage = () => {
 				confirmAction={deleteInvoice}
 			/>
 
-			<div className="flex flex-col justify-between md:flex-row-reverse">
+			<div className="flex flex-col items-stretch justify-between md:flex-row-reverse">
 				<div
-					className="group relative h-full max-h-[15rem] basis-1/2 cursor-pointer overflow-hidden bg-gray-200 shadow-inner"
-					onClick={() => setIsPdfPreviewExpanded(true)}
+					className={classNames([
+						"group relative h-full max-h-[15rem] basis-1/2 overflow-hidden",
+						invoice.activities.length > 0 &&
+							"cursor-pointer bg-gray-200 shadow-inner",
+					])}
 				>
-					<div className="mx-auto w-8/12 basis-1/2 ">
-						<PdfPreview invoiceId={invoice.id} className="shadow-xl" />
-					</div>
-					<div className="absolute right-0 top-0 flex h-full w-full items-center justify-center">
-						<div className="flex items-center justify-center gap-2 rounded-full bg-gray-900 bg-opacity-90 px-4 py-3 text-gray-50 transition-transform group-hover:scale-110 md:px-3 md:py-2 md:text-lg">
-							<FontAwesomeIcon icon={faMagnifyingGlassPlus} />
-							Preview
+					{invoice.activities.length > 0 ? (
+						<>
+							<div className="mx-auto w-8/12 basis-1/2">
+								<PdfPreview invoiceId={invoice.id} />
+							</div>
+							<div
+								className="absolute right-0 top-0 flex h-full w-full items-center justify-center"
+								onClick={() => setIsPdfPreviewExpanded(true)}
+							>
+								<div className="flex items-center justify-center gap-2 rounded-full bg-gray-900 bg-opacity-90 px-4 py-3 text-gray-50 transition-transform group-hover:scale-110 md:px-3 md:py-2 md:text-lg">
+									<FontAwesomeIcon icon={faMagnifyingGlassPlus} />
+									Preview
+								</div>
+							</div>
+						</>
+					) : (
+						<div className="flex h-[15rem] w-full items-center justify-center bg-slate-200">
+							<p className="text-4xl text-slate-400">DRAFT</p>
 						</div>
-					</div>
+					)}
 				</div>
 				<div className="mx-auto flex w-full basis-1/2 flex-col px-4 py-4 md:pt-0">
 					<div className="flex items-center justify-between md:mb-5">
