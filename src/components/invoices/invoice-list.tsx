@@ -12,6 +12,9 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import Button from "@atoms/button";
 import LogPayment from "./log-payment";
+import Link from "next/link";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 dayjs.extend(utc);
 
 interface Props {
@@ -90,11 +93,21 @@ export default function InvoiceList({
 	};
 
 	return (
-		<ListPage
-			title="Invoices"
-			createHref={`/invoices/create${clientId ? `?clientId=${clientId}` : ""}`}
-		>
-			<LogPayment />
+		<ListPage>
+			<ListPage.Header>
+				<h2 className="mr-auto text-2xl font-bold">Invoices</h2>
+
+				<LogPayment />
+
+				<Button
+					as={Link}
+					href={`/invoices/create${clientId ? `?clientId=${clientId}` : ""}`}
+					variant="primary"
+				>
+					<FontAwesomeIcon icon={faPlus} />
+					<span>Add</span>
+				</Button>
+			</ListPage.Header>
 
 			{groupByAssignedStatus && (
 				<div className="w-full border-b">

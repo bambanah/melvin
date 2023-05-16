@@ -1,7 +1,11 @@
+import Button from "@atoms/button";
 import Loading from "@atoms/loading";
 import ListPage from "@components/shared/list-page";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Prisma, RateType } from "@prisma/client";
 import { trpc } from "@utils/trpc";
+import Link from "next/link";
 
 const ItemCode = ({
 	descriptor,
@@ -43,7 +47,15 @@ function SupportItemList() {
 	}
 
 	return (
-		<ListPage title="Support Items" createHref={`/support-items/create`}>
+		<ListPage>
+			<ListPage.Header>
+				<h2 className="mr-auto text-2xl font-bold">Support Items</h2>
+
+				<Button as={Link} href="/support-items/create" variant="primary">
+					<FontAwesomeIcon icon={faPlus} />
+					<span>Add</span>
+				</Button>
+			</ListPage.Header>
 			<ListPage.Items>
 				{supportItems ? (
 					supportItems.map((supportItem) => (
