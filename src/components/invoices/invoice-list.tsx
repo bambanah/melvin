@@ -10,6 +10,8 @@ import { getTotalCostOfActivities } from "@utils/activity-utils";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import Button from "@atoms/button";
+import LogPayment from "./log-payment";
 dayjs.extend(utc);
 
 interface Props {
@@ -92,6 +94,8 @@ export default function InvoiceList({
 			title="Invoices"
 			createHref={`/invoices/create${clientId ? `?clientId=${clientId}` : ""}`}
 		>
+			<LogPayment />
+
 			{groupByAssignedStatus && (
 				<div className="w-full border-b">
 					<div className="-mb-[1px] flex w-full md:max-w-xs">

@@ -63,7 +63,7 @@ const InvoicePage = () => {
 
 	const markInvoiceAs = (invoiceStatus: InvoiceStatus) => {
 		markInvoiceAsMutation
-			.mutateAsync({ id: invoiceId, status: invoiceStatus })
+			.mutateAsync({ ids: [invoiceId], status: invoiceStatus })
 			.then(() => {
 				trpcContext.invoice.byId.invalidate({ id: invoiceId });
 				trpcContext.invoice.list.invalidate();

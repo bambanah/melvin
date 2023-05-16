@@ -36,6 +36,10 @@
 	.btn-group {
 		@apply mt-5 flex items-center justify-center gap-6;
 	}
+
+	.input {
+		@apply w-full rounded-md border bg-white p-3 shadow-md outline-none focus-within:border-indigo-500;
+	}
 }
 
 html,

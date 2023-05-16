@@ -29,3 +29,12 @@ export function groupBy<T>(arr: T[], keyGetter: (item: T) => string) {
 
 	return groupedObj;
 }
+
+export const debounce = <T extends Function>(fn: T, ms = 300) => {
+	let timeoutId: ReturnType<typeof setTimeout>;
+
+	return function (this: any, ...args: any[]) {
+		clearTimeout(timeoutId);
+		timeoutId = setTimeout(() => fn.apply(this, args), ms);
+	};
+};

@@ -4,7 +4,7 @@ import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
-import { Inter, Patua_One, Roboto_Mono, Space_Mono } from "next/font/google";
+import { Inter, Patua_One, Roboto_Mono } from "next/font/google";
 import Head from "next/head";
 
 import { pdfjs } from "react-pdf";
@@ -32,7 +32,6 @@ const patuaOne = Patua_One({
 const robotoMono = Roboto_Mono({
 	subsets: ["latin"],
 	variable: "--font-roboto-mono",
-	weight: "400",
 });
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
@@ -42,6 +41,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 				"transition-colors",
 				inter.variable,
 				patuaOne.variable,
+				robotoMono.variable,
 			])}
 		>
 			<style jsx global>{`
