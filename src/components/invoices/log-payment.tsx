@@ -1,5 +1,5 @@
 import Button from "@atoms/button";
-import { faDollar, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog } from "@headlessui/react";
 import { getTotalCostOfActivities } from "@utils/activity-utils";
@@ -8,8 +8,6 @@ import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-
-// $93.26
 
 const LogPayment = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -133,7 +131,7 @@ const LogPayment = () => {
 				className="w-auto font-mono font-medium"
 				onClick={() => setIsOpen(true)}
 			>
-				<FontAwesomeIcon icon={faDollar} /> Log Payment
+				$ Payment
 			</Button>
 			<Dialog open={isOpen} onClose={() => closeModal()}>
 				<div className="fixed inset-0 z-30 bg-black bg-opacity-25" />

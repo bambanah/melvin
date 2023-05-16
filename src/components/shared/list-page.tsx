@@ -1,4 +1,3 @@
-import { ButtonVariant } from "@atoms/button";
 import classNames from "classnames";
 import Link, { LinkProps } from "next/link";
 import React, { ReactNode } from "react";
