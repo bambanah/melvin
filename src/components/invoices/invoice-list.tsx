@@ -1,6 +1,7 @@
 import { InvoiceStatusBadge } from "@atoms/badge";
 import Button from "@atoms/button";
 import Loading from "@atoms/loading";
+import LogPayment from "@components/invoices/log-payment-modal";
 import ListPage from "@components/shared/list-page";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,7 +12,6 @@ import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import Link from "next/link";
 import { useState } from "react";
-import LogPayment from "./log-payment-modal";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";

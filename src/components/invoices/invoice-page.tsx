@@ -4,6 +4,7 @@ import ConfirmDialog from "@atoms/confirm-dialog";
 import Heading from "@atoms/heading";
 import Loading from "@atoms/loading";
 import ActivityList from "@components/activities/activity-list";
+import PdfPreview from "@components/invoices/pdf-preview";
 import {
 	faClock,
 	faCopy,
@@ -27,7 +28,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 import { toast } from "react-toastify";
-import PdfPreview from "./pdf-preview";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";

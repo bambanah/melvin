@@ -1,12 +1,12 @@
 import Button from "@atoms/button";
 import Logo from "@atoms/logo";
+import AuthModal from "@components/auth/auth-modal";
 import LoginForm from "@components/auth/login-form";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BuiltInProviderType } from "next-auth/providers";
 import { ClientSafeProvider, LiteralUnion, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
-import AuthModal from "./auth-modal";
 
 interface LoginPageProps {
 	providers: Record<
