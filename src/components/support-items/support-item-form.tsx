@@ -48,6 +48,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 			sundayCode: existingSupportItem?.sundayCode ?? "",
 			sundayRate: Number(existingSupportItem?.sundayRate) || undefined,
 		},
+		mode: "onBlur",
 	});
 
 	const onSubmit = (data: SupportItemSchema) => {
@@ -129,33 +130,35 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 
 					{(["weekday", "weeknight", "saturday", "sunday"] as const).map(
 						(day) => (
-							<div className="flex items-center gap-4" key={day}>
-								<p className="flex w-16 shrink-0 gap-1 text-sm font-semibold md:w-24 md:text-base">
+							<div className="flex items-start gap-4" key={day}>
+								<p className="mt-3 flex w-16 shrink-0 gap-1 text-sm font-semibold md:w-24 md:text-base">
 									{day.charAt(0).toUpperCase() + day.slice(1)}{" "}
 									<span className="text-red-500">
 										{day === "weekday" && "*"}
 									</span>
 								</p>
 								<div className="flex gap-2">
-									<Input
-										name={`${day}Code`}
-										register={register}
-										type="text"
-										placeholder="XX_XXX_XXXX_X_X"
-										error={!!errors[`${day}Code`]}
-										className=""
-									/>
-									<Input
-										name={`${day}Rate`}
-										register={register}
-										rules={{
-											setValueAs: (v) => (v === "" ? "" : Number(v)),
-										}}
-										type="text"
-										prefix="$"
-										error={!!errors[`${day}Rate`]}
-										className="grow basis-28"
-									/>
+									<label>
+										<Input
+											name={`${day}Code`}
+											register={register}
+											type="text"
+											placeholder="XX_XXX_XXXX_X_X"
+											error={!!errors[`${day}Code`]}
+										/>
+										<ErrorMessage error={errors[`${day}Code`]?.message} />
+									</label>
+									<label className="flex flex-col">
+										<Input
+											name={`${day}Rate`}
+											register={register}
+											type="number"
+											step={0.01}
+											prefix="$"
+											error={!!errors[`${day}Rate`]}
+										/>
+										<ErrorMessage error={errors[`${day}Rate`]?.message} />
+									</label>
 								</div>
 							</div>
 						)
