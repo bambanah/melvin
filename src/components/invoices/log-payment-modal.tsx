@@ -6,6 +6,7 @@ import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { debounce } from "@utils/generic-utils";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
+import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -89,14 +90,19 @@ const LogPayment = () => {
 				/>
 				<div>
 					<p className="font-semibold">{invoice.invoiceNo}</p>
-					<p className="">{invoice.client.name}</p>
+					<p className="text-neutral-600">{invoice.client.name}</p>
 				</div>
-				<p className="ml-auto font-semibold">
-					{getTotalCostOfActivities(invoice.activities).toLocaleString(
-						undefined,
-						{ style: "currency", currency: "AUD" }
-					)}
-				</p>
+				<div className="ml-auto text-right">
+					<p className="font-semibold">
+						{getTotalCostOfActivities(invoice.activities).toLocaleString(
+							undefined,
+							{ style: "currency", currency: "AUD" }
+						)}
+					</p>
+					<p className="text-neutral-600">
+						{dayjs.utc(invoice.date).format("DD/MM/YY")}
+					</p>
+				</div>
 			</label>
 		);
 	}
