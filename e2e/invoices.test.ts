@@ -18,7 +18,7 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 
 	await page.getByRole("link", { name: "Invoices" }).click();
 	await expect(page).toHaveURL("/invoices");
-	await page.getByRole("link", { name: "Add New" }).click();
+	await page.getByRole("link", { name: "Add" }).click();
 
 	await page.locator(".react-select").click();
 	await page.getByText(client.name, { exact: true }).click();

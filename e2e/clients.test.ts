@@ -5,7 +5,7 @@ import { waitForAlert } from "./test-utils";
 test("Can create, edit, and delete clients", async ({ page }) => {
 	await page.goto("/clients");
 
-	await page.getByRole("link", { name: "Add New" }).click();
+	await page.getByRole("link", { name: "Add" }).click();
 	await expect(page).toHaveURL("/clients/create");
 
 	const client = randomClient();

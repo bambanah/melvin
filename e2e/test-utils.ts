@@ -11,7 +11,7 @@ export async function createRandomSupportItem(page: Page) {
 
 	await page.getByRole("link", { name: "Items" }).click();
 	await expect(page).toHaveURL("/support-items");
-	await page.getByRole("link", { name: "Add New" }).click();
+	await page.getByRole("link", { name: "Add" }).click();
 
 	await page.locator("#description").fill(supportItem.description);
 	await page.locator("#weekdayCode").fill(supportItem.weekdayCode);
@@ -28,7 +28,7 @@ export async function createRandomClient(page: Page) {
 
 	await page.getByRole("link", { name: "Clients" }).click();
 	await expect(page).toHaveURL("/clients");
-	await page.getByRole("link", { name: "Add New" }).click();
+	await page.getByRole("link", { name: "Add" }).click();
 
 	await page.locator("#name").fill(client.name);
 	await page.getByRole("button", { name: "Create" }).click();
@@ -45,7 +45,7 @@ export async function createRandomActivity(
 ) {
 	await page.getByRole("link", { name: "Activities" }).nth(0).click();
 	await expect(page).toHaveURL("/activities");
-	await page.getByRole("link", { name: "Add New" }).click();
+	await page.getByRole("link", { name: "Add" }).click();
 
 	await page.locator(".react-select").nth(0).click();
 	await page.getByText(supportItemDescription, { exact: true }).click();
