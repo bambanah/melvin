@@ -119,6 +119,8 @@ export const invoiceRouter = router({
 					status: true,
 					clientId: true,
 					ownerId: true,
+					sentAt: true,
+					paidAt: true,
 					activities: {
 						select: {
 							...defaultInvoiceSelect.activities.select,
@@ -215,13 +217,31 @@ export const invoiceRouter = router({
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
+			const { ids, status } = input;
+
+			let sentAt: Date | null | undefined;
+			let paidAt: Date | null | undefined;
+
+			if (status === InvoiceStatus.CREATED) {
+				sentAt = null;
+				paidAt = null;
+			} else if (status === InvoiceStatus.SENT) {
+				sentAt = new Date();
+			} else {
+				paidAt = new Date();
+			}
+
 			const payload = await ctx.prisma.invoice.updateMany({
 				where: {
 					id: {
-						in: input.ids,
+						in: ids,
 					},
 				},
-				data: { status: input.status },
+				data: {
+					status,
+					sentAt,
+					paidAt,
+				},
 			});
 
 			return payload;
@@ -243,6 +263,7 @@ export const invoiceRouter = router({
 				select: {
 					id: true,
 					invoiceNo: true,
+					date: true,
 					client: {
 						select: {
 							name: true,

@@ -177,14 +177,9 @@ const InvoicePage = () => {
 									Send <FontAwesomeIcon icon={faPaperPlane} />
 								</Button>
 							)}
-						{/* TODO: Save invoice sent date */}
-						{invoice.status === InvoiceStatus.SENT && (
+						{invoice.sentAt && (
 							<div className="flex flex-col gap-1 text-slate-600">
-								<p>Sent on: 12/09/23</p>
-								<p>
-									Any modifications to this invoice will create a new revision
-									(Gawne2b)
-								</p>
+								<p>Sent on: {dayjs.utc(invoice.sentAt).format("DD/MM/YYYY")}</p>
 							</div>
 						)}
 					</div>
@@ -217,10 +212,13 @@ const InvoicePage = () => {
 					<p className="font-semibold">Payment</p>
 					{invoice.status === "PAID" ? (
 						<>
-							{/* TODO: Save payment date
-							<div>
-								<span className="font-semibold">Received:</span> (TODO)
-							</div> */}
+							{invoice.paidAt && (
+								<div>
+									<span className="text-slate-600">
+										Received: {dayjs.utc(invoice.paidAt).format("DD/MM/YYYY")}
+									</span>
+								</div>
+							)}
 							<Button
 								onClick={() => {
 									markInvoiceAs("CREATED");
