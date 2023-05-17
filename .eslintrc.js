@@ -36,7 +36,7 @@ module.exports = {
 			{
 				labelComponents: ["Label"],
 				labelAttributes: ["label"],
-				controlComponents: ["Input"],
+				controlComponents: ["Input", "ClientSelect"],
 				depth: 3,
 			},
 		],

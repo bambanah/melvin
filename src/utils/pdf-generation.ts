@@ -173,16 +173,16 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 		const content = [
 			user.name ?? "",
 			user.abn
-				? `ABN: ${user.abn.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}`
+				? `ABN: ${user.abn.toString().replaceAll(/\B(?=(\d{3})+(?!\d))/g, " ")}`
 				: "",
 			user.bankName ? `Bank: ${user.bankName}` : "",
 			user.bsb
-				? `BSB: ${user.bsb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "-")}`
+				? `BSB: ${user.bsb.toString().replaceAll(/\B(?=(\d{3})+(?!\d))/g, "-")}`
 				: "",
 			user.bankNumber
 				? `Account Number: ${user.bankNumber
 						?.toString()
-						.replace(/\B(?=(\d{3})+(?!\d))/g, " ")}`
+						.replaceAll(/\B(?=(\d{3})+(?!\d))/g, " ")}`
 				: "",
 		].filter((val) => val.length > 0);
 
