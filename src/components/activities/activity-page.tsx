@@ -74,7 +74,7 @@ const ActivityPage = () => {
 					<Heading size="small">{activity.supportItem.description}</Heading>
 
 					<Dropdown>
-						<Dropdown.Button>
+						<Dropdown.Button id="options-dropdown">
 							<FontAwesomeIcon icon={faEllipsisV} />
 						</Dropdown.Button>
 						<Dropdown.Items>
