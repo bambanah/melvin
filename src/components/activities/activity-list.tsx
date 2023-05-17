@@ -1,9 +1,11 @@
 import Badge from "@atoms/badge";
+import Button from "@atoms/button";
 import Loading from "@atoms/loading";
 import ListPage from "@components/shared/list-page";
 import {
 	faClock,
 	faMoneyBillWave,
+	faPlus,
 	faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,6 +16,7 @@ import { groupBy } from "@utils/generic-utils";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import dayjs from "dayjs";
+import Link from "next/link";
 import { useState } from "react";
 
 interface Props {
@@ -46,10 +49,17 @@ function ActivityList({
 		: {};
 
 	return (
-		<ListPage
-			title="Activities"
-			createHref={displayCreateButton ? "/activities/create" : undefined}
-		>
+		<ListPage>
+			<ListPage.Header>
+				<h2 className="mr-auto text-2xl font-bold">Activities</h2>
+
+				{displayCreateButton ? (
+					<Button as={Link} href="/activities/create" variant="primary">
+						<FontAwesomeIcon icon={faPlus} />
+						<span>Add</span>
+					</Button>
+				) : undefined}
+			</ListPage.Header>
 			{groupByAssignedStatus && (
 				<div className="mb-4 w-full border-b">
 					<div className="-mb-[1px] flex w-full md:max-w-xs">

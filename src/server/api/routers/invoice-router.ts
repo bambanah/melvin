@@ -4,6 +4,7 @@ import { invoiceSchema } from "@schema/invoice-schema";
 import { authedProcedure, router } from "@server/api/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { getTotalCostOfActivities } from "@utils/activity-utils";
+import { invoiceCandidatesFromPaymentAmount } from "@utils/invoice-utils";
 import { baseListQueryInput } from "@utils/trpc";
 import dayjs from "dayjs";
 import { z } from "zod";
@@ -207,20 +208,87 @@ export const invoiceRouter = router({
 			};
 		}),
 	updateStatus: authedProcedure
-		.input(z.object({ id: z.string(), status: z.nativeEnum(InvoiceStatus) }))
+		.input(
+			z.object({
+				ids: z.array(z.string()),
+				status: z.nativeEnum(InvoiceStatus),
+			})
+		)
 		.mutation(async ({ ctx, input }) => {
-			const invoice = await ctx.prisma.invoice.update({
+			const payload = await ctx.prisma.invoice.updateMany({
 				where: {
-					id: input.id,
+					id: {
+						in: input.ids,
+					},
 				},
 				data: { status: input.status },
 			});
 
-			if (!invoice) {
-				throw new TRPCError({ code: "NOT_FOUND" });
+			return payload;
+		}),
+	matchByPayment: authedProcedure
+		.input(z.object({ paymentAmount: z.number() }))
+		.query(async ({ ctx, input }) => {
+			const { paymentAmount } = input;
+
+			const invoices = await ctx.prisma.invoice.findMany({
+				where: {
+					status: "SENT",
+					activities: {
+						some: {
+							id: {},
+						},
+					},
+				},
+				select: {
+					id: true,
+					invoiceNo: true,
+					client: {
+						select: {
+							name: true,
+						},
+					},
+					activities: {
+						include: {
+							supportItem: true,
+						},
+					},
+				},
+			});
+
+			if (invoices.length === 0) {
+				return;
 			}
 
-			return parseInvoice(invoice);
+			// Convert array of invoices to map of <total, invoiceId>
+			const totals = new Map<number, string | string[]>();
+			for (const invoice of invoices) {
+				const total = getTotalCostOfActivities(invoice.activities);
+
+				if (totals.has(total)) {
+					const val = totals.get(total) as string | string[];
+
+					Array.isArray(val)
+						? val.push(invoice.id)
+						: totals.set(total, [val, invoice.id]);
+				} else {
+					totals.set(total, invoice.id);
+				}
+			}
+
+			const invoiceIds = invoiceCandidatesFromPaymentAmount(
+				paymentAmount,
+				totals
+			);
+
+			const invoiceDetails = invoices.filter((invoice) =>
+				invoiceIds.flat(2).includes(invoice.id)
+			);
+
+			return {
+				invoiceIds,
+				invoiceDetails,
+			};
 		}),
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))

@@ -142,7 +142,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					<Heading size="xsmall">Provider Travel</Heading>
 
 					{/* TODO: Autofill from previous invoice */}
-					{true && <p>Autofilled from previous invoice</p>}
+					{false && <p>Autofilled from previous invoice</p>}
 
 					<div className="mt-4 flex w-full gap-4">
 						<Label
@@ -150,13 +150,13 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 							className="w-full shrink grow basis-1/2"
 						>
 							<span>Transit Distance</span>
-							<Subheading>Distance to client&#39;s house</Subheading>
+							<Subheading>Distance to client</Subheading>
 							<Input
 								name="transitDistance"
 								register={register}
 								suffix="km"
 								rules={{
-									setValueAs: (value) => (value === "" ? null : Number(value)),
+									setValueAs: (v) => (v === "" ? null : Number(v)),
 								}}
 								error={!!errors.transitDistance}
 							/>
@@ -170,7 +170,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 								register={register}
 								suffix="mins"
 								rules={{
-									setValueAs: (value) => (value === "" ? null : Number(value)),
+									setValueAs: (v) => (v === "" ? null : Number(v)),
 								}}
 								error={!!errors.transitDuration}
 							/>

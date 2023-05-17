@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+import { round } from "./generic-utils";
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -83,3 +84,47 @@ export const getInvoiceFileName = (invoice: InvoiceByIdOutput) => {
 
 	return fileName;
 };
+
+export function invoiceCandidatesFromPaymentAmount(
+	paymentAmount: number,
+	invoiceTotals: Map<number, string | string[]>
+): (string | string[])[][] {
+	const totalAmounts = [...invoiceTotals.keys()].sort((a, b) => a - b);
+
+	const result: number[][] = [];
+	// TODO: Return suboptimal results that are within $X of payment amount
+	const suboptimalResult: number[][] = [];
+
+	function backtrack(
+		currentCombo: number[],
+		currentSum: number,
+		candidateIndex: number
+	): void {
+		if (currentSum === paymentAmount) {
+			result.push([...currentCombo]);
+			return;
+		} else if (
+			candidateIndex >= totalAmounts.length ||
+			currentSum > paymentAmount
+		) {
+			return;
+		}
+
+		backtrack([...currentCombo], currentSum, candidateIndex + 1);
+
+		currentCombo.push(totalAmounts[candidateIndex]);
+		backtrack(
+			[...currentCombo],
+			round(currentSum + totalAmounts[candidateIndex], 2),
+			candidateIndex + 1
+		);
+	}
+
+	backtrack([], 0, 0);
+
+	return result.map((invoiceIds) =>
+		invoiceIds
+			.map((id) => invoiceTotals.get(id))
+			.filter((v): v is string | string[] => v !== undefined)
+	);
+}

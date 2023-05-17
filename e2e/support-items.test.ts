@@ -5,7 +5,7 @@ import { waitForAlert } from "./test-utils";
 test("Can create, update, and delete support items", async ({ page }) => {
 	await page.goto("/support-items");
 
-	await page.getByRole("link", { name: "Add New" }).click();
+	await page.getByRole("link", { name: "Add" }).click();
 	await expect(page).toHaveURL("/support-items/create");
 
 	const supportItem = randomSupportItem();

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 export function round(value: number, exp: number) {
 	if (exp === undefined || +exp === 0) return Math.round(value);
 
@@ -29,3 +30,13 @@ export function groupBy<T>(arr: T[], keyGetter: (item: T) => string) {
 
 	return groupedObj;
 }
+
+export const debounce = <T extends Function>(fn: T, ms = 300) => {
+	let timeoutId: ReturnType<typeof setTimeout>;
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	return function (this: any, ...args: unknown[]) {
+		clearTimeout(timeoutId);
+		timeoutId = setTimeout(() => fn.apply(this, args), ms);
+	};
+};

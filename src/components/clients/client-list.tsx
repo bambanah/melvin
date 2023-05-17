@@ -1,3 +1,4 @@
+import Button from "@atoms/button";
 import Loading from "@atoms/loading";
 import ListPage from "@components/shared/list-page";
 import {
@@ -5,11 +6,13 @@ import {
 	faClock,
 	faFileAlt,
 	faPenToSquare,
+	faPlus,
 	faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { trpc } from "@utils/trpc";
 import dayjs from "dayjs";
+import Link from "next/link";
 
 const ClientList = () => {
 	const { data: { clients } = {}, error } = trpc.clients.list.useQuery({});
@@ -20,7 +23,15 @@ const ClientList = () => {
 	}
 
 	return (
-		<ListPage title="Clients" createHref="/clients/create">
+		<ListPage>
+			<ListPage.Header>
+				<h2 className="mr-auto text-2xl font-bold">Clients</h2>
+
+				<Button as={Link} href="/clients/create" variant="primary">
+					<FontAwesomeIcon icon={faPlus} />
+					<span>Add</span>
+				</Button>
+			</ListPage.Header>
 			<ListPage.Items>
 				{clients ? (
 					clients.map((client) => (

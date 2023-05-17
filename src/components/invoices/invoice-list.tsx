@@ -1,12 +1,17 @@
 import { InvoiceStatusBadge } from "@atoms/badge";
+import Button from "@atoms/button";
 import Loading from "@atoms/loading";
+import LogPayment from "@components/invoices/log-payment-modal";
 import ListPage from "@components/shared/list-page";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { InvoiceStatus } from "@prisma/client";
 import { InvoiceListOutput } from "@server/api/routers/invoice-router";
+import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
+import Link from "next/link";
 import { useState } from "react";
-import { getTotalCostOfActivities } from "@utils/activity-utils";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -88,10 +93,22 @@ export default function InvoiceList({
 	};
 
 	return (
-		<ListPage
-			title="Invoices"
-			createHref={`/invoices/create${clientId ? `?clientId=${clientId}` : ""}`}
-		>
+		<ListPage>
+			<ListPage.Header>
+				<h2 className="mr-auto text-2xl font-bold">Invoices</h2>
+
+				<LogPayment />
+
+				<Button
+					as={Link}
+					href={`/invoices/create${clientId ? `?clientId=${clientId}` : ""}`}
+					variant="primary"
+				>
+					<FontAwesomeIcon icon={faPlus} />
+					<span>Add</span>
+				</Button>
+			</ListPage.Header>
+
 			{groupByAssignedStatus && (
 				<div className="w-full border-b">
 					<div className="-mb-[1px] flex w-full md:max-w-xs">

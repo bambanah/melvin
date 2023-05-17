@@ -4,6 +4,7 @@ import ConfirmDialog from "@atoms/confirm-dialog";
 import Heading from "@atoms/heading";
 import Loading from "@atoms/loading";
 import ActivityList from "@components/activities/activity-list";
+import PdfPreview from "@components/invoices/pdf-preview";
 import {
 	faClock,
 	faCopy,
@@ -27,7 +28,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 import { toast } from "react-toastify";
-import PdfPreview from "./pdf-preview";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -63,7 +63,7 @@ const InvoicePage = () => {
 
 	const markInvoiceAs = (invoiceStatus: InvoiceStatus) => {
 		markInvoiceAsMutation
-			.mutateAsync({ id: invoiceId, status: invoiceStatus })
+			.mutateAsync({ ids: [invoiceId], status: invoiceStatus })
 			.then(() => {
 				trpcContext.invoice.byId.invalidate({ id: invoiceId });
 				trpcContext.invoice.list.invalidate();
@@ -114,10 +114,10 @@ const InvoicePage = () => {
 				confirmAction={deleteInvoice}
 			/>
 
-			<div className="flex flex-col items-stretch justify-between md:flex-row-reverse">
+			<div className="flex flex-col items-stretch justify-between md:h-[15rem] md:flex-row-reverse">
 				<div
 					className={classNames([
-						"group relative h-full max-h-[15rem] basis-1/2 overflow-hidden",
+						"group relative h-full max-h-[12rem] min-h-[12rem] basis-1/2 overflow-hidden md:h-[15rem]",
 						invoice.activities.length > 0 &&
 							"cursor-pointer bg-gray-200 shadow-inner",
 					])}
@@ -138,7 +138,7 @@ const InvoicePage = () => {
 							</div>
 						</>
 					) : (
-						<div className="flex h-[15rem] w-full items-center justify-center bg-slate-200">
+						<div className="flex h-[12rem] w-full items-center justify-center bg-slate-200 md:h-[15rem]">
 							<p className="text-4xl text-slate-400">DRAFT</p>
 						</div>
 					)}
@@ -165,19 +165,28 @@ const InvoicePage = () => {
 					</div>
 
 					<div className="flex flex-grow flex-col justify-center gap-4">
-						{invoice.status === InvoiceStatus.CREATED && (
-							<Button
-								onClick={() => {
-									markInvoiceAs("SENT");
-								}}
-								variant="primary"
-								className="font-semibold"
-							>
-								Send <FontAwesomeIcon icon={faPaperPlane} />
-							</Button>
-						)}
+						{invoice.status === InvoiceStatus.CREATED &&
+							invoice.activities.length > 0 && (
+								<Button
+									onClick={() => {
+										markInvoiceAs("SENT");
+									}}
+									variant="primary"
+									className="mt-3 font-semibold"
+								>
+									Send <FontAwesomeIcon icon={faPaperPlane} />
+								</Button>
+							)}
 						{/* TODO: Save invoice sent date */}
-						{/* {invoice.status === InvoiceStatus.SENT && <p>Sent on: TODO</p>} */}
+						{invoice.status === InvoiceStatus.SENT && (
+							<div className="flex flex-col gap-1 text-slate-600">
+								<p>Sent on: 12/09/23</p>
+								<p>
+									Any modifications to this invoice will create a new revision
+									(Gawne2b)
+								</p>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

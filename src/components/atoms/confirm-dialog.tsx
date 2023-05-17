@@ -1,6 +1,6 @@
+import Button from "@components/atoms/button";
 import { Dialog } from "@headlessui/react";
 import { Dispatch, SetStateAction } from "react";
-import Button from "./button";
 
 interface Props {
 	isOpen: boolean;

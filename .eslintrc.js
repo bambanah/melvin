@@ -12,7 +12,6 @@ module.exports = {
 		"next/core-web-vitals",
 		"plugin:@typescript-eslint/recommended",
 		"plugin:unicorn/recommended",
-		"plugin:styled-components-a11y/recommended",
 		"prettier",
 	],
 	rules: {
@@ -29,10 +28,18 @@ module.exports = {
 				allow: ["warn", "error"],
 			},
 		],
-		"styled-components-a11y/anchor-is-valid": "off",
 		"jsx-a11y/anchor-is-valid": "off",
 		"jsx-a11y/no-static-element-interactions": "off",
 		"jsx-a11y/click-events-have-key-events": "off",
+		"jsx-a11y/label-has-associated-control": [
+			2,
+			{
+				labelComponents: ["Label"],
+				labelAttributes: ["label"],
+				controlComponents: ["Input", "ClientSelect"],
+				depth: 3,
+			},
+		],
 		"unicorn/no-null": "off",
 		"unicorn/prefer-module": "off",
 		"unicorn/no-array-reduce": "off",
