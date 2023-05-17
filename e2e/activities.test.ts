@@ -16,7 +16,7 @@ test("Can create, update, and delete activities", async ({ page }) => {
 	await page.getByRole("link", { name: "Add" }).click();
 
 	await page.locator(".react-select").nth(0).click();
-	await page.getByText(supportItem.description, { exact: true }).click();
+	await page.getByText(supportItem.description, { exact: true }).nth(0).click();
 	await page.locator(".react-select").nth(1).click();
 	await page.getByText(client.name, { exact: true }).click();
 
