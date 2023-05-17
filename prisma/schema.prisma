@@ -95,6 +95,9 @@ model Invoice {
   createdAt DateTime @default(now()) @map("created")
   updatedAt DateTime @default(now()) @updatedAt
 
+  sentAt DateTime?
+  paidAt DateTime?
+
   invoiceNo String
   billTo    String?
   date      DateTime
