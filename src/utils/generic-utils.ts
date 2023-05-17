@@ -34,7 +34,8 @@ export function groupBy<T>(arr: T[], keyGetter: (item: T) => string) {
 export const debounce = <T extends Function>(fn: T, ms = 300) => {
 	let timeoutId: ReturnType<typeof setTimeout>;
 
-	return function (this: Function, ...args: unknown[]) {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	return function (this: any, ...args: unknown[]) {
 		clearTimeout(timeoutId);
 		timeoutId = setTimeout(() => fn.apply(this, args), ms);
 	};

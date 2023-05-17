@@ -47,7 +47,6 @@ export const trpc = createTRPCNext<AppRouter>({
 			],
 		};
 	},
-	ssr: true,
 });
 
 export const baseListQueryInput = z.object({
