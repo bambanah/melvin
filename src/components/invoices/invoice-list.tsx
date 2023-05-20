@@ -11,10 +11,11 @@ import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import Link from "next/link";
-import { useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { InfiniteData } from "@tanstack/react-query";
 dayjs.extend(utc);
 
 interface Props {
@@ -28,14 +29,34 @@ export default function InvoiceList({
 }: Props) {
 	const [statusFilter, setStatusFilter] = useState<"UNPAID" | "PAID">("UNPAID");
 
-	const { data: { invoices } = {}, error } = trpc.invoice.list.useQuery({
-		status: groupByAssignedStatus
-			? statusFilter === "UNPAID"
-				? [InvoiceStatus.CREATED, InvoiceStatus.SENT]
-				: [InvoiceStatus.PAID]
-			: undefined,
-		clientId,
-	});
+	const { data, fetchNextPage, isSuccess, error } =
+		trpc.invoice.list.useInfiniteQuery(
+			{
+				status: groupByAssignedStatus
+					? statusFilter === "UNPAID"
+						? [InvoiceStatus.CREATED, InvoiceStatus.SENT]
+						: [InvoiceStatus.PAID]
+					: undefined,
+				clientId,
+			},
+			{ getNextPageParam: (lastPage) => lastPage.nextCursor }
+		);
+
+	const loadMoreRef = useRef<Element>(null);
+
+	useEffect(() => {
+		const observer = new IntersectionObserver(([entry]) => {
+			if (entry.isIntersecting) {
+				fetchNextPage();
+			}
+		});
+
+		if (loadMoreRef.current) {
+			observer.observe(loadMoreRef.current);
+		}
+
+		return () => observer.disconnect();
+	}, [fetchNextPage]);
 
 	if (error) {
 		console.error(error);
@@ -43,41 +64,47 @@ export default function InvoiceList({
 	}
 
 	const InvoiceListItems = ({
-		invoices,
+		data,
 	}: {
-		invoices?: InvoiceListOutput[];
+		data?: InfiniteData<InvoiceListOutput>;
 	}) => {
-		if (!invoices) {
+		if (!data) {
 			return <Loading />;
 		}
 
-		if (invoices.length > 0) {
+		if (data?.pages?.length > 0) {
 			return (
 				<ListPage.Items>
-					{invoices.map((invoice) => (
-						<ListPage.Item key={invoice.id} href={`/invoices/${invoice.id}`}>
-							<div className="flex flex-col gap-2">
-								<div className="font-medium sm:text-lg">
-									<span className="font-semibold">{invoice.invoiceNo}</span>:{" "}
-									{invoice.client.name}
-								</div>
-								<span className="text-sm sm:text-base">
-									{dayjs.utc(invoice.date).format("DD MMM.")}
-								</span>
-							</div>
-							<div className="flex basis-10 flex-col items-end gap-2">
-								<span className="sm:text-lg">
-									{getTotalCostOfActivities(invoice.activities).toLocaleString(
-										undefined,
-										{
-											style: "currency",
-											currency: "AUD",
-										}
-									)}
-								</span>
-								<InvoiceStatusBadge invoiceStatus={invoice.status} />
-							</div>
-						</ListPage.Item>
+					{data.pages.map((page, idx) => (
+						<Fragment key={idx}>
+							{page.invoices.map((invoice) => (
+								<ListPage.Item
+									key={invoice.id}
+									href={`/invoices/${invoice.id}`}
+								>
+									<div className="flex flex-col gap-2">
+										<div className="font-medium sm:text-lg">
+											<span className="font-semibold">{invoice.invoiceNo}</span>
+											: {invoice.client.name}
+										</div>
+										<span className="text-sm sm:text-base">
+											{dayjs.utc(invoice.date).format("DD MMM.")}
+										</span>
+									</div>
+									<div className="flex basis-10 flex-col gap-2 text-right">
+										<span className="sm:text-lg">
+											{getTotalCostOfActivities(
+												invoice.activities
+											).toLocaleString(undefined, {
+												style: "currency",
+												currency: "AUD",
+											})}
+										</span>
+										<InvoiceStatusBadge invoiceStatus={invoice.status} />
+									</div>
+								</ListPage.Item>
+							))}
+						</Fragment>
 					))}
 				</ListPage.Items>
 			);
@@ -130,7 +157,9 @@ export default function InvoiceList({
 				</div>
 			)}
 
-			<InvoiceListItems invoices={invoices} />
+			{isSuccess && <InvoiceListItems data={data} />}
+
+			<div ref={loadMoreRef} className=""></div>
 		</ListPage>
 	);
 }
