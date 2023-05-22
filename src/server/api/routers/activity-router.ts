@@ -6,6 +6,7 @@ import { z } from "zod";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { baseListQueryInput } from "@utils/trpc";
 dayjs.extend(utc);
 dayjs.extend(customParseFormat);
 
@@ -35,14 +36,15 @@ function getInvoiceIdWhereCondition(invoiceIdAssigned?: boolean) {
 export const activityRouter = router({
 	list: authedProcedure
 		.input(
-			z.object({
+			baseListQueryInput.extend({
 				assigned: z.boolean().optional(),
 				invoiceId: z.string().optional(),
 				clientId: z.string().optional(),
 			})
 		)
 		.query(async ({ ctx, input }) => {
-			const { assigned, invoiceId, clientId } = input;
+			const limit = input.limit ?? 50;
+			const { assigned, invoiceId, clientId, cursor } = input;
 
 			const activities = await ctx.prisma.activity.findMany({
 				select: {
@@ -51,6 +53,8 @@ export const activityRouter = router({
 						select: { id: true, invoiceNo: true },
 					},
 				},
+				take: limit + 1,
+				cursor: cursor ? { id: cursor } : undefined,
 				where: {
 					ownerId: ctx.session.user.id,
 					invoiceId:
@@ -69,8 +73,15 @@ export const activityRouter = router({
 				],
 			});
 
+			let nextCursor: typeof cursor | undefined;
+			if (activities.length > limit) {
+				const nextInvoice = activities.pop();
+				nextCursor = nextInvoice?.id;
+			}
+
 			return {
-				activities: activities,
+				activities: activities.reverse(),
+				nextCursor,
 			};
 		}),
 	byId: authedProcedure
@@ -183,7 +194,7 @@ export const activityRouter = router({
 
 export type ActivityListOutput = inferRouterOutputs<
 	typeof activityRouter
->["list"]["activities"][0];
+>["list"];
 
 export type ActivityByIdOutput = inferRouterOutputs<
 	typeof activityRouter

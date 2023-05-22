@@ -1,5 +1,5 @@
 import Button from "@atoms/button";
-import Loading from "@atoms/loading";
+import InfiniteList from "@components/shared/infinite-list";
 import ListPage from "@components/shared/list-page";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -37,14 +37,7 @@ const ItemCode = ({
 };
 
 function SupportItemList() {
-	const { data: { supportItems } = {}, error } = trpc.supportItem.list.useQuery(
-		{}
-	);
-
-	if (error) {
-		console.error(error);
-		return <div>Error loading</div>;
-	}
+	const queryResult = trpc.supportItem.list.useInfiniteQuery({});
 
 	return (
 		<ListPage>
@@ -56,8 +49,8 @@ function SupportItemList() {
 					<span>Add</span>
 				</Button>
 			</ListPage.Header>
-			<ListPage.Items>
-				{supportItems ? (
+			<InfiniteList queryResult={queryResult} dataKey="supportItems">
+				{(supportItems) =>
 					supportItems.map((supportItem) => (
 						<ListPage.Item
 							key={supportItem.id}
@@ -94,10 +87,8 @@ function SupportItemList() {
 							</div>
 						</ListPage.Item>
 					))
-				) : (
-					<Loading />
-				)}
-			</ListPage.Items>
+				}
+			</InfiniteList>
 		</ListPage>
 	);
 }

@@ -48,22 +48,17 @@ body {
 	@apply bg-bg;
 }
 
-* {
-	@apply font-sans;
-}
-
 *,
 *::before,
 *::after {
-	box-sizing: border-box;
+	@apply font-sans;
+	@apply box-border;
 }
 
 a {
-	cursor: pointer;
-	text-decoration: none;
-	@apply text-blue-700;
+	@apply cursor-pointer no-underline;
 
 	&:hover {
-		@apply text-fg;
+		@apply text-indigo-800;
 	}
 }
