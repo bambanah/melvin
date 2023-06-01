@@ -1,4 +1,4 @@
-import { pickRandomFrom } from "./utils";
+import { pickRandomFrom } from "@utils/generic-utils";
 
 const USERS = [
 	"Finn the Human",
@@ -23,12 +23,14 @@ export const randomClient = ({
 	name,
 	number,
 	billTo,
+	avoidName,
 }: {
 	name?: string;
 	number?: number;
 	billTo?: string;
+	avoidName?: string;
 } = {}) => {
-	const clientName = name ?? pickRandomFrom(USERS);
+	const clientName = name ?? pickRandomFrom(USERS, avoidName);
 
 	return {
 		name: clientName,

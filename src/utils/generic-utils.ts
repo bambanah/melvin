@@ -40,3 +40,21 @@ export const debounce = <T extends Function>(fn: T, ms = 300) => {
 		timeoutId = setTimeout(() => fn.apply(this, args), ms);
 	};
 };
+
+export function pickRandomFrom<T>(arr: T[], avoid?: T) {
+	if (arr.length === 1) {
+		return arr[0];
+	}
+
+	if (avoid === undefined) {
+		return arr[Math.floor(Math.random() * arr.length)];
+	}
+
+	let selected: T = avoid;
+
+	while (selected === avoid) {
+		selected = arr[Math.floor(Math.random() * arr.length)];
+	}
+
+	return selected;
+}
