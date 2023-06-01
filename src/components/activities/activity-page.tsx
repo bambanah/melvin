@@ -3,6 +3,7 @@ import Dropdown from "@atoms/dropdown";
 import Heading from "@atoms/heading";
 import {
 	faCalendar,
+	faCar,
 	faClock,
 	faEllipsisV,
 	faFileAlt,
@@ -105,11 +106,20 @@ const ActivityPage = () => {
 				</div>
 
 				<div className="flex items-center gap-2">
-					<FontAwesomeIcon icon={faClock} />
-					<p>
-						{dayjs.utc(activity.startTime).format("hh:mma")} -{" "}
-						{dayjs.utc(activity.endTime).format("hh:mma")}
-					</p>
+					{activity.startTime && activity.endTime ? (
+						<>
+							<FontAwesomeIcon icon={faClock} />
+							<p>
+								{dayjs.utc(activity.startTime).format("hh:mma")} -{" "}
+								{dayjs.utc(activity.endTime).format("hh:mma")}
+							</p>
+						</>
+					) : (
+						<>
+							<FontAwesomeIcon icon={faCar} />
+							<p>{activity.itemDistance} km</p>
+						</>
+					)}
 				</div>
 
 				<div className="flex items-center gap-2">

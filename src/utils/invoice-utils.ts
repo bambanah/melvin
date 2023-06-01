@@ -92,8 +92,6 @@ export function invoiceCandidatesFromPaymentAmount(
 	const totalAmounts = [...invoiceTotals.keys()].sort((a, b) => a - b);
 
 	const result: number[][] = [];
-	// TODO: Return suboptimal results that are within $X of payment amount
-	const suboptimalResult: number[][] = [];
 
 	function backtrack(
 		currentCombo: number[],

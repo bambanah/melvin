@@ -137,6 +137,7 @@ describe("Helpers", () => {
 			endTime: dayjs.utc("1970-01-01T17:00").toDate(),
 			transitDuration: 7,
 			transitDistance: 15,
+			itemDistance: null,
 			supportItem: {
 				weekdayCode: "weekday",
 				weekdayRate: new Prisma.Decimal(1),

@@ -51,7 +51,11 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 
 			let countString = "";
 			let totalCost = 0;
-			if (activity?.supportItem?.rateType === RateType.HOUR) {
+			if (
+				activity?.supportItem?.rateType === RateType.HOUR &&
+				activity.startTime &&
+				activity.endTime
+			) {
 				const duration = getDuration(activity.startTime, activity.endTime);
 				totalCost = round(Number(rate) * duration, 2);
 
@@ -63,7 +67,7 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 			} else if (activity?.supportItem?.rateType === RateType.KM) {
 				totalCost = round(Number(rate) * (activity.itemDistance || 0), 2);
 
-				countString = `${activity.itemDistance?.toString()} kilometres`;
+				countString = `${activity.itemDistance?.toString()} km`;
 			}
 
 			const currentActivity = [

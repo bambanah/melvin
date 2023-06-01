@@ -8,8 +8,9 @@ dayjs.extend(utc);
 
 interface Activity {
 	date: Date;
-	startTime: Date;
-	endTime: Date;
+	startTime?: Date | null;
+	endTime?: Date | null;
+	itemDistance?: number | null;
 	transitDistance?: number | null;
 	transitDuration?: number | null;
 	supportItem: {
@@ -82,9 +83,14 @@ export const getTotalCostOfActivities = (activities: Activity[]) => {
 			const [, rate] = getRate(activity);
 
 			let subTotal = 0;
-			const duration = getDuration(activity.startTime, activity.endTime);
 
-			subTotal += round(duration * Number(rate), 2);
+			if (activity.startTime && activity.endTime) {
+				const duration = getDuration(activity.startTime, activity.endTime);
+
+				subTotal += round(duration * Number(rate), 2);
+			} else if (activity.itemDistance) {
+				subTotal += round(activity.itemDistance * Number(rate), 2);
+			}
 
 			if (activity.transitDistance) {
 				const isGroup =
