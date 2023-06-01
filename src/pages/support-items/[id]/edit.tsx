@@ -7,10 +7,12 @@ import { useRouter } from "next/router";
 
 const EditSupportItem = () => {
 	const router = useRouter();
-	const supportItemId = String(router.query.id);
+	const supportItemId = Array.isArray(router.query.id)
+		? router.query.id[0]
+		: router.query.id;
 
 	const { data: supportItem, error } = trpc.supportItem.byId.useQuery({
-		id: supportItemId,
+		id: supportItemId ?? "",
 	});
 
 	if (error) {

@@ -9,7 +9,7 @@ test("Can create, edit, and delete clients", async ({ page }) => {
 	await expect(page).toHaveURL("/clients/create");
 
 	const client = randomClient();
-	const updatedClient = randomClient();
+	const updatedClient = randomClient({ avoidName: client.name });
 
 	await page.locator("#name").fill(client.name);
 	await page.locator("#number").fill(client.number);

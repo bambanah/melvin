@@ -35,39 +35,43 @@ dayjs.extend(utc);
 
 const InvoicePage = () => {
 	const router = useRouter();
-	const invoiceId = String(router.query.id);
+	const invoiceId = Array.isArray(router.query.id)
+		? router.query.id[0]
+		: router.query.id;
 
 	const [isPdfPreviewExpanded, setIsPdfPreviewExpanded] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	const trpcContext = trpc.useContext();
 	const { data: invoice, error } = trpc.invoice.byId.useQuery({
-		id: invoiceId,
+		id: invoiceId ?? "",
 	});
 	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
 	const deleteInvoiceMutation = trpc.invoice.delete.useMutation();
 
 	const deleteInvoice = () => {
-		deleteInvoiceMutation
-			.mutateAsync({ id: invoiceId })
-			.then(() => {
-				trpcContext.invoice.list.invalidate();
+		if (invoiceId)
+			deleteInvoiceMutation
+				.mutateAsync({ id: invoiceId })
+				.then(() => {
+					trpcContext.invoice.list.invalidate();
 
-				toast.success("Invoice deleted");
-				router.push("/invoices");
-			})
-			.catch(() => {
-				toast.error("An error occured. Please refresh and try again.");
-			});
+					toast.success("Invoice deleted");
+					router.push("/invoices");
+				})
+				.catch(() => {
+					toast.error("An error occured. Please refresh and try again.");
+				});
 	};
 
 	const markInvoiceAs = (invoiceStatus: InvoiceStatus) => {
-		markInvoiceAsMutation
-			.mutateAsync({ ids: [invoiceId], status: invoiceStatus })
-			.then(() => {
-				trpcContext.invoice.byId.invalidate({ id: invoiceId });
-				trpcContext.invoice.list.invalidate();
-			});
+		if (invoiceId)
+			markInvoiceAsMutation
+				.mutateAsync({ ids: [invoiceId], status: invoiceStatus })
+				.then(() => {
+					trpcContext.invoice.byId.invalidate({ id: invoiceId });
+					trpcContext.invoice.list.invalidate();
+				});
 	};
 
 	if (error) {

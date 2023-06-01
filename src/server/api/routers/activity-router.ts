@@ -112,12 +112,18 @@ export const activityRouter = router({
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
+			const { activity: inputActivity } = input;
+
 			const activity = await ctx.prisma.activity.create({
 				data: {
-					...input.activity,
-					startTime: dayjs.utc(input.activity.startTime, "HH:mm").toDate(),
-					endTime: dayjs.utc(input.activity.endTime, "HH:mm").toDate(),
-					date: new Date(input.activity.date),
+					...inputActivity,
+					startTime: inputActivity.startTime
+						? dayjs.utc(inputActivity.startTime, "HH:mm").toDate()
+						: undefined,
+					endTime: inputActivity.endTime
+						? dayjs.utc(inputActivity.endTime, "HH:mm").toDate()
+						: undefined,
+					date: dayjs.utc(inputActivity.date, "YYYY-MM-DD").toDate(),
 					ownerId: ctx.session.user.id,
 				},
 			});
@@ -143,8 +149,12 @@ export const activityRouter = router({
 				data: {
 					...input.activity,
 					date: dayjs.utc(input.activity.date, "YYYY-MM-DD").toDate(),
-					startTime: dayjs.utc(input.activity.startTime, "HH:mm").toDate(),
-					endTime: dayjs.utc(input.activity.endTime, "HH:mm").toDate(),
+					startTime: input.activity.startTime
+						? dayjs.utc(input.activity.startTime, "HH:mm").toDate()
+						: undefined,
+					endTime: input.activity.endTime
+						? dayjs.utc(input.activity.endTime, "HH:mm").toDate()
+						: undefined,
 				},
 			});
 

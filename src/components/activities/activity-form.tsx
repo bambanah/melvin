@@ -18,6 +18,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 import dayjs from "dayjs";
+import { useState } from "react";
+import { SupportItemListOutput } from "@server/api/routers/support-item-router";
 dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
 interface Props {
@@ -27,6 +29,8 @@ interface Props {
 const CreateActivityForm = ({ existingActivity }: Props) => {
 	const router = useRouter();
 
+	const [supportItems, setSupportItems] = useState<SupportItemListOutput[]>();
+
 	const trpcContext = trpc.useContext();
 	const createActivityMutation = trpc.activity.add.useMutation();
 	const modifyActivityMutation = trpc.activity.modify.useMutation();
@@ -35,6 +39,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 		register,
 		handleSubmit,
 		control,
+		watch,
 		formState: { errors, isDirty, isSubmitting, isValid },
 	} = useForm<ActivitySchema>({
 		resolver: zodResolver(activitySchema),
@@ -52,15 +57,27 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 			endTime: existingActivity?.startTime
 				? dayjs.utc(existingActivity?.endTime).format("HH:mm")
 				: "",
+			itemDistance: existingActivity?.itemDistance ?? undefined,
 			transitDistance: existingActivity?.transitDistance ?? undefined,
 			transitDuration: existingActivity?.transitDuration ?? undefined,
 		},
 	});
 
 	const onSubmit = (data: ActivitySchema) => {
+		const rateType = supportItems?.find(
+			(i) => i.id === data.supportItemId
+		)?.rateType;
+
+		const activityData: ActivitySchema = {
+			...data,
+			startTime: rateType === "KM" ? undefined : data.startTime,
+			endTime: rateType === "KM" ? undefined : data.endTime,
+			itemDistance: rateType === "KM" ? data.itemDistance : undefined,
+		};
+
 		if (existingActivity?.id) {
 			modifyActivityMutation
-				.mutateAsync({ id: existingActivity.id, activity: data })
+				.mutateAsync({ id: existingActivity.id, activity: activityData })
 				.then(() => {
 					trpcContext.activity.list.invalidate();
 					trpcContext.activity.byId.invalidate({ id: existingActivity.id });
@@ -69,12 +86,14 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					router.back();
 				});
 		} else {
-			createActivityMutation.mutateAsync({ activity: data }).then(() => {
-				trpcContext.activity.list.invalidate();
+			createActivityMutation
+				.mutateAsync({ activity: activityData })
+				.then(() => {
+					trpcContext.activity.list.invalidate();
 
-				toast.success("Activity created");
-				router.push("/activities");
-			});
+					toast.success("Activity created");
+					router.push("/activities");
+				});
 		}
 	};
 
@@ -90,7 +109,11 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 				<div className="w-full">
 					<Label htmlFor="supportItemId" className="shrink grow" required>
 						<span>Support Item</span>
-						<SupportItemSelect name="supportItemId" control={control} />
+						<SupportItemSelect
+							name="supportItemId"
+							control={control}
+							setSupportItems={setSupportItems}
+						/>
 						<ErrorMessage error={errors.supportItemId?.message} />
 					</Label>
 				</div>
@@ -111,31 +134,56 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					</Label>
 				</div>
 
-				<div className="flex w-full gap-4">
-					<Label
-						htmlFor="startTime"
-						className="w-full shrink grow basis-1/2"
-						required
-					>
-						<span>Start Time</span>
-						<TimeInput
-							name="startTime"
-							register={register}
-							error={!!errors.startTime}
-							className="w-full"
-						/>
-						<ErrorMessage error={errors.startTime?.message} />
-					</Label>
-					<Label htmlFor="endTime" className="shrink grow basis-1/2" required>
-						<span>End Time</span>
-						<TimeInput
-							name="endTime"
-							register={register}
-							error={!!errors.endTime}
-						/>
-						<ErrorMessage error={errors.endTime?.message} />
-					</Label>
-				</div>
+				{supportItems?.find((i) => i.id === watch("supportItemId"))
+					?.rateType === "KM" ? (
+					<div className="flex w-full gap-4">
+						<Label
+							htmlFor="itemDistance"
+							className="w-full shrink grow basis-1/2"
+							required
+						>
+							<span>Distance</span>
+							<Subheading>Distance travelled with client</Subheading>
+							<Input
+								name="itemDistance"
+								register={register}
+								error={!!errors.itemDistance}
+								suffix="km"
+								rules={{
+									setValueAs: (v) => (v === "" ? null : Number(v)),
+								}}
+								className="w-full"
+							/>
+							<ErrorMessage error={errors.itemDistance?.message} />
+						</Label>
+					</div>
+				) : (
+					<div className="flex w-full gap-4">
+						<Label
+							htmlFor="startTime"
+							className="w-full shrink grow basis-1/2"
+							required
+						>
+							<span>Start Time</span>
+							<TimeInput
+								name="startTime"
+								register={register}
+								error={!!errors.startTime}
+								className="w-full"
+							/>
+							<ErrorMessage error={errors.startTime?.message} />
+						</Label>
+						<Label htmlFor="endTime" className="shrink grow basis-1/2" required>
+							<span>End Time</span>
+							<TimeInput
+								name="endTime"
+								register={register}
+								error={!!errors.endTime}
+							/>
+							<ErrorMessage error={errors.endTime?.message} />
+						</Label>
+					</div>
+				)}
 				<hr className="w-full" />
 
 				<div className="flex flex-col items-center gap-1">

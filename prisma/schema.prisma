@@ -119,9 +119,9 @@ model Activity {
   createdAt DateTime @default(now()) @map("created")
   updatedAt DateTime @default(now()) @updatedAt
 
-  date            DateTime @db.Date()
-  startTime       DateTime @db.Time()
-  endTime         DateTime @db.Time()
+  date            DateTime  @db.Date()
+  startTime       DateTime? @db.Time()
+  endTime         DateTime? @db.Time()
   transitDuration Int?
   transitDistance Int?
   itemDistance    Int?

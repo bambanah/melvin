@@ -3,6 +3,7 @@ import Dropdown from "@atoms/dropdown";
 import Heading from "@atoms/heading";
 import {
 	faCalendar,
+	faCar,
 	faClock,
 	faEllipsisV,
 	faFileAlt,
@@ -22,27 +23,30 @@ dayjs.extend(utc);
 
 const ActivityPage = () => {
 	const router = useRouter();
-	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+	const activityId = Array.isArray(router.query.id)
+		? router.query.id[0]
+		: router.query.id;
 
-	const activityId = String(router.query.id);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	const trpcContext = trpc.useContext();
 	const { data: activity, error } = trpc.activity.byId.useQuery({
-		id: activityId,
+		id: activityId ?? "",
 	});
 	const deleteActivityMutation = trpc.activity.delete.useMutation();
 
 	const deleteActivity = () => {
-		deleteActivityMutation
-			.mutateAsync({ id: activityId })
-			.then(() => {
-				trpcContext.activity.list.invalidate();
-				toast.success("Activity deleted");
-				router.push("/activities");
-			})
-			.catch(() => {
-				toast.error("An error occured. Please refresh and try again.");
-			});
+		if (activityId)
+			deleteActivityMutation
+				.mutateAsync({ id: activityId })
+				.then(() => {
+					trpcContext.activity.list.invalidate();
+					toast.success("Activity deleted");
+					router.push("/activities");
+				})
+				.catch(() => {
+					toast.error("An error occured. Please refresh and try again.");
+				});
 	};
 
 	if (error) {
@@ -105,11 +109,20 @@ const ActivityPage = () => {
 				</div>
 
 				<div className="flex items-center gap-2">
-					<FontAwesomeIcon icon={faClock} />
-					<p>
-						{dayjs.utc(activity.startTime).format("hh:mma")} -{" "}
-						{dayjs.utc(activity.endTime).format("hh:mma")}
-					</p>
+					{activity.startTime && activity.endTime ? (
+						<>
+							<FontAwesomeIcon icon={faClock} />
+							<p>
+								{dayjs.utc(activity.startTime).format("hh:mma")} -{" "}
+								{dayjs.utc(activity.endTime).format("hh:mma")}
+							</p>
+						</>
+					) : (
+						<>
+							<FontAwesomeIcon icon={faCar} />
+							<p>{activity.itemDistance} km</p>
+						</>
+					)}
 				</div>
 
 				<div className="flex items-center gap-2">
