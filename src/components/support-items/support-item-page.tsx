@@ -12,27 +12,30 @@ import { toast } from "react-toastify";
 
 const SupportItemPage = () => {
 	const router = useRouter();
-	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+	const supportItemId = Array.isArray(router.query.id)
+		? router.query.id[0]
+		: router.query.id;
 
-	const supportItemId = String(router.query.id);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	const trpcContext = trpc.useContext();
 	const { data: supportItem, error } = trpc.supportItem.byId.useQuery({
-		id: supportItemId,
+		id: supportItemId ?? "",
 	});
 	const deletesupportItemMutation = trpc.supportItem.delete.useMutation();
 
 	const deletesupportItem = () => {
-		deletesupportItemMutation
-			.mutateAsync({ id: supportItemId })
-			.then(() => {
-				trpcContext.supportItem.list.invalidate();
-				toast.success("Support Item deleted");
-				router.push("/support-items");
-			})
-			.catch(() => {
-				toast.error("An error occured. Please refresh and try again.");
-			});
+		if (supportItemId)
+			deletesupportItemMutation
+				.mutateAsync({ id: supportItemId })
+				.then(() => {
+					trpcContext.supportItem.list.invalidate();
+					toast.success("Support Item deleted");
+					router.push("/support-items");
+				})
+				.catch(() => {
+					toast.error("An error occured. Please refresh and try again.");
+				});
 	};
 
 	if (error) {

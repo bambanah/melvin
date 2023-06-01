@@ -278,7 +278,10 @@ export const invoiceRouter = router({
 			});
 
 			if (invoices.length === 0) {
-				return;
+				return {
+					invoiceIds: [],
+					invoiceDetails: [],
+				};
 			}
 
 			// Convert array of invoices to map of <total, invoiceId>

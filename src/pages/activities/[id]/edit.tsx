@@ -8,10 +8,12 @@ import { useRouter } from "next/router";
 
 const EditActivityContent = () => {
 	const router = useRouter();
-	const activityId = String(router.query.id);
+	const activityId = Array.isArray(router.query.id)
+		? router.query.id[0]
+		: router.query.id;
 
 	const { data: activity, error } = trpc.activity.byId.useQuery({
-		id: activityId,
+		id: activityId ?? "",
 	});
 
 	if (error) {

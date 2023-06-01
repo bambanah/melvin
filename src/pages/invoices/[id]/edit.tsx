@@ -9,13 +9,15 @@ import { toast } from "react-toastify";
 
 const EditInvoice = () => {
 	const router = useRouter();
-	const invoiceId = String(router.query.id);
+	const invoiceId = Array.isArray(router.query.id)
+		? router.query.id[0]
+		: router.query.id;
 
 	const trpcContext = trpc.useContext();
 	const modifyInvoiceMutation = trpc.invoice.modify.useMutation();
 
 	const { data: invoice, error } = trpc.invoice.byId.useQuery({
-		id: invoiceId,
+		id: invoiceId ?? "",
 	});
 
 	if (error) {

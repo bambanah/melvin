@@ -13,25 +13,30 @@ import { toast } from "react-toastify";
 
 const ClientPage = () => {
 	const router = useRouter();
+	const clientId = Array.isArray(router.query.id)
+		? router.query.id[0]
+		: router.query.id;
+
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	const trpcContext = trpc.useContext();
 	const { data: client, error } = trpc.clients.byId.useQuery({
-		id: String(router.query.id),
+		id: clientId ?? "",
 	});
 	const deleteClientMutation = trpc.clients.delete.useMutation();
 
 	const deleteClient = () => {
-		deleteClientMutation
-			.mutateAsync({ id: String(router.query.id) })
-			.then(() => {
-				trpcContext.clients.list.invalidate();
-				toast.success("Client deleted");
-				router.push("/clients");
-			})
-			.catch(() => {
-				toast.error("An error occured. Please refresh and try again.");
-			});
+		if (clientId)
+			deleteClientMutation
+				.mutateAsync({ id: clientId })
+				.then(() => {
+					trpcContext.clients.list.invalidate();
+					toast.success("Client deleted");
+					router.push("/clients");
+				})
+				.catch(() => {
+					toast.error("An error occured. Please refresh and try again.");
+				});
 	};
 
 	if (error) {
