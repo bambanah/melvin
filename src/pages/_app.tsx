@@ -1,4 +1,3 @@
-import { AppContextProvider } from "@context/app-context";
 import "@styles/globals.css";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
@@ -50,15 +49,13 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 			`}</style>
 
 			<SessionProvider session={session}>
-				<AppContextProvider>
-					<Head>
-						<title>Melvin</title>
-						<link rel="shortcut icon" type="image/png" href="/melvin.png" />
-					</Head>
-					<Component {...pageProps} />
+				<Head>
+					<title>Melvin</title>
+					<link rel="shortcut icon" type="image/png" href="/melvin.png" />
+				</Head>
+				<Component {...pageProps} />
 
-					<ToastContainer />
-				</AppContextProvider>
+				<ToastContainer />
 			</SessionProvider>
 		</main>
 	);
