@@ -195,7 +195,7 @@ const LogPayment = () => {
 									}}
 									disabled={invoicesToUpdate.length === 0}
 								>
-									Mark as Sent
+									Mark as Paid
 								</Button>
 								<Button type="button" onClick={() => closeModal()}>
 									Cancel
