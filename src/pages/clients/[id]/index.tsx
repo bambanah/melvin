@@ -1,13 +1,15 @@
-import ClientPage from "@components/clients/client-page";
+const ClientPage = dynamic(() => import("@components/clients/client-page"));
 import Layout from "@components/shared/layout";
-import React from "react";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
 
 const ClientView = () => {
-	return (
-		<Layout>
-			<ClientPage />
-		</Layout>
-	);
+	const router = useRouter();
+	const clientId = Array.isArray(router.query.id)
+		? router.query.id[0]
+		: router.query.id;
+
+	return <Layout>{clientId && <ClientPage clientId={clientId} />}</Layout>;
 };
 
 export default ClientView;

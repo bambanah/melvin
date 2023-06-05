@@ -1,10 +1,7 @@
 import { InvoiceStatusBadge } from "@atoms/badge";
 import Button from "@atoms/button";
-import ConfirmDialog from "@atoms/confirm-dialog";
 import Heading from "@atoms/heading";
 import Loading from "@atoms/loading";
-import ActivityList from "@components/activities/activity-list";
-import PdfPreview from "@components/invoices/pdf-preview";
 import {
 	faClock,
 	faCopy,
@@ -28,23 +25,26 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 import { toast } from "react-toastify";
+const PdfPreview = dynamic(() => import("@components/invoices/pdf-preview"));
+const ConfirmDialog = dynamic(() => import("@atoms/confirm-dialog"));
+const ActivityList = dynamic(
+	() => import("@components/activities/activity-list")
+);
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import dynamic from "next/dynamic";
 dayjs.extend(utc);
 
-const InvoicePage = () => {
+const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 	const router = useRouter();
-	const invoiceId = Array.isArray(router.query.id)
-		? router.query.id[0]
-		: router.query.id;
 
 	const [isPdfPreviewExpanded, setIsPdfPreviewExpanded] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	const trpcContext = trpc.useContext();
 	const { data: invoice, error } = trpc.invoice.byId.useQuery({
-		id: invoiceId ?? "",
+		id: invoiceId,
 	});
 	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
 	const deleteInvoiceMutation = trpc.invoice.delete.useMutation();

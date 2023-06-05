@@ -13,25 +13,21 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { trpc } from "@utils/trpc";
 import Head from "next/head";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { useRouter } from "next/router";
 dayjs.extend(utc);
 
-const ActivityPage = () => {
+const ActivityPage = ({ activityId }: { activityId: string }) => {
 	const router = useRouter();
-	const activityId = Array.isArray(router.query.id)
-		? router.query.id[0]
-		: router.query.id;
-
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	const trpcContext = trpc.useContext();
 	const { data: activity, error } = trpc.activity.byId.useQuery({
-		id: activityId ?? "",
+		id: activityId,
 	});
 	const deleteActivityMutation = trpc.activity.delete.useMutation();
 

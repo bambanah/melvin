@@ -7,7 +7,7 @@ import { debounce } from "@utils/generic-utils";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 const LogPayment = () => {
@@ -53,7 +53,7 @@ const LogPayment = () => {
 
 	useEffect(() => {
 		// Check for invoices matching the total
-		fetchMatchingInvoiceIds();
+		if (amountPaid > 0) fetchMatchingInvoiceIds();
 	}, [amountPaid, fetchMatchingInvoiceIds]);
 
 	function InvoiceCard({ invoiceId }: { invoiceId: string }) {
@@ -111,7 +111,7 @@ const LogPayment = () => {
 		return (
 			<div className="flex flex-col gap-4 rounded-md">
 				{ids.map((candidate, idx) => (
-					<React.Fragment key={idx}>
+					<Fragment key={idx}>
 						{Array.isArray(candidate) ? (
 							<div className="flex flex-col gap-2" key={idx}>
 								{candidate.map((invoiceId) => (
@@ -125,7 +125,7 @@ const LogPayment = () => {
 						{idx < ids.length - 1 && (
 							<FontAwesomeIcon icon={faPlus} size="xl" key={`${idx}-icon`} />
 						)}
-					</React.Fragment>
+					</Fragment>
 				))}
 			</div>
 		);

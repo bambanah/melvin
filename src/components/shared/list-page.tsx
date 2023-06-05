@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import Link, { LinkProps } from "next/link";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 
 const Header = ({ children }: { children: ReactNode | ReactNode[] }) => (
 	<div className="flex items-center justify-between gap-2 px-4 py-2">

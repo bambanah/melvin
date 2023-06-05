@@ -1,7 +1,6 @@
-import { useSession } from "next-auth/react";
-import React from "react";
-import SupportItemList from "@components/support-items/support-item-list";
 import Layout from "@components/shared/layout";
+import SupportItemList from "@components/support-items/support-item-list";
+import { useSession } from "next-auth/react";
 
 function SupportItems() {
 	const { status } = useSession({

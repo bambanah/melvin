@@ -1,13 +1,15 @@
 import Layout from "@components/shared/layout";
-import InvoicePage from "@components/invoices/invoice-page";
-import React from "react";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
+const InvoicePage = dynamic(() => import("@components/invoices/invoice-page"));
 
 const Invoice = () => {
-	return (
-		<Layout>
-			<InvoicePage />
-		</Layout>
-	);
+	const router = useRouter();
+	const invoiceId = Array.isArray(router.query.id)
+		? router.query.id[0]
+		: router.query.id;
+
+	return <Layout>{invoiceId && <InvoicePage invoiceId={invoiceId} />}</Layout>;
 };
 
 export default Invoice;

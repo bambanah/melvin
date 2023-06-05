@@ -10,11 +10,8 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-const SupportItemPage = () => {
+const SupportItemPage = ({ supportItemId }: { supportItemId: string }) => {
 	const router = useRouter();
-	const supportItemId = Array.isArray(router.query.id)
-		? router.query.id[0]
-		: router.query.id;
 
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 

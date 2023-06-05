@@ -1,10 +1,19 @@
 import Layout from "@components/shared/layout";
-import SupportItemPage from "@components/support-items/support-item-page";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
+const SupportItemPage = dynamic(
+	() => import("@components/support-items/support-item-page")
+);
 
 const Activity = () => {
+	const router = useRouter();
+	const supportItemId = Array.isArray(router.query.id)
+		? router.query.id[0]
+		: router.query.id;
+
 	return (
 		<Layout>
-			<SupportItemPage />
+			{supportItemId && <SupportItemPage supportItemId={supportItemId} />}
 		</Layout>
 	);
 };
