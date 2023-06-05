@@ -7,9 +7,6 @@ import type { AppProps } from "next/app";
 import { Inter, Patua_One, Roboto_Mono } from "next/font/google";
 import Head from "next/head";
 
-import { pdfjs } from "react-pdf";
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-
 import "react-loading-skeleton/dist/skeleton.css";
 
 import { ToastContainer } from "react-toastify";
