@@ -9,7 +9,7 @@ import { Menu, Transition } from "@headlessui/react";
 import classNames from "classnames";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import React from "react";
+import { Fragment } from "react";
 
 interface NavAuthProps {
 	user?: { id: string; email: string };
@@ -27,7 +27,7 @@ const NavAuth = ({ user }: NavAuthProps) => {
 				</Menu.Button>
 			</div>
 			<Transition
-				as={React.Fragment}
+				as={Fragment}
 				enter="transition ease-out duration-100"
 				enterFrom="transform opacity-0 scale-95"
 				enterTo="transform opacity-100 scale-100"

@@ -2,7 +2,7 @@ import Loading from "@atoms/loading";
 import Navbar from "@components/navigation/navbar";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import React from "react";
+import { ReactNode } from "react";
 
 interface Props {
 	children: React.ReactNode;
@@ -13,7 +13,7 @@ const Layout = ({ children, isLoading }: Props) => {
 	const session = useSession();
 	const router = useRouter();
 
-	let content: React.ReactNode;
+	let content: ReactNode;
 
 	if (session.status === "unauthenticated") {
 		router.push("/login");

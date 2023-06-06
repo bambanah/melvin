@@ -1,7 +1,6 @@
-import { useSession } from "next-auth/react";
-import React from "react";
 import ActivityList from "@components/activities/activity-list";
 import Layout from "@components/shared/layout";
+import { useSession } from "next-auth/react";
 
 function Activities() {
 	const { status } = useSession({

@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
 
 interface Props {
 	href: string;

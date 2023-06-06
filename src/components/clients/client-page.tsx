@@ -11,11 +11,8 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-const ClientPage = () => {
+const ClientPage = ({ clientId }: { clientId: string }) => {
 	const router = useRouter();
-	const clientId = Array.isArray(router.query.id)
-		? router.query.id[0]
-		: router.query.id;
 
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 

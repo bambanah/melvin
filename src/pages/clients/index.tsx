@@ -1,6 +1,5 @@
-import Layout from "@components/shared/layout";
-import React from "react";
 import ClientPage from "@components/clients/client-list";
+import Layout from "@components/shared/layout";
 import Head from "next/head";
 
 const Clients = () => {

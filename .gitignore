@@ -11,5 +11,6 @@ yarn-error.log
 /playwright/.cache/
 e2e/setup/storage-state.json
 .swc
+analyze/
 
 next-env.d.ts

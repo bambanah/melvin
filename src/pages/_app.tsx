@@ -1,4 +1,3 @@
-import { AppContextProvider } from "@context/app-context";
 import "@styles/globals.css";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
@@ -6,9 +5,6 @@ import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { Inter, Patua_One, Roboto_Mono } from "next/font/google";
 import Head from "next/head";
-
-import { pdfjs } from "react-pdf";
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 import "react-loading-skeleton/dist/skeleton.css";
 
@@ -53,15 +49,13 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 			`}</style>
 
 			<SessionProvider session={session}>
-				<AppContextProvider>
-					<Head>
-						<title>Melvin</title>
-						<link rel="shortcut icon" type="image/png" href="/melvin.png" />
-					</Head>
-					<Component {...pageProps} />
+				<Head>
+					<title>Melvin</title>
+					<link rel="shortcut icon" type="image/png" href="/melvin.png" />
+				</Head>
+				<Component {...pageProps} />
 
-					<ToastContainer />
-				</AppContextProvider>
+				<ToastContainer />
 			</SessionProvider>
 		</main>
 	);
