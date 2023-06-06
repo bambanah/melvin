@@ -65,7 +65,7 @@ export default function InvoiceList({
 									{dayjs.utc(invoice.date).format("DD MMM.")}
 								</span>
 							</div>
-							<div className="flex basis-10 flex-col gap-2 text-right">
+							<div className="flex basis-10 flex-col items-end gap-2">
 								<span className="sm:text-lg">
 									{getTotalCostOfActivities(invoice.activities).toLocaleString(
 										undefined,

@@ -1,8 +1,8 @@
-import Loading from "@atoms/loading";
 import Navbar from "@components/navigation/navbar";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
+import SkeletonLayout from "./skeleton-layout";
 
 interface Props {
 	children: React.ReactNode;
@@ -16,15 +16,13 @@ const Layout = ({ children, isLoading }: Props) => {
 	let content: ReactNode;
 
 	if (session.status === "unauthenticated") {
-		router.push("/login");
 		content = <p>Redirecting...</p>;
+		router.push("/login");
+	} else if (session.status === "loading" || isLoading) {
+		content = <SkeletonLayout />;
+	} else {
+		content = children;
 	}
-
-	if (session.status === "loading" || isLoading) {
-		content = <Loading />;
-	}
-
-	content = children;
 
 	return (
 		<div className="flex h-full min-h-screen w-full flex-col">
