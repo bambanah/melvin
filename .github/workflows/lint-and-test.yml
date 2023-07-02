@@ -26,27 +26,19 @@ jobs:
           mysql root password: password
 
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
       - uses: pnpm/action-setup@v2
         with:
           version: 8
-          run_install: false
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
+      - uses: actions/setup-node@v3
         with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: 16
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install && npx playwright install
+        run: pnpm install
+
+      - name: Install playwright browsers
+        run: npx playwright install
 
       - name: Initialise database
         run: pnpm db:push
