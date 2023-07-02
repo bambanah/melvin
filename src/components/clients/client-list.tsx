@@ -38,7 +38,9 @@ const ClientList = () => {
 							className="flex w-full justify-between gap-2 p-4 text-sm"
 						>
 							<div className="flex min-h-[2.5rem] flex-col gap-2">
-								<h3 className="font-semibold sm:text-lg">{client.name}</h3>
+								<Link href={`/clients/${client.id}`}>
+									<h3 className="font-semibold sm:text-lg">{client.name}</h3>
+								</Link>
 								{client.invoices.length > 0 && (
 									<>
 										<span className="flex items-center gap-2 text-gray-600">
@@ -77,7 +79,6 @@ const ClientList = () => {
 					))
 				}
 			</InfiniteList>
-			;
 		</ListPage>
 	);
 };

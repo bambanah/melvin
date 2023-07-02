@@ -15,7 +15,8 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 	dataKey,
 	className,
 }: InfiniteListProps<TData, TError, TKey>) => {
-	const { data, fetchNextPage, isSuccess, isLoading, isFetching } = queryResult;
+	const { data, fetchNextPage, isSuccess, isLoading, isFetching, hasNextPage } =
+		queryResult;
 	const dataReturned =
 		isSuccess && data.pages.flatMap((page) => page[dataKey])?.length > 0;
 
@@ -23,7 +24,7 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(([entry]) => {
-			if (entry.isIntersecting) {
+			if (entry.isIntersecting && hasNextPage) {
 				fetchNextPage();
 			}
 		});
@@ -33,7 +34,7 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 		}
 
 		return () => observer.disconnect();
-	}, [fetchNextPage]);
+	}, [fetchNextPage, hasNextPage]);
 
 	return (
 		<div
@@ -42,8 +43,6 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 				className,
 			])}
 		>
-			{(isLoading || isFetching) && <Loading />}
-
 			{isSuccess && (
 				<div className="flex flex-col divide-y">
 					{dataReturned ? (
@@ -58,6 +57,7 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 				</div>
 			)}
 
+			{(isLoading || isFetching) && !data && <Loading />}
 			{!isLoading && !isFetching && dataReturned && (
 				<p className="mx-auto mt-8 text-slate-400">You reached the end!</p>
 			)}
