@@ -1,5 +1,7 @@
 import {
 	FieldValues,
+	Path,
+	PathValue,
 	useController,
 	UseControllerProps,
 } from "react-hook-form";
@@ -25,7 +27,7 @@ function Select<T extends FieldValues>({ options, ...rest }: SelectProps<T>) {
 			unstyled
 			options={options}
 			value={options.find((c) => c.value === value)}
-			onChange={(val) => onChange(val?.value)}
+			onChange={(val) => onChange(val?.value as PathValue<T, Path<T>>)}
 			classNames={{
 				control: () =>
 					"p-3 border w-full bg-white shadow-md rounded-md focus-within:border-indigo-500 outline-none cursor-pointer",

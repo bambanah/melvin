@@ -51,16 +51,13 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 						))
 					) : (
 						<p className="mx-auto mt-8 text-slate-400">
-							There&#39;s nothing here...
+							There&#39;s nothing here
 						</p>
 					)}
 				</div>
 			)}
 
 			{(isLoading || isFetching) && !data && <Loading />}
-			{!isLoading && !isFetching && dataReturned && (
-				<p className="mx-auto mt-8 text-slate-400">You reached the end!</p>
-			)}
 
 			<div ref={loadMoreRef} className=""></div>
 		</div>

@@ -19,33 +19,21 @@ export const pdfRouter = router({
 			const invoices = await invoiceCaller.byId({ id: invoiceId });
 
 			if (!invoices) {
-				return new TRPCError({ code: "NOT_FOUND" });
+				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
 			const { pdfString } = await generatePDF(invoices);
 
 			if (!pdfString) {
-				return new TRPCError({ code: "NOT_FOUND" });
+				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
 			if (base64) {
 				return `data:application/pdf;base64,${pdfString}`;
-				// return response
-				// 	.status(200)
-				// 	.setHeader("Content-Type", "application/pdf")
-				// 	.setHeader("Content-Disposition", `inline; filename="${fileName}"`)
-				// 	.send(pdfString);
 			}
 
 			const pdfContent = Buffer.from(pdfString, "base64").toString();
 
 			return pdfContent;
-			// response.writeHead(200, {
-			// 	"Content-Type": "application/pdf",
-			// 	"Content-Length": pdfContent.length,
-			// 	"Content-Disposition": `inline; filename="${fileName}"`,
-			// });
-
-			// response.end(pdfContent);
 		}),
 });
