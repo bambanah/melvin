@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import InfiniteList from "@components/shared/infinite-list";
+import ListFilterRow from "@components/shared/list-filter-row";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
@@ -57,24 +58,13 @@ export default function InvoiceList({
 			</ListPage.Header>
 
 			{groupByAssignedStatus && (
-				<div className="w-full border-b">
-					<div className="-mb-[1px] flex w-full md:max-w-xs">
-						{(["UNPAID", "PAID"] as const).map((status) => (
-							<button
-								key={status}
-								type="button"
-								onClick={() => setStatusFilter(status)}
-								className={classNames([
-									"basis-1/2 border-b px-4 py-2 text-center transition-all",
-									statusFilter === status &&
-										"border-indigo-700 text-indigo-700",
-								])}
-							>
-								{status}
-							</button>
-						))}
-					</div>
-				</div>
+				<ListFilterRow
+					items={(["UNPAID", "PAID"] as const).map((status) => ({
+						onClick: () => setStatusFilter(status),
+						children: status,
+						active: statusFilter === status,
+					}))}
+				/>
 			)}
 
 			<InfiniteList queryResult={queryResult} dataKey="invoices">

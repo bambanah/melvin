@@ -1,6 +1,7 @@
 import Badge from "@atoms/badge";
 import Button from "@atoms/button";
 import InfiniteList from "@components/shared/infinite-list";
+import ListFilterRow from "@components/shared/list-filter-row";
 import ListPage from "@components/shared/list-page";
 import {
 	faCar,
@@ -19,7 +20,6 @@ import {
 } from "@utils/date-utils";
 import { groupBy } from "@utils/generic-utils";
 import { trpc } from "@utils/trpc";
-import classNames from "classnames";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { useState } from "react";
@@ -60,24 +60,13 @@ function ActivityList({
 				) : undefined}
 			</ListPage.Header>
 			{groupByAssignedStatus && (
-				<div className="mb-4 w-full border-b">
-					<div className="-mb-[1px] flex w-full md:max-w-xs">
-						{[false, true].map((status, idx) => (
-							<button
-								key={idx}
-								type="button"
-								onClick={() => setAssignedFilter(status)}
-								className={classNames([
-									"basis-1/2 border-b px-4 py-2 text-center transition-all",
-									assignedFilter === status &&
-										"border-indigo-700 text-indigo-700",
-								])}
-							>
-								{status ? "ASSIGNED" : "UNASSIGNED"}
-							</button>
-						))}
-					</div>
-				</div>
+				<ListFilterRow
+					items={[false, true].map((assigned) => ({
+						onClick: () => setAssignedFilter(assigned),
+						active: assignedFilter === assigned,
+						children: assigned ? "ASSIGNED" : "UNASSIGNED",
+					}))}
+				/>
 			)}
 			<InfiniteList queryResult={queryResult} dataKey="activities">
 				{(activities) =>
