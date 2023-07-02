@@ -1,6 +1,7 @@
 import Badge from "@atoms/badge";
 import Button from "@atoms/button";
-import Loading from "@atoms/loading";
+import InfiniteList from "@components/shared/infinite-list";
+import ListFilterRow from "@components/shared/list-filter-row";
 import ListPage from "@components/shared/list-page";
 import {
 	faCar,
@@ -19,7 +20,6 @@ import {
 } from "@utils/date-utils";
 import { groupBy } from "@utils/generic-utils";
 import { trpc } from "@utils/trpc";
-import classNames from "classnames";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { useState } from "react";
@@ -30,6 +30,11 @@ interface Props {
 	groupByAssignedStatus?: boolean;
 }
 
+const groupActivitiesByDate = (activities?: ActivityListOutput["activities"]) =>
+	activities
+		? groupBy(activities, (activity) => dayjs(activity.date).toString())
+		: {};
+
 function ActivityList({
 	invoiceId,
 	displayCreateButton = true,
@@ -37,21 +42,10 @@ function ActivityList({
 }: Props) {
 	const [assignedFilter, setAssignedFilter] = useState<boolean>(false);
 
-	const { data: { activities } = {}, error } = trpc.activity.list.useQuery({
+	const queryResult = trpc.activity.list.useInfiniteQuery({
 		assigned: groupByAssignedStatus ? assignedFilter : undefined,
 		invoiceId,
 	});
-
-	if (error) {
-		console.error(error);
-		return <div>Error loading</div>;
-	}
-
-	// TODO: Display something other than "Loading..." when there are no activities
-
-	const groupedActivities: { [key: string]: ActivityListOutput[] } = activities
-		? groupBy(activities, (activity) => dayjs(activity.date).toString())
-		: {};
 
 	return (
 		<ListPage>
@@ -66,105 +60,97 @@ function ActivityList({
 				) : undefined}
 			</ListPage.Header>
 			{groupByAssignedStatus && (
-				<div className="mb-4 w-full border-b">
-					<div className="-mb-[1px] flex w-full md:max-w-xs">
-						{[false, true].map((status, idx) => (
-							<button
-								key={idx}
-								type="button"
-								onClick={() => setAssignedFilter(status)}
-								className={classNames([
-									"basis-1/2 border-b px-4 py-2 text-center transition-all",
-									assignedFilter === status &&
-										"border-indigo-700 text-indigo-700",
-								])}
-							>
-								{status ? "ASSIGNED" : "UNASSIGNED"}
-							</button>
-						))}
-					</div>
-				</div>
+				<ListFilterRow
+					items={[false, true].map((assigned) => ({
+						onClick: () => setAssignedFilter(assigned),
+						active: assignedFilter === assigned,
+						children: assigned ? "ASSIGNED" : "UNASSIGNED",
+					}))}
+				/>
 			)}
+			<InfiniteList queryResult={queryResult} dataKey="activities">
+				{(activities) =>
+					Object.entries(groupActivitiesByDate(activities)).map(
+						([date, groupedActivities]) => (
+							<div key={date} className="mb-4 overflow-hidden">
+								<div className="flex w-full items-center gap-2 border-b px-4 py-2 text-left">
+									{dayjs(date).format("dddd D MMM.")}
+									{isDateHoliday(date) && <Badge variant="INFO">Holiday</Badge>}
+								</div>
 
-			{Object.keys(groupedActivities).length > 0 ? (
-				Object.keys(groupedActivities).map((group) => (
-					<div key={group} className="mb-4 overflow-hidden">
-						<div className="flex w-full items-center gap-2 border-b px-4 py-2 text-left">
-							{dayjs(group).format("dddd D MMM.")}
-							{isDateHoliday(group) && <Badge variant="INFO">Holiday</Badge>}
-						</div>
-
-						<ListPage.Items>
-							{groupedActivities[group].map((activity) => (
-								<ListPage.Item
-									href={`/activities/${activity.id}`}
-									key={activity.id}
-									className="flex-col md:flex-row"
-								>
-									<div className="flex flex-col gap-2 overflow-hidden">
-										<p className="truncate text-lg font-semibold">
-											{activity.supportItem.description}
-										</p>
-										{activity.itemDistance ? (
-											<div className="flex items-center gap-2 whitespace-nowrap">
-												<FontAwesomeIcon
-													icon={faCar}
-													className="w-4 text-gray-600"
-												/>
-												{activity.itemDistance}km
-											</div>
-										) : (
-											<div className="flex items-center gap-2 whitespace-nowrap">
-												<FontAwesomeIcon
-													icon={faClock}
-													className="w-4 text-gray-600"
-												/>
-												{dayjs.utc(activity.startTime).format("HH:mm")} -{" "}
-												{dayjs.utc(activity.endTime).format("HH:mm")}
-												<span className="hidden md:inline">
-													(
-													{activity.startTime &&
-														activity.endTime &&
-														formatDuration(
-															getDuration(activity.startTime, activity.endTime)
-														)}
-													)
-												</span>
-											</div>
-										)}
-									</div>
-									<div className="flex flex-col items-start justify-between gap-2 md:items-end">
-										<div className="flex items-center gap-2 md:flex-row-reverse md:font-semibold">
-											<FontAwesomeIcon
-												icon={faUser}
-												className="w-4 text-gray-600"
-											/>
-											<span>{activity.client?.name}</span>
-										</div>
-										<div className="flex items-center gap-2 md:flex-row-reverse">
-											<FontAwesomeIcon
-												icon={faMoneyBillWave}
-												className="w-4 text-gray-600"
-											/>
-											<span>
-												{getTotalCostOfActivities([activity]).toLocaleString(
-													undefined,
-													{
-														style: "currency",
-														currency: "AUD",
-													}
+								<div className="flex flex-col divide-y">
+									{groupedActivities.map((activity) => (
+										<ListPage.Item
+											href={`/activities/${activity.id}`}
+											key={activity.id}
+											className="flex-col md:flex-row"
+										>
+											<div className="flex flex-col gap-2 overflow-hidden">
+												<p className="truncate text-lg font-semibold">
+													{activity.supportItem.description}
+												</p>
+												{activity.itemDistance ? (
+													<div className="flex items-center gap-2 whitespace-nowrap">
+														<FontAwesomeIcon
+															icon={faCar}
+															className="w-4 text-gray-600"
+														/>
+														{activity.itemDistance}km
+													</div>
+												) : (
+													<div className="flex items-center gap-2 whitespace-nowrap">
+														<FontAwesomeIcon
+															icon={faClock}
+															className="w-4 text-gray-600"
+														/>
+														{dayjs.utc(activity.startTime).format("HH:mm")} -{" "}
+														{dayjs.utc(activity.endTime).format("HH:mm")}
+														<span className="hidden md:inline">
+															(
+															{activity.startTime &&
+																activity.endTime &&
+																formatDuration(
+																	getDuration(
+																		activity.startTime,
+																		activity.endTime
+																	)
+																)}
+															)
+														</span>
+													</div>
 												)}
-											</span>
-										</div>
-									</div>
-								</ListPage.Item>
-							))}
-						</ListPage.Items>
-					</div>
-				))
-			) : (
-				<Loading />
-			)}
+											</div>
+											<div className="flex flex-col items-start justify-between gap-2 md:items-end">
+												<div className="flex items-center gap-2 md:flex-row-reverse md:font-semibold">
+													<FontAwesomeIcon
+														icon={faUser}
+														className="w-4 text-gray-600"
+													/>
+													<span>{activity.client?.name}</span>
+												</div>
+												<div className="flex items-center gap-2 md:flex-row-reverse">
+													<FontAwesomeIcon
+														icon={faMoneyBillWave}
+														className="w-4 text-gray-600"
+													/>
+													<span>
+														{getTotalCostOfActivities([
+															activity,
+														]).toLocaleString(undefined, {
+															style: "currency",
+															currency: "AUD",
+														})}
+													</span>
+												</div>
+											</div>
+										</ListPage.Item>
+									))}
+								</div>
+							</div>
+						)
+					)
+				}
+			</InfiniteList>
 		</ListPage>
 	);
 }

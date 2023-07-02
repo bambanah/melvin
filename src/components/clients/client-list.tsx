@@ -1,5 +1,5 @@
 import Button from "@atoms/button";
-import Loading from "@atoms/loading";
+import InfiniteList from "@components/shared/infinite-list";
 import ListPage from "@components/shared/list-page";
 import {
 	faBuilding,
@@ -15,12 +15,10 @@ import dayjs from "dayjs";
 import Link from "next/link";
 
 const ClientList = () => {
-	const { data: { clients } = {}, error } = trpc.clients.list.useQuery({});
-
-	if (error) {
-		console.error(error);
-		return <div>Error loading</div>;
-	}
+	const queryResult = trpc.clients.list.useInfiniteQuery(
+		{},
+		{ getNextPageParam: (lastPage) => lastPage.nextCursor }
+	);
 
 	return (
 		<ListPage>
@@ -32,12 +30,17 @@ const ClientList = () => {
 					<span>Add</span>
 				</Button>
 			</ListPage.Header>
-			<ListPage.Items>
-				{clients ? (
+			<InfiniteList queryResult={queryResult} dataKey="clients">
+				{(clients) =>
 					clients.map((client) => (
-						<ListPage.Item href={`/clients/${client.id}`} key={client.id}>
+						<div
+							key={client.id}
+							className="flex w-full justify-between gap-2 p-4 text-sm"
+						>
 							<div className="flex min-h-[2.5rem] flex-col gap-2">
-								<h3 className="font-semibold sm:text-lg">{client.name}</h3>
+								<Link href={`/clients/${client.id}`}>
+									<h3 className="font-semibold sm:text-lg">{client.name}</h3>
+								</Link>
 								{client.invoices.length > 0 && (
 									<>
 										<span className="flex items-center gap-2 text-gray-600">
@@ -72,12 +75,10 @@ const ClientList = () => {
 									</span>
 								)}
 							</div>
-						</ListPage.Item>
+						</div>
 					))
-				) : (
-					<Loading />
-				)}
-			</ListPage.Items>
+				}
+			</InfiniteList>
 		</ListPage>
 	);
 };

@@ -1,18 +1,18 @@
 import { InvoiceStatusBadge } from "@atoms/badge";
 import Button from "@atoms/button";
-import Loading from "@atoms/loading";
 import LogPayment from "@components/invoices/log-payment-modal";
 import ListPage from "@components/shared/list-page";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { InvoiceStatus } from "@prisma/client";
-import { InvoiceListOutput } from "@server/api/routers/invoice-router";
 import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import Link from "next/link";
 import { useState } from "react";
 
+import InfiniteList from "@components/shared/infinite-list";
+import ListFilterRow from "@components/shared/list-filter-row";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
@@ -28,69 +28,17 @@ export default function InvoiceList({
 }: Props) {
 	const [statusFilter, setStatusFilter] = useState<"UNPAID" | "PAID">("UNPAID");
 
-	const { data: { invoices } = {}, error } = trpc.invoice.list.useQuery({
-		status: groupByAssignedStatus
-			? statusFilter === "UNPAID"
-				? [InvoiceStatus.CREATED, InvoiceStatus.SENT]
-				: [InvoiceStatus.PAID]
-			: undefined,
-		clientId,
-	});
-
-	if (error) {
-		console.error(error);
-		return <div>Error loading</div>;
-	}
-
-	const InvoiceListItems = ({
-		invoices,
-	}: {
-		invoices?: InvoiceListOutput[];
-	}) => {
-		if (!invoices) {
-			return <Loading />;
-		}
-
-		if (invoices.length > 0) {
-			return (
-				<ListPage.Items>
-					{invoices.map((invoice) => (
-						<ListPage.Item key={invoice.id} href={`/invoices/${invoice.id}`}>
-							<div className="flex flex-col gap-2">
-								<div className="font-medium sm:text-lg">
-									<span className="font-semibold">{invoice.invoiceNo}</span>:{" "}
-									{invoice.client.name}
-								</div>
-								<span className="text-sm sm:text-base">
-									{dayjs.utc(invoice.date).format("DD MMM.")}
-								</span>
-							</div>
-							<div className="flex basis-10 flex-col items-end gap-2">
-								<span className="sm:text-lg">
-									{getTotalCostOfActivities(invoice.activities).toLocaleString(
-										undefined,
-										{
-											style: "currency",
-											currency: "AUD",
-										}
-									)}
-								</span>
-								<InvoiceStatusBadge invoiceStatus={invoice.status} />
-							</div>
-						</ListPage.Item>
-					))}
-				</ListPage.Items>
-			);
-		}
-
-		return (
-			<ListPage.Items>
-				<div className="py-8 text-center text-neutral-600">
-					There&#39;s nothing here...
-				</div>
-			</ListPage.Items>
-		);
-	};
+	const queryResult = trpc.invoice.list.useInfiniteQuery(
+		{
+			status: groupByAssignedStatus
+				? statusFilter === "UNPAID"
+					? [InvoiceStatus.CREATED, InvoiceStatus.SENT]
+					: [InvoiceStatus.PAID]
+				: undefined,
+			clientId,
+		},
+		{ getNextPageParam: (lastPage) => lastPage.nextCursor }
+	);
 
 	return (
 		<ListPage>
@@ -110,27 +58,53 @@ export default function InvoiceList({
 			</ListPage.Header>
 
 			{groupByAssignedStatus && (
-				<div className="w-full border-b">
-					<div className="-mb-[1px] flex w-full md:max-w-xs">
-						{(["UNPAID", "PAID"] as const).map((status) => (
-							<button
-								key={status}
-								type="button"
-								onClick={() => setStatusFilter(status)}
-								className={classNames([
-									"basis-1/2 border-b px-4 py-2 text-center transition-all",
-									statusFilter === status &&
-										"border-indigo-700 text-indigo-700",
-								])}
-							>
-								{status}
-							</button>
-						))}
-					</div>
-				</div>
+				<ListFilterRow
+					items={(["UNPAID", "PAID"] as const).map((status) => ({
+						onClick: () => setStatusFilter(status),
+						children: status,
+						active: statusFilter === status,
+					}))}
+				/>
 			)}
 
-			<InvoiceListItems invoices={invoices} />
+			<InfiniteList queryResult={queryResult} dataKey="invoices">
+				{(invoices) =>
+					invoices.map((invoice) => (
+						<div
+							key={invoice.id}
+							className={classNames([
+								"flex w-full justify-between gap-2 p-4 text-sm text-zinc-900",
+							])}
+						>
+							<div className="flex flex-col gap-2">
+								<div className="font-medium sm:text-lg">
+									<Link
+										href={`/invoices/${invoice.id}`}
+										className="font-semibold"
+									>
+										{invoice.invoiceNo}: {invoice.client.name}
+									</Link>
+								</div>
+								<span className="text-sm sm:text-base">
+									{dayjs.utc(invoice.date).format("DD MMM.")}
+								</span>
+							</div>
+							<div className="flex basis-10 flex-col gap-2 text-right">
+								<span className="sm:text-lg">
+									{getTotalCostOfActivities(invoice.activities).toLocaleString(
+										undefined,
+										{
+											style: "currency",
+											currency: "AUD",
+										}
+									)}
+								</span>
+								<InvoiceStatusBadge invoiceStatus={invoice.status} />
+							</div>
+						</div>
+					))
+				}
+			</InfiniteList>
 		</ListPage>
 	);
 }

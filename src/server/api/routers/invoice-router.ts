@@ -2,7 +2,7 @@ import { Invoice, InvoiceStatus } from "@prisma/client";
 import { activitySchema } from "@schema/activity-schema";
 import { invoiceSchema } from "@schema/invoice-schema";
 import { authedProcedure, router } from "@server/api/trpc";
-import { inferRouterOutputs, TRPCError } from "@trpc/server";
+import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { invoiceCandidatesFromPaymentAmount } from "@utils/invoice-utils";
 import { baseListQueryInput } from "@utils/trpc";
@@ -333,7 +333,7 @@ export const invoiceRouter = router({
 
 export type InvoiceListOutput = inferRouterOutputs<
 	typeof invoiceRouter
->["list"]["invoices"][0];
+>["list"];
 
 export type InvoiceByIdOutput = inferRouterOutputs<
 	typeof invoiceRouter

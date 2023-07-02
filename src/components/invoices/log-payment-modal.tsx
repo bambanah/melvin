@@ -133,12 +133,7 @@ const LogPayment = () => {
 
 	return (
 		<>
-			<Button
-				className="w-auto font-mono font-medium"
-				onClick={() => setIsOpen(true)}
-			>
-				$ Payment
-			</Button>
+			<Button onClick={() => setIsOpen(true)}>$ Payment</Button>
 			<Dialog open={isOpen} onClose={() => closeModal()}>
 				<div className="fixed inset-0 z-30 bg-black bg-opacity-25" />
 

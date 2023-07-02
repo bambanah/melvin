@@ -8,10 +8,6 @@ const Header = ({ children }: { children: ReactNode | ReactNode[] }) => (
 	</div>
 );
 
-const Items = ({ children }: { children: ReactNode }) => {
-	return <div className="flex flex-col divide-y">{children}</div>;
-};
-
 const Item = ({
 	children,
 	className,
@@ -20,7 +16,7 @@ const Item = ({
 	LinkProps) => (
 	<Link
 		className={classNames([
-			"flex w-full justify-between gap-2 p-4 text-sm text-zinc-900 hover:bg-zinc-100",
+			"flex w-full justify-between gap-2 p-4 text-sm text-neutral-900 hover:bg-zinc-100",
 			className,
 		])}
 		{...rest}
@@ -46,6 +42,6 @@ const PageComponent = ({ children, className }: PageComponentProps) => {
 	);
 };
 
-const ListPage = Object.assign(PageComponent, { Items, Item, Header });
+const ListPage = Object.assign(PageComponent, { Item, Header });
 
 export default ListPage;
