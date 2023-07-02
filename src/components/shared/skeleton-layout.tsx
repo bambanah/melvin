@@ -1,24 +1,28 @@
 import Skeleton from "react-loading-skeleton";
 import ListPage from "./list-page";
+import ListFilterRow from "./list-filter-row";
 
 const SkeletonLayout = () => {
 	return (
 		<ListPage>
 			<ListPage.Header>
-				<h2 className="mr-auto w-[12rem] text-3xl font-bold">
+				<h2 className="mr-auto w-32 text-3xl font-bold">
 					<Skeleton />
 				</h2>
 
-				<div className="w-24 text-4xl">
+				<div className="box-content h-6 w-24 border border-transparent py-2 text-4xl">
 					<Skeleton />
 				</div>
-
-				<Skeleton />
 			</ListPage.Header>
-			<ListPage.Items>
+			<ListFilterRow
+				items={Array.from({ length: 2 }).map(() => ({
+					children: <Skeleton />,
+				}))}
+			/>
+			<ul>
 				{Array.from({ length: 5 }).map((id, idx) => (
 					<ListPage.Item key={idx} href="#">
-						<div className="flex w-[20rem] flex-col gap-2">
+						<div className="flex w-[18rem] flex-col gap-2">
 							<div className="w-full sm:text-lg">
 								<Skeleton />
 							</div>
@@ -36,7 +40,7 @@ const SkeletonLayout = () => {
 						</div>
 					</ListPage.Item>
 				))}
-			</ListPage.Items>
+			</ul>
 		</ListPage>
 	);
 };
