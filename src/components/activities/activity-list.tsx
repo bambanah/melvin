@@ -89,14 +89,36 @@ function ActivityList({
 												<p className="truncate text-lg font-semibold">
 													{activity.supportItem.description}
 												</p>
-												<div className="flex items-center gap-2 whitespace-nowrap">
-													<FontAwesomeIcon
-														icon={faClock}
-														className="w-4 text-gray-600"
-													/>
-													{dayjs.utc(activity.startTime).format("HH:mm")} -{" "}
-													{dayjs.utc(activity.endTime).format("HH:mm")}
-												</div>
+												{activity.itemDistance ? (
+													<div className="flex items-center gap-2 whitespace-nowrap">
+														<FontAwesomeIcon
+															icon={faCar}
+															className="w-4 text-gray-600"
+														/>
+														{activity.itemDistance}km
+													</div>
+												) : (
+													<div className="flex items-center gap-2 whitespace-nowrap">
+														<FontAwesomeIcon
+															icon={faClock}
+															className="w-4 text-gray-600"
+														/>
+														{dayjs.utc(activity.startTime).format("HH:mm")} -{" "}
+														{dayjs.utc(activity.endTime).format("HH:mm")}
+														<span className="hidden md:inline">
+															(
+															{activity.startTime &&
+																activity.endTime &&
+																formatDuration(
+																	getDuration(
+																		activity.startTime,
+																		activity.endTime
+																	)
+																)}
+															)
+														</span>
+													</div>
+												)}
 											</div>
 											<div className="flex flex-col items-start justify-between gap-2 md:items-end">
 												<div className="flex items-center gap-2 md:flex-row-reverse md:font-semibold">
