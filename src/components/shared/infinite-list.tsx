@@ -42,6 +42,8 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 				className,
 			])}
 		>
+			{(isLoading || isFetching) && <Loading />}
+
 			{isSuccess && (
 				<div className="flex flex-col divide-y">
 					{dataReturned ? (
@@ -49,15 +51,15 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 							<Fragment key={idx}>{children(page[dataKey])}</Fragment>
 						))
 					) : (
-						<span>There&#39;s nothing here...</span>
+						<p className="mx-auto mt-8 text-slate-400">
+							There&#39;s nothing here...
+						</p>
 					)}
 				</div>
 			)}
 
-			{isLoading && <Loading />}
-
 			{!isLoading && !isFetching && dataReturned && (
-				<div>No more items to show</div>
+				<p className="mx-auto mt-8 text-slate-400">You reached the end!</p>
 			)}
 
 			<div ref={loadMoreRef} className=""></div>
