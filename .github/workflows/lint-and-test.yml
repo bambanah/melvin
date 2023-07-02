@@ -2,16 +2,15 @@ name: "Lint and Test"
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
+  push:
+    branches:
+      - main
 
 env:
   DATABASE_URL: mysql://root:password@localhost:3306/melvin
   NEXTAUTH_URL: "http://localhost:3000"
-  NEXTAUTH_SECRET: "7893onvi808u7q1ounbv"
-  GOOGLE_ID: ""
-  GOOGLE_SECRET: ""
-  EMAIL_SERVER: ""
-  EMAIL_FROM: ""
 
 jobs:
   e2e-tests:
