@@ -1,12 +1,13 @@
 {
 	"name": "melvin",
 	"private": true,
+	"packageManager": "pnpm@8.6.5",
 	"scripts": {
 		"prepare": "husky install",
 		"build:1-generate": "prisma generate",
 		"build:2-build": "next build",
 		"build": "run-s build:*",
-		"build-analyze": "cross-env ANALYZE=true yarn build",
+		"build-analyze": "cross-env ANALYZE=true pnpm build",
 		"build-ci": "run-s build:* prisma:push",
 		"db:nuke": "docker-compose down --volumes --remove-orphans",
 		"db:reset": "run-s db:nuke db:up prisma:migrate",

@@ -1,0 +1,89 @@
+name: "Lint and Test"
+
+on:
+  pull_request:
+    branches: [main]
+
+env:
+  DATABASE_URL: mysql://root:password@localhost:3306/melvin
+  NEXTAUTH_URL: "http://localhost:3000"
+  NEXTAUTH_SECRET: "7893onvi808u7q1ounbv"
+  GOOGLE_ID: ""
+  GOOGLE_SECRET: ""
+  EMAIL_SERVER: ""
+  EMAIL_FROM: ""
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up MySQL
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql database: melvin
+          mysql user: root
+          mysql root password: password
+
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install && npx playwright install
+
+      - name: Initialise database
+        run: pnpm db:push
+
+      - name: Run tests
+        run: pnpm test:e2e
+
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "pnpm"
+      - run: pnpm install
+
+      - name: Run tests
+        run: pnpm test:unit
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "pnpm"
+      - run: pnpm install
+
+      - name: Lint
+        run: pnpm lint
