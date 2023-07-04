@@ -57,10 +57,7 @@ export const activityRouter = router({
 				cursor: cursor ? { id: cursor } : undefined,
 				where: {
 					ownerId: ctx.session.user.id,
-					invoiceId:
-						assigned === undefined
-							? invoiceId
-							: getInvoiceIdWhereCondition(assigned),
+					invoiceId: invoiceId ?? getInvoiceIdWhereCondition(assigned),
 					clientId,
 				},
 				orderBy: [

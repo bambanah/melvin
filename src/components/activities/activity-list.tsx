@@ -23,6 +23,7 @@ import { trpc } from "@utils/trpc";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { useState } from "react";
+import { assignedFilterMap, assignedFilters } from "./activity-list.constants";
 
 interface Props {
 	invoiceId?: string;
@@ -40,7 +41,7 @@ function ActivityList({
 	displayCreateButton = true,
 	groupByAssignedStatus = true,
 }: Props) {
-	const [assignedFilter, setAssignedFilter] = useState<boolean>(false);
+	const [assignedFilter, setAssignedFilter] = useState<boolean | undefined>();
 
 	const queryResult = trpc.activity.list.useInfiniteQuery({
 		assigned: groupByAssignedStatus ? assignedFilter : undefined,
@@ -59,15 +60,17 @@ function ActivityList({
 					</Button>
 				) : undefined}
 			</ListPage.Header>
+
 			{groupByAssignedStatus && (
 				<ListFilterRow
-					items={[false, true].map((assigned) => ({
-						onClick: () => setAssignedFilter(assigned),
-						active: assignedFilter === assigned,
-						children: assigned ? "ASSIGNED" : "UNASSIGNED",
+					items={assignedFilters.map((assigned) => ({
+						onClick: () => setAssignedFilter(assignedFilterMap[assigned]),
+						active: assignedFilter === assignedFilterMap[assigned],
+						children: assigned,
 					}))}
 				/>
 			)}
+
 			<InfiniteList queryResult={queryResult} dataKey="activities">
 				{(activities) =>
 					Object.entries(groupActivitiesByDate(activities)).map(

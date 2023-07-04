@@ -1,18 +1,22 @@
 import { InvoiceStatusBadge } from "@atoms/badge";
 import Button from "@atoms/button";
 import LogPayment from "@components/invoices/log-payment-modal";
+import InfiniteList from "@components/shared/infinite-list";
+import ListFilterRow from "@components/shared/list-filter-row";
 import ListPage from "@components/shared/list-page";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { InvoiceStatus } from "@prisma/client";
 import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
 import Link from "next/link";
 import { useState } from "react";
+import {
+	StatusFilter,
+	statusFilterMap,
+	statusFilters,
+} from "./invoice-list.constants";
 
-import InfiniteList from "@components/shared/infinite-list";
-import ListFilterRow from "@components/shared/list-filter-row";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
@@ -26,15 +30,11 @@ export default function InvoiceList({
 	clientId,
 	groupByAssignedStatus = true,
 }: Props) {
-	const [statusFilter, setStatusFilter] = useState<"UNPAID" | "PAID">("UNPAID");
+	const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
 
 	const queryResult = trpc.invoice.list.useInfiniteQuery(
 		{
-			status: groupByAssignedStatus
-				? statusFilter === "UNPAID"
-					? [InvoiceStatus.CREATED, InvoiceStatus.SENT]
-					: [InvoiceStatus.PAID]
-				: undefined,
+			status: statusFilterMap[statusFilter],
 			clientId,
 		},
 		{ getNextPageParam: (lastPage) => lastPage.nextCursor }
@@ -59,7 +59,7 @@ export default function InvoiceList({
 
 			{groupByAssignedStatus && (
 				<ListFilterRow
-					items={(["UNPAID", "PAID"] as const).map((status) => ({
+					items={statusFilters.map((status) => ({
 						onClick: () => setStatusFilter(status),
 						children: status,
 						active: statusFilter === status,
