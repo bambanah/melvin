@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { faCar } from "@fortawesome/free-solid-svg-icons";
 dayjs.extend(utc);
 
 interface Props {
@@ -191,20 +192,27 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 											}}
 											className="w-5 cursor-pointer border bg-white outline-none ring-0"
 										/>
-										<div className="flex flex-col gap-2 pl-1 md:pl-4">
+										<div className="flex w-full flex-col gap-2 pl-1 md:pl-4">
 											<p className="font-semibold">
 												{activity.supportItem.description}
 											</p>
-											<div className="flex justify-between text-sm md:gap-6 md:text-sm">
-												<span className="basis-1/2">
+											<div className="flex justify-start gap-6 text-sm md:text-sm">
+												<span>
 													<FontAwesomeIcon icon={faCalendar} />{" "}
 													{dayjs.utc(activity.date).format("dddd DD/MM")}
 												</span>
-												<span className="basis-1/2">
-													<FontAwesomeIcon icon={faClock} />{" "}
-													{dayjs.utc(activity.startTime).format("h:mma")}-
-													{dayjs.utc(activity.endTime).format("h:mma")}
-												</span>
+												{activity.startTime ? (
+													<span className="">
+														<FontAwesomeIcon icon={faClock} />{" "}
+														{dayjs.utc(activity.startTime).format("h:mma")}-
+														{dayjs.utc(activity.endTime).format("h:mma")}
+													</span>
+												) : (
+													<span className="">
+														<FontAwesomeIcon icon={faCar} />{" "}
+														{activity.itemDistance} km
+													</span>
+												)}
 											</div>
 										</div>
 									</label>
