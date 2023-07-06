@@ -36,8 +36,14 @@ module.exports = {
 			{
 				labelComponents: ["Label"],
 				labelAttributes: ["label"],
-				controlComponents: ["Input", "ClientSelect"],
-				depth: 3,
+				controlComponents: [
+					"Input",
+					"SupportItemSelect",
+					"ClientSelect",
+					"TimeInput",
+					"DatePicker",
+				],
+				depth: 2,
 			},
 		],
 		"unicorn/no-null": "off",

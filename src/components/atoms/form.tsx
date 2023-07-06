@@ -10,7 +10,7 @@ const Form = ({ className, flex = "col", children, ...rest }: Props) => (
 	<form
 		className={
 			className ??
-			classNames([`flex flex-wrap items-stretch gap-6 flex-${flex} w-full`])
+			classNames([`flex flex-wrap items-stretch gap-4 flex-${flex} w-full`])
 		}
 		{...rest}
 	>

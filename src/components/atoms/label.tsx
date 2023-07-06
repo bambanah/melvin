@@ -14,8 +14,9 @@ const Label = ({
 > & { required?: boolean }) => (
 	<label
 		className={classNames([
-			"flex flex-auto flex-col gap-2",
-			required && "[&>span]:after:text-red-600 [&>span]:after:content-['_*']",
+			"flex flex-col gap-2",
+			required &&
+				"[&>p]:ml-1 [&>span]:ml-1 [&>span]:after:text-red-600 [&>span]:after:content-['_*']",
 			className,
 		])}
 		{...rest}

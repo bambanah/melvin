@@ -123,11 +123,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 						<ClientSelect name="clientId" control={control} />
 						<ErrorMessage error={errors.clientId?.message} />
 					</Label>
-					<Label
-						htmlFor="description"
-						className="shrink grow basis-1/2"
-						required
-					>
+					<Label className="shrink grow basis-1/2" required>
 						<span>Date</span>
 						<DatePicker name="date" register={register} error={!!errors.date} />
 						<ErrorMessage error={errors.date?.message} />
@@ -159,11 +155,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					</div>
 				) : (
 					<div className="flex w-full gap-4">
-						<Label
-							htmlFor="startTime"
-							className="w-full shrink grow basis-1/2"
-							required
-						>
+						<Label className="w-full shrink grow basis-1/2" required>
 							<span>Start Time</span>
 							<TimeInput
 								name="startTime"

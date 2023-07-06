@@ -1,6 +1,6 @@
 import { Invoice, InvoiceStatus } from "@prisma/client";
 import { activitySchema } from "@schema/activity-schema";
-import { invoiceSchema } from "@schema/invoice-schema";
+import { InvoiceSchema, invoiceSchema } from "@schema/invoice-schema";
 import { authedProcedure, router } from "@server/api/trpc";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { getTotalCostOfActivities } from "@utils/activity-utils";
@@ -39,6 +39,24 @@ function parseInvoice<T extends Partial<Invoice>>(
 		date: dayjs(invoice.date).format("YYYY-MM-DD"),
 	};
 }
+
+const generateNestedWriteForActivities = (
+	activitiesToCreate: InvoiceSchema["activitiesToCreate"],
+	clientId: string,
+	ownerId: string
+) => ({
+	data: activitiesToCreate.flatMap(({ supportItemId, activities }) =>
+		activities.map((activity) => ({
+			...activity,
+			date: dayjs.utc(activity.date, "YYYY-MM-DD").toDate(),
+			startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
+			endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
+			clientId,
+			supportItemId,
+			ownerId,
+		}))
+	),
+});
 
 export const invoiceRouter = router({
 	list: authedProcedure
@@ -149,6 +167,7 @@ export const invoiceRouter = router({
 		)
 		.mutation(async ({ input, ctx }) => {
 			const { invoice: inputInvoice } = input;
+
 			const invoice = await ctx.prisma.invoice.create({
 				data: {
 					invoiceNo: inputInvoice.invoiceNo,
@@ -160,6 +179,11 @@ export const invoiceRouter = router({
 					ownerId: ctx.session.user.id,
 					activities: {
 						connect: inputInvoice.activityIds?.map((id) => ({ id })),
+						createMany: generateNestedWriteForActivities(
+							inputInvoice.activitiesToCreate,
+							inputInvoice.clientId,
+							ctx.session.user.id
+						),
 					},
 				},
 			});
@@ -193,6 +217,11 @@ export const invoiceRouter = router({
 						: new Date(),
 					activities: {
 						connect: inputInvoice.activityIds?.map((id) => ({ id })),
+						createMany: generateNestedWriteForActivities(
+							inputInvoice.activitiesToCreate,
+							inputInvoice.clientId,
+							ctx.session.user.id
+						),
 					},
 				},
 				select: {

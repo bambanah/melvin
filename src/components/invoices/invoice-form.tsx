@@ -9,7 +9,7 @@ import Input from "@components/forms/input";
 import { faCalendar, faClock } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { invoiceSchema, InvoiceSchema } from "@schema/invoice-schema";
+import { InvoiceSchema, invoiceSchema } from "@schema/invoice-schema";
 import { InvoiceByIdOutput } from "@server/api/routers/invoice-router";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
@@ -17,9 +17,10 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
+import { faCar } from "@fortawesome/free-solid-svg-icons";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { faCar } from "@fortawesome/free-solid-svg-icons";
+import InvoiceActivityCreationForm from "./invoice-activity-creation-form";
 dayjs.extend(utc);
 
 interface Props {
@@ -223,6 +224,13 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 						</div>
 					</div>
 				)}
+
+				<InvoiceActivityCreationForm
+					control={control}
+					register={register}
+					getValues={getValues}
+					setValue={setValue}
+				/>
 
 				<div className="btn-group">
 					<Button
