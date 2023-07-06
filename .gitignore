@@ -14,3 +14,4 @@ e2e/setup/storage-state.json
 analyze/
 
 next-env.d.ts
+.vercel
