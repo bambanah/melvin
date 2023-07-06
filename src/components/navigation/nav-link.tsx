@@ -18,8 +18,8 @@ const Link = ({ href, icon, children, className }: Props) => {
 		<NextLink
 			href={href}
 			className={classNames([
-				active ? "text-indigo-700" : "text-neutral-600",
-				"flex flex-col gap-1 whitespace-nowrap p-2 text-xs hover:text-indigo-700 md:text-base md:font-semibold",
+				active ? "text-orange-700" : "text-neutral-600",
+				"flex flex-col gap-1 whitespace-nowrap p-2 text-xs hover:text-orange-700 md:text-base md:font-semibold",
 				className,
 			])}
 		>

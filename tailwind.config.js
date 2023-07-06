@@ -14,11 +14,11 @@ module.exports = {
 				top: "0 0px 10px 1px rgb(0 0 0 / 0.1)",
 			},
 			colors: {
-				fg: "#272D2D",
-				bg: "#F6F8FF",
+				fg: "#2D2B27",
+				bg: "#FAF8F3",
 				display: "#4F4789",
 			},
 		},
 	},
-	plugins: [],
+	darkMode: "media",
 };

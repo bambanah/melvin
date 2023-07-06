@@ -43,11 +43,11 @@ const ClientList = () => {
 								</Link>
 								{client.invoices.length > 0 && (
 									<>
-										<span className="flex items-center gap-2 text-gray-600">
+										<span className="flex items-center gap-2 text-zinc-600">
 											<FontAwesomeIcon icon={faFileAlt} size="sm" />
 											{client.invoices.length}
 										</span>
-										<div className="flex items-center gap-2 text-gray-600">
+										<div className="flex items-center gap-2 text-zinc-600">
 											<FontAwesomeIcon icon={faClock} size="sm" />
 											<span>
 												{dayjs(client.invoices[0].date).format("DD/MM")} -
@@ -57,7 +57,7 @@ const ClientList = () => {
 									</>
 								)}
 							</div>
-							<div className="flex flex-col items-end gap-2 pt-[0.5rem] text-gray-600">
+							<div className="flex flex-col items-end gap-2 pt-[0.5rem] text-zinc-600">
 								<span className="flex items-center gap-2">
 									{client.number}
 									<FontAwesomeIcon icon={faUser} size="sm" />

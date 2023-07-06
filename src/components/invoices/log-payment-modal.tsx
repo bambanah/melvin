@@ -68,8 +68,8 @@ const LogPayment = () => {
 		return (
 			<label
 				className={classNames([
-					"flex cursor-pointer items-center gap-4 rounded-md border px-4 py-2 hover:border-indigo-500",
-					checked ? "border-indigo-500 bg-indigo-100" : "bg-white",
+					"flex cursor-pointer items-center gap-4 rounded-md border px-4 py-2 hover:border-orange-500",
+					checked ? "border-orange-500 bg-orange-100" : "bg-white",
 				])}
 				htmlFor={invoiceId}
 			>
@@ -147,10 +147,10 @@ const LogPayment = () => {
 
 								<div
 									className={classNames([
-										"flex items-center overflow-hidden rounded-md border bg-white px-3 text-fg shadow-md focus-within:border-indigo-500",
+										"flex items-center overflow-hidden rounded-md border bg-white px-3 text-fg shadow-md focus-within:border-orange-500",
 									])}
 								>
-									<span className="font-light text-gray-500">$</span>
+									<span className="font-light text-zinc-500">$</span>
 									<input
 										type="number"
 										step="0.01"

@@ -30,12 +30,12 @@ function Input<T extends FieldValues>({
 	return (
 		<div
 			className={classNames([
-				"flex items-center overflow-hidden rounded-md border bg-white pl-3 text-fg shadow-md focus-within:border-indigo-500",
+				"flex items-center overflow-hidden rounded-md border bg-white pl-3 text-fg shadow-md focus-within:border-orange-500",
 				error && "border-red-600",
 				className,
 			])}
 		>
-			<span className="text-sm font-light text-gray-500">{prefix}</span>
+			<span className="text-sm font-light text-zinc-500">{prefix}</span>
 			<input
 				{...register(name, rules)}
 				id={id ?? name}
@@ -45,7 +45,7 @@ function Input<T extends FieldValues>({
 				])}
 			/>
 			{suffix && (
-				<span className="mr-3 text-sm font-light text-gray-500">{suffix}</span>
+				<span className="mr-3 text-sm font-light text-zinc-500">{suffix}</span>
 			)}
 		</div>
 	);

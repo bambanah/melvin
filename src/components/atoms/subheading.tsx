@@ -6,7 +6,7 @@ const Subheading = ({
 	...rest
 }: React.HTMLAttributes<HTMLParagraphElement>) => (
 	<p
-		className={classNames(["m-0 -mt-1 text-sm text-gray-700", className])}
+		className={classNames(["m-0 -mt-1 text-sm text-zinc-700", className])}
 		{...rest}
 	>
 		{children}

@@ -32,7 +32,7 @@ const ConfirmDialog = ({
 							{title ?? "Are you sure?"}
 						</Dialog.Title>
 						{description && (
-							<p className="text-sm text-gray-500">{description}</p>
+							<p className="text-sm text-zinc-500">{description}</p>
 						)}
 
 						<div className="flex gap-4 pt-2">

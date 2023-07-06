@@ -123,7 +123,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					className={classNames([
 						"group relative h-full max-h-[12rem] min-h-[12rem] basis-1/2 overflow-hidden md:h-[15rem]",
 						invoice.activities.length > 0 &&
-							"cursor-pointer bg-gray-200 shadow-inner",
+							"cursor-pointer bg-zinc-200 shadow-inner",
 					])}
 				>
 					{invoice.activities.length > 0 ? (
@@ -135,15 +135,15 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 								className="absolute right-0 top-0 flex h-full w-full items-center justify-center"
 								onClick={() => setIsPdfPreviewExpanded(true)}
 							>
-								<div className="flex items-center justify-center gap-2 rounded-full bg-gray-900 bg-opacity-90 px-4 py-3 text-gray-50 transition-transform group-hover:scale-110 md:px-3 md:py-2 md:text-lg">
+								<div className="flex items-center justify-center gap-2 rounded-full bg-zinc-900 bg-opacity-90 px-4 py-3 text-zinc-50 transition-transform group-hover:scale-110 md:px-3 md:py-2 md:text-lg">
 									<FontAwesomeIcon icon={faMagnifyingGlassPlus} />
 									Preview
 								</div>
 							</div>
 						</>
 					) : (
-						<div className="flex h-[12rem] w-full items-center justify-center bg-slate-200 md:h-[15rem]">
-							<p className="text-4xl text-slate-400">DRAFT</p>
+						<div className="flex h-[12rem] w-full items-center justify-center bg-zinc-200 md:h-[15rem]">
+							<p className="text-4xl text-zinc-400">DRAFT</p>
 						</div>
 					)}
 				</div>
@@ -157,7 +157,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 							EDIT
 						</Link>
 					</div>
-					<p className="text-sm text-gray-700">Total</p>
+					<p className="text-sm text-zinc-700">Total</p>
 					<div className="flex items-center justify-between">
 						<p className="text-xl">
 							{getTotalCostOfActivities(invoice.activities).toLocaleString(
@@ -182,7 +182,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 								</Button>
 							)}
 						{invoice.sentAt && (
-							<div className="flex flex-col gap-1 text-slate-600">
+							<div className="flex flex-col gap-1 text-zinc-600">
 								<p>Sent on: {dayjs.utc(invoice.sentAt).format("DD/MM/YYYY")}</p>
 							</div>
 						)}
@@ -197,7 +197,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 						<p>{dayjs.utc(invoice.date).format("DD/MM/YYYY")}</p>
 					</div>
 					<Link
-						className="flex w-full items-center gap-4 p-2 text-left text-fg hover:bg-gray-200"
+						className="flex w-full items-center gap-4 p-2 text-left text-fg hover:bg-zinc-200"
 						href={`/clients/${invoice.client.id}`}
 					>
 						<FontAwesomeIcon icon={faUser} className="text-fg" />
@@ -218,7 +218,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 						<>
 							{invoice.paidAt && (
 								<div>
-									<span className="text-slate-600">
+									<span className="text-zinc-600">
 										Received: {dayjs.utc(invoice.paidAt).format("DD/MM/YYYY")}
 									</span>
 								</div>

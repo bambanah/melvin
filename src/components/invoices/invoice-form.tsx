@@ -89,7 +89,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 
 	return (
 		<div className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-3">
-			<Heading className="border-b pb-4">
+			<Heading className="pb-4">
 				{existingInvoice
 					? `Updating ${existingInvoice.invoiceNo}`
 					: "Create Invoice"}
@@ -160,9 +160,9 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 									<label
 										key={activity.id}
 										className={classNames([
-											"flex cursor-pointer gap-2 rounded-md border px-2 py-3 shadow-md transition-shadow hover:border-indigo-500 md:p-4",
+											"flex cursor-pointer gap-2 rounded-md border px-2 py-3 shadow-md transition-shadow hover:border-orange-500 md:p-4",
 											getValues("activityIds")?.some((c) => c === activity.id)
-												? "border-indigo-500 bg-indigo-100"
+												? "border-orange-300 bg-orange-50"
 												: "bg-white",
 										])}
 										htmlFor={activity.id}

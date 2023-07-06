@@ -16,7 +16,7 @@ const Navbar = () => {
 	const session = useSession();
 
 	return (
-		<div className="fixed bottom-0 flex h-14 w-full items-center gap-8 border-t bg-bg shadow-top md:relative md:mx-auto md:h-20 md:max-w-7xl md:px-10 md:shadow-none">
+		<div className="fixed bottom-0 flex h-14 w-full items-center gap-8 border-t bg-inherit shadow-top md:relative md:mx-auto md:h-20 md:max-w-7xl md:border-none md:px-10 md:shadow-none">
 			<Link href="/invoices" className="hidden md:inline-block">
 				<Logo>melvin</Logo>
 			</Link>
@@ -34,8 +34,8 @@ const Navbar = () => {
 					Items
 				</NavLink>
 				<Link
-					href="/activities/create"
-					className="order-3 mb-2 flex h-14 w-14 items-center justify-center gap-2 rounded-full bg-gray-900 text-2xl text-gray-50 shadow-lg hover:bg-gray-800 md:order-6 md:ml-auto md:h-auto md:w-auto md:rounded-md md:px-3 md:py-1.5 md:text-sm md:hover:text-gray-50"
+					href="/invoices/create"
+					className="order-3 mb-2 flex h-14 w-14 items-center justify-center gap-2 rounded-full bg-zinc-900 text-2xl text-zinc-50 shadow-lg hover:bg-zinc-800 md:order-6 md:ml-auto md:h-auto md:w-auto md:rounded-md md:px-3 md:py-1.5 md:text-sm md:hover:text-zinc-50"
 				>
 					<FontAwesomeIcon icon={faPenToSquare} />
 					<span className="hidden md:inline">LOG</span>

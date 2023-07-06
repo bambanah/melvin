@@ -76,7 +76,7 @@ function ActivityList({
 					Object.entries(groupActivitiesByDate(activities)).map(
 						([date, groupedActivities]) => (
 							<div key={date} className="mb-4 overflow-hidden">
-								<div className="flex w-full items-center gap-2 border-b px-4 py-2 text-left">
+								<div className="flex w-full items-center gap-2 px-4 py-2 text-left">
 									{dayjs(date).format("dddd D MMM.")}
 									{isDateHoliday(date) && <Badge variant="INFO">Holiday</Badge>}
 								</div>
@@ -86,7 +86,7 @@ function ActivityList({
 										<ListPage.Item
 											href={`/activities/${activity.id}`}
 											key={activity.id}
-											className="flex-col md:flex-row"
+											className="flex-col border-dashed md:flex-row"
 										>
 											<div className="flex flex-col gap-2 overflow-hidden">
 												<p className="truncate text-lg font-semibold">
@@ -96,7 +96,7 @@ function ActivityList({
 													<div className="flex items-center gap-2 whitespace-nowrap">
 														<FontAwesomeIcon
 															icon={faCar}
-															className="w-4 text-gray-600"
+															className="w-4 text-zinc-600"
 														/>
 														{activity.itemDistance}km
 													</div>
@@ -104,7 +104,7 @@ function ActivityList({
 													<div className="flex items-center gap-2 whitespace-nowrap">
 														<FontAwesomeIcon
 															icon={faClock}
-															className="w-4 text-gray-600"
+															className="w-4 text-zinc-600"
 														/>
 														{dayjs.utc(activity.startTime).format("HH:mm")} -{" "}
 														{dayjs.utc(activity.endTime).format("HH:mm")}
@@ -127,14 +127,14 @@ function ActivityList({
 												<div className="flex items-center gap-2 md:flex-row-reverse md:font-semibold">
 													<FontAwesomeIcon
 														icon={faUser}
-														className="w-4 text-gray-600"
+														className="w-4 text-zinc-600"
 													/>
 													<span>{activity.client?.name}</span>
 												</div>
 												<div className="flex items-center gap-2 md:flex-row-reverse">
 													<FontAwesomeIcon
 														icon={faMoneyBillWave}
-														className="w-4 text-gray-600"
+														className="w-4 text-zinc-600"
 													/>
 													<span>
 														{getTotalCostOfActivities([

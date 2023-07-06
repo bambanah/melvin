@@ -9,7 +9,7 @@ const DropdownButton = ({
 }: HTMLAttributes<HTMLButtonElement>) => (
 	<Menu.Button
 		className={classNames([
-			"py-2 px-4 text-xl hover:bg-neutral-100",
+			"px-4 py-2 text-xl hover:bg-neutral-100",
 			className,
 		])}
 		{...rest}
@@ -19,7 +19,7 @@ const DropdownButton = ({
 );
 
 const DropdownItems = ({ children }: { children: ReactNode }) => (
-	<Menu.Items className="absolute right-0 flex w-40 origin-top-right flex-col bg-slate-50 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+	<Menu.Items className="absolute right-0 flex w-40 origin-top-right flex-col bg-zinc-50 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 		{children}
 	</Menu.Items>
 );

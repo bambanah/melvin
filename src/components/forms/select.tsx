@@ -30,10 +30,10 @@ function Select<T extends FieldValues>({ options, ...rest }: SelectProps<T>) {
 			onChange={(val) => onChange(val?.value as PathValue<T, Path<T>>)}
 			classNames={{
 				control: () =>
-					"p-3 border w-full bg-white shadow-md rounded-md focus-within:border-indigo-500 outline-none cursor-pointer",
+					"p-3 border w-full bg-white shadow-md rounded-md focus-within:border-orange-500 outline-none cursor-pointer",
 				option: (state) =>
 					state.isFocused
-						? "bg-indigo-200 rounded-none p-2 last:rounded-b-md"
+						? "bg-orange-200 rounded-none p-2 last:rounded-b-md"
 						: "p-2",
 				menu: () => "rounded-none shadow-md rounded-b-md bg-white",
 			}}

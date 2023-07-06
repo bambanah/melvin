@@ -16,7 +16,7 @@ const ListFilterRow = ({ items }: Props) => {
 						className={classNames([
 							"basis-1/2 border-b px-4 py-2 text-center transition-all",
 							className,
-							active && "border-indigo-700 text-indigo-700",
+							active && "border-orange-700 text-orange-700",
 						])}
 						{...rest}
 					/>

@@ -5655,7 +5655,7 @@ packages:
   /is-array-buffer@3.0.2:
     resolution:
       {
-        integrity: sha512-y+FyyR/w8vfIRq4eQcM1EYgSTnmHXPqaF+IgzgraytCFq5Xh8lllDVmAZolPJiZttZLeFSINPYMaEJ7/vWUa1w==,
+        integrity: sha512-y+FyyR/w8vfIRq4eQcM1EYgSTnmHXPqaF+IgzzinctCFq5Xh8lllDVmAZolPJiZttZLeFSINPYMaEJ7/vWUa1w==,
       }
     dependencies:
       call-bind: 1.0.2

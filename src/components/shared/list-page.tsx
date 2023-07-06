@@ -16,7 +16,7 @@ const Item = ({
 	LinkProps) => (
 	<Link
 		className={classNames([
-			"flex w-full justify-between gap-2 p-4 text-sm text-neutral-900 hover:bg-zinc-100",
+			"flex w-full justify-between gap-2 p-4 text-sm text-neutral-900 transition-colors duration-75 hover:bg-orange-100",
 			className,
 		])}
 		{...rest}

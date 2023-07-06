@@ -4,7 +4,7 @@ import { InvoiceStatus } from "@prisma/client";
 type Variant = "DEFAULT" | "INFO" | "SUCCESS" | "WARNING" | "ERROR";
 
 const variantStyles: Record<Variant, string> = {
-	DEFAULT: "bg-slate-200 text-slate-600",
+	DEFAULT: "bg-zinc-200 text-zinc-600",
 	INFO: "bg-blue-100 text-blue-500",
 	SUCCESS: "bg-green-200 text-green-600",
 	WARNING: "bg-yellow-100 text-yellow-600",
