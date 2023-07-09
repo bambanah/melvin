@@ -146,8 +146,10 @@ model SupportItem {
   createdAt DateTime @default(now()) @map("created")
   updatedAt DateTime @default(now()) @updatedAt
 
-  description   String
-  rateType      RateType @default(HOUR)
+  description String
+  rateType    RateType @default(HOUR)
+  isGroup     Boolean?
+
   weekdayCode   String
   weeknightCode String?
   saturdayCode  String?
