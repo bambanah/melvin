@@ -17,15 +17,12 @@ const Navbar = () => {
 
 	return (
 		<div className="fixed bottom-0 flex h-14 w-full items-center gap-8 border-t bg-inherit shadow-top md:relative md:mx-auto md:h-20 md:max-w-7xl md:border-none md:px-10 md:shadow-none">
-			<Link href="/invoices" className="hidden md:inline-block">
-				<Logo>melvin</Logo>
-			</Link>
 			<div className="flex w-full items-center justify-evenly md:mt-2 md:flex-row md:content-end md:justify-start md:gap-3 md:p-0">
-				<NavLink href="/clients" icon={faUsers} className="order-1">
-					Clients
-				</NavLink>
-				<NavLink href="/invoices" icon={faFile} className="order-2">
+				<NavLink href="/invoices" icon={faFile} className="order-1">
 					Invoices
+				</NavLink>
+				<NavLink href="/clients" icon={faUsers} className="order-2">
+					Clients
 				</NavLink>
 				<NavLink href="/activities" icon={faRunning} className="order-4">
 					Activities
