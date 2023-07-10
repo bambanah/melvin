@@ -83,15 +83,16 @@ function ActivityList({
 
 								<div className="flex flex-col divide-y">
 									{groupedActivities.map((activity) => (
-										<ListPage.Item
-											href={`/activities/${activity.id}`}
+										<div
 											key={activity.id}
-											className="flex-col border-dashed md:flex-row"
+											className="flex w-full flex-col justify-between border-dashed p-4 md:flex-row"
 										>
 											<div className="flex flex-col gap-2 overflow-hidden">
-												<p className="truncate text-lg font-semibold">
-													{activity.supportItem.description}
-												</p>
+												<Link href={`/activities/${activity.id}`}>
+													<p className="truncate text-lg font-semibold">
+														{activity.supportItem.description}
+													</p>
+												</Link>
 												{activity.itemDistance ? (
 													<div className="flex items-center gap-2 whitespace-nowrap">
 														<FontAwesomeIcon
@@ -124,13 +125,17 @@ function ActivityList({
 												)}
 											</div>
 											<div className="flex flex-col items-start justify-between gap-2 md:items-end">
-												<div className="flex items-center gap-2 md:flex-row-reverse md:font-semibold">
-													<FontAwesomeIcon
-														icon={faUser}
-														className="w-4 text-zinc-600"
-													/>
-													<span>{activity.client?.name}</span>
-												</div>
+												{activity.client && (
+													<Link href={`/clients${activity.client.id}`}>
+														<div className="flex items-center gap-2 md:flex-row-reverse md:font-semibold">
+															<FontAwesomeIcon
+																icon={faUser}
+																className="w-4 text-zinc-600"
+															/>
+															<span>{activity.client.name}</span>
+														</div>
+													</Link>
+												)}
 												<div className="flex items-center gap-2 md:flex-row-reverse">
 													<FontAwesomeIcon
 														icon={faMoneyBillWave}
@@ -146,7 +151,7 @@ function ActivityList({
 													</span>
 												</div>
 											</div>
-										</ListPage.Item>
+										</div>
 									))}
 								</div>
 							</div>
