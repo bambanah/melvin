@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { supportItemSchema } from "@schema/support-item-schema";
 import { authedProcedure, router } from "@server/api/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
@@ -8,6 +9,7 @@ const defaultSupportItemSelect = {
 	id: true,
 	description: true,
 	rateType: true,
+	isGroup: true,
 	weekdayCode: true,
 	weekdayRate: true,
 	weeknightCode: true,
@@ -16,7 +18,7 @@ const defaultSupportItemSelect = {
 	saturdayRate: true,
 	sundayCode: true,
 	sundayRate: true,
-};
+} as const satisfies Prisma.SupportItemSelect;
 
 export const supportItemRouter = router({
 	list: authedProcedure
@@ -81,7 +83,10 @@ export const supportItemRouter = router({
 		)
 		.mutation(async ({ ctx, input }) => {
 			const activity = await ctx.prisma.supportItem.create({
-				data: { ...input.supportItem, ownerId: ctx.session.user.id },
+				data: {
+					...input.supportItem,
+					ownerId: ctx.session.user.id,
+				},
 			});
 
 			if (!activity) {

@@ -3,6 +3,7 @@ import Form from "@atoms/form";
 import Heading from "@atoms/heading";
 import Label from "@atoms/label";
 import Subheading from "@atoms/subheading";
+import Checkbox from "@components/forms/checkbox";
 import ErrorMessage from "@components/forms/error-message";
 import Input from "@components/forms/input";
 import Select from "@components/forms/select";
@@ -39,6 +40,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 		defaultValues: {
 			description: existingSupportItem?.description ?? "",
 			rateType: existingSupportItem?.rateType ?? RateType.HOUR,
+			isGroup: existingSupportItem?.isGroup ?? false,
 			weekdayCode: existingSupportItem?.weekdayCode ?? "",
 			weekdayRate: Number(existingSupportItem?.weekdayRate) || undefined,
 			weeknightCode: existingSupportItem?.weeknightCode ?? "",
@@ -105,7 +107,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 							<ErrorMessage error={errors.description?.message} />
 						</Label>
 
-						<Label htmlFor="rateType" required>
+						<Label required>
 							<span>Rate Type</span>
 							<Subheading>This will almost always be per hour</Subheading>
 							<Select
@@ -119,6 +121,9 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 							<ErrorMessage error={errors.rateType?.message} />
 						</Label>
 					</div>
+					<Checkbox name="isGroup" register={register}>
+						Is this a group activity?
+					</Checkbox>
 				</div>
 
 				<div className="flex flex-col gap-4">
