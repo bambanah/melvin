@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { supportItemSchema } from "@schema/support-item-schema";
 import { authedProcedure, router } from "@server/api/trpc";
-import { inferRouterOutputs, TRPCError } from "@trpc/server";
+import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { baseListQueryInput } from "@utils/trpc";
 import { z } from "zod";
 
@@ -53,7 +53,7 @@ export const supportItemRouter = router({
 	byId: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			const activity = await ctx.prisma.supportItem.findFirst({
+			const supportItem = await ctx.prisma.supportItem.findFirst({
 				select: {
 					...defaultSupportItemSelect,
 					weeknightCode: true,
@@ -69,11 +69,11 @@ export const supportItemRouter = router({
 				},
 			});
 
-			if (!activity) {
+			if (!supportItem) {
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			return activity;
+			return supportItem;
 		}),
 	create: authedProcedure
 		.input(
@@ -82,18 +82,21 @@ export const supportItemRouter = router({
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
-			const activity = await ctx.prisma.supportItem.create({
+			const supportItem = await ctx.prisma.supportItem.create({
 				data: {
 					...input.supportItem,
 					ownerId: ctx.session.user.id,
 				},
 			});
 
-			if (!activity) {
-				throw new TRPCError({ code: "NOT_FOUND" });
+			if (!supportItem) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Couldn't create support item",
+				});
 			}
 
-			return activity;
+			return supportItem;
 		}),
 	update: authedProcedure
 		.input(
@@ -102,33 +105,36 @@ export const supportItemRouter = router({
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
-			const activity = await ctx.prisma.supportItem.update({
+			const supportItem = await ctx.prisma.supportItem.update({
 				where: {
 					id: input.supportItem.id,
 				},
 				data: input.supportItem,
 			});
 
-			if (!activity) {
-				throw new TRPCError({ code: "NOT_FOUND" });
+			if (!supportItem) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Couldn't update support item",
+				});
 			}
 
-			return { activity };
+			return supportItem;
 		}),
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
-			const activity = await ctx.prisma.supportItem.delete({
+			const supportItem = await ctx.prisma.supportItem.delete({
 				where: {
 					id: input.id,
 				},
 			});
 
-			if (!activity) {
+			if (!supportItem) {
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			return {};
+			return "Deleted";
 		}),
 });
 
