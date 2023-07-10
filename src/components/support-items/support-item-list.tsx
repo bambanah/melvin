@@ -1,11 +1,7 @@
 import Button from "@atoms/button";
 import InfiniteList from "@components/shared/infinite-list";
 import ListPage from "@components/shared/list-page";
-import {
-	faPeopleGroup,
-	faPlus,
-	faUserGroup,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Prisma, RateType } from "@prisma/client";
 import { trpc } from "@utils/trpc";
