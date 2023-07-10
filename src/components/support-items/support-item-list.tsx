@@ -1,7 +1,11 @@
 import Button from "@atoms/button";
 import InfiniteList from "@components/shared/infinite-list";
 import ListPage from "@components/shared/list-page";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+	faPeopleGroup,
+	faPlus,
+	faUserGroup,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Prisma, RateType } from "@prisma/client";
 import { trpc } from "@utils/trpc";
@@ -52,40 +56,45 @@ function SupportItemList() {
 			<InfiniteList queryResult={queryResult} dataKey="supportItems">
 				{(supportItems) =>
 					supportItems.map((supportItem) => (
-						<ListPage.Item
-							key={supportItem.id}
-							href={`/support-items/${supportItem.id}`}
-						>
-							<div className="flex flex-col gap-4">
+						<div key={supportItem.id} className="flex flex-col gap-4 p-4">
+							<Link href={`/support-items/${supportItem.id}`}>
 								<p className="font-semibold sm:text-lg">
-									{supportItem.description}
+									{supportItem.description}{" "}
+									{supportItem.isGroup && (
+										<FontAwesomeIcon
+											icon={faUserGroup}
+											size="2xs"
+											className="ml-2"
+											title="Group Activity"
+										/>
+									)}
 								</p>
-								<ItemCode
-									descriptor="Base"
-									code={supportItem.weekdayCode}
-									rate={supportItem.weekdayRate}
-									rateType={supportItem.rateType}
-								/>
-								<ItemCode
-									descriptor="Weeknight"
-									code={supportItem.weeknightCode}
-									rate={supportItem.weeknightRate}
-									rateType={supportItem.rateType}
-								/>
-								<ItemCode
-									descriptor="Saturday"
-									code={supportItem.saturdayCode}
-									rate={supportItem.saturdayRate}
-									rateType={supportItem.rateType}
-								/>
-								<ItemCode
-									descriptor="Sunday"
-									code={supportItem.sundayCode}
-									rate={supportItem.sundayRate}
-									rateType={supportItem.rateType}
-								/>
-							</div>
-						</ListPage.Item>
+							</Link>
+							<ItemCode
+								descriptor="Base"
+								code={supportItem.weekdayCode}
+								rate={supportItem.weekdayRate}
+								rateType={supportItem.rateType}
+							/>
+							<ItemCode
+								descriptor="Weeknight"
+								code={supportItem.weeknightCode}
+								rate={supportItem.weeknightRate}
+								rateType={supportItem.rateType}
+							/>
+							<ItemCode
+								descriptor="Saturday"
+								code={supportItem.saturdayCode}
+								rate={supportItem.saturdayRate}
+								rateType={supportItem.rateType}
+							/>
+							<ItemCode
+								descriptor="Sunday"
+								code={supportItem.sundayCode}
+								rate={supportItem.sundayRate}
+								rateType={supportItem.rateType}
+							/>
+						</div>
 					))
 				}
 			</InfiniteList>
