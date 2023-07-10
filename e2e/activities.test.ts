@@ -45,7 +45,10 @@ test("Can create, update, and delete activities", async ({ page }) => {
 	await page.getByRole("link", { name: "Activities" }).click();
 	await expect(page).toHaveURL("/activities");
 
-	await page.getByRole("link").filter({ hasText: "13:25" }).click();
+	await page
+		.getByRole("link")
+		.filter({ hasText: supportItem.description })
+		.click();
 
 	await page.locator("button#options-dropdown").click();
 	await page.locator("button").filter({ hasText: "Delete" }).click();
