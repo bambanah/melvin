@@ -38,6 +38,8 @@ module.exports = {
 				labelAttributes: ["label"],
 				controlComponents: [
 					"Input",
+					"Select",
+					"Checkbox",
 					"SupportItemSelect",
 					"ClientSelect",
 					"TimeInput",
