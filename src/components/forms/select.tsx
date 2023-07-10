@@ -11,7 +11,7 @@ interface SelectProps<T extends FieldValues>
 	extends Omit<UseControllerProps<T>, "defaultValue"> {
 	options: {
 		value: string;
-		label: string;
+		label: string | JSX.Element;
 	}[];
 }
 
@@ -33,9 +33,10 @@ function Select<T extends FieldValues>({ options, ...rest }: SelectProps<T>) {
 					"p-3 border w-full bg-white shadow-md rounded-md focus-within:border-orange-500 outline-none cursor-pointer",
 				option: (state) =>
 					state.isFocused
-						? "bg-orange-200 rounded-none p-2 last:rounded-b-md"
-						: "p-2",
-				menu: () => "rounded-none shadow-md rounded-b-md bg-white",
+						? "bg-orange-200 rounded-none p-2 last:rounded-b-md border-t"
+						: "p-2 border-t",
+				menu: () =>
+					"rounded-none shadow-lg border border-t-none rounded-b-md bg-white",
 			}}
 			styles={{
 				control: (styles) => ({

@@ -1,7 +1,9 @@
 import Select from "@components/forms/select";
+import { faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SupportItemListOutput } from "@server/api/routers/support-item-router";
 import { trpc } from "@utils/trpc";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Control, FieldValues, Path } from "react-hook-form";
 
 interface Props<T extends FieldValues> {
@@ -17,24 +19,36 @@ const SupportItemSelect = <T extends FieldValues>({
 	control,
 	setSupportItems,
 }: Props<T>) => {
+	const [options, setOptions] = useState<
+		{ label: JSX.Element; value: string }[]
+	>([]);
 	const { data: { supportItems } = {} } = trpc.supportItem.list.useQuery({});
 
-	if (!supportItems) {
-		return (
-			<Select
-				options={[{ label: "Loading...", value: "" }]}
-				name={name}
-				control={control}
-			/>
-		);
-	}
+	useEffect(() => {
+		if (supportItems) {
+			setSupportItems && setSupportItems(supportItems);
 
-	setSupportItems && setSupportItems(supportItems);
-
-	const options = supportItems.map((supportItem) => ({
-		label: supportItem.description,
-		value: supportItem.id,
-	}));
+			setOptions(
+				supportItems.map((supportItem) => ({
+					label: (
+						<span className="flex items-center gap-2">
+							{supportItem.description}
+							{supportItem.isGroup ? (
+								<FontAwesomeIcon
+									icon={faUserGroup}
+									size="xs"
+									className="text-zinc-600"
+								/>
+							) : (
+								""
+							)}
+						</span>
+					),
+					value: supportItem.id,
+				}))
+			);
+		}
+	}, [setSupportItems, supportItems]);
 
 	return <Select options={options} name={name} control={control} />;
 };
