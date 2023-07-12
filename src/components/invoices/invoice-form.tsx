@@ -6,22 +6,19 @@ import Subheading from "@atoms/subheading";
 import ClientSelect from "@components/forms/client-select";
 import ErrorMessage from "@components/forms/error-message";
 import Input from "@components/forms/input";
-import { faCalendar, faClock } from "@fortawesome/free-regular-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InvoiceSchema, invoiceSchema } from "@schema/invoice-schema";
 import { InvoiceByIdOutput } from "@server/api/routers/invoice-router";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-
-import { faCar } from "@fortawesome/free-solid-svg-icons";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import InvoiceActivityCreationForm from "./invoice-activity-creation-form";
 import UnassignedActivities from "./unnassigned-activities";
+
 dayjs.extend(utc);
 
 interface Props {
