@@ -41,7 +41,7 @@ export const clientRouter = router({
 				where: { ownerId: ctx.session.user.id },
 				cursor: cursor ? { id: cursor } : undefined,
 				orderBy: {
-					createdAt: "asc",
+					createdAt: "desc",
 				},
 			});
 
@@ -52,7 +52,7 @@ export const clientRouter = router({
 			}
 
 			return {
-				clients: clients.reverse(),
+				clients,
 				nextCursor,
 			};
 		}),
@@ -99,7 +99,7 @@ export const clientRouter = router({
 							invoiceNo: true,
 						},
 						orderBy: {
-							createdAt: "asc",
+							createdAt: "desc",
 						},
 					},
 					invoiceNumberPrefix: true,
@@ -113,12 +113,12 @@ export const clientRouter = router({
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			const nextInvoiceNo = getNextInvoiceNo(
+			const { nextInvoiceNo, latestInvoiceNo } = getNextInvoiceNo(
 				client.invoices.map((i) => i.invoiceNo),
 				client.invoiceNumberPrefix
 			);
 
-			return nextInvoiceNo;
+			return { nextInvoiceNo, latestInvoiceNo };
 		}),
 	latestInvoice: authedProcedure
 		.input(z.object({ clientId: z.string() }))

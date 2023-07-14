@@ -35,7 +35,7 @@ export const supportItemRouter = router({
 				},
 				cursor: cursor ? { id: cursor } : undefined,
 				orderBy: {
-					createdAt: "asc",
+					createdAt: "desc",
 				},
 			});
 
@@ -46,7 +46,7 @@ export const supportItemRouter = router({
 			}
 
 			return {
-				supportItems: supportItems.reverse(),
+				supportItems,
 				nextCursor,
 			};
 		}),

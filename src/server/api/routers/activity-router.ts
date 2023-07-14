@@ -62,10 +62,10 @@ export const activityRouter = router({
 				},
 				orderBy: [
 					{
-						date: "asc",
+						date: "desc",
 					},
 					{
-						startTime: "asc",
+						startTime: "desc",
 					},
 				],
 			});
@@ -77,7 +77,7 @@ export const activityRouter = router({
 			}
 
 			return {
-				activities: activities.reverse(),
+				activities,
 				nextCursor,
 			};
 		}),

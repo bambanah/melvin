@@ -67,7 +67,7 @@ export const invoiceRouter = router({
 			})
 		)
 		.query(async ({ ctx, input }) => {
-			const limit = input.limit ?? 50;
+			const limit = input.limit ?? 5;
 			const { cursor, status, clientId } = input;
 
 			const invoices = await ctx.prisma.invoice.findMany({
@@ -86,10 +86,10 @@ export const invoiceRouter = router({
 				cursor: cursor ? { id: cursor } : undefined,
 				orderBy: [
 					{
-						status: "desc",
+						status: "asc",
 					},
 					{
-						updatedAt: "asc",
+						createdAt: "desc",
 					},
 				],
 			});
@@ -101,7 +101,7 @@ export const invoiceRouter = router({
 			}
 
 			return {
-				invoices: invoices.map((invoice) => parseInvoice(invoice)).reverse(),
+				invoices: invoices.map((invoice) => parseInvoice(invoice)),
 				nextCursor,
 			};
 		}),
