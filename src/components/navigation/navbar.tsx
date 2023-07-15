@@ -1,4 +1,3 @@
-import Logo from "@atoms/logo";
 import NavAuth from "@components/auth/nav-auth";
 import NavLink from "@components/navigation/nav-link";
 import {
