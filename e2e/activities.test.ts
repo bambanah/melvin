@@ -6,13 +6,13 @@ import {
 } from "./test-utils";
 
 test("Can create, update, and delete activities", async ({ page }) => {
-	await page.goto("/");
+	await page.goto("/dashboard");
 
 	const client = await createRandomClient(page);
 	const supportItem = await createRandomSupportItem(page);
 
 	await page.getByRole("link", { name: "Activities" }).nth(0).click();
-	await expect(page).toHaveURL("/activities");
+	await expect(page).toHaveURL("/dashboard/activities");
 	await page.getByRole("link", { name: "Add" }).click();
 
 	await page.locator(".react-select").nth(0).click();
@@ -27,7 +27,7 @@ test("Can create, update, and delete activities", async ({ page }) => {
 
 	await waitForAlert(page, "activity created");
 
-	await expect(page).toHaveURL("/activities");
+	await expect(page).toHaveURL("/dashboard/activities");
 
 	await page
 		.getByRole("link")
@@ -43,7 +43,7 @@ test("Can create, update, and delete activities", async ({ page }) => {
 	await waitForAlert(page, "activity updated");
 
 	await page.getByRole("link", { name: "Activities" }).click();
-	await expect(page).toHaveURL("/activities");
+	await expect(page).toHaveURL("/dashboard/activities");
 
 	await page
 		.getByRole("link")

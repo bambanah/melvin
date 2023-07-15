@@ -92,7 +92,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					trpcContext.activity.list.invalidate();
 
 					toast.success("Activity created");
-					router.push("/activities");
+					router.push("/dashboard/activities");
 				});
 		}
 	};

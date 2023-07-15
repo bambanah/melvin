@@ -18,9 +18,9 @@ interface LoginPageProps {
 const LoginPage = ({ providers }: LoginPageProps) => {
 	const router = useRouter();
 
-	let callbackUrl = String(router.query.callbackUrl ?? "/");
+	let callbackUrl = String(router.query.callbackUrl ?? "/dashboard");
 
-	if (router.query.callbackUrl === "/login") callbackUrl = "/";
+	if (router.query.callbackUrl === "/login") callbackUrl = "/dashboard";
 
 	return (
 		<AuthModal>

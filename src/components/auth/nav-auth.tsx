@@ -39,7 +39,7 @@ const NavAuth = ({ user }: NavAuthProps) => {
 					<div className="flex flex-col">
 						<Menu.Item>
 							<Link
-								href="/account"
+								href="/dashboard/account"
 								className="w-full overflow-clip text-ellipsis p-2 text-zinc-900"
 							>
 								<p className="text-sm">Signed in as</p>
@@ -52,7 +52,7 @@ const NavAuth = ({ user }: NavAuthProps) => {
 							{({ active }) => (
 								<Button
 									as={Link}
-									href="/account/edit"
+									href="/dashboard/account/edit"
 									className={classNames(["btn-base", active && "btn-raised"])}
 								>
 									Manage Account

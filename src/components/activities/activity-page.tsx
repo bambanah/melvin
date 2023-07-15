@@ -38,7 +38,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 				.then(() => {
 					trpcContext.activity.list.invalidate();
 					toast.success("Activity deleted");
-					router.push("/activities");
+					router.push("/dashboard/activities");
 				})
 				.catch(() => {
 					toast.error("An error occured. Please refresh and try again.");
@@ -80,7 +80,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 						<Dropdown.Items>
 							<Dropdown.Item>
 								<Link
-									href={`/activities/${activity.id}/edit`}
+									href={`/dashboard/activities/${activity.id}/edit`}
 									className="px-3 py-4 text-neutral-900 hover:bg-neutral-100 sm:py-2"
 								>
 									Edit
@@ -123,7 +123,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 
 				<div className="flex items-center gap-2">
 					<FontAwesomeIcon icon={faUser} />
-					<Link href={`/clients/${activity.client?.id}`}>
+					<Link href={`/dashboard/clients/${activity.client?.id}`}>
 						{activity.client?.name}
 					</Link>
 				</div>
@@ -131,7 +131,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 				{activity.invoice && (
 					<div className="flex items-center gap-2">
 						<FontAwesomeIcon icon={faFileAlt} />
-						<Link href={`/clients/${activity.client?.id}`}>
+						<Link href={`/dashboard/clients/${activity.client?.id}`}>
 							{activity.invoice.invoiceNo}
 						</Link>
 					</div>

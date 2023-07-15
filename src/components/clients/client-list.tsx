@@ -25,7 +25,7 @@ const ClientList = () => {
 			<ListPage.Header>
 				<h2 className="mr-auto text-2xl font-bold">Clients</h2>
 
-				<Button as={Link} href="/clients/create" variant="primary">
+				<Button as={Link} href="/dashboard/clients/create" variant="primary">
 					<FontAwesomeIcon icon={faPlus} />
 					<span>Add</span>
 				</Button>
@@ -38,7 +38,7 @@ const ClientList = () => {
 							className="flex w-full justify-between gap-2 p-4 text-sm"
 						>
 							<div className="flex min-h-[2.5rem] flex-col gap-2">
-								<Link href={`/clients/${client.id}`}>
+								<Link href={`/dashboard/clients/${client.id}`}>
 									<h3 className="font-semibold sm:text-lg">{client.name}</h3>
 								</Link>
 								{client.invoices.length > 0 && (
