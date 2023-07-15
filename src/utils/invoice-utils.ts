@@ -51,7 +51,6 @@ export const getHighestInvoiceNo = (
 		return undefined;
 	}
 
-	// eslint-disable-next-line unicorn/no-array-reduce
 	const highest = invoiceNumbers.reduce((previous, current) => {
 		if (getNumber(current) === null) return previous;
 

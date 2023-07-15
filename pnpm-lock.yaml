@@ -181,9 +181,6 @@ devDependencies:
   eslint-plugin-testing-library:
     specifier: ^5.11.0
     version: 5.11.0(eslint@8.44.0)(typescript@5.1.6)
-  eslint-plugin-unicorn:
-    specifier: ^47.0.0
-    version: 47.0.0(eslint@8.44.0)
   husky:
     specifier: ^8.0.3
     version: 8.0.3
@@ -3120,14 +3117,6 @@ packages:
       }
     dev: true
 
-  /builtin-modules@3.3.0:
-    resolution:
-      {
-        integrity: sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==,
-      }
-    engines: { node: ">=6" }
-    dev: true
-
   /bundle-name@3.0.0:
     resolution:
       {
@@ -3331,16 +3320,6 @@ packages:
         integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==,
       }
     dev: false
-
-  /clean-regexp@1.0.0:
-    resolution:
-      {
-        integrity: sha512-GfisEZEJvzKrmGWkvfhgzcz/BllN1USeqD2V6tg14OAOgaCD2Z/PUEuxnAZ/nPvmaHRG7a8y77p1T/IRQ4D1Hw==,
-      }
-    engines: { node: ">=4" }
-    dependencies:
-      escape-string-regexp: 1.0.5
-    dev: true
 
   /client-only@0.0.1:
     resolution:
@@ -4499,34 +4478,6 @@ packages:
       - typescript
     dev: true
 
-  /eslint-plugin-unicorn@47.0.0(eslint@8.44.0):
-    resolution:
-      {
-        integrity: sha512-ivB3bKk7fDIeWOUmmMm9o3Ax9zbMz1Bsza/R2qm46ufw4T6VBFBaJIR1uN3pCKSmSXm8/9Nri8V+iUut1NhQGA==,
-      }
-    engines: { node: ">=16" }
-    peerDependencies:
-      eslint: ">=8.38.0"
-    dependencies:
-      "@babel/helper-validator-identifier": 7.22.5
-      "@eslint-community/eslint-utils": 4.4.0(eslint@8.44.0)
-      ci-info: 3.8.0
-      clean-regexp: 1.0.0
-      eslint: 8.44.0
-      esquery: 1.5.0
-      indent-string: 4.0.0
-      is-builtin-module: 3.2.1
-      jsesc: 3.0.2
-      lodash: 4.17.21
-      pluralize: 8.0.0
-      read-pkg-up: 7.0.1
-      regexp-tree: 0.1.27
-      regjsparser: 0.10.0
-      safe-regex: 2.1.1
-      semver: 7.5.3
-      strip-indent: 3.0.0
-    dev: true
-
   /eslint-scope@5.1.1:
     resolution:
       {
@@ -5564,16 +5515,6 @@ packages:
       has-tostringtag: 1.0.0
     dev: true
 
-  /is-builtin-module@3.2.1:
-    resolution:
-      {
-        integrity: sha512-BSLE3HnV2syZ0FK0iMA/yUGplUeMmNz4AW5fnTunbCIqZi4vG3WjJT9FHMy5D69xmAYBHXQhJdALdpwVxV501A==,
-      }
-    engines: { node: ">=6" }
-    dependencies:
-      builtin-modules: 3.3.0
-    dev: true
-
   /is-callable@1.2.7:
     resolution:
       {
@@ -6527,14 +6468,6 @@ packages:
       - utf-8-validate
     dev: true
 
-  /jsesc@0.5.0:
-    resolution:
-      {
-        integrity: sha512-uZz5UnB7u4T9LvwmFqXii7pZSouaRPorGs5who1Ip7VO0wxanFvBL7GkM6dTHlgX+jhBApRetaWpnDabOeTcnA==,
-      }
-    hasBin: true
-    dev: true
-
   /jsesc@2.5.2:
     resolution:
       {
@@ -6542,15 +6475,6 @@ packages:
       }
     engines: { node: ">=4" }
     hasBin: true
-
-  /jsesc@3.0.2:
-    resolution:
-      {
-        integrity: sha512-xKqzzWXDttJuOcawBt4KnKHHIf5oQ/Cxax+0PWFG+DFDgHNAdi+TXECADI+RYiFUMmx8792xsMbbgXj4CwnP4g==,
-      }
-    engines: { node: ">=6" }
-    hasBin: true
-    dev: true
 
   /json-parse-better-errors@1.0.2:
     resolution:
@@ -7858,14 +7782,6 @@ packages:
     hasBin: true
     dev: true
 
-  /pluralize@8.0.0:
-    resolution:
-      {
-        integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==,
-      }
-    engines: { node: ">=4" }
-    dev: true
-
   /postcss-import@15.1.0(postcss@8.4.25):
     resolution:
       {
@@ -8462,14 +8378,6 @@ packages:
         integrity: sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==,
       }
 
-  /regexp-tree@0.1.27:
-    resolution:
-      {
-        integrity: sha512-iETxpjK6YoRWJG5o6hXLwvjYAoW+FEZn9os0PD/b6AP6xQwsa/Y7lCVgIixBbUPMfhu+i2LtdeAqVTgGlQarfA==,
-      }
-    hasBin: true
-    dev: true
-
   /regexp.prototype.flags@1.5.0:
     resolution:
       {
@@ -8480,16 +8388,6 @@ packages:
       call-bind: 1.0.2
       define-properties: 1.2.0
       functions-have-names: 1.2.3
-    dev: true
-
-  /regjsparser@0.10.0:
-    resolution:
-      {
-        integrity: sha512-qx+xQGZVsy55CH0a1hiVwHmqjLryfh7wQyF5HO07XJ9f7dQMY/gPQHhlyDkIzJKC+x2fUCpCcUODUUUFrm7SHA==,
-      }
-    hasBin: true
-    dependencies:
-      jsesc: 0.5.0
     dev: true
 
   /require-directory@2.1.1:
@@ -8655,15 +8553,6 @@ packages:
       call-bind: 1.0.2
       get-intrinsic: 1.2.1
       is-regex: 1.1.4
-    dev: true
-
-  /safe-regex@2.1.1:
-    resolution:
-      {
-        integrity: sha512-rx+x8AMzKb5Q5lQ95Zoi6ZbJqwCLkqi3XuJXp5P3rT8OEc6sZCJG5AE5dU3lsgRr/F4Bs31jSlVN+j5KrsGu9A==,
-      }
-    dependencies:
-      regexp-tree: 0.1.27
     dev: true
 
   /safer-buffer@2.1.2:

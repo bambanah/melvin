@@ -11,7 +11,6 @@ module.exports = {
 	extends: [
 		"next/core-web-vitals",
 		"plugin:@typescript-eslint/recommended",
-		"plugin:unicorn/recommended",
 		"prettier",
 	],
 	rules: {
@@ -48,11 +47,6 @@ module.exports = {
 				depth: 2,
 			},
 		],
-		"unicorn/no-null": "off",
-		"unicorn/prefer-module": "off",
-		"unicorn/no-array-reduce": "off",
-		"unicorn/prefer-top-level-await": "off",
-		"unicorn/prevent-abbreviations": "off",
 	},
 	overrides: [
 		{
