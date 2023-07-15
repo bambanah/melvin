@@ -131,7 +131,7 @@ const ClientForm = ({ existingClient }: Props) => {
 					>
 						{formPurpose.charAt(0).toUpperCase() + formPurpose.slice(1)}
 					</Button>
-					<Link href="/clients">
+					<Link href="/dashboard/clients">
 						<Button type="button">Cancel</Button>
 					</Link>
 				</div>

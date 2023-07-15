@@ -57,7 +57,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					trpcContext.invoice.list.invalidate();
 
 					toast.success("Invoice deleted");
-					router.push("/invoices");
+					router.push("/dashboard/invoices");
 				})
 				.catch(() => {
 					toast.error("An error occured. Please refresh and try again.");
@@ -151,7 +151,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					<div className="flex items-center justify-between md:mb-5">
 						<Heading className="py-3">{invoice.invoiceNo}</Heading>
 						<Link
-							href={`/invoices/${invoice.id}/edit`}
+							href={`/dashboard/invoices/${invoice.id}/edit`}
 							className="px-4 py-3 text-sm"
 						>
 							EDIT
@@ -198,7 +198,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					</div>
 					<Link
 						className="flex w-full items-center gap-4 p-2 text-left text-fg hover:bg-zinc-200"
-						href={`/clients/${invoice.client.id}`}
+						href={`/dashboard/clients/${invoice.client.id}`}
 					>
 						<FontAwesomeIcon icon={faUser} className="text-fg" />
 						{invoice.client.name}
@@ -247,7 +247,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					<Button
 						as="a"
 						className="justify-start"
-						href={`/invoices/create?copyFrom=${invoiceId}`}
+						href={`/dashboard/invoices/create?copyFrom=${invoiceId}`}
 					>
 						<FontAwesomeIcon icon={faCopy} />
 						Copy

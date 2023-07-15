@@ -28,7 +28,7 @@ const SupportItemPage = ({ supportItemId }: { supportItemId: string }) => {
 				.then(() => {
 					trpcContext.supportItem.list.invalidate();
 					toast.success("Support Item deleted");
-					router.push("/support-items");
+					router.push("/dashboard/support-items");
 				})
 				.catch(() => {
 					toast.error("An error occured. Please refresh and try again.");
@@ -68,7 +68,7 @@ const SupportItemPage = ({ supportItemId }: { supportItemId: string }) => {
 						<Dropdown.Items>
 							<Dropdown.Item>
 								<Link
-									href={`/support-items/${supportItem.id}/edit`}
+									href={`/dashboard/support-items/${supportItem.id}/edit`}
 									className="px-3 py-4 text-neutral-900 hover:bg-neutral-100 sm:py-2"
 								>
 									Edit

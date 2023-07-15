@@ -8,7 +8,7 @@ import {
 } from "./test-utils";
 
 test("Can create, update, and delete invoices", async ({ page }) => {
-	await page.goto("/");
+	await page.goto("/dashboard");
 	const client = await createRandomClient(page);
 	const supportItem = await createRandomSupportItem(page);
 	await createRandomActivity(page, client.name, supportItem.description);
@@ -17,7 +17,7 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 	const newRandomInvoice = randomInvoice();
 
 	await page.getByRole("link", { name: "Invoices" }).click();
-	await expect(page).toHaveURL("/invoices");
+	await expect(page).toHaveURL("/dashboard/invoices");
 	await page.getByRole("link", { name: "Add" }).click();
 
 	await page.locator(".react-select").click();
@@ -28,7 +28,7 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 
 	await page.getByRole("button", { name: "Create" }).click();
 	await waitForAlert(page, "invoice created");
-	await expect(page).toHaveURL("/invoices");
+	await expect(page).toHaveURL("/dashboard/invoices");
 	await page.getByRole("link", { name: invoice.invoiceNo }).click();
 
 	await page.getByRole("link", { name: "Edit" }).click();
@@ -38,7 +38,7 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 	await waitForAlert(page, "invoice updated");
 	await page.getByRole("link", { name: "Invoices" }).click();
 
-	await expect(page).toHaveURL("/invoices");
+	await expect(page).toHaveURL("/dashboard/invoices");
 
 	// TODO: Delete invoice
 	// await page.getByRole("link", { name: newRandomInvoice.invoiceNo }).click();

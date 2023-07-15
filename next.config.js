@@ -9,13 +9,10 @@ module.exports = withBundleAnalyzer({
 	async redirects() {
 		return [
 			{
-				source: "/",
-				destination: "/invoices",
-				permanent: true,
+				source: "/dashboard",
+				destination: "/dashboard/invoices",
+				permanent: false,
 			},
 		];
-	},
-	compiler: {
-		styledComponents: true,
 	},
 });

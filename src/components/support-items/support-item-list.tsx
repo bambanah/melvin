@@ -44,7 +44,11 @@ function SupportItemList() {
 			<ListPage.Header>
 				<h2 className="mr-auto text-2xl font-bold">Support Items</h2>
 
-				<Button as={Link} href="/support-items/create" variant="primary">
+				<Button
+					as={Link}
+					href="/dashboard/support-items/create"
+					variant="primary"
+				>
 					<FontAwesomeIcon icon={faPlus} />
 					<span>Add</span>
 				</Button>
@@ -53,7 +57,7 @@ function SupportItemList() {
 				{(supportItems) =>
 					supportItems.map((supportItem) => (
 						<div key={supportItem.id} className="flex flex-col gap-4 p-4">
-							<Link href={`/support-items/${supportItem.id}`}>
+							<Link href={`/dashboard/support-items/${supportItem.id}`}>
 								<p className="font-semibold sm:text-lg">
 									{supportItem.description}{" "}
 									{supportItem.isGroup && (

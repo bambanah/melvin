@@ -17,7 +17,7 @@ const Layout = ({ children, isLoading }: Props) => {
 
 	if (session.status === "unauthenticated") {
 		content = <p>Redirecting...</p>;
-		router.push("/login");
+		router.push("/");
 	} else if (session.status === "loading" || isLoading) {
 		content = <SkeletonLayout />;
 	} else {

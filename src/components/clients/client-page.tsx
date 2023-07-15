@@ -29,7 +29,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 				.then(() => {
 					trpcContext.clients.list.invalidate();
 					toast.success("Client deleted");
-					router.push("/clients");
+					router.push("/dashboard/clients");
 				})
 				.catch(() => {
 					toast.error("An error occured. Please refresh and try again.");
@@ -65,7 +65,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 						<Dropdown.Items>
 							<Dropdown.Item>
 								<Link
-									href={`/clients/${client.id}/edit`}
+									href={`/dashboard/clients/${client.id}/edit`}
 									className="px-3 py-4 text-neutral-900 hover:bg-neutral-100 sm:py-2"
 								>
 									Edit

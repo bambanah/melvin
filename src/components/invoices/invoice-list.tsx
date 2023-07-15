@@ -49,7 +49,9 @@ export default function InvoiceList({
 
 				<Button
 					as={Link}
-					href={`/invoices/create${clientId ? `?clientId=${clientId}` : ""}`}
+					href={`/dashboard/invoices/create${
+						clientId ? `?clientId=${clientId}` : ""
+					}`}
 					variant="primary"
 				>
 					<FontAwesomeIcon icon={faPlus} />
@@ -79,7 +81,7 @@ export default function InvoiceList({
 							<div className="flex flex-col gap-2">
 								<div className="font-medium sm:text-lg">
 									<Link
-										href={`/invoices/${invoice.id}`}
+										href={`/dashboard/invoices/${invoice.id}`}
 										className="font-semibold"
 									>
 										{invoice.invoiceNo}: {invoice.client.name}

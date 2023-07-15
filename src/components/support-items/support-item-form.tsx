@@ -64,7 +64,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 					trpcContext.supportItem.byId.invalidate({
 						id: existingSupportItem.id,
 					});
-					router.push("/support-items");
+					router.push("/dashboard/support-items");
 				});
 		} else {
 			createSupportItemMutation
@@ -75,7 +75,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 					toast.success("Support Item created");
 
 					trpcContext.supportItem.list.invalidate();
-					router.push("/support-items");
+					router.push("/dashboard/support-items");
 				});
 		}
 	};

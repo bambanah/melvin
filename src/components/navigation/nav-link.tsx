@@ -12,7 +12,7 @@ interface Props {
 }
 
 const Link = ({ href, icon, children, className }: Props) => {
-	const active = useRouter().pathname.split("/")[1] === href.split("/")[1];
+	const active = useRouter().pathname.split("/")[2] === href.split("/")[2];
 
 	return (
 		<NextLink

@@ -3,10 +3,10 @@ import { randomClient } from "./random/random-client";
 import { waitForAlert } from "./test-utils";
 
 test("Can create, edit, and delete clients", async ({ page }) => {
-	await page.goto("/clients");
+	await page.goto("/dashboard/clients");
 
 	await page.getByRole("link", { name: "Add" }).click();
-	await expect(page).toHaveURL("/clients/create");
+	await expect(page).toHaveURL("/dashboard/clients/create");
 
 	const client = randomClient();
 	const updatedClient = randomClient({ avoidName: client.name });
@@ -19,7 +19,7 @@ test("Can create, edit, and delete clients", async ({ page }) => {
 	await page.getByRole("button", { name: "Create" }).click();
 
 	await waitForAlert(page, "Client Created");
-	await expect(page).toHaveURL("/clients");
+	await expect(page).toHaveURL("/dashboard/clients");
 
 	await page.getByRole("link").filter({ hasText: client.name }).click();
 
@@ -31,7 +31,7 @@ test("Can create, edit, and delete clients", async ({ page }) => {
 	await waitForAlert(page, "Client Updated");
 
 	await page.getByRole("link", { name: "Clients" }).click();
-	await expect(page).toHaveURL("/clients");
+	await expect(page).toHaveURL("/dashboard/clients");
 
 	await page.getByRole("link").filter({ hasText: updatedClient.name }).click();
 	await page.locator("button#options-dropdown").click();

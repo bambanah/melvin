@@ -54,7 +54,11 @@ function ActivityList({
 				<h2 className="mr-auto text-2xl font-bold">Activities</h2>
 
 				{displayCreateButton ? (
-					<Button as={Link} href="/activities/create" variant="primary">
+					<Button
+						as={Link}
+						href="/dashboard/activities/create"
+						variant="primary"
+					>
 						<FontAwesomeIcon icon={faPlus} />
 						<span>Add</span>
 					</Button>
@@ -88,7 +92,7 @@ function ActivityList({
 											className="flex w-full flex-col justify-between border-dashed p-4 md:flex-row"
 										>
 											<div className="flex flex-col gap-2 overflow-hidden">
-												<Link href={`/activities/${activity.id}`}>
+												<Link href={`/dashboard/activities/${activity.id}`}>
 													<p className="truncate text-lg font-semibold">
 														{activity.supportItem.description}
 													</p>
@@ -126,7 +130,9 @@ function ActivityList({
 											</div>
 											<div className="flex flex-col items-start justify-between gap-2 md:items-end">
 												{activity.client && (
-													<Link href={`/clients${activity.client.id}`}>
+													<Link
+														href={`/dashboard/clients${activity.client.id}`}
+													>
 														<div className="flex items-center gap-2 md:flex-row-reverse md:font-semibold">
 															<FontAwesomeIcon
 																icon={faUser}
