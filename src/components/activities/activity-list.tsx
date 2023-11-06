@@ -131,7 +131,7 @@ function ActivityList({
 											<div className="flex flex-col items-start justify-between gap-2 md:items-end">
 												{activity.client && (
 													<Link
-														href={`/dashboard/clients${activity.client.id}`}
+														href={`/dashboard/clients/${activity.client.id}`}
 													>
 														<div className="flex items-center gap-2 md:flex-row-reverse md:font-semibold">
 															<FontAwesomeIcon
