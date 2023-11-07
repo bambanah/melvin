@@ -24,6 +24,7 @@ import dayjs from "dayjs";
 import Link from "next/link";
 import { useState } from "react";
 import { assignedFilterMap, assignedFilters } from "./activity-list.constants";
+import ActivityTable from "./activity-table";
 
 interface Props {
 	invoiceId?: string;
@@ -43,7 +44,7 @@ function ActivityList({
 }: Props) {
 	const [assignedFilter, setAssignedFilter] = useState<boolean | undefined>();
 
-	const queryResult = trpc.activity.list.useInfiniteQuery({
+	const { data } = trpc.activity.list.useQuery({
 		assigned: groupByAssignedStatus ? assignedFilter : undefined,
 		invoiceId,
 	});
@@ -51,7 +52,7 @@ function ActivityList({
 	return (
 		<ListPage>
 			<ListPage.Header>
-				<h2 className="mr-auto text-2xl font-bold">Activities</h2>
+				<h2 className="mr-auto text-2xl font-bold"></h2>
 
 				{displayCreateButton ? (
 					<Button
@@ -65,17 +66,9 @@ function ActivityList({
 				) : undefined}
 			</ListPage.Header>
 
-			{groupByAssignedStatus && (
-				<ListFilterRow
-					items={assignedFilters.map((assigned) => ({
-						onClick: () => setAssignedFilter(assignedFilterMap[assigned]),
-						active: assignedFilter === assignedFilterMap[assigned],
-						children: assigned,
-					}))}
-				/>
-			)}
+			{data && <ActivityTable data={data.activities} />}
 
-			<InfiniteList queryResult={queryResult} dataKey="activities">
+			{/* <InfiniteList queryResult={queryResult} dataKey="activities">
 				{(activities) =>
 					Object.entries(groupActivitiesByDate(activities)).map(
 						([date, groupedActivities]) => (
@@ -164,7 +157,7 @@ function ActivityList({
 						)
 					)
 				}
-			</InfiniteList>
+			</InfiniteList> */}
 		</ListPage>
 	);
 }
