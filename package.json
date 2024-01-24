@@ -59,6 +59,7 @@
 		"@trpc/next": "^10.34.0",
 		"@trpc/react-query": "^10.34.0",
 		"@trpc/server": "^10.34.0",
+		"@vercel/speed-insights": "^1.0.7",
 		"classnames": "^2.3.2",
 		"dayjs": "^1.11.9",
 		"jspdf": "^2.5.1",

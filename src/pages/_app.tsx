@@ -1,5 +1,6 @@
 import "@styles/globals.css";
 import { trpc } from "@utils/trpc";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import classNames from "classnames";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
@@ -32,32 +33,35 @@ const robotoMono = Roboto_Mono({
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 	return (
-		<main
-			className={classNames([
-				"transition-colors",
-				inter.variable,
-				patuaOne.variable,
-				robotoMono.variable,
-			])}
-		>
-			<style jsx global>{`
-				:root {
-					--font-inter: ${inter.style.fontFamily};
-					--font-patua-one: ${patuaOne.style.fontFamily};
-					--font-roboto-mono: ${robotoMono.style.fontFamily};
-				}
-			`}</style>
+		<>
+			<main
+				className={classNames([
+					"transition-colors",
+					inter.variable,
+					patuaOne.variable,
+					robotoMono.variable,
+				])}
+			>
+				<style jsx global>{`
+					:root {
+						--font-inter: ${inter.style.fontFamily};
+						--font-patua-one: ${patuaOne.style.fontFamily};
+						--font-roboto-mono: ${robotoMono.style.fontFamily};
+					}
+				`}</style>
 
-			<SessionProvider session={session}>
-				<Head>
-					<title>Melvin</title>
-					<link rel="shortcut icon" type="image/png" href="/melvin.png" />
-				</Head>
-				<Component {...pageProps} />
+				<SessionProvider session={session}>
+					<Head>
+						<title>Melvin</title>
+						<link rel="shortcut icon" type="image/png" href="/melvin.png" />
+					</Head>
+					<Component {...pageProps} />
 
-				<ToastContainer />
-			</SessionProvider>
-		</main>
+					<ToastContainer />
+				</SessionProvider>
+			</main>
+			<SpeedInsights />
+		</>
 	);
 }
 
