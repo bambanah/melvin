@@ -4,13 +4,10 @@ on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - main
 
 env:
-  DATABASE_URL: postgres://postgres:postgres@localhost:5432/melvin
-  DIRECT_URL: postgres://postgres:postgres@localhost:5432/melvin
+  DATABASE_URL: postgres://postgres:pass@localhost:5432/melvin
+  DIRECT_URL: postgres://postgres:pass@localhost:5432/melvin
   NEXTAUTH_URL: "http://localhost:3000"
 
 jobs:
@@ -18,13 +15,10 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      # Label used to access the service container
       postgres:
-        # Docker Hub image
         image: postgres
-        # Provide the password for postgres
         env:
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: pass
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -32,7 +26,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          # Maps tcp port 5432 on service container to the host
           - 5432:5432
 
     steps:
