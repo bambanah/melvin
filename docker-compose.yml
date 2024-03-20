@@ -1,14 +1,10 @@
 version: "3.6"
 services:
-  mysql-db:
-    container_name: mysql-db
-    image: mysql:8
+  postgres-db:
+    container_name: postgres-db
+    image: postgres:16
     ports:
-      - "3309:3306"
+      - "5432:5432"
     restart: unless-stopped
-    volumes:
-      - db_data:/var/lib/mysql
     environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=true
-volumes:
-  db_data:
+      - POSTGRES_PASSWORD=pass
