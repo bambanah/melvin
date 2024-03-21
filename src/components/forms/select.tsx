@@ -23,7 +23,7 @@ function Select<T extends FieldValues>({ options, ...rest }: SelectProps<T>) {
 	return (
 		<ReactSelect
 			name={name}
-			className="react-select w-full"
+			className="react-select w-full min-w-0"
 			unstyled
 			options={options}
 			value={options.find((c) => c.value === value)}
