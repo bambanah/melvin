@@ -106,11 +106,11 @@ const InvoiceActivityCreationForm = ({
 		supportItemId && groupSupportItemIds?.includes(supportItemId);
 
 	return (
-		<div className="flex  flex-col gap-4">
+		<div className="flex flex-col gap-4">
 			<Heading size="xsmall">Create Activities</Heading>
 
 			{fields.length > 0 && (
-				<div className="mb-4 flex  flex-col gap-6">
+				<div className="mb-4 flex flex-col gap-6">
 					{fields.map((field, index) => (
 						<div key={field.id} className="flex flex-col">
 							<div className="flex items-center gap-2">
@@ -123,6 +123,7 @@ const InvoiceActivityCreationForm = ({
 								) && (
 									<ClientSelect
 										name={`activitiesToCreate.${index}.groupClientId`}
+										excludeClientId={watch("clientId")}
 										control={control}
 									/>
 								)}
