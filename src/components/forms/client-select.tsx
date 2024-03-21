@@ -3,7 +3,10 @@ import { trpc } from "@utils/trpc";
 import { useEffect, useState } from "react";
 import { FieldValues, UseControllerProps } from "react-hook-form";
 
-function ClientSelect<T extends FieldValues>(props: UseControllerProps<T>) {
+function ClientSelect<T extends FieldValues>({
+	excludeClientId,
+	...props
+}: { excludeClientId?: string } & UseControllerProps<T>) {
 	const [options, setOptions] = useState<{ label: string; value: string }[]>(
 		[]
 	);
@@ -12,13 +15,15 @@ function ClientSelect<T extends FieldValues>(props: UseControllerProps<T>) {
 	useEffect(() => {
 		if (clients) {
 			setOptions(
-				clients.map((client) => ({
-					label: client.name,
-					value: client.id,
-				}))
+				clients
+					.filter((client) => client.id !== excludeClientId)
+					.map((client) => ({
+						label: client.name,
+						value: client.id,
+					}))
 			);
 		}
-	}, [clients]);
+	}, [clients, excludeClientId]);
 
 	return <Select options={options} {...props} />;
 }
