@@ -8,10 +8,7 @@ interface Props extends HTMLProps<HTMLFormElement> {
 
 const Form = ({ className, flex = "col", children, ...rest }: Props) => (
 	<form
-		className={
-			className ??
-			classNames([`flex flex-wrap items-stretch gap-4 flex-${flex} w-full`])
-		}
+		className={className ?? classNames([`flex gap-4 flex-${flex} w-full`])}
 		{...rest}
 	>
 		{children}
