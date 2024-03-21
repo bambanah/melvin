@@ -67,11 +67,17 @@ model User {
 }
 
 model Client {
-  id                  String     @id @default(cuid())
-  createdAt           DateTime   @default(now()) @map("created")
-  updatedAt           DateTime   @default(now()) @updatedAt
-  number              String?
-  name                String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created")
+  updatedAt DateTime @default(now()) @updatedAt
+
+  name         String
+  number       String?
+  invoiceEmail String?
+
+  defaultTransitDistance Int?
+  defaultTransitTime     Int?
+
   billTo              String?
   invoiceNumberPrefix String?
   ownerId             String
