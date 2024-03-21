@@ -11,8 +11,8 @@ interface Activity {
 	startTime?: Date | null;
 	endTime?: Date | null;
 	itemDistance?: number | null;
-	transitDistance?: number | null;
-	transitDuration?: number | null;
+	transitDistance?: Prisma.Decimal | null;
+	transitDuration?: Prisma.Decimal | null;
 	supportItem: {
 		description?: string;
 		weekdayCode: string;
@@ -96,11 +96,14 @@ export const getTotalCostOfActivities = (activities: Activity[]) => {
 				const isGroup =
 					activity.supportItem.description?.includes("Group Activities");
 				const ratePerKm = isGroup ? 0.43 : 0.85;
-				subTotal += round(activity.transitDistance * ratePerKm, 2);
+				subTotal += round(Number(activity.transitDistance) * ratePerKm, 2);
 			}
 
 			if (activity.transitDuration) {
-				subTotal += round(activity.transitDuration * (Number(rate) / 60), 2);
+				subTotal += round(
+					Number(activity.transitDuration) * (Number(rate) / 60),
+					2
+				);
 			}
 
 			return subTotal;

@@ -60,7 +60,12 @@ export const clientRouter = router({
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
 			const client = await ctx.prisma.client.findFirst({
-				select: { ...defaultClientSelect, invoiceNumberPrefix: true },
+				select: {
+					...defaultClientSelect,
+					invoiceNumberPrefix: true,
+					defaultTransitDistance: true,
+					defaultTransitTime: true,
+				},
 				where: {
 					ownerId: ctx.session.user.id,
 					id: input.id,
@@ -145,7 +150,16 @@ export const clientRouter = router({
 		)
 		.mutation(async ({ input, ctx }) => {
 			const client = await ctx.prisma.client.create({
-				data: { ...input.client, ownerId: ctx.session.user.id },
+				data: {
+					...input.client,
+					defaultTransitDistance: input.client.defaultTransitDistance
+						? parseFloat(input.client.defaultTransitDistance)
+						: undefined,
+					defaultTransitTime: input.client.defaultTransitTime
+						? parseFloat(input.client.defaultTransitTime)
+						: undefined,
+					ownerId: ctx.session.user.id,
+				},
 			});
 
 			if (!client) {
@@ -168,7 +182,15 @@ export const clientRouter = router({
 				where: {
 					id: input.id,
 				},
-				data: { ...input.client },
+				data: {
+					...input.client,
+					defaultTransitDistance: input.client.defaultTransitDistance
+						? parseFloat(input.client.defaultTransitDistance)
+						: undefined,
+					defaultTransitTime: input.client.defaultTransitTime
+						? parseFloat(input.client.defaultTransitTime)
+						: undefined,
+				},
 			});
 
 			if (!client) {

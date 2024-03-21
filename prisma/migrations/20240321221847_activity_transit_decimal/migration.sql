@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Activity" ALTER COLUMN "transitDuration" SET DATA TYPE DECIMAL(65,30),
+ALTER COLUMN "transitDistance" SET DATA TYPE DECIMAL(65,30);

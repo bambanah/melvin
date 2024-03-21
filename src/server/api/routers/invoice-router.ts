@@ -1,4 +1,4 @@
-import { Invoice, InvoiceStatus } from "@prisma/client";
+import { Client, Invoice, InvoiceStatus } from "@prisma/client";
 import { activitySchema } from "@schema/activity-schema";
 import { InvoiceSchema, invoiceSchema } from "@schema/invoice-schema";
 import { authedProcedure, router } from "@server/api/trpc";
@@ -42,7 +42,7 @@ function parseInvoice<T extends Partial<Invoice>>(
 
 const generateNestedWriteForActivities = (
 	activitiesToCreate: InvoiceSchema["activitiesToCreate"],
-	clientId: string,
+	client: Client,
 	ownerId: string
 ) => ({
 	data: activitiesToCreate.flatMap(({ supportItemId, activities }) =>
@@ -51,10 +51,36 @@ const generateNestedWriteForActivities = (
 			date: dayjs.utc(activity.date, "YYYY-MM-DD").toDate(),
 			startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
 			endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
-			clientId,
+			clientId: client.id,
+			transitDistance: client.defaultTransitDistance ?? undefined,
+			transitDuration: client.defaultTransitTime ?? undefined,
 			supportItemId,
 			ownerId,
 		}))
+	),
+});
+
+const generateNestedWriteForGroupActivities = (
+	activitiesToCreate: InvoiceSchema["activitiesToCreate"],
+	ownerId: string,
+	clients: Client[]
+) => ({
+	data: activitiesToCreate.flatMap(
+		({ supportItemId, groupClientId, activities }) => {
+			const client = clients.find((c) => c.id === groupClientId);
+
+			return activities.map((activity) => ({
+				...activity,
+				supportItemId,
+				date: dayjs.utc(activity.date, "YYYY-MM-DD").toDate(),
+				startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
+				endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
+				clientId: groupClientId,
+				transitDistance: client?.defaultTransitDistance ?? undefined,
+				transitDuration: client?.defaultTransitTime ?? undefined,
+				ownerId,
+			}));
+		}
 	),
 });
 
@@ -168,6 +194,17 @@ export const invoiceRouter = router({
 		.mutation(async ({ input, ctx }) => {
 			const { invoice: inputInvoice } = input;
 
+			const client = await ctx.prisma.client.findUnique({
+				where: { id: inputInvoice.clientId },
+			});
+
+			if (!client) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Can't find that client",
+				});
+			}
+
 			const invoice = await ctx.prisma.invoice.create({
 				data: {
 					invoiceNo: inputInvoice.invoiceNo,
@@ -181,7 +218,7 @@ export const invoiceRouter = router({
 						connect: inputInvoice.activityIds?.map((id) => ({ id })),
 						createMany: generateNestedWriteForActivities(
 							inputInvoice.activitiesToCreate,
-							inputInvoice.clientId,
+							client,
 							ctx.session.user.id
 						),
 					},
@@ -196,20 +233,25 @@ export const invoiceRouter = router({
 				(activity) => activity.groupClientId
 			);
 			if (groupActivitiesToCreate) {
-				await ctx.prisma.activity.createMany({
-					data: groupActivitiesToCreate.flatMap(
-						({ supportItemId, groupClientId, activities }) =>
-							activities.map((activity) => ({
-								...activity,
-								date: dayjs.utc(activity.date, "YYYY-MM-DD").toDate(),
-								startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
-								endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
-								clientId: groupClientId,
-								supportItemId,
-								ownerId: ctx.session.user.id,
-							}))
-					),
+				const groupClientIds = groupActivitiesToCreate.map(
+					(activity) => activity.groupClientId
+				);
+
+				const clients = await ctx.prisma.client.findMany({
+					where: {
+						id: {
+							in: groupClientIds,
+						},
+					},
 				});
+
+				await ctx.prisma.activity.createMany(
+					generateNestedWriteForGroupActivities(
+						groupActivitiesToCreate,
+						ctx.session.user.id,
+						clients
+					)
+				);
 			}
 
 			return parseInvoice(invoice);
@@ -224,6 +266,11 @@ export const invoiceRouter = router({
 		)
 		.mutation(async ({ ctx, input }) => {
 			const { id, invoice: inputInvoice } = input;
+
+			const client = await ctx.prisma.client.findUnique({
+				where: { id: inputInvoice.clientId },
+			});
+
 			const invoice = await ctx.prisma.invoice.update({
 				where: {
 					id,
@@ -237,11 +284,14 @@ export const invoiceRouter = router({
 						: new Date(),
 					activities: {
 						connect: inputInvoice.activityIds?.map((id) => ({ id })),
-						createMany: generateNestedWriteForActivities(
-							inputInvoice.activitiesToCreate,
-							inputInvoice.clientId,
-							ctx.session.user.id
-						),
+						createMany:
+							inputInvoice.activitiesToCreate && client
+								? generateNestedWriteForActivities(
+										inputInvoice.activitiesToCreate,
+										client,
+										ctx.session.user.id
+									)
+								: undefined,
 					},
 				},
 				select: {

@@ -25,8 +25,8 @@ const getActivity = (
 		date: date,
 		startTime: dayjs.utc(`1970-01-01T${startTime}`).toDate(),
 		endTime: dayjs.utc(`1970-01-01T${endTime}`).toDate(),
-		transitDuration: transitDuration,
-		transitDistance: transitDistance,
+		transitDuration: new Prisma.Decimal(transitDuration),
+		transitDistance: new Prisma.Decimal(transitDistance),
 		supportItem: {
 			description: "Support Item",
 			weekdayCode: "04_104_0125_6_1",
@@ -135,8 +135,8 @@ describe("Helpers", () => {
 			date: new Date("2022-01-14"),
 			startTime: dayjs.utc("1970-01-01T15:00").toDate(),
 			endTime: dayjs.utc("1970-01-01T17:00").toDate(),
-			transitDuration: 7,
-			transitDistance: 15,
+			transitDuration: new Prisma.Decimal(7),
+			transitDistance: new Prisma.Decimal(15),
 			itemDistance: null,
 			supportItem: {
 				weekdayCode: "weekday",

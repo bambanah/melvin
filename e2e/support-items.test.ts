@@ -23,6 +23,7 @@ test("Can create, update, and delete support items", async ({ page }) => {
 	await page
 		.getByRole("link")
 		.filter({ hasText: supportItem.description })
+		.first()
 		.click();
 	await page.locator("button#options-dropdown").click();
 	await page.getByRole("menuitem", { name: "Edit" }).click();

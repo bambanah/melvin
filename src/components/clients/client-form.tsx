@@ -40,6 +40,9 @@ const ClientForm = ({ existingClient }: Props) => {
 			number: existingClient?.number ?? "",
 			billTo: existingClient?.billTo ?? "",
 			invoiceNumberPrefix: existingClient?.invoiceNumberPrefix ?? "",
+			defaultTransitDistance:
+				existingClient?.defaultTransitDistance?.toString() ?? "",
+			defaultTransitTime: existingClient?.defaultTransitTime?.toString() ?? "",
 		},
 	});
 
@@ -53,7 +56,10 @@ const ClientForm = ({ existingClient }: Props) => {
 	const onSubmit = (data: ClientSchema) => {
 		if (existingClient?.id) {
 			updateClientMutation
-				.mutateAsync({ id: existingClient.id, client: data })
+				.mutateAsync({
+					id: existingClient.id,
+					client: data,
+				})
 				.then(() => submitCallback("Client updated"));
 		} else {
 			createClientMutation
@@ -122,7 +128,32 @@ const ClientForm = ({ existingClient }: Props) => {
 					/>
 					<ErrorMessage error={errors.billTo?.message} />
 				</Label>
-
+				<Label>
+					<span>Default Transit Distance (km)</span>
+					<Input
+						name="defaultTransitDistance"
+						type="number"
+						step={0.1}
+						register={register}
+						error={!!errors.defaultTransitDistance}
+						placeholder="7"
+						suffix="km"
+					/>
+					<ErrorMessage error={errors.defaultTransitDistance?.message} />
+				</Label>
+				<Label>
+					<span>Default Transit Time</span>
+					<Input
+						name="defaultTransitTime"
+						type="number"
+						step={0.1}
+						register={register}
+						error={!!errors.defaultTransitTime}
+						placeholder="15"
+						suffix="mins"
+					/>
+					<ErrorMessage error={errors.defaultTransitTime?.message} />
+				</Label>
 				<div className="btn-group">
 					<Button
 						type="submit"

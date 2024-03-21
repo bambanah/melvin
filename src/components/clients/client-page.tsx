@@ -113,6 +113,24 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 						<p className="text-neutral-500">Not set</p>
 					)}
 				</div>
+
+				<div className="flex flex-col">
+					<h3 className="font-semibold">Default Transit Distance</h3>
+					{client.defaultTransitDistance ? (
+						<p>{client.defaultTransitDistance.toString()}</p>
+					) : (
+						<p className="text-neutral-500">Not set</p>
+					)}
+				</div>
+
+				<div className="flex flex-col">
+					<h3 className="font-semibold">Default Transit Time</h3>
+					{client.defaultTransitTime ? (
+						<p>{client.defaultTransitTime.toString()}</p>
+					) : (
+						<p className="text-neutral-500">Not set</p>
+					)}
+				</div>
 			</div>
 
 			<InvoiceList clientId={client.id} groupByAssignedStatus={false} />

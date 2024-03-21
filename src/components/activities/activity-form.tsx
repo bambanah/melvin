@@ -58,8 +58,12 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 				? dayjs.utc(existingActivity?.endTime).format("HH:mm")
 				: "",
 			itemDistance: existingActivity?.itemDistance ?? undefined,
-			transitDistance: existingActivity?.transitDistance ?? undefined,
-			transitDuration: existingActivity?.transitDuration ?? undefined,
+			transitDistance: existingActivity?.transitDistance
+				? Number(existingActivity?.transitDistance)
+				: undefined,
+			transitDuration: existingActivity?.transitDuration
+				? Number(existingActivity?.transitDuration)
+				: undefined,
 		},
 	});
 
