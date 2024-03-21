@@ -50,7 +50,7 @@ export async function createRandomActivity(
 	await page.locator(".react-select").nth(0).click();
 	await page.getByText(supportItemDescription, { exact: true }).click();
 	await page.locator(".react-select").nth(1).click();
-	await page.getByText(clientName, { exact: true }).click();
+	await page.getByText(clientName, { exact: true }).first().click();
 
 	await page.locator("#startTime").fill("09:15");
 	await page.locator("#endTime").fill("15:23");

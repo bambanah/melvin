@@ -33,7 +33,11 @@ test("Can create, edit, and delete clients", async ({ page }) => {
 	await page.getByRole("link", { name: "Clients" }).click();
 	await expect(page).toHaveURL("/dashboard/clients");
 
-	await page.getByRole("link").filter({ hasText: updatedClient.name }).click();
+	await page
+		.getByRole("link")
+		.filter({ hasText: updatedClient.name })
+		.first()
+		.click();
 	await page.locator("button#options-dropdown").click();
 	await page.locator("button").filter({ hasText: "Delete" }).click();
 	await page.locator("button").filter({ hasText: "Delete" }).click();
