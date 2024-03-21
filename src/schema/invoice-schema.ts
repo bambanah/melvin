@@ -12,6 +12,7 @@ export const invoiceSchema = z.object({
 	activitiesToCreate: z.array(
 		z.object({
 			supportItemId: z.string(),
+			groupClientId: z.string(),
 			activities: z.array(
 				z
 					.object({

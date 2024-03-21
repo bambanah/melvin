@@ -1,6 +1,6 @@
 import Button from "@atoms/button";
 import Heading from "@atoms/heading";
-import Label from "@atoms/label";
+import ClientSelect from "@components/forms/client-select";
 import DatePicker from "@components/forms/date-picker";
 import SupportItemSelect from "@components/forms/support-item-select";
 import TimeInput from "@components/forms/time-input";
@@ -14,12 +14,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { InvoiceSchema } from "@schema/invoice-schema";
+import { trpc } from "@utils/trpc";
 import classNames from "classnames";
+import { useMemo } from "react";
 import {
 	Control,
 	UseFormGetValues,
 	UseFormRegister,
 	UseFormSetValue,
+	UseFormWatch,
 	useFieldArray,
 } from "react-hook-form";
 
@@ -28,6 +31,7 @@ interface Props {
 	register: UseFormRegister<InvoiceSchema>;
 	getValues: UseFormGetValues<InvoiceSchema>;
 	setValue: UseFormSetValue<InvoiceSchema>;
+	watch: UseFormWatch<InvoiceSchema>;
 }
 
 const InvoiceActivityCreationForm = ({
@@ -35,7 +39,16 @@ const InvoiceActivityCreationForm = ({
 	register,
 	getValues,
 	setValue,
+	watch,
 }: Props) => {
+	const { data: { supportItems: groupSupportItems } = {} } =
+		trpc.supportItem.list.useQuery({ description: "group" });
+
+	const groupSupportItemIds = useMemo(
+		() => groupSupportItems?.map((item) => item.id),
+		[groupSupportItems]
+	);
+
 	const {
 		fields,
 		append: appendActivity,
@@ -89,12 +102,15 @@ const InvoiceActivityCreationForm = ({
 		});
 	};
 
+	const isGroupSupportItem = (supportItemId?: string) =>
+		supportItemId && groupSupportItemIds?.includes(supportItemId);
+
 	return (
-		<div className="flex flex-col gap-4">
+		<div className="flex  flex-col gap-4">
 			<Heading size="xsmall">Create Activities</Heading>
 
 			{fields.length > 0 && (
-				<div className="mb-4 flex flex-col gap-6">
+				<div className="mb-4 flex  flex-col gap-6">
 					{fields.map((field, index) => (
 						<div key={field.id} className="flex flex-col">
 							<div className="flex items-center gap-2">
@@ -102,6 +118,14 @@ const InvoiceActivityCreationForm = ({
 									name={`activitiesToCreate.${index}.supportItemId`}
 									control={control}
 								/>
+								{isGroupSupportItem(
+									watch("activitiesToCreate")[index].supportItemId
+								) && (
+									<ClientSelect
+										name={`activitiesToCreate.${index}.groupClientId`}
+										control={control}
+									/>
+								)}
 								<button
 									className="px-2 py-1 hover:shadow"
 									onClick={() => remove(index)}
@@ -144,28 +168,23 @@ const InvoiceActivityCreationForm = ({
 										)}
 										<span className="flex items-center gap-2">
 											<FontAwesomeIcon icon={faCalendar} />
-											<Label>
-												<DatePicker
-													register={register}
-													name={`activitiesToCreate.${index}.activities.${activityFieldIndex}.date`}
-												/>
-											</Label>
+											<DatePicker
+												register={register}
+												name={`activitiesToCreate.${index}.activities.${activityFieldIndex}.date`}
+											/>
 										</span>
 										<span className="flex items-center gap-2">
 											<FontAwesomeIcon icon={faClock} />
-											<Label>
-												<TimeInput
-													register={register}
-													name={`activitiesToCreate.${index}.activities.${activityFieldIndex}.startTime`}
-												/>
-											</Label>
+											<TimeInput
+												register={register}
+												name={`activitiesToCreate.${index}.activities.${activityFieldIndex}.startTime`}
+											/>
+
 											<FontAwesomeIcon icon={faArrowRight} />
-											<Label>
-												<TimeInput
-													register={register}
-													name={`activitiesToCreate.${index}.activities.${activityFieldIndex}.endTime`}
-												/>
-											</Label>
+											<TimeInput
+												register={register}
+												name={`activitiesToCreate.${index}.activities.${activityFieldIndex}.endTime`}
+											/>
 										</span>
 										<button
 											className="ml-auto px-2 py-1 hover:shadow"
@@ -191,7 +210,11 @@ const InvoiceActivityCreationForm = ({
 
 			<Button
 				onClick={() =>
-					appendActivity({ supportItemId: "", activities: [{ date: "" }] })
+					appendActivity({
+						supportItemId: "",
+						groupClientId: "",
+						activities: [{ date: "" }],
+					})
 				}
 				className="mx-auto w-full"
 			>

@@ -22,16 +22,22 @@ const defaultSupportItemSelect = {
 
 export const supportItemRouter = router({
 	list: authedProcedure
-		.input(baseListQueryInput)
+		.input(baseListQueryInput.extend({ description: z.string().optional() }))
 		.query(async ({ ctx, input }) => {
 			const limit = input.limit ?? 50;
-			const { cursor } = input;
+			const { cursor, description } = input;
 
 			const supportItems = await ctx.prisma.supportItem.findMany({
 				select: defaultSupportItemSelect,
 				take: limit + 1,
 				where: {
 					ownerId: ctx.session.user.id,
+					description: description
+						? {
+								contains: description,
+								mode: "insensitive",
+							}
+						: undefined,
 				},
 				cursor: cursor ? { id: cursor } : undefined,
 				orderBy: {

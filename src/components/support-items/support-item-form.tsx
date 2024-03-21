@@ -143,7 +143,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 									</span>
 								</p>
 								<div className="flex gap-2">
-									<label>
+									<span className="flex flex-col">
 										<Input
 											name={`${day}Code`}
 											register={register}
@@ -152,8 +152,8 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 											error={!!errors[`${day}Code`]}
 										/>
 										<ErrorMessage error={errors[`${day}Code`]?.message} />
-									</label>
-									<label className="flex flex-col">
+									</span>
+									<span className="flex flex-col">
 										<Input
 											name={`${day}Rate`}
 											register={register}
@@ -164,7 +164,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 											error={!!errors[`${day}Rate`]}
 										/>
 										<ErrorMessage error={errors[`${day}Rate`]?.message} />
-									</label>
+									</span>
 								</div>
 							</div>
 						)

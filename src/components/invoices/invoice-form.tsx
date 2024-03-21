@@ -161,6 +161,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 					register={register}
 					getValues={getValues}
 					setValue={setValue}
+					watch={watch}
 				/>
 
 				<div className="btn-group">

@@ -192,6 +192,26 @@ export const invoiceRouter = router({
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
+			const groupActivitiesToCreate = inputInvoice.activitiesToCreate.filter(
+				(activity) => activity.groupClientId
+			);
+			if (groupActivitiesToCreate) {
+				await ctx.prisma.activity.createMany({
+					data: groupActivitiesToCreate.flatMap(
+						({ supportItemId, groupClientId, activities }) =>
+							activities.map((activity) => ({
+								...activity,
+								date: dayjs.utc(activity.date, "YYYY-MM-DD").toDate(),
+								startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
+								endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
+								clientId: groupClientId,
+								supportItemId,
+								ownerId: ctx.session.user.id,
+							}))
+					),
+				});
+			}
+
 			return parseInvoice(invoice);
 		}),
 	modify: authedProcedure
