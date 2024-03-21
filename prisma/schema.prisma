@@ -75,8 +75,8 @@ model Client {
   number       String?
   invoiceEmail String?
 
-  defaultTransitDistance Int?
-  defaultTransitTime     Int?
+  defaultTransitDistance Decimal?
+  defaultTransitTime     Decimal?
 
   billTo              String?
   invoiceNumberPrefix String?
@@ -115,8 +115,8 @@ model Activity {
   date            DateTime    @db.Date
   startTime       DateTime?   @db.Time(6)
   endTime         DateTime?   @db.Time(6)
-  transitDuration Int?
-  transitDistance Int?
+  transitDuration Decimal?
+  transitDistance Decimal?
   itemDistance    Int?
   ownerId         String?
   clientId        String?

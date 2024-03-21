@@ -85,7 +85,7 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 			// Provider Travel - Labour Costs
 			if (activity.transitDuration) {
 				const travelTotal = round(
-					(Number(rate) / 60) * activity.transitDuration,
+					(Number(rate) / 60) * Number(activity.transitDuration),
 					2
 				);
 
@@ -106,7 +106,7 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 				const isGroup =
 					activity.supportItem.description.includes("Group Activities");
 				const ratePerKm = isGroup ? 0.43 : 0.85;
-				const travelTotal = ratePerKm * activity.transitDistance;
+				const travelTotal = ratePerKm * Number(activity.transitDistance);
 
 				const supportItemCode = getNonLabourTravelCode(
 					activity.supportItem.weekdayCode

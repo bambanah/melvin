@@ -12,9 +12,12 @@ const EditClient = () => {
 		? router.query.id[0]
 		: router.query.id;
 
-	const { data: client, error } = trpc.clients.byId.useQuery({
-		id: clientId ?? "",
-	});
+	const { data: client, error } = trpc.clients.byId.useQuery(
+		{
+			id: clientId ?? "",
+		},
+		{ enabled: !!clientId }
+	);
 
 	if (error) {
 		return (
