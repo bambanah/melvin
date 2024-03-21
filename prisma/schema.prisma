@@ -4,8 +4,8 @@ generator client {
 
 datasource db {
   provider     = "postgresql"
-  url          = env("POSTGRES_URL")
-  directUrl    = env("POSTGRES_URL_NON_POOLING")
+  url          = env("DATABASE_URL")
+  directUrl    = env("DIRECT_URL")
   relationMode = "prisma"
 }
 
@@ -18,14 +18,13 @@ model Account {
   expires_at         Int?
   token_type         String?
   scope              String?
-  id_token           String? @db.Text
-  access_token       String? @db.Text
+  id_token           String?
+  access_token       String?
   session_state      String?
   oauth_token_secret String?
   oauth_token        String?
-
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId             String  @unique
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -33,9 +32,8 @@ model Account {
 model Session {
   sessionToken String   @unique
   expires      DateTime
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -49,92 +47,79 @@ model VerificationToken {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String?  @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-
+  id            String        @id @default(cuid())
+  email         String?       @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now()) @updatedAt
   name          String?
   emailVerified DateTime?
   image         String?
-
-  abn        BigInt?
-  bankName   String?
-  bankNumber BigInt?
-  bsb        Int?
-
-  account  Account?
-  sessions Session[]
-
-  clients      Client[]
-  invoices     Invoice[]
-  supportItems SupportItem[]
-  activities   Activity[]
+  abn           BigInt?
+  bankName      String?
+  bankNumber    BigInt?
+  bsb           Int?
+  account       Account?
+  sessions      Session[]
+  clients       Client[]
+  invoices      Invoice[]
+  supportItems  SupportItem[]
+  activities    Activity[]
 }
 
 model Client {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @map("created")
-  updatedAt DateTime @default(now()) @updatedAt
-
+  id                  String     @id @default(cuid())
+  createdAt           DateTime   @default(now()) @map("created")
+  updatedAt           DateTime   @default(now()) @updatedAt
   number              String?
   name                String
   billTo              String?
   invoiceNumberPrefix String?
-
-  invoices   Invoice[]
-  activities Activity[]
-
-  ownerId String
-  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId             String
+  invoices            Invoice[]
+  activities          Activity[]
+  owner               User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
 }
 
 model Invoice {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @map("created")
-  updatedAt DateTime @default(now()) @updatedAt
-
-  sentAt DateTime?
-  paidAt DateTime?
-
-  invoiceNo String
-  billTo    String?
-  date      DateTime
-  status    InvoiceStatus @default(CREATED)
-
+  id         String        @id @default(cuid())
+  createdAt  DateTime      @default(now()) @map("created")
+  updatedAt  DateTime      @default(now()) @updatedAt
+  sentAt     DateTime?
+  paidAt     DateTime?
+  invoiceNo  String
+  billTo     String?
+  date       DateTime
+  status     InvoiceStatus @default(CREATED)
+  clientId   String
+  ownerId    String
   activities Activity[]
-
-  clientId String
-  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  ownerId  String
-  owner    User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  client     Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  owner      User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([clientId])
   @@index([ownerId])
 }
 
 model Activity {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @map("created")
-  updatedAt DateTime @default(now()) @updatedAt
-
-  date            DateTime  @db.Date()
-  startTime       DateTime? @db.Time()
-  endTime         DateTime? @db.Time()
+  id              String      @id @default(cuid())
+  createdAt       DateTime    @default(now()) @map("created")
+  updatedAt       DateTime    @default(now()) @updatedAt
+  date            DateTime    @db.Date
+  startTime       DateTime?   @db.Time(6)
+  endTime         DateTime?   @db.Time(6)
   transitDuration Int?
   transitDistance Int?
   itemDistance    Int?
-
-  ownerId       String?
-  owner         User?       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  clientId      String?
-  client        Client?     @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  supportItemId String
-  supportItem   SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
-  invoiceId     String?
-  invoice       Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  ownerId         String?
+  clientId        String?
+  supportItemId   String
+  invoiceId       String?
+  owner           User?       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  client          Client?     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  supportItem     SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
+  invoice         Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
 
   @@index([ownerId])
   @@index([clientId])
@@ -143,14 +128,12 @@ model Activity {
 }
 
 model SupportItem {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @map("created")
-  updatedAt DateTime @default(now()) @updatedAt
-
-  description String
-  rateType    RateType @default(HOUR)
-  isGroup     Boolean?
-
+  id            String     @id @default(cuid())
+  createdAt     DateTime   @default(now()) @map("created")
+  updatedAt     DateTime   @default(now()) @updatedAt
+  description   String
+  rateType      RateType   @default(HOUR)
+  isGroup       Boolean?
   weekdayCode   String
   weeknightCode String?
   saturdayCode  String?
@@ -159,11 +142,9 @@ model SupportItem {
   weeknightRate Decimal?
   saturdayRate  Decimal?
   sundayRate    Decimal?
-
-  activities Activity[]
-
-  ownerId String
-  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId       String
+  activities    Activity[]
+  owner         User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
 }

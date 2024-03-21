@@ -31,7 +31,7 @@ module.exports = {
 		"jsx-a11y/no-static-element-interactions": "off",
 		"jsx-a11y/click-events-have-key-events": "off",
 		"jsx-a11y/label-has-associated-control": [
-			2,
+			1,
 			{
 				labelComponents: ["Label"],
 				labelAttributes: ["label"],
@@ -44,7 +44,7 @@ module.exports = {
 					"TimeInput",
 					"DatePicker",
 				],
-				depth: 2,
+				depth: 3,
 			},
 		],
 	},

@@ -6,8 +6,8 @@ on:
       - main
 
 env:
-  POSTGRES_URL: postgres://postgres:pass@localhost:5432/melvin
-  POSTGRES_URL_NON_POOLING: postgres://postgres:pass@localhost:5432/melvin
+  DATABASE_URL: postgres://postgres:pass@localhost:5432/melvin
+  DIRECT_URL: postgres://postgres:pass@localhost:5432/melvin
   NEXTAUTH_URL: "http://localhost:3000"
 
 jobs:
