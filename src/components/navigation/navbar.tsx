@@ -10,12 +10,13 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { ModeToggle } from "../theme-toggle";
 
 const Navbar = () => {
 	const session = useSession();
 
 	return (
-		<div className="fixed bottom-0 flex h-14 w-full items-center gap-8 border-t bg-inherit shadow-top md:relative md:mx-auto md:h-20 md:max-w-7xl md:border-none md:px-10 md:shadow-none">
+		<div className="shadow-top fixed bottom-0 flex h-14 w-full items-center gap-8 border-t bg-inherit md:relative md:mx-auto md:h-20 md:max-w-7xl md:border-none md:px-10 md:shadow-none">
 			<div className="flex w-full items-center justify-evenly md:mt-2 md:flex-row md:content-end md:justify-start md:gap-3 md:p-0">
 				<NavLink href="/dashboard/invoices" icon={faFile} className="order-1">
 					Invoices
@@ -44,6 +45,9 @@ const Navbar = () => {
 					<FontAwesomeIcon icon={faPenToSquare} />
 					<span className="hidden md:inline">LOG</span>
 				</Link>
+				<div className="order-6">
+					<ModeToggle />
+				</div>
 			</div>
 
 			<NavAuth user={session.data?.user} />

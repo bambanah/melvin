@@ -1,4 +1,4 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Form from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
 import Label from "@/components/ui/label";
@@ -166,17 +166,14 @@ const ClientForm = ({ existingClient }: Props) => {
 					/>
 					<ErrorMessage error={errors.invoiceEmail?.message} />
 				</Label>
-				<div className="btn-group">
-					<Button
-						type="submit"
-						variant="primary"
-						disabled={isSubmitting || !isDirty || !isValid}
-					>
+
+				<div className="mt-4 flex justify-center gap-4">
+					<Button type="submit" disabled={isSubmitting || !isDirty || !isValid}>
 						{formPurpose.charAt(0).toUpperCase() + formPurpose.slice(1)}
 					</Button>
-					<Link href="/dashboard/clients">
-						<Button type="button">Cancel</Button>
-					</Link>
+					<Button asChild type="button" variant="secondary">
+						<Link href="/dashboard/clients">Cancel</Link>
+					</Button>
 				</div>
 			</Form>
 		</div>

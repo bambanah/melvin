@@ -1,4 +1,4 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Form from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
 import Label from "@/components/ui/label";
@@ -164,15 +164,15 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 					watch={watch}
 				/>
 
-				<div className="btn-group">
-					<Button
-						type="submit"
-						variant="primary"
-						disabled={!isDirty || !isValid || isSubmitting}
-					>
+				<div className="mt-4 flex justify-center gap-4">
+					<Button type="submit" disabled={!isDirty || !isValid || isSubmitting}>
 						{existingInvoice ? "Update" : "Create"}
 					</Button>
-					<Button type="button" onClick={() => router.back()}>
+					<Button
+						type="button"
+						onClick={() => router.back()}
+						variant="secondary"
+					>
 						Cancel
 					</Button>
 				</div>

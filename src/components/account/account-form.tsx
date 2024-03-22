@@ -1,4 +1,4 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Form from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
 import Label from "@/components/ui/label";
@@ -134,7 +134,7 @@ const AccountForm = ({ existingUser }: Props) => {
 					</Label>
 				</div>
 
-				<div className="btn-group">
+				<div className="mt-4 flex justify-center gap-4">
 					<Button
 						type="submit"
 						variant="secondary"

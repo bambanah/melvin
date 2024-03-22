@@ -1,17 +1,18 @@
 import { InvoiceStatusBadge } from "@/components/ui/badge";
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import LogPayment from "@/components/invoices/log-payment-modal";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListFilterRow from "@/components/shared/list-filter-row";
 import ListPage from "@/components/shared/list-page";
-import { getTotalCostOfActivities } from "@/lib/activity-utils";
-import { trpc } from "@/lib/trpc";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import {
 	faDownload,
 	faEnvelope,
 	faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getTotalCostOfActivities } from "@/lib/activity-utils";
+import { trpc } from "@/lib/trpc";
 import classNames from "classnames";
 import Link from "next/link";
 import { useState } from "react";
@@ -51,15 +52,15 @@ export default function InvoiceList({
 
 				<LogPayment />
 
-				<Button
-					as={Link}
-					href={`/dashboard/invoices/create${
-						clientId ? `?clientId=${clientId}` : ""
-					}`}
-					variant="primary"
-				>
-					<FontAwesomeIcon icon={faPlus} />
-					<span>Add</span>
+				<Button asChild variant="secondary">
+					<Link
+						href={`/dashboard/invoices/create${
+							clientId ? `?clientId=${clientId}` : ""
+						}`}
+					>
+						<FontAwesomeIcon icon={faPlus} />
+						<span>Add</span>
+					</Link>
 				</Button>
 			</ListPage.Header>
 

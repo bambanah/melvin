@@ -1,4 +1,4 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Form from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
 import Label from "@/components/ui/label";
@@ -223,12 +223,8 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					</div>
 				</div>
 
-				<div className="btn-group">
-					<Button
-						type="submit"
-						variant="primary"
-						disabled={isSubmitting || !isDirty || !isValid}
-					>
+				<div className="mt-4 flex justify-center gap-4">
+					<Button type="submit" disabled={isSubmitting || !isDirty || !isValid}>
 						{existingActivity ? "Update" : "Create"}
 					</Button>
 					<Button type="button" onClick={() => router.back()}>

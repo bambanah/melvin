@@ -1,4 +1,5 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
 	faCaretDown,
 	faExternalLink,
@@ -20,7 +21,7 @@ const NavAuth = ({ user }: NavAuthProps) => {
 		<Menu as="div" className="relative z-50 hidden text-left md:inline-block">
 			<div>
 				<Menu.Button>
-					<div className="flex items-center gap-1 whitespace-nowrap p-3 text-zinc-700 hover:text-fg">
+					<div className="hover:text-fg flex items-center gap-1 whitespace-nowrap p-3 text-zinc-700">
 						<FontAwesomeIcon icon={faUserCircle} size="xl" />
 						<FontAwesomeIcon icon={faCaretDown} size="xs" />
 					</div>
@@ -51,24 +52,25 @@ const NavAuth = ({ user }: NavAuthProps) => {
 						<Menu.Item>
 							{({ active }) => (
 								<Button
-									as={Link}
-									href="/dashboard/account/edit"
-									className={classNames(["btn-base", active && "btn-raised"])}
+									asChild
+									variant="secondary"
+									className={cn("btn-base", active ? "btn-raised" : "")}
 								>
-									Manage Account
+									<Link href="/dashboard/account/edit">Manage Account</Link>
 								</Button>
 							)}
 						</Menu.Item>
 						<Menu.Item>
 							{({ active }) => (
 								<Button
-									as="a"
-									href="/price-guide-22-23.pdf"
-									target="_blank"
+									asChild
+									variant="secondary"
 									className={classNames(["btn-base", active && "btn-raised"])}
 								>
-									Price Guide
-									<FontAwesomeIcon icon={faExternalLink} size="xs" />
+									<Link href="/price-guide-22-23.pdf" target="_blank">
+										Price Guide
+										<FontAwesomeIcon icon={faExternalLink} size="xs" />
+									</Link>
 								</Button>
 							)}
 						</Menu.Item>
@@ -78,6 +80,7 @@ const NavAuth = ({ user }: NavAuthProps) => {
 							{({ active }) => (
 								<Button
 									type="button"
+									variant="secondary"
 									onClick={() => {
 										signOut();
 									}}

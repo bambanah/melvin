@@ -1,4 +1,4 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
@@ -76,7 +76,7 @@ const EditAccountPage = () => {
 					{isAdvancedExpanded && (
 						<div>
 							<Button
-								variant="danger"
+								variant="destructive"
 								onClick={() => setAccountResetDialogOpen(true)}
 							>
 								Reset Account

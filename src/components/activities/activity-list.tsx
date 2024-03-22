@@ -1,5 +1,5 @@
 import Badge from "@/components/ui/badge";
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListFilterRow from "@/components/shared/list-filter-row";
 import ListPage from "@/components/shared/list-page";
@@ -56,13 +56,11 @@ function ActivityList({
 				<h2 className="mr-auto text-2xl font-bold">Activities</h2>
 
 				{displayCreateButton ? (
-					<Button
-						as={Link}
-						href="/dashboard/activities/create"
-						variant="primary"
-					>
-						<FontAwesomeIcon icon={faPlus} />
-						<span>Add</span>
+					<Button asChild>
+						<Link href="/dashboard/activities/create">
+							<FontAwesomeIcon icon={faPlus} />
+							<span>Add</span>
+						</Link>
 					</Button>
 				) : undefined}
 			</ListPage.Header>

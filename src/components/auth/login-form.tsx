@@ -1,4 +1,4 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Form from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
@@ -22,13 +22,11 @@ const LoginForm = () => {
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
 			<input
-				className="grow border bg-neutral-50 px-6 py-3 text-fg"
+				className="text-fg grow border bg-neutral-50 px-6 py-3"
 				placeholder="Email Address"
 				{...register("email")}
 			/>
-			<Button type="submit" variant="primary">
-				Continue
-			</Button>
+			<Button type="submit">Continue</Button>
 		</Form>
 	);
 };

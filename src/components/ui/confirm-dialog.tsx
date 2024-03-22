@@ -1,4 +1,4 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Dialog } from "@headlessui/react";
 import { Dispatch, SetStateAction } from "react";
 
@@ -38,7 +38,7 @@ const ConfirmDialog = ({
 						<div className="flex gap-4 pt-2">
 							<Button
 								type="button"
-								variant="danger"
+								variant="destructive"
 								onClick={() => {
 									confirmAction();
 									setIsOpen(false);

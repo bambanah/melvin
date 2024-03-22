@@ -3,6 +3,7 @@ import Dropdown from "@/components/ui/dropdown";
 import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
 import InvoiceList from "@/components/invoices/invoice-list";
+import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import {
 	faArrowUpRightFromSquare,
 	faEllipsisV,
