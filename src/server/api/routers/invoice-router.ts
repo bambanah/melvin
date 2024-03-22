@@ -1,7 +1,7 @@
-import { Client, Invoice, InvoiceStatus } from "@prisma/client";
 import { activitySchema } from "@/schema/activity-schema";
 import { InvoiceSchema, invoiceSchema } from "@/schema/invoice-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
+import { Client, Invoice, InvoiceStatus } from "@prisma/client";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { invoiceCandidatesFromPaymentAmount } from "@/lib/invoice-utils";

@@ -1,4 +1,4 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListPage from "@/components/shared/list-page";
 import { faPlus, faUserGroup } from "@fortawesome/free-solid-svg-icons";
@@ -44,13 +44,11 @@ function SupportItemList() {
 			<ListPage.Header>
 				<h2 className="mr-auto text-2xl font-bold">Support Items</h2>
 
-				<Button
-					as={Link}
-					href="/dashboard/support-items/create"
-					variant="primary"
-				>
-					<FontAwesomeIcon icon={faPlus} />
-					<span>Add</span>
+				<Button asChild>
+					<Link href="/dashboard/support-items/create">
+						<FontAwesomeIcon icon={faPlus} />
+						<span>Add</span>
+					</Link>
 				</Button>
 			</ListPage.Header>
 			<InfiniteList queryResult={queryResult} dataKey="supportItems">

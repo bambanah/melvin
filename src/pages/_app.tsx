@@ -1,7 +1,8 @@
 import "@/styles/globals.css";
 import { trpc } from "@/lib/trpc";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import { cn } from "@/lib/utils";
 import classNames from "classnames";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { Inter, Patua_One, Roboto_Mono } from "next/font/google";
@@ -14,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import { ThemeProvider } from "@/components/theme-provider";
 config.autoAddCss = false;
 
 // Google fonts
@@ -33,23 +35,22 @@ const robotoMono = Roboto_Mono({
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 	return (
-		<>
-			<main
-				className={classNames([
-					"transition-colors",
-					inter.variable,
-					patuaOne.variable,
-					robotoMono.variable,
-				])}
-			>
-				<style jsx global>{`
-					:root {
-						--font-inter: ${inter.style.fontFamily};
-						--font-patua-one: ${patuaOne.style.fontFamily};
-						--font-roboto-mono: ${robotoMono.style.fontFamily};
-					}
-				`}</style>
-
+		<main
+			className={cn(
+				"min-h-screen bg-background font-sans antialiased",
+				inter.variable,
+				patuaOne.variable,
+				robotoMono.variable
+			)}
+		>
+			<style jsx global>{`
+				:root {
+					--font-inter: ${inter.style.fontFamily};
+					--font-patua-one: ${patuaOne.style.fontFamily};
+					--font-roboto-mono: ${robotoMono.style.fontFamily};
+				}
+			`}</style>
+			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 				<SessionProvider session={session}>
 					<Head>
 						<title>Melvin</title>
@@ -59,9 +60,8 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
 					<ToastContainer />
 				</SessionProvider>
-			</main>
-			<SpeedInsights />
-		</>
+			</ThemeProvider>
+		</main>
 	);
 }
 

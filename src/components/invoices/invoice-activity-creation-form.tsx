@@ -1,6 +1,6 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Heading from "@/components/ui/heading";
-import ClientSelect from "@/components/forms/client-select";
+import Label from "@/components/ui/label";
 import DatePicker from "@/components/forms/date-picker";
 import SupportItemSelect from "@/components/forms/support-item-select";
 import TimeInput from "@/components/forms/time-input";
@@ -199,6 +199,7 @@ const InvoiceActivityCreationForm = ({
 									<Button
 										onClick={() => field.activities.push({ date: "" })}
 										className="mt-2 w-16 px-8 py-2"
+										variant="secondary"
 									>
 										<FontAwesomeIcon icon={faPlus} />
 									</Button>

@@ -1,4 +1,4 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog } from "@headlessui/react";
@@ -147,14 +147,14 @@ const LogPayment = () => {
 
 								<div
 									className={classNames([
-										"flex items-center overflow-hidden rounded-md border bg-white px-3 text-fg shadow-md focus-within:border-orange-500",
+										"text-fg flex items-center overflow-hidden rounded-md border bg-white px-3 shadow-md focus-within:border-orange-500",
 									])}
 								>
 									<span className="font-light text-zinc-500">$</span>
 									<input
 										type="number"
 										step="0.01"
-										className="w-full border-none py-3 pl-1 text-fg outline-none"
+										className="text-fg w-full border-none py-3 pl-1 outline-none"
 										onChange={(e) =>
 											updateAmountPaid(Number.parseFloat(e.target.value) || 0)
 										}
@@ -180,10 +180,9 @@ const LogPayment = () => {
 									</>
 								)}
 
-							<div className="btn-group mt-0">
+							<div className="mt-0 flex justify-center gap-4">
 								<Button
 									type="button"
-									variant="primary"
 									onClick={() => {
 										updateMatchingInvoices();
 										closeModal();

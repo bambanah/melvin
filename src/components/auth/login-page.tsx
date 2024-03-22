@@ -1,4 +1,4 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Logo from "@/components/ui/logo";
 import AuthModal from "@/components/auth/auth-modal";
 import LoginForm from "@/components/auth/login-form";
