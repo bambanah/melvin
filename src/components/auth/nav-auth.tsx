@@ -1,13 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import {
-	faCaretDown,
-	faExternalLink,
-	faUserCircle,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Menu, Transition } from "@headlessui/react";
-import classNames from "classnames";
+import { ExternalLink } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { Fragment } from "react";
@@ -39,56 +34,38 @@ const NavAuth = ({ user }: NavAuthProps) => {
 				<Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-zinc-300 bg-white p-2 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 					<div className="flex flex-col">
 						<Menu.Item>
-							<Link
-								href="/dashboard/account"
-								className="w-full overflow-clip text-ellipsis p-2 text-zinc-900"
-							>
+							<div className="w-full overflow-clip text-ellipsis p-2 text-zinc-900">
 								<p className="text-sm">Signed in as</p>
 								{user && <span className="font-semibold">{user.email}</span>}
-							</Link>
+							</div>
 						</Menu.Item>
 					</div>
 					<div className="flex flex-col gap-2 py-4">
 						<Menu.Item>
-							{({ active }) => (
-								<Button
-									asChild
-									variant="secondary"
-									className={cn("btn-base", active ? "btn-raised" : "")}
-								>
-									<Link href="/dashboard/account/edit">Manage Account</Link>
-								</Button>
-							)}
+							<Button asChild variant="outline">
+								<Link href="/dashboard/account/edit">Manage Account</Link>
+							</Button>
 						</Menu.Item>
 						<Menu.Item>
-							{({ active }) => (
-								<Button
-									asChild
-									variant="secondary"
-									className={classNames(["btn-base", active && "btn-raised"])}
-								>
-									<Link href="/price-guide-22-23.pdf" target="_blank">
-										Price Guide
-										<FontAwesomeIcon icon={faExternalLink} size="xs" />
-									</Link>
-								</Button>
-							)}
+							<Button asChild variant="outline">
+								<Link href="/price-guide-22-23.pdf" target="_blank">
+									Price Guide
+									<ExternalLink className="ml-1 h-4 w-4" />
+								</Link>
+							</Button>
 						</Menu.Item>
 					</div>
 					<div className="flex flex-col gap-1 pt-4">
 						<Menu.Item>
-							{({ active }) => (
-								<Button
-									type="button"
-									variant="secondary"
-									onClick={() => {
-										signOut();
-									}}
-									className={classNames(["btn-base", active && "btn-raised"])}
-								>
-									Log Out
-								</Button>
-							)}
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => {
+									signOut();
+								}}
+							>
+								Log Out
+							</Button>
 						</Menu.Item>
 					</div>
 				</Menu.Items>
