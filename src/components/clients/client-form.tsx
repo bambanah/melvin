@@ -43,6 +43,7 @@ const ClientForm = ({ existingClient }: Props) => {
 			defaultTransitDistance:
 				existingClient?.defaultTransitDistance?.toString() ?? "",
 			defaultTransitTime: existingClient?.defaultTransitTime?.toString() ?? "",
+			invoiceEmail: existingClient?.invoiceEmail ?? "",
 		},
 	});
 
@@ -153,6 +154,17 @@ const ClientForm = ({ existingClient }: Props) => {
 						suffix="mins"
 					/>
 					<ErrorMessage error={errors.defaultTransitTime?.message} />
+				</Label>
+				<Label>
+					<span>Invoice Email</span>
+					<Input
+						name="invoiceEmail"
+						type="text"
+						register={register}
+						error={!!errors.invoiceEmail}
+						placeholder="invoices@client.com"
+					/>
+					<ErrorMessage error={errors.invoiceEmail?.message} />
 				</Label>
 				<div className="btn-group">
 					<Button
