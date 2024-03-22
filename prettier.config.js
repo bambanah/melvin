@@ -6,4 +6,12 @@ module.exports = {
 	trailingComma: "es5",
 	plugins: [require.resolve("prettier-plugin-tailwindcss")],
 	tailwindConfig: "./tailwind.config.js",
+	overrides: [
+		{
+			files: "pnpm-lock.yaml",
+			options: {
+				singleQuote: true,
+			},
+		},
+	],
 };
