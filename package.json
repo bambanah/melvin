@@ -3,7 +3,7 @@
 	"private": true,
 	"packageManager": "pnpm@8.15.5",
 	"scripts": {
-		"prepare": "husky install",
+		"prepare": "husky",
 		"build:1-generate": "prisma generate",
 		"build:2-build": "next build",
 		"build": "run-s build:*",
@@ -94,7 +94,6 @@
 		"@types/jest": "^29.5.12",
 		"@types/node": "^20.11.30",
 		"@types/react": "18.2.67",
-		"@types/react-datepicker": "^4.19.6",
 		"@types/react-dom": "^18.2.22",
 		"@types/safe-json-stringify": "^1.1.5",
 		"@types/styled-components": "^5.1.34",
