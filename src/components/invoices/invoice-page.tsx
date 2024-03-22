@@ -4,13 +4,12 @@ import Heading from "@atoms/heading";
 import Loading from "@atoms/loading";
 import {
 	faClock,
-	faCopy,
-	faFilePdf,
 	faPaperPlane,
 	faUser,
 } from "@fortawesome/free-regular-svg-icons";
 import {
 	faDollarSign,
+	faDownload,
 	faMagnifyingGlassPlus,
 	faRunning,
 	faUndo,
@@ -21,20 +20,21 @@ import { InvoiceStatus } from "@prisma/client";
 import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { trpc } from "@utils/trpc";
 import classNames from "classnames";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 import { toast } from "react-toastify";
+
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+
 const PdfPreview = dynamic(() => import("@components/invoices/pdf-preview"));
 const ConfirmDialog = dynamic(() => import("@atoms/confirm-dialog"));
 const ActivityList = dynamic(
 	() => import("@components/activities/activity-list")
 );
-
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import dynamic from "next/dynamic";
-dayjs.extend(utc);
 
 const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 	const router = useRouter();
@@ -168,19 +168,49 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 						<InvoiceStatusBadge invoiceStatus={invoice.status} />
 					</div>
 
-					<div className="flex flex-grow flex-col justify-center gap-4">
-						{invoice.status === InvoiceStatus.CREATED &&
-							invoice.activities.length > 0 && (
+					<div className="flex flex-grow flex-col justify-start gap-4">
+						<div className="mt-5 flex justify-center gap-2">
+							{invoice.status === InvoiceStatus.CREATED &&
+								invoice.activities.length > 0 && (
+									<Button
+										onClick={() => {
+											markInvoiceAs(InvoiceStatus.SENT);
+										}}
+										variant="primary"
+										className="w-1/2 grow"
+									>
+										<FontAwesomeIcon icon={faPaperPlane} /> Mark as Sent
+									</Button>
+								)}
+							{invoice.status === InvoiceStatus.SENT && (
 								<Button
-									onClick={() => {
-										markInvoiceAs("SENT");
-									}}
-									variant="primary"
-									className="mt-3 font-semibold"
+									onClick={() => markInvoiceAs(InvoiceStatus.PAID)}
+									variant="secondary"
+									className="w-1/2 grow"
 								>
-									Send <FontAwesomeIcon icon={faPaperPlane} />
+									<FontAwesomeIcon icon={faDollarSign} /> Mark as Paid
 								</Button>
 							)}
+							{invoice.status === InvoiceStatus.PAID && (
+								<Button
+									onClick={() => {
+										markInvoiceAs("CREATED");
+									}}
+									className="w-1/2 grow"
+								>
+									<FontAwesomeIcon icon={faUndo} />
+									Revert to Created
+								</Button>
+							)}
+							<Button
+								as="a"
+								href={`/api/invoices/generate-pdf/${invoiceId}`}
+								className="w-1/2 grow"
+							>
+								<FontAwesomeIcon icon={faDownload} />
+								Download PDF
+							</Button>
+						</div>
 						{invoice.sentAt && (
 							<div className="flex flex-col gap-1 text-zinc-600">
 								<p>Sent on: {dayjs.utc(invoice.sentAt).format("DD/MM/YYYY")}</p>
@@ -189,77 +219,33 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					</div>
 				</div>
 			</div>
-			<div className="flex w-full flex-col justify-between md:flex-row-reverse md:pt-6">
+			<div className="flex w-full flex-col justify-between md:flex-row md:pt-6">
 				<div className="flex basis-1/2 flex-col gap-0 p-2 px-4">
 					<p className="font-semibold">Info</p>
 					<div className="flex items-center gap-4 p-2">
-						<FontAwesomeIcon icon={faClock} />
+						<FontAwesomeIcon icon={faClock} className="w-4 text-fg" />
 						<p>{dayjs.utc(invoice.date).format("DD/MM/YYYY")}</p>
 					</div>
 					<Link
 						className="flex w-full items-center gap-4 p-2 text-left text-fg hover:bg-zinc-200"
 						href={`/dashboard/clients/${invoice.client.id}`}
 					>
-						<FontAwesomeIcon icon={faUser} className="text-fg" />
+						<FontAwesomeIcon icon={faUser} className="w-4 text-fg" />
 						{invoice.client.name}
 					</Link>
 					<div className="flex items-center gap-4 p-2">
-						<FontAwesomeIcon icon={faRunning} />
+						<FontAwesomeIcon icon={faRunning} className="w-4 text-fg" />
 						<p>
 							{invoice.activities.length} Activit
 							{invoice.activities.length > 1 ? "ies" : "y"}
 						</p>
 					</div>
-				</div>
-
-				<div className="flex basis-1/2 flex-col gap-2 px-4 pb-4">
-					<p className="font-semibold">Payment</p>
-					{invoice.status === "PAID" ? (
-						<>
-							{invoice.paidAt && (
-								<div>
-									<span className="text-zinc-600">
-										Received: {dayjs.utc(invoice.paidAt).format("DD/MM/YYYY")}
-									</span>
-								</div>
-							)}
-							<Button
-								onClick={() => {
-									markInvoiceAs("CREATED");
-								}}
-								className="justify-start"
-							>
-								<FontAwesomeIcon icon={faUndo} />
-								Revert to Created
-							</Button>
-						</>
-					) : (
-						<Button
-							type="button"
-							className="justify-start"
-							onClick={() => markInvoiceAs(InvoiceStatus.PAID)}
-						>
-							<FontAwesomeIcon icon={faDollarSign} />
-							Payment Received
-						</Button>
+					{invoice.paidAt && (
+						<div className="flex items-center gap-4 p-2">
+							<FontAwesomeIcon icon={faDollarSign} className="w-4 text-fg" />
+							<p>Paid {dayjs.utc(invoice.paidAt).format("DD/MM/YYYY")}</p>
+						</div>
 					)}
-					<p className="font-semibold">More</p>
-					<Button
-						as="a"
-						className="justify-start"
-						href={`/dashboard/invoices/create?copyFrom=${invoiceId}`}
-					>
-						<FontAwesomeIcon icon={faCopy} />
-						Copy
-					</Button>
-					<Button
-						as="a"
-						className="justify-start"
-						href={`/api/invoices/generate-pdf/${invoiceId}`}
-					>
-						<FontAwesomeIcon icon={faFilePdf} />
-						Export as PDF
-					</Button>
 				</div>
 			</div>
 
