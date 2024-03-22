@@ -9,7 +9,7 @@ import Input from "@/components/forms/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InvoiceSchema, invoiceSchema } from "@/schema/invoice-schema";
 import { InvoiceByIdOutput } from "@/server/api/routers/invoice-router";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import classNames from "classnames";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";

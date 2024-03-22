@@ -12,7 +12,7 @@ import { RateType } from "@prisma/client";
 import type { SupportItemSchema } from "@/schema/support-item-schema";
 import { supportItemSchema } from "@/schema/support-item-schema";
 import { SupportItemByIdOutput } from "@/server/api/routers/support-item-router";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";

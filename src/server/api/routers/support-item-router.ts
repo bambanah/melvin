@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { supportItemSchema } from "@/schema/support-item-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
-import { baseListQueryInput } from "@/utils/trpc";
+import { baseListQueryInput } from "@/lib/trpc";
 import { z } from "zod";
 
 const defaultSupportItemSelect = {

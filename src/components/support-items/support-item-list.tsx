@@ -4,7 +4,7 @@ import ListPage from "@/components/shared/list-page";
 import { faPlus, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Prisma, RateType } from "@prisma/client";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import Link from "next/link";
 
 const ItemCode = ({

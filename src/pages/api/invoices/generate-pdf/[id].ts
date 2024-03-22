@@ -1,6 +1,6 @@
 import { InvoiceByIdOutput } from "@/server/api/routers/invoice-router";
 import prisma from "@/server/prisma";
-import generatePDF from "@/utils/pdf-generation";
+import generatePDF from "@/lib/pdf-generation";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async (request: NextApiRequest, response: NextApiResponse) => {

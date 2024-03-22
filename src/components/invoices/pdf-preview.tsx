@@ -1,5 +1,5 @@
 import Loading from "@/components/atoms/loading";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import { FC, useState } from "react";
 import { Document, Page } from "react-pdf";
 import { SizeMe } from "react-sizeme";

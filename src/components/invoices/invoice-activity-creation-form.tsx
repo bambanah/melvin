@@ -14,7 +14,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { InvoiceSchema } from "@/schema/invoice-schema";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import classNames from "classnames";
 import { useMemo } from "react";
 import {

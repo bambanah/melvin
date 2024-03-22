@@ -3,7 +3,7 @@ import Dropdown from "@/components/atoms/dropdown";
 import Heading from "@/components/atoms/heading";
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";

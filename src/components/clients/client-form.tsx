@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { ClientSchema } from "@/schema/client-schema";
 import { clientSchema } from "@/schema/client-schema";
 import { ClientByIdOutput } from "@/server/api/routers/client-router";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";

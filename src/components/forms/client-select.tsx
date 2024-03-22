@@ -1,5 +1,5 @@
 import Select from "@/components/forms/select";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import { useEffect, useState } from "react";
 import { FieldValues, UseControllerProps } from "react-hook-form";
 
