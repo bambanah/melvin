@@ -94,7 +94,7 @@
 		"@types/jest": "^29.5.12",
 		"@types/node": "^20.11.30",
 		"@types/react": "18.2.67",
-		"@types/react-datepicker": "^4.19.6",
+		"@types/react-datepicker": "^6.0.0",
 		"@types/react-dom": "^18.2.22",
 		"@types/safe-json-stringify": "^1.1.5",
 		"@types/styled-components": "^5.1.34",
