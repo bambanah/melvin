@@ -24,7 +24,10 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 	await page.getByText(client.name, { exact: true }).click();
 
 	await page.locator("#invoiceNo").fill(invoice.invoiceNo);
-	await page.getByText(supportItem.description, { exact: true }).click();
+	await page
+		.getByText(supportItem.description, { exact: true })
+		.first()
+		.click();
 
 	await page.getByRole("button", { name: "Create" }).click();
 	await waitForAlert(page, "invoice created");
