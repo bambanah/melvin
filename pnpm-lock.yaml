@@ -195,7 +195,7 @@ devDependencies:
     version: 29.7.0
   npm-run-all2:
     specifier: ^5.0.0
-    version: 5.0.0
+    version: 5.0.2
   postcss:
     specifier: ^8.4.38
     version: 8.4.38
@@ -3368,8 +3368,8 @@ packages:
       webidl-conversions: 7.0.0
     dev: true
 
-  /dompurify@2.4.8:
-    resolution: {integrity: sha512-O90eQdAQOiLZoE9pEgPz3JfqXh5yrhJHv0/LzOv3wWFLTWUqAKaISD1aWASQTLshLM+jziuSerbtUESKK8Jibw==}
+  /dompurify@2.4.9:
+    resolution: {integrity: sha512-iHtnxYMotKgOTvxIqq677JsKHvCOkAFqj9x8Mek2zdeHW1XjuFKwjpmZeMaXQRQ8AbJZDbcRz/+r1QhwvFtmQg==}
     requiresBuild: true
     dev: false
     optional: true
@@ -5466,7 +5466,7 @@ packages:
     optionalDependencies:
       canvg: 3.0.10
       core-js: 3.36.1
-      dompurify: 2.4.8
+      dompurify: 2.4.9
       html2canvas: 1.4.1
     dev: false
 
@@ -5927,12 +5927,12 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /npm-run-all2@5.0.0:
-    resolution: {integrity: sha512-twczQhEpj55UROtg0Xz0nzn83TanS5Re12g5g1hcdnyAhlWOt9VNHdSHf2Z6MO3/wOVqy9tEdi0ruJt5NnMgmw==}
+  /npm-run-all2@5.0.2:
+    resolution: {integrity: sha512-S2G6FWZ3pNWAAKm2PFSOtEAG/N+XO/kz3+9l6V91IY+Y3XFSt7Lp7DV92KCgEboEW0hRTu0vFaMe4zXDZYaOyA==}
     engines: {node: '>= 10'}
     hasBin: true
     dependencies:
-      ansi-styles: 4.3.0
+      ansi-styles: 5.2.0
       cross-spawn: 7.0.3
       memorystream: 0.3.1
       minimatch: 3.1.2
