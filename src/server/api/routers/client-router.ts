@@ -1,8 +1,8 @@
-import { clientSchema } from "@schema/client-schema";
-import { authedProcedure, router } from "@server/api/trpc";
+import { clientSchema } from "@/schema/client-schema";
+import { authedProcedure, router } from "@/server/api/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
-import { getNextInvoiceNo } from "@utils/invoice-utils";
-import { baseListQueryInput } from "@utils/trpc";
+import { getNextInvoiceNo } from "@/utils/invoice-utils";
+import { baseListQueryInput } from "@/utils/trpc";
 import { z } from "zod";
 
 const defaultClientSelect = {

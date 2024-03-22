@@ -1,7 +1,7 @@
-import Layout from "@components/shared/layout";
+import Layout from "@/components/shared/layout";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-const InvoicePage = dynamic(() => import("@components/invoices/invoice-page"));
+const InvoicePage = dynamic(() => import("@/components/invoices/invoice-page"));
 
 const Invoice = () => {
 	const router = useRouter();

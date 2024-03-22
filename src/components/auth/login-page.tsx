@@ -1,7 +1,7 @@
-import Button from "@atoms/button";
-import Logo from "@atoms/logo";
-import AuthModal from "@components/auth/auth-modal";
-import LoginForm from "@components/auth/login-form";
+import Button from "@/components/atoms/button";
+import Logo from "@/components/atoms/logo";
+import AuthModal from "@/components/auth/auth-modal";
+import LoginForm from "@/components/auth/login-form";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BuiltInProviderType } from "next-auth/providers";

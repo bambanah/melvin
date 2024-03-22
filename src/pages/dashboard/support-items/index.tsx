@@ -1,5 +1,5 @@
-import Layout from "@components/shared/layout";
-import SupportItemList from "@components/support-items/support-item-list";
+import Layout from "@/components/shared/layout";
+import SupportItemList from "@/components/support-items/support-item-list";
 
 function SupportItems() {
 	return (

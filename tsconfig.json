@@ -17,15 +17,7 @@
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitReturns": true,
 		"paths": {
-			"@atoms/*": ["src/components/atoms/*"],
-			"@components/*": ["src/components/*"],
-			"@context/*": ["src/context/*"],
-			"@env/*": ["src/env/*"],
-			"@pages/*": ["src/pages/*"],
-			"@schema/*": ["src/schema/*"],
-			"@server/*": ["src/server/*"],
-			"@styles/*": ["src/styles/*"],
-			"@utils/*": ["src/utils/*"]
+			"@/*": ["src/*"]
 		},
 		"pretty": true,
 		"resolveJsonModule": true,

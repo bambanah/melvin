@@ -1,5 +1,5 @@
 import { chromium } from "@playwright/test";
-import prisma from "@server/prisma";
+import prisma from "@/server/prisma";
 import dayjs from "dayjs";
 import fs from "node:fs";
 import path from "node:path";

@@ -1,5 +1,5 @@
-import NavAuth from "@components/auth/nav-auth";
-import NavLink from "@components/navigation/nav-link";
+import NavAuth from "@/components/auth/nav-auth";
+import NavLink from "@/components/navigation/nav-link";
 import {
 	faFile,
 	faPenToSquare,

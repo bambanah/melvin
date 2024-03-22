@@ -1,4 +1,4 @@
-import Navbar from "@components/navigation/navbar";
+import Navbar from "@/components/navigation/navbar";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";

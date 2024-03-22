@@ -1,4 +1,4 @@
-import LoginPage from "@components/auth/login-page";
+import LoginPage from "@/components/auth/login-page";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getProviders, getSession } from "next-auth/react";
 

@@ -1,4 +1,4 @@
-import { router } from "@server/api/trpc";
+import { router } from "@/server/api/trpc";
 import { activityRouter } from "./routers/activity-router";
 import { clientRouter } from "./routers/client-router";
 import { invoiceRouter } from "./routers/invoice-router";

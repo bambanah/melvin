@@ -1,8 +1,8 @@
-import Loading from "@atoms/loading";
-import NotFound from "@atoms/not-found";
-import ActivityForm from "@components/activities/activity-form";
-import Layout from "@components/shared/layout";
-import { trpc } from "@utils/trpc";
+import Loading from "@/components/atoms/loading";
+import NotFound from "@/components/atoms/not-found";
+import ActivityForm from "@/components/activities/activity-form";
+import Layout from "@/components/shared/layout";
+import { trpc } from "@/utils/trpc";
 import Head from "next/head";
 import { useRouter } from "next/router";
 

@@ -1,8 +1,8 @@
-import Heading from "@atoms/heading";
+import Heading from "@/components/atoms/heading";
 import { faCalendar, faClock, faCar } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { InvoiceSchema } from "@schema/invoice-schema";
-import { ActivityListOutput } from "@server/api/routers/activity-router";
+import { InvoiceSchema } from "@/schema/invoice-schema";
+import { ActivityListOutput } from "@/server/api/routers/activity-router";
 import classNames from "classnames";
 import dayjs from "dayjs";
 import React from "react";

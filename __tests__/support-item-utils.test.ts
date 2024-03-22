@@ -2,7 +2,7 @@ import {
 	getSupportCategories,
 	getRegistrationGroups,
 	getSupportItemDefs,
-} from "@utils/support-item-utils";
+} from "@/utils/support-item-utils";
 
 describe("support item utils", () => {
 	it("should get support categories", () => {

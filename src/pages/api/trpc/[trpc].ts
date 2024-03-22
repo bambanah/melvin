@@ -1,5 +1,5 @@
-import { createContext } from "@server/api/context";
-import { appRouter } from "@server/api/app-router";
+import { createContext } from "@/server/api/context";
+import { appRouter } from "@/server/api/app-router";
 import * as trpcNext from "@trpc/server/adapters/next";
 
 export default trpcNext.createNextApiHandler({
@@ -11,6 +11,6 @@ export default trpcNext.createNextApiHandler({
 					console.error(
 						`❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`
 					);
-			  }
+				}
 			: undefined,
 });

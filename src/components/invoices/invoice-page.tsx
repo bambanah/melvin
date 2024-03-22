@@ -1,7 +1,7 @@
-import { InvoiceStatusBadge } from "@atoms/badge";
-import Button from "@atoms/button";
-import Heading from "@atoms/heading";
-import Loading from "@atoms/loading";
+import { InvoiceStatusBadge } from "@/components/atoms/badge";
+import Button from "@/components/atoms/button";
+import Heading from "@/components/atoms/heading";
+import Loading from "@/components/atoms/loading";
 import {
 	faClock,
 	faPaperPlane,
@@ -17,8 +17,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog, Transition } from "@headlessui/react";
 import { InvoiceStatus } from "@prisma/client";
-import { getTotalCostOfActivities } from "@utils/activity-utils";
-import { trpc } from "@utils/trpc";
+import { getTotalCostOfActivities } from "@/utils/activity-utils";
+import { trpc } from "@/utils/trpc";
 import classNames from "classnames";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -30,10 +30,12 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
-const PdfPreview = dynamic(() => import("@components/invoices/pdf-preview"));
-const ConfirmDialog = dynamic(() => import("@atoms/confirm-dialog"));
+const PdfPreview = dynamic(() => import("@/components/invoices/pdf-preview"));
+const ConfirmDialog = dynamic(
+	() => import("@/components/atoms/confirm-dialog")
+);
 const ActivityList = dynamic(
-	() => import("@components/activities/activity-list")
+	() => import("@/components/activities/activity-list")
 );
 
 const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {

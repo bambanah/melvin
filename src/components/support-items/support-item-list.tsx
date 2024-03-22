@@ -1,10 +1,10 @@
-import Button from "@atoms/button";
-import InfiniteList from "@components/shared/infinite-list";
-import ListPage from "@components/shared/list-page";
+import Button from "@/components/atoms/button";
+import InfiniteList from "@/components/shared/infinite-list";
+import ListPage from "@/components/shared/list-page";
 import { faPlus, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Prisma, RateType } from "@prisma/client";
-import { trpc } from "@utils/trpc";
+import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 
 const ItemCode = ({

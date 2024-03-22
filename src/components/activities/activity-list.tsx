@@ -1,8 +1,8 @@
-import Badge from "@atoms/badge";
-import Button from "@atoms/button";
-import InfiniteList from "@components/shared/infinite-list";
-import ListFilterRow from "@components/shared/list-filter-row";
-import ListPage from "@components/shared/list-page";
+import Badge from "@/components/atoms/badge";
+import Button from "@/components/atoms/button";
+import InfiniteList from "@/components/shared/infinite-list";
+import ListFilterRow from "@/components/shared/list-filter-row";
+import ListPage from "@/components/shared/list-page";
 import {
 	faCar,
 	faClock,
@@ -11,15 +11,15 @@ import {
 	faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ActivityListOutput } from "@server/api/routers/activity-router";
-import { getTotalCostOfActivities } from "@utils/activity-utils";
+import { ActivityListOutput } from "@/server/api/routers/activity-router";
+import { getTotalCostOfActivities } from "@/utils/activity-utils";
 import {
 	formatDuration,
 	getDuration,
 	isHoliday as isDateHoliday,
-} from "@utils/date-utils";
-import { groupBy } from "@utils/generic-utils";
-import { trpc } from "@utils/trpc";
+} from "@/utils/date-utils";
+import { groupBy } from "@/utils/generic-utils";
+import { trpc } from "@/utils/trpc";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { useState } from "react";
@@ -31,7 +31,9 @@ interface Props {
 	groupByAssignedStatus?: boolean;
 }
 
-const groupActivitiesByDate = (activities?: ActivityListOutput["activities"]) =>
+const groupActivitiesByDate = (
+	activities?: ActivityListOutput["activities"]
+) =>
 	activities
 		? groupBy(activities, (activity) => dayjs(activity.date).toString())
 		: {};

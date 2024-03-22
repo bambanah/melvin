@@ -1,4 +1,4 @@
-import { pickRandomFrom } from "@utils/generic-utils";
+import { pickRandomFrom } from "@/utils/generic-utils";
 
 const USERS = [
 	"Finn the Human",
