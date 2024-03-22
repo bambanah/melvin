@@ -4,7 +4,11 @@ import LogPayment from "@components/invoices/log-payment-modal";
 import InfiniteList from "@components/shared/infinite-list";
 import ListFilterRow from "@components/shared/list-filter-row";
 import ListPage from "@components/shared/list-page";
-import { faEnvelope, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+	faDownload,
+	faEnvelope,
+	faPlus,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { trpc } from "@utils/trpc";
@@ -86,10 +90,16 @@ export default function InvoiceList({
 									>
 										{invoice.invoiceNo}: {invoice.client.name}
 									</Link>
+									<a
+										href={`/api/invoices/generate-pdf/${invoice.id}`}
+										target="_blank"
+									>
+										<FontAwesomeIcon icon={faDownload} size="sm" />
+									</a>
 									{invoice.client.invoiceEmail && (
 										<a
 											href={`mailto:${invoice.client.invoiceEmail}`}
-											className="text-neutral-500"
+											target="_blank"
 										>
 											<FontAwesomeIcon icon={faEnvelope} size="sm" />
 										</a>
