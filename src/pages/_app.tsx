@@ -1,7 +1,6 @@
 import "@/styles/globals.css";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
-import classNames from "classnames";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
@@ -60,6 +59,8 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
 					<ToastContainer />
 				</SessionProvider>
+
+				<SpeedInsights />
 			</ThemeProvider>
 		</main>
 	);

@@ -4,7 +4,6 @@ import LogPayment from "@/components/invoices/log-payment-modal";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListFilterRow from "@/components/shared/list-filter-row";
 import ListPage from "@/components/shared/list-page";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import {
 	faDownload,
 	faEnvelope,
