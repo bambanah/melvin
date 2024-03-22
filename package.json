@@ -3,6 +3,7 @@
 	"private": true,
 	"packageManager": "pnpm@8.15.5",
 	"scripts": {
+		"preinstall": "npx only-allow pnpm",
 		"prepare": "husky",
 		"build": "run-s build:*",
 		"build:1-generate": "prisma generate",
