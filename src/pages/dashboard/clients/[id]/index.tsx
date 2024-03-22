@@ -1,5 +1,5 @@
-const ClientPage = dynamic(() => import("@components/clients/client-page"));
-import Layout from "@components/shared/layout";
+const ClientPage = dynamic(() => import("@/components/clients/client-page"));
+import Layout from "@/components/shared/layout";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 

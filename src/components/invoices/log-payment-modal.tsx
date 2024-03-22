@@ -1,10 +1,10 @@
-import Button from "@atoms/button";
+import Button from "@/components/atoms/button";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog } from "@headlessui/react";
-import { getTotalCostOfActivities } from "@utils/activity-utils";
-import { debounce } from "@utils/generic-utils";
-import { trpc } from "@utils/trpc";
+import { getTotalCostOfActivities } from "@/utils/activity-utils";
+import { debounce } from "@/utils/generic-utils";
+import { trpc } from "@/utils/trpc";
 import classNames from "classnames";
 import dayjs from "dayjs";
 import { Fragment, useEffect, useState } from "react";

@@ -1,5 +1,5 @@
-import "@styles/globals.css";
-import { trpc } from "@utils/trpc";
+import "@/styles/globals.css";
+import { trpc } from "@/utils/trpc";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import classNames from "classnames";
 import { SessionProvider } from "next-auth/react";

@@ -1,9 +1,9 @@
-import Button from "@atoms/button";
-import Heading from "@atoms/heading";
-import ClientSelect from "@components/forms/client-select";
-import DatePicker from "@components/forms/date-picker";
-import SupportItemSelect from "@components/forms/support-item-select";
-import TimeInput from "@components/forms/time-input";
+import Button from "@/components/atoms/button";
+import Heading from "@/components/atoms/heading";
+import ClientSelect from "@/components/forms/client-select";
+import DatePicker from "@/components/forms/date-picker";
+import SupportItemSelect from "@/components/forms/support-item-select";
+import TimeInput from "@/components/forms/time-input";
 import { faCalendar, faClock } from "@fortawesome/free-regular-svg-icons";
 import {
 	faArrowDown,
@@ -13,8 +13,8 @@ import {
 	faX,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { InvoiceSchema } from "@schema/invoice-schema";
-import { trpc } from "@utils/trpc";
+import { InvoiceSchema } from "@/schema/invoice-schema";
+import { trpc } from "@/utils/trpc";
 import classNames from "classnames";
 import { useMemo } from "react";
 import {

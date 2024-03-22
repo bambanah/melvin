@@ -1,7 +1,7 @@
 const ActivityPage = dynamic(
-	() => import("@components/activities/activity-page")
+	() => import("@/components/activities/activity-page")
 );
-import Layout from "@components/shared/layout";
+import Layout from "@/components/shared/layout";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 

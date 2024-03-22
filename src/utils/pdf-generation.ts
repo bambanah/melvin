@@ -1,6 +1,6 @@
 import { RateType } from "@prisma/client";
-import { InvoiceByIdOutput } from "@server/api/routers/invoice-router";
-import prisma from "@server/prisma";
+import { InvoiceByIdOutput } from "@/server/api/routers/invoice-router";
+import prisma from "@/server/prisma";
 import jspdf from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
 import { getRate, getTotalCostOfActivities } from "./activity-utils";

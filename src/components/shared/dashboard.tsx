@@ -1,4 +1,4 @@
-import Heading from "@atoms/heading";
+import Heading from "@/components/atoms/heading";
 
 const Dashboard = () => {
 	return (

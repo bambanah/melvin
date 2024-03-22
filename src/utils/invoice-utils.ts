@@ -1,4 +1,4 @@
-import { InvoiceByIdOutput } from "@server/api/routers/invoice-router";
+import { InvoiceByIdOutput } from "@/server/api/routers/invoice-router";
 
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -75,7 +75,7 @@ export const getInvoiceFileName = (invoice: InvoiceByIdOutput) => {
 		? dayjs(earliestDate).format("DD-MM")
 		: `(${dayjs(earliestDate).format("DD-MM")})-(${dayjs(latestDate).format(
 				"DD-MM"
-		  )})`;
+			)})`;
 
 	const fileName = `${invoice.invoiceNo}_${dateRangeFormatted}-${dayjs(
 		invoice.date

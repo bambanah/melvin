@@ -1,6 +1,6 @@
-import Button from "@atoms/button";
-import InfiniteList from "@components/shared/infinite-list";
-import ListPage from "@components/shared/list-page";
+import Button from "@/components/atoms/button";
+import InfiniteList from "@/components/shared/infinite-list";
+import ListPage from "@/components/shared/list-page";
 import {
 	faBuilding,
 	faClock,
@@ -10,7 +10,7 @@ import {
 	faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { trpc } from "@utils/trpc";
+import { trpc } from "@/utils/trpc";
 import dayjs from "dayjs";
 import Link from "next/link";
 

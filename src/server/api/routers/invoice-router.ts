@@ -1,11 +1,11 @@
 import { Client, Invoice, InvoiceStatus } from "@prisma/client";
-import { activitySchema } from "@schema/activity-schema";
-import { InvoiceSchema, invoiceSchema } from "@schema/invoice-schema";
-import { authedProcedure, router } from "@server/api/trpc";
+import { activitySchema } from "@/schema/activity-schema";
+import { InvoiceSchema, invoiceSchema } from "@/schema/invoice-schema";
+import { authedProcedure, router } from "@/server/api/trpc";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
-import { getTotalCostOfActivities } from "@utils/activity-utils";
-import { invoiceCandidatesFromPaymentAmount } from "@utils/invoice-utils";
-import { baseListQueryInput } from "@utils/trpc";
+import { getTotalCostOfActivities } from "@/utils/activity-utils";
+import { invoiceCandidatesFromPaymentAmount } from "@/utils/invoice-utils";
+import { baseListQueryInput } from "@/utils/trpc";
 import dayjs from "dayjs";
 import { z } from "zod";
 

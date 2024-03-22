@@ -1,8 +1,8 @@
-import Layout from "@components/shared/layout";
+import Layout from "@/components/shared/layout";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 const SupportItemPage = dynamic(
-	() => import("@components/support-items/support-item-page")
+	() => import("@/components/support-items/support-item-page")
 );
 
 const Activity = () => {

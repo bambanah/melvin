@@ -1,5 +1,5 @@
-import Button from "@atoms/button";
-import Form from "@atoms/form";
+import Button from "@/components/atoms/button";
+import Form from "@/components/atoms/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
@@ -22,7 +22,7 @@ const LoginForm = () => {
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
 			<input
-				className="grow border bg-neutral-50 py-3 px-6 text-fg"
+				className="grow border bg-neutral-50 px-6 py-3 text-fg"
 				placeholder="Email Address"
 				{...register("email")}
 			/>

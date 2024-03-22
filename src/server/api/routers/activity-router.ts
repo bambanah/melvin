@@ -1,12 +1,12 @@
-import { activitySchema } from "@schema/activity-schema";
-import { authedProcedure, router } from "@server/api/trpc";
+import { activitySchema } from "@/schema/activity-schema";
+import { authedProcedure, router } from "@/server/api/trpc";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { baseListQueryInput } from "@utils/trpc";
+import { baseListQueryInput } from "@/utils/trpc";
 dayjs.extend(utc);
 dayjs.extend(customParseFormat);
 

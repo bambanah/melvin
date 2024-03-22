@@ -1,5 +1,5 @@
-import ClientForm from "@components/clients/client-form";
-import Layout from "@components/shared/layout";
+import ClientForm from "@/components/clients/client-form";
+import Layout from "@/components/shared/layout";
 import Head from "next/head";
 
 const CreateClient = () => {

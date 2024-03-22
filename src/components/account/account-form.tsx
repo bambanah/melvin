@@ -1,13 +1,13 @@
-import Button from "@atoms/button";
-import Form from "@atoms/form";
-import Heading from "@atoms/heading";
-import Label from "@atoms/label";
-import ErrorMessage from "@components/forms/error-message";
-import Input from "@components/forms/input";
+import Button from "@/components/atoms/button";
+import Form from "@/components/atoms/form";
+import Heading from "@/components/atoms/heading";
+import Label from "@/components/atoms/label";
+import ErrorMessage from "@/components/forms/error-message";
+import Input from "@/components/forms/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserSchema, userSchema } from "@schema/user-schema";
-import { UserFetchOutput } from "@server/api/routers/user-router";
-import { trpc } from "@utils/trpc";
+import { UserSchema, userSchema } from "@/schema/user-schema";
+import { UserFetchOutput } from "@/server/api/routers/user-router";
+import { trpc } from "@/utils/trpc";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 
