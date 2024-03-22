@@ -76,7 +76,7 @@ export default function InvoiceList({
 						<div
 							key={invoice.id}
 							className={classNames([
-								"flex w-full justify-between gap-2 p-4 text-sm text-zinc-900",
+								"flex w-full justify-between gap-2 p-4 text-sm text-foreground",
 							])}
 						>
 							<div className="flex flex-col gap-2">
