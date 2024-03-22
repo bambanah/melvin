@@ -1,4 +1,4 @@
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListPage from "@/components/shared/list-page";
 import {
@@ -25,9 +25,11 @@ const ClientList = () => {
 			<ListPage.Header>
 				<h2 className="mr-auto text-2xl font-bold">Clients</h2>
 
-				<Button as={Link} href="/dashboard/clients/create" variant="primary">
-					<FontAwesomeIcon icon={faPlus} />
-					<span>Add</span>
+				<Button asChild>
+					<Link href="/dashboard/clients/create">
+						<FontAwesomeIcon icon={faPlus} />
+						<span>Add</span>
+					</Link>
 				</Button>
 			</ListPage.Header>
 			<InfiniteList queryResult={queryResult} dataKey="clients">

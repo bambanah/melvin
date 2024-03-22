@@ -1,4 +1,4 @@
-import supportItems from "../../src/lib/ndis-support-catalogue-22-23.json";
+import supportItems from "@/lib/ndis-support-catalogue-22-23.json";
 import { pickRandomFrom } from "@/lib/generic-utils";
 
 export const randomSupportItem = (

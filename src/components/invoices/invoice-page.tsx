@@ -1,7 +1,9 @@
+import { Button } from "@/components/ui/button";
 import { InvoiceStatusBadge } from "@/components/ui/badge";
-import Button from "@/components/ui/button";
 import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
+import { getTotalCostOfActivities } from "@/lib/activity-utils";
+import { trpc } from "@/lib/trpc";
 import {
 	faClock,
 	faPaperPlane,
@@ -17,8 +19,6 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog, Transition } from "@headlessui/react";
 import { InvoiceStatus } from "@prisma/client";
-import { getTotalCostOfActivities } from "@/lib/activity-utils";
-import { trpc } from "@/lib/trpc";
 import classNames from "classnames";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -227,7 +227,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 						<p>{dayjs.utc(invoice.date).format("DD/MM/YYYY")}</p>
 					</div>
 					<Link
-						className="flex w-full items-center gap-4 p-2 text-left text-fg hover:bg-zinc-200"
+						className="text-fg flex w-full items-center gap-4 p-2 text-left hover:bg-zinc-200"
 						href={`/dashboard/clients/${invoice.client.id}`}
 					>
 						<FontAwesomeIcon icon={faUser} className="w-4 text-fg" />
