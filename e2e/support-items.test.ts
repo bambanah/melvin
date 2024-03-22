@@ -35,7 +35,10 @@ test("Can create, update, and delete support items", async ({ page }) => {
 	await page.getByRole("link", { name: "Items" }).click();
 	await expect(page).toHaveURL("/dashboard/support-items");
 
-	await page.getByRole("link", { name: newSupportItem.description }).click();
+	await page
+		.getByRole("link", { name: newSupportItem.description })
+		.first()
+		.click();
 	await page.locator("button#options-dropdown").click();
 	await page.locator("button").filter({ hasText: "Delete" }).click();
 	await page.locator("button").filter({ hasText: "Delete" }).click();
