@@ -5,6 +5,7 @@
 	"scripts": {
 		"preinstall": "npx only-allow pnpm",
 		"prepare": "husky",
+		"postinstall": "prisma generate",
 		"build": "run-s build:*",
 		"build:1-generate": "prisma generate",
 		"build:2-build": "next build",
@@ -27,8 +28,7 @@
 		"test": "run-s test:*",
 		"test:unit": "jest",
 		"test:e2e": "playwright test",
-		"pw:codegen": "playwright codegen http://localhost:3000 --load-storage=e2e/setup/storage-state.json",
-		"postinstall": "prisma generate"
+		"pw:codegen": "playwright codegen http://localhost:3000 --load-storage=e2e/setup/storage-state.json"
 	},
 	"prisma": {
 		"seed": "tsx prisma/seed.ts"
