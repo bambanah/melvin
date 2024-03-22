@@ -1,6 +1,6 @@
 import { authedProcedure, router } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import generatePDF from "@/utils/pdf-generation";
+import generatePDF from "@/lib/pdf-generation";
 import { z } from "zod";
 import { invoiceRouter } from "./invoice-router";
 

@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { pickRandomFrom } from "@/utils/generic-utils";
+import { pickRandomFrom } from "@/lib/generic-utils";
 
 const BILL_TO = ["Corp Enterprises", "Enterprise Corp", "Company Two"];
 

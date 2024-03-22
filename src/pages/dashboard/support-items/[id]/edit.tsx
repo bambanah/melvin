@@ -1,7 +1,7 @@
 import Loading from "@/components/atoms/loading";
 import Layout from "@/components/shared/layout";
 import SupportItemForm from "@/components/support-items/support-item-form";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import Head from "next/head";
 import { useRouter } from "next/router";
 

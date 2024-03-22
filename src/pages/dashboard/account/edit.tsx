@@ -6,7 +6,7 @@ import AccountForm from "@/components/account/account-form";
 import Layout from "@/components/shared/layout";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import classNames from "classnames";
 import { useRouter } from "next/router";
 import { useState } from "react";

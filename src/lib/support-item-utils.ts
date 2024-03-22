@@ -5,7 +5,7 @@ export const getSupportItemDefs = (registrationGroupName?: string) => {
 		? supportItems
 		: supportItems.filter(
 				(item) => item.registrationGroupName === registrationGroupName
-		  );
+			);
 };
 
 export const getRegistrationGroups = () => [

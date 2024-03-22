@@ -8,7 +8,7 @@ import {
 	faEllipsisV,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";

@@ -2,7 +2,7 @@ import Select from "@/components/forms/select";
 import { faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SupportItemListOutput } from "@/server/api/routers/support-item-router";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Control, FieldValues, Path } from "react-hook-form";
 

@@ -1,4 +1,4 @@
-import { pickRandomFrom } from "@/utils/generic-utils";
+import { pickRandomFrom } from "@/lib/generic-utils";
 
 describe("Generic utils test", () => {
 	const testArr = ["first", "second", "third", "fourth", "fifth"];

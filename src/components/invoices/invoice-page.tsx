@@ -17,8 +17,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog, Transition } from "@headlessui/react";
 import { InvoiceStatus } from "@prisma/client";
-import { getTotalCostOfActivities } from "@/utils/activity-utils";
-import { trpc } from "@/utils/trpc";
+import { getTotalCostOfActivities } from "@/lib/activity-utils";
+import { trpc } from "@/lib/trpc";
 import classNames from "classnames";
 import dynamic from "next/dynamic";
 import Link from "next/link";

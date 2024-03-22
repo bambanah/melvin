@@ -6,7 +6,7 @@ import { z } from "zod";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { baseListQueryInput } from "@/utils/trpc";
+import { baseListQueryInput } from "@/lib/trpc";
 dayjs.extend(utc);
 dayjs.extend(customParseFormat);
 

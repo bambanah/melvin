@@ -7,7 +7,7 @@ import Input from "@/components/forms/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserSchema, userSchema } from "@/schema/user-schema";
 import { UserFetchOutput } from "@/server/api/routers/user-router";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 

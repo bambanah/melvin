@@ -4,14 +4,14 @@ import LogPayment from "@/components/invoices/log-payment-modal";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListFilterRow from "@/components/shared/list-filter-row";
 import ListPage from "@/components/shared/list-page";
+import { getTotalCostOfActivities } from "@/lib/activity-utils";
+import { trpc } from "@/lib/trpc";
 import {
 	faDownload,
 	faEnvelope,
 	faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getTotalCostOfActivities } from "@/utils/activity-utils";
-import { trpc } from "@/utils/trpc";
 import classNames from "classnames";
 import Link from "next/link";
 import { useState } from "react";

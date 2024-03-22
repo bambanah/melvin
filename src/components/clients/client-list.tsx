@@ -10,7 +10,7 @@ import {
 	faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "@/lib/trpc";
 import dayjs from "dayjs";
 import Link from "next/link";
 
