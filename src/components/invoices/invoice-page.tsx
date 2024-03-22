@@ -176,7 +176,6 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 										onClick={() => {
 											markInvoiceAs(InvoiceStatus.SENT);
 										}}
-										variant="primary"
 										className="w-1/2 grow"
 									>
 										<FontAwesomeIcon icon={faPaperPlane} /> Mark as Sent
@@ -202,13 +201,11 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 									Revert to Created
 								</Button>
 							)}
-							<Button
-								as="a"
-								href={`/api/invoices/generate-pdf/${invoiceId}`}
-								className="w-1/2 grow"
-							>
-								<FontAwesomeIcon icon={faDownload} />
-								Download PDF
+							<Button asChild className="w-1/2 grow">
+								<a href={`/api/invoices/generate-pdf/${invoiceId}`}>
+									<FontAwesomeIcon icon={faDownload} />
+									Download PDF
+								</a>
 							</Button>
 						</div>
 						{invoice.sentAt && (
@@ -223,18 +220,18 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 				<div className="flex basis-1/2 flex-col gap-0 p-2 px-4">
 					<p className="font-semibold">Info</p>
 					<div className="flex items-center gap-4 p-2">
-						<FontAwesomeIcon icon={faClock} className="w-4 text-fg" />
+						<FontAwesomeIcon icon={faClock} className="text-fg w-4" />
 						<p>{dayjs.utc(invoice.date).format("DD/MM/YYYY")}</p>
 					</div>
 					<Link
 						className="text-fg flex w-full items-center gap-4 p-2 text-left hover:bg-zinc-200"
 						href={`/dashboard/clients/${invoice.client.id}`}
 					>
-						<FontAwesomeIcon icon={faUser} className="w-4 text-fg" />
+						<FontAwesomeIcon icon={faUser} className="text-fg w-4" />
 						{invoice.client.name}
 					</Link>
 					<div className="flex items-center gap-4 p-2">
-						<FontAwesomeIcon icon={faRunning} className="w-4 text-fg" />
+						<FontAwesomeIcon icon={faRunning} className="text-fg w-4" />
 						<p>
 							{invoice.activities.length} Activit
 							{invoice.activities.length > 1 ? "ies" : "y"}
@@ -242,7 +239,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					</div>
 					{invoice.paidAt && (
 						<div className="flex items-center gap-4 p-2">
-							<FontAwesomeIcon icon={faDollarSign} className="w-4 text-fg" />
+							<FontAwesomeIcon icon={faDollarSign} className="text-fg w-4" />
 							<p>Paid {dayjs.utc(invoice.paidAt).format("DD/MM/YYYY")}</p>
 						</div>
 					)}
