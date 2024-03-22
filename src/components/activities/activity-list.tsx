@@ -1,4 +1,4 @@
-import Badge from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListFilterRow from "@/components/shared/list-filter-row";
@@ -82,7 +82,9 @@ function ActivityList({
 							<div key={date} className="mb-4 overflow-hidden">
 								<div className="flex w-full items-center gap-2 px-4 py-2 text-left">
 									{dayjs(date).format("dddd D MMM.")}
-									{isDateHoliday(date) && <Badge variant="INFO">Holiday</Badge>}
+									{isDateHoliday(date) && (
+										<Badge variant="success">Holiday</Badge>
+									)}
 								</div>
 
 								<div className="flex flex-col divide-y">
