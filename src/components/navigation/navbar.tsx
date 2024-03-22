@@ -2,14 +2,11 @@ import NavAuth from "@/components/auth/nav-auth";
 import NavLink from "@/components/navigation/nav-link";
 import {
 	faFile,
-	faPenToSquare,
 	faRunning,
 	faShoePrints,
 	faUsers,
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { ModeToggle } from "../theme-toggle";
 
 const Navbar = () => {
@@ -38,19 +35,11 @@ const Navbar = () => {
 				>
 					Items
 				</NavLink>
-				<Link
-					href="/dashboard/invoices/create"
-					className="order-3 mb-2 flex h-14 w-14 items-center justify-center gap-2 rounded-full bg-zinc-900 text-2xl text-zinc-50 shadow-lg hover:bg-zinc-800 md:order-6 md:ml-auto md:h-auto md:w-auto md:rounded-md md:px-3 md:py-1.5 md:text-sm md:hover:text-zinc-50"
-				>
-					<FontAwesomeIcon icon={faPenToSquare} />
-					<span className="hidden md:inline">LOG</span>
-				</Link>
-				<div className="order-6">
-					<ModeToggle />
-				</div>
 			</div>
-
-			<NavAuth user={session.data?.user} />
+			<div className="flex items-center gap-2">
+				<ModeToggle />
+				<NavAuth user={session.data?.user} />
+			</div>
 		</div>
 	);
 };

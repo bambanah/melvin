@@ -18,9 +18,7 @@ module.exports = {
 		"@typescript-eslint/no-var-requires": "off",
 		"@typescript-eslint/no-empty-interface": "warn",
 		"@typescript-eslint/ban-types": "warn",
-		"import/no-anonymous-default-export": "off",
 		"prefer-template": "error",
-		"arrow-parens": ["error", "always"],
 		"no-console": [
 			"error",
 			{
