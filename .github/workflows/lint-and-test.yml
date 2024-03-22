@@ -35,7 +35,7 @@ jobs:
           version: 8
       - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
           cache: "pnpm"
 
       - name: Install dependencies
@@ -60,7 +60,7 @@ jobs:
           version: 8
       - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
           cache: "pnpm"
       - run: pnpm install
 
@@ -77,7 +77,7 @@ jobs:
           version: 8
       - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
           cache: "pnpm"
       - run: pnpm install
 
