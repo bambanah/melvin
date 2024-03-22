@@ -4,7 +4,7 @@ import LogPayment from "@components/invoices/log-payment-modal";
 import InfiniteList from "@components/shared/infinite-list";
 import ListFilterRow from "@components/shared/list-filter-row";
 import ListPage from "@components/shared/list-page";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getTotalCostOfActivities } from "@utils/activity-utils";
 import { trpc } from "@utils/trpc";
@@ -79,13 +79,21 @@ export default function InvoiceList({
 							])}
 						>
 							<div className="flex flex-col gap-2">
-								<div className="font-medium sm:text-lg">
+								<div className="flex items-center gap-4 font-medium sm:text-lg">
 									<Link
 										href={`/dashboard/invoices/${invoice.id}`}
 										className="font-semibold"
 									>
 										{invoice.invoiceNo}: {invoice.client.name}
 									</Link>
+									{invoice.client.invoiceEmail && (
+										<a
+											href={`mailto:${invoice.client.invoiceEmail}`}
+											className="text-neutral-500"
+										>
+											<FontAwesomeIcon icon={faEnvelope} size="sm" />
+										</a>
+									)}
 								</div>
 								<span className="text-sm sm:text-base">
 									{dayjs.utc(invoice.date).format("DD MMM.")}

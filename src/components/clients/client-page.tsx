@@ -3,7 +3,10 @@ import Dropdown from "@atoms/dropdown";
 import Heading from "@atoms/heading";
 import Loading from "@atoms/loading";
 import InvoiceList from "@components/invoices/invoice-list";
-import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
+import {
+	faArrowUpRightFromSquare,
+	faEllipsisV,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { trpc } from "@utils/trpc";
 import Link from "next/link";
@@ -127,6 +130,21 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 					<h3 className="font-semibold">Default Transit Time</h3>
 					{client.defaultTransitTime ? (
 						<p>{client.defaultTransitTime.toString()}</p>
+					) : (
+						<p className="text-neutral-500">Not set</p>
+					)}
+				</div>
+
+				<div className="flex flex-col">
+					<h3 className="font-semibold">Invoice Email</h3>
+					{client.invoiceEmail ? (
+						<a
+							className="flex items-center gap-2 underline"
+							href={`mailto:${client.invoiceEmail}`}
+						>
+							{client.invoiceEmail}
+							<FontAwesomeIcon icon={faArrowUpRightFromSquare} size="xs" />
+						</a>
 					) : (
 						<p className="text-neutral-500">Not set</p>
 					)}

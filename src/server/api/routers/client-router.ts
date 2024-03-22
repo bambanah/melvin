@@ -65,6 +65,7 @@ export const clientRouter = router({
 					invoiceNumberPrefix: true,
 					defaultTransitDistance: true,
 					defaultTransitTime: true,
+					invoiceEmail: true,
 				},
 				where: {
 					ownerId: ctx.session.user.id,

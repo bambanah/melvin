@@ -16,7 +16,7 @@ const defaultInvoiceSelect = {
 	date: true,
 	status: true,
 	client: {
-		select: { name: true, number: true, id: true },
+		select: { name: true, number: true, id: true, invoiceEmail: true },
 	},
 	activities: {
 		select: {
