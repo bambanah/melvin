@@ -1,4 +1,4 @@
-import Loading from "@/components/atoms/loading";
+import Loading from "@/components/ui/loading";
 import { UseTRPCInfiniteQueryResult } from "@trpc/react-query/shared";
 import classNames from "classnames";
 import React, { Fragment, useEffect, useRef } from "react";

@@ -1,5 +1,5 @@
-import Button from "@/components/atoms/button";
-import Logo from "@/components/atoms/logo";
+import Button from "@/components/ui/button";
+import Logo from "@/components/ui/logo";
 import AuthModal from "@/components/auth/auth-modal";
 import LoginForm from "@/components/auth/login-form";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";

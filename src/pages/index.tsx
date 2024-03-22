@@ -1,5 +1,5 @@
-import Heading from "@/components/atoms/heading";
-import Logo from "@/components/atoms/logo";
+import Heading from "@/components/ui/heading";
+import Logo from "@/components/ui/logo";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import Link from "next/link";

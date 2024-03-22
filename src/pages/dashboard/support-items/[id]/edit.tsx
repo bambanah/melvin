@@ -1,4 +1,4 @@
-import Loading from "@/components/atoms/loading";
+import Loading from "@/components/ui/loading";
 import Layout from "@/components/shared/layout";
 import SupportItemForm from "@/components/support-items/support-item-form";
 import { trpc } from "@/lib/trpc";

@@ -1,5 +1,5 @@
-import Button from "@/components/atoms/button";
-import Form from "@/components/atoms/form";
+import Button from "@/components/ui/button";
+import Form from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";

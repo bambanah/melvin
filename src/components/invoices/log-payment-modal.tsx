@@ -1,4 +1,4 @@
-import Button from "@/components/atoms/button";
+import Button from "@/components/ui/button";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog } from "@headlessui/react";

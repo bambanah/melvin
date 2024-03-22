@@ -1,7 +1,7 @@
-import Button from "@/components/atoms/button";
-import Form from "@/components/atoms/form";
-import Heading from "@/components/atoms/heading";
-import Label from "@/components/atoms/label";
+import Button from "@/components/ui/button";
+import Form from "@/components/ui/form";
+import Heading from "@/components/ui/heading";
+import Label from "@/components/ui/label";
 import ErrorMessage from "@/components/forms/error-message";
 import Input from "@/components/forms/input";
 import { zodResolver } from "@hookform/resolvers/zod";
