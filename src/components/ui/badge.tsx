@@ -1,46 +1,53 @@
-import classNames from "classnames";
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { cn } from "@/lib/utils";
 import { InvoiceStatus } from "@prisma/client";
 
-type Variant = "DEFAULT" | "INFO" | "SUCCESS" | "WARNING" | "ERROR";
+const badgeVariants = cva(
+	"inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+	{
+		variants: {
+			variant: {
+				default:
+					"border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+				secondary:
+					"border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+				success:
+					"border-transparent bg-success text-success-foreground hover:bg-success/80",
+				destructive:
+					"border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+				outline: "text-foreground",
+			},
+		},
+		defaultVariants: {
+			variant: "default",
+		},
+	}
+);
 
-const variantStyles: Record<Variant, string> = {
-	DEFAULT: "bg-zinc-200 text-zinc-600",
-	INFO: "bg-blue-100 text-blue-500",
-	SUCCESS: "bg-green-200 text-green-600",
-	WARNING: "bg-yellow-100 text-yellow-600",
-	ERROR: "bg-red-100 text-red-600",
-};
+export interface BadgeProps
+	extends React.HTMLAttributes<HTMLDivElement>,
+		VariantProps<typeof badgeVariants> {}
 
-interface Props {
-	children: string;
-	variant?: Variant;
-}
-
-export const InvoiceStatusBadge = ({
+function InvoiceStatusBadge({
 	invoiceStatus,
 }: {
 	invoiceStatus: InvoiceStatus;
-}) => {
-	let variant: Variant;
+}) {
+	let variant: VariantProps<typeof badgeVariants>["variant"];
 
-	if (invoiceStatus === "PAID") variant = "SUCCESS";
-	else if (invoiceStatus === "SENT") variant = "WARNING";
-	else variant = "DEFAULT";
+	if (invoiceStatus === "PAID") variant = "default";
+	else if (invoiceStatus === "SENT") variant = "success";
+	else variant = "secondary";
 
 	return <Badge variant={variant}>{invoiceStatus}</Badge>;
-};
+}
 
-const Badge = ({ children, variant = "DEFAULT" }: Props) => {
+function Badge({ className, variant, ...props }: BadgeProps) {
 	return (
-		<div
-			className={classNames(
-				"flex h-5 items-center justify-center rounded-[5px] px-2 text-xs font-bold",
-				variantStyles[variant]
-			)}
-		>
-			{children}
-		</div>
+		<div className={cn(badgeVariants({ variant }), className)} {...props} />
 	);
-};
+}
 
-export default Badge;
+export { Badge, InvoiceStatusBadge, badgeVariants };
