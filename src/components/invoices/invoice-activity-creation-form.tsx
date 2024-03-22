@@ -1,5 +1,5 @@
-import Button from "@/components/atoms/button";
-import Heading from "@/components/atoms/heading";
+import Button from "@/components/ui/button";
+import Heading from "@/components/ui/heading";
 import ClientSelect from "@/components/forms/client-select";
 import DatePicker from "@/components/forms/date-picker";
 import SupportItemSelect from "@/components/forms/support-item-select";

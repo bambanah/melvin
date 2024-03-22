@@ -1,4 +1,4 @@
-import Loading from "@/components/atoms/loading";
+import Loading from "@/components/ui/loading";
 import { trpc } from "@/lib/trpc";
 import { FC, useState } from "react";
 import { Document, Page } from "react-pdf";

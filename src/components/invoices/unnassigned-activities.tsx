@@ -1,4 +1,4 @@
-import Heading from "@/components/atoms/heading";
+import Heading from "@/components/ui/heading";
 import { faCalendar, faClock, faCar } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { InvoiceSchema } from "@/schema/invoice-schema";

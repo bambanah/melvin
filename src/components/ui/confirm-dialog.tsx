@@ -1,4 +1,4 @@
-import Button from "@/components/atoms/button";
+import Button from "@/components/ui/button";
 import { Dialog } from "@headlessui/react";
 import { Dispatch, SetStateAction } from "react";
 

@@ -1,4 +1,4 @@
-import Button from "@/components/atoms/button";
+import Button from "@/components/ui/button";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListPage from "@/components/shared/list-page";
 import { faPlus, faUserGroup } from "@fortawesome/free-solid-svg-icons";

@@ -1,7 +1,7 @@
-import { InvoiceStatusBadge } from "@/components/atoms/badge";
-import Button from "@/components/atoms/button";
-import Heading from "@/components/atoms/heading";
-import Loading from "@/components/atoms/loading";
+import { InvoiceStatusBadge } from "@/components/ui/badge";
+import Button from "@/components/ui/button";
+import Heading from "@/components/ui/heading";
+import Loading from "@/components/ui/loading";
 import {
 	faClock,
 	faPaperPlane,
@@ -31,9 +31,7 @@ import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
 const PdfPreview = dynamic(() => import("@/components/invoices/pdf-preview"));
-const ConfirmDialog = dynamic(
-	() => import("@/components/atoms/confirm-dialog")
-);
+const ConfirmDialog = dynamic(() => import("@/components/ui/confirm-dialog"));
 const ActivityList = dynamic(
 	() => import("@/components/activities/activity-list")
 );

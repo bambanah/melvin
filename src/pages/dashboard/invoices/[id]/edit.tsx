@@ -1,4 +1,4 @@
-import Loading from "@/components/atoms/loading";
+import Loading from "@/components/ui/loading";
 import InvoiceForm from "@/components/invoices/invoice-form";
 import Layout from "@/components/shared/layout";
 import { InvoiceSchema } from "@/schema/invoice-schema";

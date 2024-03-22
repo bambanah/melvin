@@ -1,7 +1,7 @@
-import ConfirmDialog from "@/components/atoms/confirm-dialog";
-import Dropdown from "@/components/atoms/dropdown";
-import Heading from "@/components/atoms/heading";
-import Loading from "@/components/atoms/loading";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
+import Dropdown from "@/components/ui/dropdown";
+import Heading from "@/components/ui/heading";
+import Loading from "@/components/ui/loading";
 import InvoiceList from "@/components/invoices/invoice-list";
 import {
 	faArrowUpRightFromSquare,

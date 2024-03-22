@@ -1,7 +1,7 @@
-import Button from "@/components/atoms/button";
-import ConfirmDialog from "@/components/atoms/confirm-dialog";
-import Heading from "@/components/atoms/heading";
-import Loading from "@/components/atoms/loading";
+import Button from "@/components/ui/button";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
+import Heading from "@/components/ui/heading";
+import Loading from "@/components/ui/loading";
 import AccountForm from "@/components/account/account-form";
 import Layout from "@/components/shared/layout";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";

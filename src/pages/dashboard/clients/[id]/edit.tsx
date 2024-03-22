@@ -1,5 +1,5 @@
-import Loading from "@/components/atoms/loading";
-import NotFound from "@/components/atoms/not-found";
+import Loading from "@/components/ui/loading";
+import NotFound from "@/components/ui/not-found";
 import ClientForm from "@/components/clients/client-form";
 import Layout from "@/components/shared/layout";
 import { trpc } from "@/lib/trpc";

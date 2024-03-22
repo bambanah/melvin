@@ -1,6 +1,6 @@
-import ConfirmDialog from "@/components/atoms/confirm-dialog";
-import Dropdown from "@/components/atoms/dropdown";
-import Heading from "@/components/atoms/heading";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
+import Dropdown from "@/components/ui/dropdown";
+import Heading from "@/components/ui/heading";
 import {
 	faCalendar,
 	faCar,

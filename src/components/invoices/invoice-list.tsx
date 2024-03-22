@@ -1,5 +1,5 @@
-import { InvoiceStatusBadge } from "@/components/atoms/badge";
-import Button from "@/components/atoms/button";
+import { InvoiceStatusBadge } from "@/components/ui/badge";
+import Button from "@/components/ui/button";
 import LogPayment from "@/components/invoices/log-payment-modal";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListFilterRow from "@/components/shared/list-filter-row";
