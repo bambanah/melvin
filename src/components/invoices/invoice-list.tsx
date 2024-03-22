@@ -1,17 +1,13 @@
-import { InvoiceStatusBadge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import LogPayment from "@/components/invoices/log-payment-modal";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListFilterRow from "@/components/shared/list-filter-row";
 import ListPage from "@/components/shared/list-page";
-import {
-	faDownload,
-	faEnvelope,
-	faPlus,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { InvoiceStatusBadge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { trpc } from "@/lib/trpc";
+import { faDownload, faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
 import Link from "next/link";
 import { useState } from "react";
@@ -23,6 +19,7 @@ import {
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { Plus } from "lucide-react";
 dayjs.extend(utc);
 
 interface Props {
@@ -51,14 +48,14 @@ export default function InvoiceList({
 
 				<LogPayment />
 
-				<Button asChild variant="secondary">
+				<Button asChild variant="inverted">
 					<Link
 						href={`/dashboard/invoices/create${
 							clientId ? `?clientId=${clientId}` : ""
 						}`}
 					>
-						<FontAwesomeIcon icon={faPlus} />
-						<span>Add</span>
+						<Plus className="mr-2 h-4 w-4" />
+						Add
 					</Link>
 				</Button>
 			</ListPage.Header>

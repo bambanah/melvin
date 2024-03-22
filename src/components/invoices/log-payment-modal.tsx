@@ -9,6 +9,7 @@ import classNames from "classnames";
 import dayjs from "dayjs";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { DollarSign } from "lucide-react";
 
 const LogPayment = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -133,7 +134,9 @@ const LogPayment = () => {
 
 	return (
 		<>
-			<Button onClick={() => setIsOpen(true)}>$ Payment</Button>
+			<Button onClick={() => setIsOpen(true)} variant="outline">
+				<DollarSign className="mr-2 h-4 w-4" /> Payment
+			</Button>
 			<Dialog open={isOpen} onClose={() => closeModal()}>
 				<div className="fixed inset-0 z-30 bg-black bg-opacity-25" />
 
