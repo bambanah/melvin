@@ -109,7 +109,7 @@ function ActivityList({
 													<div className="flex items-center gap-2 whitespace-nowrap">
 														<FontAwesomeIcon
 															icon={faClock}
-															className="w-4 text-zinc-600"
+															className="w-4 text-foreground text-opacity-30"
 														/>
 														{dayjs.utc(activity.startTime).format("HH:mm")} -{" "}
 														{dayjs.utc(activity.endTime).format("HH:mm")}
