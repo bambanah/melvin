@@ -14,6 +14,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import { useState, MouseEventHandler } from "react";
 config.autoAddCss = false;
 
 // Google fonts
@@ -32,6 +33,15 @@ const robotoMono = Roboto_Mono({
 });
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+	const [mouse, setMouse] = useState({
+		left: 0,
+		top: 0,
+	});
+
+	const handleMouseMove: MouseEventHandler<HTMLElement> = (event) => {
+		setMouse({ left: event.pageX, top: event.pageY });
+	};
+
 	return (
 		<>
 			<main
@@ -41,6 +51,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 					patuaOne.variable,
 					robotoMono.variable,
 				])}
+				onMouseMove={handleMouseMove}
 			>
 				<style jsx global>{`
 					:root {
@@ -55,7 +66,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 						<title>Melvin</title>
 						<link rel="shortcut icon" type="image/png" href="/melvin.png" />
 					</Head>
-					<Component {...pageProps} />
+					<Component {...pageProps} mouse={mouse} />
 
 					<ToastContainer />
 				</SessionProvider>

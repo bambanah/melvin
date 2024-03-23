@@ -83,3 +83,14 @@ a {
 		@apply text-orange-700;
 	}
 }
+
+.cat-wrap {
+	display: inline-grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+	gap: 8px;
+
+	* {
+		place-self: center;
+		margin: 8px;
+	}
+}
