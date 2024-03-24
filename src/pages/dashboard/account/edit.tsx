@@ -20,14 +20,14 @@ const EditAccountPage = () => {
 
 	const { data: user, error } = trpc.user.fetch.useQuery();
 	const resetAccountMutation = trpc.user.reset.useMutation();
-	const trpcContext = trpc.useContext();
+	const trpcUtils = trpc.useUtils();
 
 	const resetAccount = () => {
 		resetAccountMutation
 			.mutateAsync()
 			.then(() => {
 				toast.error("Account has been reset.");
-				trpcContext.user.fetch.invalidate();
+				trpcUtils.user.fetch.invalidate();
 				router.reload();
 			})
 			.catch((error) => {
