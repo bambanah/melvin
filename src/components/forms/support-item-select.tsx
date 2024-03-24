@@ -49,7 +49,13 @@ const SupportItemSelect = <T extends FieldValues>({
 		}
 	}, [setSupportItems, supportItems]);
 
-	return <FormSelect options={options} {...props} />;
+	return (
+		<FormSelect
+			options={options}
+			placeholder="Select a support item..."
+			{...props}
+		/>
+	);
 };
 
 export default SupportItemSelect;

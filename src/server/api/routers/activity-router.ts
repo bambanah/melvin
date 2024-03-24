@@ -1,14 +1,12 @@
+import { baseListQueryInput } from "@/lib/trpc";
 import { activitySchema } from "@/schema/activity-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
-import { inferRouterOutputs, TRPCError } from "@trpc/server";
+import { TRPCError, inferRouterOutputs } from "@trpc/server";
+import dayjs from "dayjs";
 import { z } from "zod";
 
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-import { baseListQueryInput } from "@/lib/trpc";
-dayjs.extend(utc);
-dayjs.extend(customParseFormat);
+dayjs.extend(require("dayjs/plugin/utc"));
+dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
 const defaultActivitySelect = {
 	id: true,
@@ -131,7 +129,8 @@ export const activityRouter = router({
 					endTime: inputActivity.endTime
 						? dayjs.utc(inputActivity.endTime, "HH:mm").toDate()
 						: undefined,
-					date: dayjs.utc(inputActivity.date, "YYYY-MM-DD").toDate(),
+					transitDistance: inputActivity.transitDistance || undefined,
+					transitDuration: inputActivity.transitDuration || undefined,
 					ownerId: ctx.session.user.id,
 				},
 			});
@@ -156,13 +155,14 @@ export const activityRouter = router({
 				},
 				data: {
 					...input.activity,
-					date: dayjs.utc(input.activity.date, "YYYY-MM-DD").toDate(),
 					startTime: input.activity.startTime
 						? dayjs.utc(input.activity.startTime, "HH:mm").toDate()
 						: undefined,
 					endTime: input.activity.endTime
 						? dayjs.utc(input.activity.endTime, "HH:mm").toDate()
 						: undefined,
+					transitDistance: input.activity.transitDistance || undefined,
+					transitDuration: input.activity.transitDuration || undefined,
 				},
 			});
 
