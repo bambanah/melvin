@@ -4,7 +4,7 @@ import Heading from "@/components/ui/heading";
 import Label from "@/components/ui/label";
 import Subheading from "@/components/ui/subheading";
 import ErrorMessage from "@/components/forms/error-message";
-import Input from "@/components/forms/input";
+import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ClientSchema } from "@/schema/client-schema";
 import { clientSchema } from "@/schema/client-schema";
