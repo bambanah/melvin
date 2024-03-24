@@ -10,9 +10,9 @@ import {
 
 export interface InputProps<T extends FieldValues>
 	extends React.InputHTMLAttributes<HTMLInputElement> {
-	register: UseFormRegister<T>;
+	register?: UseFormRegister<T>;
 	rules?: RegisterOptions;
-	name: Path<T>;
+	name?: Path<T>;
 	error?: boolean;
 	suffix?: string;
 }

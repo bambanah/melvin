@@ -29,7 +29,7 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 
 			<LoginForm />
 
-			<div className="mt-4 flex w-full flex-nowrap items-center justify-center gap-4 text-sm text-neutral-800 before:grow before:border-t before:border-neutral-300 before:content-[''] after:grow after:border-t after:border-neutral-300 after:content-['']">
+			<div className="flex w-full flex-nowrap items-center justify-center gap-4 text-sm text-neutral-800 before:grow before:border-t before:border-neutral-300 before:content-[''] after:grow after:border-t after:border-neutral-300 after:content-['']">
 				OR
 			</div>
 
@@ -40,9 +40,10 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 						<Button
 							onClick={() => signIn(provider.id, { callbackUrl })}
 							key={provider.id}
+							variant="outline"
 							className="w-full"
 						>
-							<FontAwesomeIcon icon={faGoogle} />
+							<FontAwesomeIcon icon={faGoogle} className="mr-2 h-4 w-4" />
 							Sign in with {provider.name}
 						</Button>
 					))}
