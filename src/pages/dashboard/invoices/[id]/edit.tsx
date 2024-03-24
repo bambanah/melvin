@@ -13,7 +13,7 @@ const EditInvoice = () => {
 		? router.query.id[0]
 		: router.query.id;
 
-	const trpcContext = trpc.useContext();
+	const trpcUtils = trpc.useUtils();
 	const modifyInvoiceMutation = trpc.invoice.modify.useMutation();
 
 	const { data: invoice, error } = trpc.invoice.byId.useQuery({
@@ -40,8 +40,8 @@ const EditInvoice = () => {
 		modifyInvoiceMutation
 			.mutateAsync({ id: invoice.id, invoice: invoiceData })
 			.then(() => {
-				trpcContext.invoice.list.invalidate();
-				trpcContext.invoice.byId.invalidate({ id: invoice.id });
+				trpcUtils.invoice.list.invalidate();
+				trpcUtils.invoice.byId.invalidate({ id: invoice.id });
 
 				toast.success("Invoice updated");
 				router.back();

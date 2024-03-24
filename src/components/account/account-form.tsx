@@ -16,7 +16,7 @@ interface Props {
 }
 
 const AccountForm = ({ existingUser }: Props) => {
-	const trpcContext = trpc.useContext();
+	const trpcUtils = trpc.useUtils();
 	const updateUserMutation = trpc.user.update.useMutation();
 
 	const existingUserWithDefaults = useMemo(
@@ -48,7 +48,7 @@ const AccountForm = ({ existingUser }: Props) => {
 		if (isDirty) {
 			updateUserMutation
 				.mutateAsync({ user: data })
-				.then(() => trpcContext.user.fetch.invalidate());
+				.then(() => trpcUtils.user.fetch.invalidate());
 		}
 	};
 

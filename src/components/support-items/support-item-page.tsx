@@ -15,7 +15,7 @@ const SupportItemPage = ({ supportItemId }: { supportItemId: string }) => {
 
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-	const trpcContext = trpc.useContext();
+	const trpcUtils = trpc.useUtils();
 	const { data: supportItem, error } = trpc.supportItem.byId.useQuery({
 		id: supportItemId ?? "",
 	});
@@ -26,7 +26,7 @@ const SupportItemPage = ({ supportItemId }: { supportItemId: string }) => {
 			deletesupportItemMutation
 				.mutateAsync({ id: supportItemId })
 				.then(() => {
-					trpcContext.supportItem.list.invalidate();
+					trpcUtils.supportItem.list.invalidate();
 					toast.success("Support Item deleted");
 					router.push("/dashboard/support-items");
 				})

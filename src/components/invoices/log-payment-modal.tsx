@@ -23,7 +23,7 @@ const LogPayment = () => {
 		{ paymentAmount: amountPaid ?? 0 },
 		{ enabled: false }
 	);
-	const trpcContext = trpc.useContext();
+	const trpcUtils = trpc.useUtils();
 	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
 
 	const closeModal = () => {
@@ -45,8 +45,8 @@ const LogPayment = () => {
 				status: "PAID",
 			})
 			.then(() => {
-				trpcContext.invoice.list.invalidate();
-				trpcContext.invoice.matchByPayment.invalidate();
+				trpcUtils.invoice.list.invalidate();
+				trpcUtils.invoice.matchByPayment.invalidate();
 				toast.success("Invoices updated");
 				closeModal();
 			});

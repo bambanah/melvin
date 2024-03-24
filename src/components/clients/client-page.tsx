@@ -19,7 +19,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-	const trpcContext = trpc.useContext();
+	const trpcUtils = trpc.useUtils();
 	const { data: client, error } = trpc.clients.byId.useQuery({
 		id: clientId ?? "",
 	});
@@ -30,7 +30,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 			deleteClientMutation
 				.mutateAsync({ id: clientId })
 				.then(() => {
-					trpcContext.clients.list.invalidate();
+					trpcUtils.clients.list.invalidate();
 					toast.success("Client deleted");
 					router.push("/dashboard/clients");
 				})

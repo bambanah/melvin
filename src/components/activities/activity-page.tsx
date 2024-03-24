@@ -25,7 +25,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 	const router = useRouter();
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-	const trpcContext = trpc.useContext();
+	const trpcUtils = trpc.useUtils();
 	const { data: activity, error } = trpc.activity.byId.useQuery({
 		id: activityId,
 	});
@@ -36,7 +36,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 			deleteActivityMutation
 				.mutateAsync({ id: activityId })
 				.then(() => {
-					trpcContext.activity.list.invalidate();
+					trpcUtils.activity.list.invalidate();
 					toast.success("Activity deleted");
 					router.push("/dashboard/activities");
 				})

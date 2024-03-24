@@ -47,7 +47,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 
 	const [supportItems, setSupportItems] = useState<SupportItemListOutput[]>();
 
-	const trpcContext = trpc.useContext();
+	const trpcUtils = trpc.useUtils();
 	const createActivityMutation = trpc.activity.add.useMutation();
 	const modifyActivityMutation = trpc.activity.modify.useMutation();
 
@@ -90,8 +90,8 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 			modifyActivityMutation
 				.mutateAsync({ id: existingActivity.id, activity: activityData })
 				.then(() => {
-					trpcContext.activity.list.invalidate();
-					trpcContext.activity.byId.invalidate({ id: existingActivity.id });
+					trpcUtils.activity.list.invalidate();
+					trpcUtils.activity.byId.invalidate({ id: existingActivity.id });
 
 					toast.success("Activity updated");
 					router.back();
@@ -100,7 +100,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 			createActivityMutation
 				.mutateAsync({ activity: activityData })
 				.then(() => {
-					trpcContext.activity.list.invalidate();
+					trpcUtils.activity.list.invalidate();
 
 					toast.success("Activity created");
 					router.push("/dashboard/activities");
