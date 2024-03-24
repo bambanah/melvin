@@ -1,4 +1,4 @@
-import Select from "@/components/forms/select";
+import { FormSelect } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { useEffect, useState } from "react";
 import { FieldValues, UseControllerProps } from "react-hook-form";
@@ -25,7 +25,9 @@ function ClientSelect<T extends FieldValues>({
 		}
 	}, [clients, excludeClientId]);
 
-	return <Select options={options} {...props} />;
+	return (
+		<FormSelect options={options} placeholder="Select a client..." {...props} />
+	);
 }
 
 export default ClientSelect;

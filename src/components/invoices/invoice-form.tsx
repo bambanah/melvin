@@ -1,15 +1,15 @@
-import { Button } from "@/components/ui/button";
-import Form from "@/components/ui/form";
-import Heading from "@/components/ui/heading";
-import Label from "@/components/ui/label";
-import Subheading from "@/components/ui/subheading";
 import ClientSelect from "@/components/forms/client-select";
 import ErrorMessage from "@/components/forms/error-message";
+import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
+import Heading from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import Label from "@/components/ui/label-old";
+import Subheading from "@/components/ui/subheading";
+import { trpc } from "@/lib/trpc";
 import { InvoiceSchema, invoiceSchema } from "@/schema/invoice-schema";
 import { InvoiceByIdOutput } from "@/server/api/routers/invoice-router";
-import { trpc } from "@/lib/trpc";
+import { zodResolver } from "@hookform/resolvers/zod";
 import classNames from "classnames";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -29,15 +29,7 @@ interface Props {
 const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 	const router = useRouter();
 
-	const {
-		register,
-		handleSubmit,
-		control,
-		watch,
-		getValues,
-		setValue,
-		formState: { errors, isDirty, isSubmitting, isValid },
-	} = useForm<InvoiceSchema>({
+	const form = useForm<InvoiceSchema>({
 		resolver: zodResolver(invoiceSchema),
 		defaultValues: {
 			...existingInvoice,
@@ -49,7 +41,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 		},
 	});
 
-	const clientId = watch("clientId");
+	const clientId = form.watch("clientId");
 	const { data: billTo, refetch: refetchBillTo } =
 		trpc.clients.getBillTo.useQuery(
 			{
@@ -76,12 +68,13 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 
 	useEffect(() => {
 		if (nextInvoiceNo && !existingInvoice)
-			setValue("invoiceNo", nextInvoiceNo, { shouldValidate: true });
-		setValue("billTo", billTo ?? "", { shouldValidate: true });
-	}, [billTo, existingInvoice, nextInvoiceNo, setValue]);
+			form.setValue("invoiceNo", nextInvoiceNo, { shouldValidate: true });
+
+		form.setValue("billTo", billTo ?? "", { shouldValidate: true });
+	}, [billTo, existingInvoice, form, nextInvoiceNo]);
 
 	const { data: { activities } = {} } = trpc.activity.list.useQuery({
-		clientId: watch("clientId"),
+		clientId: form.watch("clientId"),
 		assigned: false,
 	});
 
@@ -92,90 +85,99 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 					? `Updating ${existingInvoice.invoiceNo}`
 					: "Create Invoice"}
 			</Heading>
-			<Form onSubmit={handleSubmit(onSubmit)}>
-				<div className="flex flex-col gap-6 md:flex-row">
-					<Label className="basis-1/2" required>
-						<span>Client</span>
-						<Subheading>Who will this invoice be for?</Subheading>
-						<ClientSelect control={control} name="clientId" />
-						<ErrorMessage error={errors.clientId?.message} />
-					</Label>
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)}>
+					<div className="flex flex-col gap-6 md:flex-row">
+						<Label className="basis-1/2" required>
+							<span>Client</span>
+							<Subheading>Who will this invoice be for?</Subheading>
+							<ClientSelect control={form.control} name="clientId" />
+							<ErrorMessage error={form.formState.errors.clientId?.message} />
+						</Label>
 
-					<Label className="basis-1/2">
-						<span>Date</span>
-						<Subheading>Date to display on invoice</Subheading>
-						<Input
-							name="date"
-							type="date"
-							register={register}
-							error={!!errors.date}
+						<Label className="basis-1/2">
+							<span>Date</span>
+							<Subheading>Date to display on invoice</Subheading>
+							<Input
+								name="date"
+								type="date"
+								register={form.register}
+								error={!!form.formState.errors.date}
+							/>
+							<ErrorMessage error={form.formState.errors.date?.message} />
+						</Label>
+					</div>
+					<div className="flex flex-col gap-6 md:flex-row">
+						<Label className="basis-1/2">
+							<span>Bill To</span>
+							<Subheading
+								className={classNames([
+									"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
+									billTo ? "max-h-5" : "max-h-0",
+								])}
+							>
+								{billTo ? "Loaded from client information" : <br />}
+							</Subheading>
+							<Input name="billTo" register={form.register} />
+							<ErrorMessage error={form.formState.errors.billTo?.message} />
+						</Label>
+						<Label className="basis-1/2" required>
+							<span>Invoice Number</span>
+
+							<Subheading
+								className={classNames([
+									"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
+									billTo ? "max-h-5" : "max-h-0",
+								])}
+							>
+								Previous invoice was {latestInvoiceNo}
+							</Subheading>
+
+							<Input
+								name="invoiceNo"
+								placeholder={"Smith-XX"}
+								register={form.register}
+							/>
+							<ErrorMessage error={form.formState.errors.invoiceNo?.message} />
+						</Label>
+					</div>
+
+					{form.watch("clientId") && !!activities?.length && (
+						<UnassignedActivities
+							activities={activities}
+							setValue={form.setValue}
+							getValues={form.getValues}
 						/>
-						<ErrorMessage error={errors.date?.message} />
-					</Label>
-				</div>
-				<div className="flex flex-col gap-6 md:flex-row">
-					<Label className="basis-1/2">
-						<span>Bill To</span>
-						<Subheading
-							className={classNames([
-								"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
-								billTo ? "max-h-5" : "max-h-0",
-							])}
-						>
-							{billTo ? "Loaded from client information" : <br />}
-						</Subheading>
-						<Input name="billTo" register={register} />
-						<ErrorMessage error={errors.billTo?.message} />
-					</Label>
-					<Label className="basis-1/2" required>
-						<span>Invoice Number</span>
+					)}
 
-						<Subheading
-							className={classNames([
-								"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
-								billTo ? "max-h-5" : "max-h-0",
-							])}
-						>
-							Previous invoice was {latestInvoiceNo}
-						</Subheading>
-
-						<Input
-							name="invoiceNo"
-							placeholder={"Smith-XX"}
-							register={register}
-						/>
-						<ErrorMessage error={errors.invoiceNo?.message} />
-					</Label>
-				</div>
-
-				{watch("clientId") && activities && (
-					<UnassignedActivities
-						activities={activities}
-						setValue={setValue}
-						getValues={getValues}
+					<InvoiceActivityCreationForm
+						control={form.control}
+						register={form.register}
+						getValues={form.getValues}
+						setValue={form.setValue}
+						watch={form.watch}
 					/>
-				)}
 
-				<InvoiceActivityCreationForm
-					control={control}
-					register={register}
-					getValues={getValues}
-					setValue={setValue}
-					watch={watch}
-				/>
-
-				<div className="mt-4 flex justify-center gap-4">
-					<Button type="submit" disabled={!isDirty || !isValid || isSubmitting}>
-						{existingInvoice ? "Update" : "Create"}
-					</Button>
-					<Button
-						type="button"
-						onClick={() => router.back()}
-						variant="secondary"
-					>
-						Cancel
-					</Button>
-				</div>
+					<div className="mt-4 flex justify-center gap-4">
+						<Button
+							type="submit"
+							disabled={
+								!form.formState.isDirty ||
+								!form.formState.isValid ||
+								form.formState.isSubmitting
+							}
+						>
+							{existingInvoice ? "Update" : "Create"}
+						</Button>
+						<Button
+							type="button"
+							onClick={() => router.back()}
+							variant="secondary"
+						>
+							Cancel
+						</Button>
+					</div>
+				</form>
 			</Form>
 		</div>
 	);
