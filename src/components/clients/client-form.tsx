@@ -24,7 +24,7 @@ const ClientForm = ({ existingClient }: Props) => {
 
 	const router = useRouter();
 
-	const trpcContext = trpc.useContext();
+	const trpcUtils = trpc.useUtils();
 	const updateClientMutation = trpc.clients.update.useMutation();
 	const createClientMutation = trpc.clients.create.useMutation();
 
@@ -48,7 +48,7 @@ const ClientForm = ({ existingClient }: Props) => {
 	});
 
 	const submitCallback = (successMessage: string) => {
-		trpcContext.clients.list.invalidate();
+		trpcUtils.clients.list.invalidate();
 		toast.success(successMessage);
 
 		router.back();

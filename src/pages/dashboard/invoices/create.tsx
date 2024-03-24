@@ -8,12 +8,12 @@ import { toast } from "react-toastify";
 const CreateInvoice = () => {
 	const router = useRouter();
 
-	const trpcContext = trpc.useContext();
+	const trpcUtils = trpc.useUtils();
 	const createInvoiceMutation = trpc.invoice.create.useMutation();
 
 	function onSubmit(invoiceData: InvoiceSchema) {
 		createInvoiceMutation.mutateAsync({ invoice: invoiceData }).then(() => {
-			trpcContext.invoice.list.invalidate();
+			trpcUtils.invoice.list.invalidate();
 
 			toast.success("Invoice created");
 			router.back();

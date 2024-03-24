@@ -26,7 +26,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 
 	const router = useRouter();
 
-	const trpcContext = trpc.useContext();
+	const trpcUtils = trpc.useUtils();
 	const createSupportItemMutation = trpc.supportItem.create.useMutation();
 	const updateSupportItemMutation = trpc.supportItem.update.useMutation();
 
@@ -60,8 +60,8 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 				.then(() => {
 					toast.success("Support Item updated");
 
-					trpcContext.supportItem.list.invalidate();
-					trpcContext.supportItem.byId.invalidate({
+					trpcUtils.supportItem.list.invalidate();
+					trpcUtils.supportItem.byId.invalidate({
 						id: existingSupportItem.id,
 					});
 					router.push("/dashboard/support-items");
@@ -74,7 +74,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 				.then(() => {
 					toast.success("Support Item created");
 
-					trpcContext.supportItem.list.invalidate();
+					trpcUtils.supportItem.list.invalidate();
 					router.push("/dashboard/support-items");
 				});
 		}

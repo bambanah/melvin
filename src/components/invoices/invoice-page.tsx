@@ -42,7 +42,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 	const [isPdfPreviewExpanded, setIsPdfPreviewExpanded] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-	const trpcContext = trpc.useContext();
+	const trpcUtils = trpc.useUtils();
 	const { data: invoice, error } = trpc.invoice.byId.useQuery({
 		id: invoiceId,
 	});
@@ -54,7 +54,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 			deleteInvoiceMutation
 				.mutateAsync({ id: invoiceId })
 				.then(() => {
-					trpcContext.invoice.list.invalidate();
+					trpcUtils.invoice.list.invalidate();
 
 					toast.success("Invoice deleted");
 					router.push("/dashboard/invoices");
@@ -69,8 +69,8 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 			markInvoiceAsMutation
 				.mutateAsync({ ids: [invoiceId], status: invoiceStatus })
 				.then(() => {
-					trpcContext.invoice.byId.invalidate({ id: invoiceId });
-					trpcContext.invoice.list.invalidate();
+					trpcUtils.invoice.byId.invalidate({ id: invoiceId });
+					trpcUtils.invoice.list.invalidate();
 				});
 	};
 
