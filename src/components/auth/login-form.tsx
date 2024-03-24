@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
-import Form from "@/components/ui/form-old";
+import { Form } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { FormControl, FormField, FormItem, FormMessage } from "../ui/form";
 
 const loginFormSchema = z.object({
 	email: z.string().email(),
@@ -11,7 +13,7 @@ const loginFormSchema = z.object({
 type LoginFormSchema = z.infer<typeof loginFormSchema>;
 
 const LoginForm = () => {
-	const { register, handleSubmit } = useForm<LoginFormSchema>({
+	const form = useForm<LoginFormSchema>({
 		resolver: zodResolver(loginFormSchema),
 	});
 
@@ -20,13 +22,24 @@ const LoginForm = () => {
 	};
 
 	return (
-		<Form onSubmit={handleSubmit(onSubmit)}>
-			<input
-				className="text-fg grow border bg-neutral-50 px-6 py-3"
-				placeholder="Email Address"
-				{...register("email")}
-			/>
-			<Button type="submit">Continue</Button>
+		<Form {...form}>
+			<form onSubmit={form.handleSubmit(onSubmit)}>
+				<FormField
+					control={form.control}
+					name="email"
+					render={({ field }) => (
+						<FormItem>
+							<FormControl>
+								<Input placeholder={"Email Address"} {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				<Button type="submit" className="mt-4 w-full">
+					Continue
+				</Button>
+			</form>
 		</Form>
 	);
 };
