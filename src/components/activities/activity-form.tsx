@@ -1,25 +1,41 @@
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import Heading from "@/components/ui/heading";
-import Label from "@/components/ui/label-old";
-import Subheading from "@/components/ui/subheading";
 import ClientSelect from "@/components/forms/client-select";
-import DatePicker from "@/components/forms/date-picker";
 import ErrorMessage from "@/components/forms/error-message";
-import { Input } from "@/components/ui/input";
 import SupportItemSelect from "@/components/forms/support-item-select";
-import TimeInput from "@/components/forms/time-input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { activitySchema, ActivitySchema } from "@/schema/activity-schema";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
+import Heading from "@/components/ui/heading";
+import { Input } from "@/components/ui/input";
+import Label from "@/components/ui/label-old";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import Subheading from "@/components/ui/subheading";
+import { trpc } from "@/lib/trpc";
+import { cn } from "@/lib/utils";
+import { ActivitySchema, activitySchema } from "@/schema/activity-schema";
 import { ActivityByIdOutput } from "@/server/api/routers/activity-router";
 import { SupportItemListOutput } from "@/server/api/routers/support-item-router";
-import { trpc } from "@/lib/trpc";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CalendarIcon } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 import dayjs from "dayjs";
+dayjs.extend(require("dayjs/plugin/utc"));
+dayjs.extend(require("dayjs/plugin/localizedFormat"));
 dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
 interface Props {
@@ -39,10 +55,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 		resolver: zodResolver(activitySchema),
 		mode: "onBlur",
 		defaultValues: {
-			date: (existingActivity?.date
-				? dayjs.utc(existingActivity?.date)
-				: dayjs()
-			).format("YYYY-MM-DD"),
+			date: existingActivity?.date ? existingActivity.date : new Date(),
 			supportItemId: existingActivity?.supportItem.id ?? "",
 			clientId: existingActivity?.client?.id ?? "",
 			startTime: existingActivity?.startTime
@@ -53,11 +66,11 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 				: "",
 			itemDistance: existingActivity?.itemDistance ?? undefined,
 			transitDistance: existingActivity?.transitDistance
-				? Number(existingActivity?.transitDistance)
-				: undefined,
+				? existingActivity?.transitDistance.toString()
+				: "",
 			transitDuration: existingActivity?.transitDuration
-				? Number(existingActivity?.transitDuration)
-				: undefined,
+				? existingActivity?.transitDuration.toString()
+				: "",
 		},
 	});
 
@@ -105,38 +118,76 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					onSubmit={form.handleSubmit(onSubmit)}
 					className="flex w-full flex-col items-center gap-5"
 				>
-					<div className="w-full">
-						<Label htmlFor="supportItemId" className="shrink grow" required>
-							<span>Support Item</span>
-							<SupportItemSelect
-								name="supportItemId"
-								control={form.control}
-								setSupportItems={setSupportItems}
-							/>
-							<ErrorMessage
-								error={form.formState.errors.supportItemId?.message}
-							/>
-						</Label>
-					</div>
+					<FormField
+						name="supportItemId"
+						control={form.control}
+						render={() => (
+							<FormItem className="w-full">
+								<FormLabel required>Support Item</FormLabel>
+								<FormControl>
+									<SupportItemSelect
+										name="supportItemId"
+										control={form.control}
+										setSupportItems={setSupportItems}
+									/>
+								</FormControl>
+							</FormItem>
+						)}
+					/>
 					<div className="flex w-full gap-4">
-						<Label
-							htmlFor="clientId"
-							className="shrink grow basis-1/2"
-							required
-						>
-							<span>Client</span>
-							<ClientSelect name="clientId" control={form.control} />
-							<ErrorMessage error={form.formState.errors.clientId?.message} />
-						</Label>
-						<Label className="shrink grow basis-1/2" required>
-							<span>Date</span>
-							<DatePicker
-								name="date"
-								register={form.register}
-								error={!!form.formState.errors.date}
-							/>
-							<ErrorMessage error={form.formState.errors.date?.message} />
-						</Label>
+						<FormField
+							name="clientId"
+							control={form.control}
+							render={() => (
+								<FormItem className="shrink grow basis-1/2">
+									<FormLabel required>Client</FormLabel>
+									<FormControl>
+										<ClientSelect name="clientId" control={form.control} />
+									</FormControl>
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="date"
+							render={({ field }) => (
+								<FormItem className="flex shrink grow basis-1/2 flex-col gap-1 pt-1">
+									<FormLabel required>Date</FormLabel>
+									<Popover>
+										<PopoverTrigger asChild>
+											<FormControl>
+												<Button
+													variant={"outline"}
+													className={cn(
+														"pl-3 text-left font-normal",
+														!field.value && "text-muted-foreground"
+													)}
+												>
+													{field.value ? (
+														<span>{dayjs.utc(field.value).format("LL")}</span>
+													) : (
+														<span>Pick a date</span>
+													)}
+													<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+												</Button>
+											</FormControl>
+										</PopoverTrigger>
+										<PopoverContent className="w-auto p-0" align="start">
+											<Calendar
+												mode="single"
+												selected={field.value}
+												onSelect={field.onChange}
+												disabled={(date) =>
+													date > new Date() || date < new Date("1900-01-01")
+												}
+												initialFocus
+											/>
+										</PopoverContent>
+									</Popover>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 					</div>
 
 					{supportItems?.find((i) => i.id === form.watch("supportItemId"))
@@ -166,80 +217,81 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 						</div>
 					) : (
 						<div className="flex w-full gap-4">
-							<Label className="w-full shrink grow basis-1/2" required>
-								<span>Start Time</span>
-								<TimeInput
-									name="startTime"
-									register={form.register}
-									error={!!form.formState.errors.startTime}
-									className="w-full"
-								/>
-								<ErrorMessage
-									error={form.formState.errors.startTime?.message}
-								/>
-							</Label>
-							<Label
-								htmlFor="endTime"
-								className="shrink grow basis-1/2"
-								required
-							>
-								<span>End Time</span>
-								<TimeInput
-									name="endTime"
-									register={form.register}
-									error={!!form.formState.errors.endTime}
-								/>
-								<ErrorMessage error={form.formState.errors.endTime?.message} />
-							</Label>
+							<FormField
+								name="startTime"
+								control={form.control}
+								render={({ field }) => (
+									<FormItem className="shrink grow basis-1/2">
+										<FormLabel required>Start Time</FormLabel>
+										<FormControl>
+											<Input type="time" {...field} />
+										</FormControl>
+									</FormItem>
+								)}
+							/>
+							<FormField
+								name="endTime"
+								control={form.control}
+								render={({ field }) => (
+									<FormItem className="shrink grow basis-1/2">
+										<FormLabel required>End Time</FormLabel>
+										<FormControl>
+											<Input type="time" {...field} />
+										</FormControl>
+									</FormItem>
+								)}
+							/>
 						</div>
 					)}
 					<hr className="w-full" />
 
 					<div className="flex flex-col items-center gap-1">
 						<Heading size="xsmall">Provider Travel</Heading>
-
-						{/* TODO: Autofill from previous invoice */}
-						{false && <p>Autofilled from previous invoice</p>}
-
 						<div className="mt-4 flex w-full gap-4">
-							<Label
-								htmlFor="transitDistance"
-								className="w-full shrink grow basis-1/2"
-							>
-								<span>Transit Distance</span>
-								<Subheading>Distance to client</Subheading>
-								<Input
-									name="transitDistance"
-									register={form.register}
-									suffix="km"
-									rules={{
-										setValueAs: (v) => (v === "" ? null : Number(v)),
-									}}
-									error={!!form.formState.errors.transitDistance}
-								/>
-								<ErrorMessage
-									error={form.formState.errors.transitDistance?.message}
-								/>
-							</Label>
-							<Label
-								htmlFor="transitDuration"
-								className="shrink grow basis-1/2"
-							>
-								<span>Transit Duration</span>
-								<Subheading>Duration of drive</Subheading>
-								<Input
-									name="transitDuration"
-									register={form.register}
-									suffix="mins"
-									rules={{
-										setValueAs: (v) => (v === "" ? null : Number(v)),
-									}}
-									error={!!form.formState.errors.transitDuration}
-								/>
-								<ErrorMessage
-									error={form.formState.errors.transitDuration?.message}
-								/>
-							</Label>
+							<FormField
+								name="transitDistance"
+								control={form.control}
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Transit Distance</FormLabel>
+										<FormControl>
+											<Input
+												rules={{
+													valueAsNumber: true,
+												}}
+												type="number"
+												step={0.1}
+												{...field}
+											/>
+										</FormControl>
+										<FormDescription>
+											Distance to client (in km)
+										</FormDescription>
+									</FormItem>
+								)}
+							/>
+							<FormField
+								name="transitDuration"
+								control={form.control}
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Transit Duration</FormLabel>
+										<FormControl>
+											<Input
+												rules={{
+													valueAsNumber: true,
+												}}
+												type="number"
+												step={0.1}
+												{...field}
+											/>
+										</FormControl>
+										<FormDescription>
+											Duration of drive (in minutes)
+										</FormDescription>
+									</FormItem>
+								)}
+							/>
 						</div>
 					</div>
 
