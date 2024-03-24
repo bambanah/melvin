@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import Form from "@/components/ui/form";
+import Form from "@/components/ui/form-old";
 import Heading from "@/components/ui/heading";
-import Label from "@/components/ui/label";
+import Label from "@/components/ui/label-old";
 import Subheading from "@/components/ui/subheading";
 import ErrorMessage from "@/components/forms/error-message";
 import { Input } from "@/components/ui/input";
