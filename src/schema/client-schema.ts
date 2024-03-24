@@ -3,11 +3,11 @@ import { z } from "zod";
 export const clientSchema = z.object({
 	id: z.string().optional(),
 	name: z.string().min(1, "Required"),
-	number: z.string().nullish(),
-	billTo: z.string().nullish(),
-	invoiceNumberPrefix: z.string().nullish(),
-	defaultTransitDistance: z.string().nullish(),
-	defaultTransitTime: z.string().nullish(),
-	invoiceEmail: z.string().nullish(),
+	number: z.string().optional(),
+	billTo: z.string().optional(),
+	invoiceNumberPrefix: z.string().optional(),
+	defaultTransitDistance: z.string().optional(),
+	defaultTransitTime: z.string().optional(),
+	invoiceEmail: z.string().optional(),
 });
 export type ClientSchema = z.infer<typeof clientSchema>;
