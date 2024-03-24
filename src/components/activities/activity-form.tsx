@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import Form from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
-import Label from "@/components/ui/label";
+import Label from "@/components/ui/label-old";
 import Subheading from "@/components/ui/subheading";
 import ClientSelect from "@/components/forms/client-select";
 import DatePicker from "@/components/forms/date-picker";
@@ -35,13 +35,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 	const createActivityMutation = trpc.activity.add.useMutation();
 	const modifyActivityMutation = trpc.activity.modify.useMutation();
 
-	const {
-		register,
-		handleSubmit,
-		control,
-		watch,
-		formState: { errors, isDirty, isSubmitting, isValid },
-	} = useForm<ActivitySchema>({
+	const form = useForm<ActivitySchema>({
 		resolver: zodResolver(activitySchema),
 		mode: "onBlur",
 		defaultValues: {
@@ -106,131 +100,165 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 			<Heading className="">
 				{existingActivity ? `Update Activity` : "Log Activity"}
 			</Heading>
-			<Form
-				onSubmit={handleSubmit(onSubmit)}
-				className="flex w-full flex-col items-center gap-5"
-			>
-				<div className="w-full">
-					<Label htmlFor="supportItemId" className="shrink grow" required>
-						<span>Support Item</span>
-						<SupportItemSelect
-							name="supportItemId"
-							control={control}
-							setSupportItems={setSupportItems}
-						/>
-						<ErrorMessage error={errors.supportItemId?.message} />
-					</Label>
-				</div>
-				<div className="flex w-full gap-4">
-					<Label htmlFor="clientId" className="shrink grow basis-1/2" required>
-						<span>Client</span>
-						<ClientSelect name="clientId" control={control} />
-						<ErrorMessage error={errors.clientId?.message} />
-					</Label>
-					<Label className="shrink grow basis-1/2" required>
-						<span>Date</span>
-						<DatePicker name="date" register={register} error={!!errors.date} />
-						<ErrorMessage error={errors.date?.message} />
-					</Label>
-				</div>
-
-				{supportItems?.find((i) => i.id === watch("supportItemId"))
-					?.rateType === "KM" ? (
+			<Form {...form}>
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className="flex w-full flex-col items-center gap-5"
+				>
+					<div className="w-full">
+						<Label htmlFor="supportItemId" className="shrink grow" required>
+							<span>Support Item</span>
+							<SupportItemSelect
+								name="supportItemId"
+								control={form.control}
+								setSupportItems={setSupportItems}
+							/>
+							<ErrorMessage
+								error={form.formState.errors.supportItemId?.message}
+							/>
+						</Label>
+					</div>
 					<div className="flex w-full gap-4">
 						<Label
-							htmlFor="itemDistance"
-							className="w-full shrink grow basis-1/2"
+							htmlFor="clientId"
+							className="shrink grow basis-1/2"
 							required
 						>
-							<span>Distance</span>
-							<Subheading>Distance travelled with client</Subheading>
-							<Input
-								name="itemDistance"
-								register={register}
-								error={!!errors.itemDistance}
-								suffix="km"
-								rules={{
-									setValueAs: (v) => (v === "" ? null : Number(v)),
-								}}
-								className="w-full"
+							<span>Client</span>
+							<ClientSelect name="clientId" control={form.control} />
+							<ErrorMessage error={form.formState.errors.clientId?.message} />
+						</Label>
+						<Label className="shrink grow basis-1/2" required>
+							<span>Date</span>
+							<DatePicker
+								name="date"
+								register={form.register}
+								error={!!form.formState.errors.date}
 							/>
-							<ErrorMessage error={errors.itemDistance?.message} />
+							<ErrorMessage error={form.formState.errors.date?.message} />
 						</Label>
 					</div>
-				) : (
-					<div className="flex w-full gap-4">
-						<Label className="w-full shrink grow basis-1/2" required>
-							<span>Start Time</span>
-							<TimeInput
-								name="startTime"
-								register={register}
-								error={!!errors.startTime}
-								className="w-full"
-							/>
-							<ErrorMessage error={errors.startTime?.message} />
-						</Label>
-						<Label htmlFor="endTime" className="shrink grow basis-1/2" required>
-							<span>End Time</span>
-							<TimeInput
-								name="endTime"
-								register={register}
-								error={!!errors.endTime}
-							/>
-							<ErrorMessage error={errors.endTime?.message} />
-						</Label>
+
+					{supportItems?.find((i) => i.id === form.watch("supportItemId"))
+						?.rateType === "KM" ? (
+						<div className="flex w-full gap-4">
+							<Label
+								htmlFor="itemDistance"
+								className="w-full shrink grow basis-1/2"
+								required
+							>
+								<span>Distance</span>
+								<Subheading>Distance travelled with client</Subheading>
+								<Input
+									name="itemDistance"
+									register={form.register}
+									error={!!form.formState.errors.itemDistance}
+									suffix="km"
+									rules={{
+										setValueAs: (v) => (v === "" ? null : Number(v)),
+									}}
+									className="w-full"
+								/>
+								<ErrorMessage
+									error={form.formState.errors.itemDistance?.message}
+								/>
+							</Label>
+						</div>
+					) : (
+						<div className="flex w-full gap-4">
+							<Label className="w-full shrink grow basis-1/2" required>
+								<span>Start Time</span>
+								<TimeInput
+									name="startTime"
+									register={form.register}
+									error={!!form.formState.errors.startTime}
+									className="w-full"
+								/>
+								<ErrorMessage
+									error={form.formState.errors.startTime?.message}
+								/>
+							</Label>
+							<Label
+								htmlFor="endTime"
+								className="shrink grow basis-1/2"
+								required
+							>
+								<span>End Time</span>
+								<TimeInput
+									name="endTime"
+									register={form.register}
+									error={!!form.formState.errors.endTime}
+								/>
+								<ErrorMessage error={form.formState.errors.endTime?.message} />
+							</Label>
+						</div>
+					)}
+					<hr className="w-full" />
+
+					<div className="flex flex-col items-center gap-1">
+						<Heading size="xsmall">Provider Travel</Heading>
+
+						{/* TODO: Autofill from previous invoice */}
+						{false && <p>Autofilled from previous invoice</p>}
+
+						<div className="mt-4 flex w-full gap-4">
+							<Label
+								htmlFor="transitDistance"
+								className="w-full shrink grow basis-1/2"
+							>
+								<span>Transit Distance</span>
+								<Subheading>Distance to client</Subheading>
+								<Input
+									name="transitDistance"
+									register={form.register}
+									suffix="km"
+									rules={{
+										setValueAs: (v) => (v === "" ? null : Number(v)),
+									}}
+									error={!!form.formState.errors.transitDistance}
+								/>
+								<ErrorMessage
+									error={form.formState.errors.transitDistance?.message}
+								/>
+							</Label>
+							<Label
+								htmlFor="transitDuration"
+								className="shrink grow basis-1/2"
+							>
+								<span>Transit Duration</span>
+								<Subheading>Duration of drive</Subheading>
+								<Input
+									name="transitDuration"
+									register={form.register}
+									suffix="mins"
+									rules={{
+										setValueAs: (v) => (v === "" ? null : Number(v)),
+									}}
+									error={!!form.formState.errors.transitDuration}
+								/>
+								<ErrorMessage
+									error={form.formState.errors.transitDuration?.message}
+								/>
+							</Label>
+						</div>
 					</div>
-				)}
-				<hr className="w-full" />
 
-				<div className="flex flex-col items-center gap-1">
-					<Heading size="xsmall">Provider Travel</Heading>
-
-					{/* TODO: Autofill from previous invoice */}
-					{false && <p>Autofilled from previous invoice</p>}
-
-					<div className="mt-4 flex w-full gap-4">
-						<Label
-							htmlFor="transitDistance"
-							className="w-full shrink grow basis-1/2"
+					<div className="mt-4 flex justify-center gap-4">
+						<Button
+							type="submit"
+							disabled={
+								form.formState.isSubmitting ||
+								!form.formState.isDirty ||
+								!form.formState.isValid
+							}
 						>
-							<span>Transit Distance</span>
-							<Subheading>Distance to client</Subheading>
-							<Input
-								name="transitDistance"
-								register={register}
-								suffix="km"
-								rules={{
-									setValueAs: (v) => (v === "" ? null : Number(v)),
-								}}
-								error={!!errors.transitDistance}
-							/>
-							<ErrorMessage error={errors.transitDistance?.message} />
-						</Label>
-						<Label htmlFor="transitDuration" className="shrink grow basis-1/2">
-							<span>Transit Duration</span>
-							<Subheading>Duration of drive</Subheading>
-							<Input
-								name="transitDuration"
-								register={register}
-								suffix="mins"
-								rules={{
-									setValueAs: (v) => (v === "" ? null : Number(v)),
-								}}
-								error={!!errors.transitDuration}
-							/>
-							<ErrorMessage error={errors.transitDuration?.message} />
-						</Label>
+							{existingActivity ? "Update" : "Create"}
+						</Button>
+						<Button type="button" onClick={() => router.back()}>
+							Cancel
+						</Button>
 					</div>
-				</div>
-
-				<div className="mt-4 flex justify-center gap-4">
-					<Button type="submit" disabled={isSubmitting || !isDirty || !isValid}>
-						{existingActivity ? "Update" : "Create"}
-					</Button>
-					<Button type="button" onClick={() => router.back()}>
-						Cancel
-					</Button>
-				</div>
+				</form>
 			</Form>
 		</div>
 	);

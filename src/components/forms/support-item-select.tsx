@@ -1,4 +1,4 @@
-import Select from "@/components/forms/select";
+import { FormSelect } from "@/components/ui/select";
 import { faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SupportItemListOutput } from "@/server/api/routers/support-item-router";
@@ -15,9 +15,8 @@ interface Props<T extends FieldValues> {
 }
 
 const SupportItemSelect = <T extends FieldValues>({
-	name,
-	control,
 	setSupportItems,
+	...props
 }: Props<T>) => {
 	const [options, setOptions] = useState<
 		{ label: JSX.Element; value: string }[]
@@ -50,7 +49,7 @@ const SupportItemSelect = <T extends FieldValues>({
 		}
 	}, [setSupportItems, supportItems]);
 
-	return <Select options={options} name={name} control={control} />;
+	return <FormSelect options={options} {...props} />;
 };
 
 export default SupportItemSelect;

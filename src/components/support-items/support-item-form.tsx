@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
-import Form from "@/components/ui/form";
+import Form from "@/components/ui/form-old";
 import Heading from "@/components/ui/heading";
-import Label from "@/components/ui/label";
+import Label from "@/components/ui/label-old";
 import Subheading from "@/components/ui/subheading";
 import Checkbox from "@/components/forms/checkbox";
 import ErrorMessage from "@/components/forms/error-message";
 import { Input } from "@/components/ui/input";
-import Select from "@/components/forms/select";
+import Select from "@/components/ui/select-old";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RateType } from "@prisma/client";
 import type { SupportItemSchema } from "@/schema/support-item-schema";

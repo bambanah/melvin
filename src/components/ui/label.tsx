@@ -1,28 +1,24 @@
-/* eslint-disable jsx-a11y/label-has-for */
-/* eslint-disable jsx-a11y/label-has-associated-control */
-import classNames from "classnames";
-import { DetailedHTMLProps, LabelHTMLAttributes } from "react";
+import * as React from "react";
+import * as LabelPrimitive from "@radix-ui/react-label";
+import { cva, type VariantProps } from "class-variance-authority";
 
-const Label = ({
-	children,
-	className,
-	required,
-	...rest
-}: DetailedHTMLProps<
-	LabelHTMLAttributes<HTMLLabelElement>,
-	HTMLLabelElement
-> & { required?: boolean }) => (
-	<label
-		className={classNames([
-			"flex flex-col gap-2",
-			required &&
-				"[&>p]:ml-1 [&>span]:ml-1 [&>span]:after:text-red-600 [&>span]:after:content-['_*']",
-			className,
-		])}
-		{...rest}
-	>
-		{children}
-	</label>
+import { cn } from "@/lib/utils";
+
+const labelVariants = cva(
+	"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 );
 
-export default Label;
+const Label = React.forwardRef<
+	React.ElementRef<typeof LabelPrimitive.Root>,
+	React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &
+		VariantProps<typeof labelVariants>
+>(({ className, ...props }, ref) => (
+	<LabelPrimitive.Root
+		ref={ref}
+		className={cn(labelVariants(), className)}
+		{...props}
+	/>
+));
+Label.displayName = LabelPrimitive.Root.displayName;
+
+export { Label };
