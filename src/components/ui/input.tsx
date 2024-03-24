@@ -29,7 +29,6 @@ function InputInner<T extends FieldValues>(
 				className
 			)}
 			ref={ref}
-			prefix="asfd"
 			{...props}
 		/>
 	);
