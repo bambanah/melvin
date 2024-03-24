@@ -1,15 +1,20 @@
 import { Button } from "@/components/ui/button";
-import Form from "@/components/ui/form-old";
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
-import Label from "@/components/ui/label-old";
-import Subheading from "@/components/ui/subheading";
-import ErrorMessage from "@/components/forms/error-message";
 import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { trpc } from "@/lib/trpc";
 import type { ClientSchema } from "@/schema/client-schema";
 import { clientSchema } from "@/schema/client-schema";
 import { ClientByIdOutput } from "@/server/api/routers/client-router";
-import { trpc } from "@/lib/trpc";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
@@ -28,12 +33,7 @@ const ClientForm = ({ existingClient }: Props) => {
 	const updateClientMutation = trpc.clients.update.useMutation();
 	const createClientMutation = trpc.clients.create.useMutation();
 
-	const {
-		register,
-		handleSubmit,
-		formState: { isDirty, isValid, isSubmitting, errors },
-		watch,
-	} = useForm<ClientSchema>({
+	const form = useForm<ClientSchema>({
 		resolver: zodResolver(clientSchema),
 		defaultValues: {
 			name: existingClient?.name ?? "",
@@ -80,101 +80,119 @@ const ClientForm = ({ existingClient }: Props) => {
 				All fields except <b>Participant Name</b> can be modified directly on an
 				Invoice.
 			</p>
-			<Form onSubmit={handleSubmit(onSubmit)}>
-				<Label htmlFor="name" required>
-					<span>Participant Name</span>
-					<Input
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+					<FormField
 						name="name"
-						type="text"
-						register={register}
-						error={!!errors.name}
-						placeholder="John Smith"
+						control={form.control}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel required>Participant Name</FormLabel>
+								<FormControl>
+									<Input placeholder="John Smith" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-					<ErrorMessage error={errors.name?.message} />
-				</Label>
-				<Label htmlFor="number">
-					<span>Participant Number</span>
-					<Input
+					<FormField
 						name="number"
-						type="text"
-						register={register}
-						error={!!errors.number}
-						placeholder="123456789"
+						control={form.control}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Participant Number</FormLabel>
+								<FormControl>
+									<Input placeholder="123456789" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-					<ErrorMessage error={errors.number?.message} />
-				</Label>
-				<Label htmlFor="invoiceNumberPrefix">
-					<span>Invoice Prefix</span>
-					<Subheading>
-						Default prefix to use for invoice numbers (
-						{watch("invoiceNumberPrefix") || "Smith-"}XX)
-					</Subheading>
-					<Input
+					<FormField
 						name="invoiceNumberPrefix"
-						type="text"
-						register={register}
-						error={!!errors.invoiceNumberPrefix}
-						placeholder="Smith-"
+						control={form.control}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Invoice Number Prefix</FormLabel>
+								<FormControl>
+									<Input placeholder="Smith-" {...field} />
+								</FormControl>
+								<FormDescription>
+									Default prefix to use for invoice numbers
+								</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-					<ErrorMessage error={errors.invoiceNumberPrefix?.message} />
-				</Label>
-				<Label htmlFor="billTo">
-					<span>Bill To</span>
-					<Input
+					<FormField
 						name="billTo"
-						type="text"
-						register={register}
-						error={!!errors.billTo}
-						placeholder="HELP Enterprises"
+						control={form.control}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Bill To</FormLabel>
+								<FormControl>
+									<Input placeholder="HELP Enterprises" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-					<ErrorMessage error={errors.billTo?.message} />
-				</Label>
-				<Label>
-					<span>Default Transit Distance (km)</span>
-					<Input
+					<FormField
 						name="defaultTransitDistance"
-						type="number"
-						step={0.1}
-						register={register}
-						error={!!errors.defaultTransitDistance}
-						placeholder="7"
-						suffix="km"
+						control={form.control}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Default Transit Distance</FormLabel>
+								<FormControl>
+									<Input placeholder="123456789" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-					<ErrorMessage error={errors.defaultTransitDistance?.message} />
-				</Label>
-				<Label>
-					<span>Default Transit Time</span>
-					<Input
+					<FormField
 						name="defaultTransitTime"
-						type="number"
-						step={0.1}
-						register={register}
-						error={!!errors.defaultTransitTime}
-						placeholder="15"
-						suffix="mins"
+						control={form.control}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Default Transit Time</FormLabel>
+								<FormControl>
+									<Input placeholder="123456789" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-					<ErrorMessage error={errors.defaultTransitTime?.message} />
-				</Label>
-				<Label>
-					<span>Invoice Email</span>
-					<Input
+					<FormField
 						name="invoiceEmail"
-						type="text"
-						register={register}
-						error={!!errors.invoiceEmail}
-						placeholder="invoices@client.com"
+						control={form.control}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Invoice Email</FormLabel>
+								<FormControl>
+									<Input placeholder="invoices@client.com" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-					<ErrorMessage error={errors.invoiceEmail?.message} />
-				</Label>
 
-				<div className="mt-4 flex justify-center gap-4">
-					<Button type="submit" disabled={isSubmitting || !isDirty || !isValid}>
-						{formPurpose.charAt(0).toUpperCase() + formPurpose.slice(1)}
-					</Button>
-					<Button asChild type="button" variant="secondary">
-						<Link href="/dashboard/clients">Cancel</Link>
-					</Button>
-				</div>
+					<div className="mt-4 flex justify-center gap-4">
+						<Button
+							type="submit"
+							disabled={
+								form.formState.isSubmitting ||
+								!form.formState.isDirty ||
+								!form.formState.isValid
+							}
+						>
+							{formPurpose.charAt(0).toUpperCase() + formPurpose.slice(1)}
+						</Button>
+						<Button asChild type="button" variant="secondary">
+							<Link href="/dashboard/clients">Cancel</Link>
+						</Button>
+					</div>
+				</form>
 			</Form>
 		</div>
 	);
