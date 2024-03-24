@@ -5,7 +5,7 @@ import Label from "@/components/ui/label";
 import Subheading from "@/components/ui/subheading";
 import Checkbox from "@/components/forms/checkbox";
 import ErrorMessage from "@/components/forms/error-message";
-import Input from "@/components/forms/input";
+import { Input } from "@/components/ui/input";
 import Select from "@/components/forms/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RateType } from "@prisma/client";

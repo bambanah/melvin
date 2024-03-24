@@ -6,7 +6,7 @@ import Subheading from "@/components/ui/subheading";
 import ClientSelect from "@/components/forms/client-select";
 import DatePicker from "@/components/forms/date-picker";
 import ErrorMessage from "@/components/forms/error-message";
-import Input from "@/components/forms/input";
+import { Input } from "@/components/ui/input";
 import SupportItemSelect from "@/components/forms/support-item-select";
 import TimeInput from "@/components/forms/time-input";
 import { zodResolver } from "@hookform/resolvers/zod";

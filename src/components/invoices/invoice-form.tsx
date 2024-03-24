@@ -5,7 +5,7 @@ import Label from "@/components/ui/label";
 import Subheading from "@/components/ui/subheading";
 import ClientSelect from "@/components/forms/client-select";
 import ErrorMessage from "@/components/forms/error-message";
-import Input from "@/components/forms/input";
+import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InvoiceSchema, invoiceSchema } from "@/schema/invoice-schema";
 import { InvoiceByIdOutput } from "@/server/api/routers/invoice-router";
