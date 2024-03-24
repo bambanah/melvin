@@ -3,7 +3,7 @@ import Form from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
 import Label from "@/components/ui/label";
 import ErrorMessage from "@/components/forms/error-message";
-import Input from "@/components/forms/input";
+import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserSchema, userSchema } from "@/schema/user-schema";
 import { UserFetchOutput } from "@/server/api/routers/user-router";
