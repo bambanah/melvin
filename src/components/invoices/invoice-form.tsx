@@ -98,12 +98,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 						<Label className="basis-1/2">
 							<span>Date</span>
 							<Subheading>Date to display on invoice</Subheading>
-							<Input
-								name="date"
-								type="date"
-								register={form.register}
-								error={!!form.formState.errors.date}
-							/>
+							<Input name="date" type="date" register={form.register} />
 							<ErrorMessage error={form.formState.errors.date?.message} />
 						</Label>
 					</div>

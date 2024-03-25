@@ -1,13 +1,18 @@
 import { Button } from "@/components/ui/button";
-import Form from "@/components/ui/form-old";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
-import Label from "@/components/ui/label-old";
-import ErrorMessage from "@/components/forms/error-message";
 import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { trpc } from "@/lib/trpc";
 import { UserSchema, userSchema } from "@/schema/user-schema";
 import { UserFetchOutput } from "@/server/api/routers/user-router";
-import { trpc } from "@/lib/trpc";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 
@@ -30,119 +35,128 @@ const AccountForm = ({ existingUser }: Props) => {
 		[existingUser]
 	);
 
-	const {
-		register,
-		handleSubmit,
-		reset,
-		formState: { isDirty, isValid, isSubmitting, errors },
-	} = useForm<UserSchema>({
+	const form = useForm<UserSchema>({
+		mode: "onBlur",
 		resolver: zodResolver(userSchema),
 		defaultValues: existingUserWithDefaults,
 	});
 
 	useEffect(() => {
-		reset(existingUserWithDefaults);
-	}, [existingUser, existingUserWithDefaults, reset]);
+		form.reset(existingUserWithDefaults);
+	}, [existingUser, existingUserWithDefaults, form]);
 
 	const onSubmit = (data: UserSchema) => {
-		if (isDirty) {
-			updateUserMutation
-				.mutateAsync({ user: data })
-				.then(() => trpcUtils.user.fetch.invalidate());
-		}
+		updateUserMutation
+			.mutateAsync({ user: data })
+			.then(() => trpcUtils.user.fetch.invalidate());
 	};
 
 	return (
 		<div className="mb-8 flex w-full flex-col items-center self-center">
-			<Form
-				onSubmit={handleSubmit(onSubmit)}
-				className="flex w-full flex-col gap-8"
-			>
-				<div className="flex flex-col gap-4">
-					<Heading className="-mb-2" size="small">
-						Account Details
-					</Heading>
-					<Label htmlFor="name">
-						<span>Name</span>
-						<Input
+			<Form {...form}>
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className="flex w-full flex-col gap-8"
+				>
+					<div className="flex flex-col gap-4">
+						<Heading className="-mb-2" size="small">
+							Account Details
+						</Heading>
+						<FormField
 							name="name"
-							type="text"
-							register={register}
-							error={!!errors.name}
-							placeholder="John Smith"
+							control={form.control}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Name</FormLabel>
+									<FormControl>
+										<Input placeholder="John Smith" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
-						<ErrorMessage error={errors.name?.message} />
-					</Label>
-					<Label htmlFor="number">
-						<span>ABN</span>
-						<Input
+						<FormField
 							name="abn"
-							type="text"
-							register={register}
-							rules={{
-								setValueAs: (v) => (v === "" ? null : Number(v)),
-							}}
-							error={!!errors.abn}
-							placeholder="12345678901"
+							control={form.control}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>ABN</FormLabel>
+									<FormControl>
+										<Input
+											type="number"
+											register={form.register}
+											rules={{
+												setValueAs: (v) => (v === "" ? undefined : Number(v)),
+											}}
+											placeholder="12345678901"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
-						<ErrorMessage error={errors.abn?.message} />
-					</Label>
-				</div>
+					</div>
 
-				<div className="flex flex-col gap-4">
-					<Heading className="-mb-2" size="small">
-						Bank Details
-					</Heading>
-					<Label htmlFor="bankName">
-						<span>Bank Name</span>
-						<Input
+					<div className="flex flex-col gap-4">
+						<Heading className="-mb-2" size="small">
+							Bank Details
+						</Heading>
+						<FormField
 							name="bankName"
-							type="text"
-							register={register}
-							error={!!errors.bankName}
-							placeholder="Commonwealth Bank"
+							control={form.control}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Bank Name</FormLabel>
+									<FormControl>
+										<Input placeholder="Commonwealth Bank" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
-						<ErrorMessage error={errors.bankName?.message} />
-					</Label>
-					<Label htmlFor="bankNumber">
-						<span>Bank Number</span>
-						<Input
+						<FormField
 							name="bankNumber"
-							type="text"
-							register={register}
-							rules={{
-								setValueAs: (v) => (v === "" ? null : Number(v)),
-							}}
-							error={!!errors.bankNumber}
-							placeholder="123456789"
+							control={form.control}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Bank Number</FormLabel>
+									<FormControl>
+										<Input placeholder="123456789" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
-						<ErrorMessage error={errors.bankNumber?.message} />
-					</Label>
-					<Label htmlFor="bsb">
-						<span>BSB</span>
-						<Input
+						<FormField
 							name="bsb"
-							type="text"
-							register={register}
-							rules={{
-								setValueAs: (v) => (v === "" ? null : Number(v)),
-							}}
-							error={!!errors.bsb}
-							placeholder="123-456"
+							control={form.control}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>BSB</FormLabel>
+									<FormControl>
+										<Input type="number" placeholder="123456" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
-						<ErrorMessage error={errors.bsb?.message} />
-					</Label>
-				</div>
+					</div>
 
-				<div className="mt-4 flex justify-center gap-4">
-					<Button
-						type="submit"
-						variant="secondary"
-						disabled={isSubmitting || !isDirty || !isValid}
-					>
-						Save
-					</Button>
-				</div>
+					<div className="mt-4 flex justify-center gap-4">
+						<Button
+							type="submit"
+							variant="secondary"
+							disabled={
+								form.formState.isSubmitting ||
+								!form.formState.isDirty ||
+								!form.formState.isValid
+							}
+						>
+							Save
+						</Button>
+					</div>
+				</form>
 			</Form>
 		</div>
 	);

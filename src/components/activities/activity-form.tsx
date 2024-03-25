@@ -1,5 +1,4 @@
 import ClientSelect from "@/components/forms/client-select";
-import ErrorMessage from "@/components/forms/error-message";
 import SupportItemSelect from "@/components/forms/support-item-select";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -14,13 +13,11 @@ import {
 } from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
-import Label from "@/components/ui/label-old";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import Subheading from "@/components/ui/subheading";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { ActivitySchema, activitySchema } from "@/schema/activity-schema";
@@ -193,27 +190,22 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					{supportItems?.find((i) => i.id === form.watch("supportItemId"))
 						?.rateType === "KM" ? (
 						<div className="flex w-full gap-4">
-							<Label
-								htmlFor="itemDistance"
-								className="w-full shrink grow basis-1/2"
-								required
-							>
-								<span>Distance</span>
-								<Subheading>Distance travelled with client</Subheading>
-								<Input
-									name="itemDistance"
-									register={form.register}
-									error={!!form.formState.errors.itemDistance}
-									suffix="km"
-									rules={{
-										setValueAs: (v) => (v === "" ? null : Number(v)),
-									}}
-									className="w-full"
-								/>
-								<ErrorMessage
-									error={form.formState.errors.itemDistance?.message}
-								/>
-							</Label>
+							<FormField
+								name="itemDistance"
+								control={form.control}
+								render={({ field }) => (
+									<FormItem className="">
+										<FormLabel required>Distance</FormLabel>
+										<FormControl>
+											<Input type="time" {...field} />
+										</FormControl>
+										<FormDescription>
+											Distance travelled with client
+										</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 						</div>
 					) : (
 						<div className="flex w-full gap-4">
