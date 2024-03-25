@@ -102,7 +102,6 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 								register={register}
 								type="text"
 								placeholder="Description"
-								error={!!errors.description}
 							/>
 							<ErrorMessage error={errors.description?.message} />
 						</Label>
@@ -149,7 +148,6 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 											register={register}
 											type="text"
 											placeholder="XX_XXX_XXXX_X_X"
-											error={!!errors[`${day}Code`]}
 										/>
 										<ErrorMessage error={errors[`${day}Code`]?.message} />
 									</span>
@@ -161,7 +159,6 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 												setValueAs: (v) => (v === "" ? "" : Number(v)),
 											}}
 											prefix="$"
-											error={!!errors[`${day}Rate`]}
 										/>
 										<ErrorMessage error={errors[`${day}Rate`]?.message} />
 									</span>
