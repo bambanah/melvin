@@ -1,10 +1,20 @@
 import ClientSelect from "@/components/forms/client-select";
-import DatePicker from "@/components/forms/date-picker";
 import SupportItemSelect from "@/components/forms/support-item-select";
-import TimeInput from "@/components/forms/time-input";
 import { Button } from "@/components/ui/button";
+import {
+	FormControl,
+	FormField,
+	FormItem,
+	FormMessage,
+} from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
+import { cn } from "@/lib/utils";
 import { InvoiceSchema } from "@/schema/invoice-schema";
 import { faCalendar, faClock } from "@fortawesome/free-regular-svg-icons";
 import {
@@ -16,19 +26,25 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
+import { CalendarIcon } from "lucide-react";
 import { useMemo } from "react";
 import {
 	Control,
 	UseFormGetValues,
-	UseFormRegister,
 	UseFormSetValue,
 	UseFormWatch,
 	useFieldArray,
 } from "react-hook-form";
+import { Calendar } from "../ui/calendar";
+
+import dayjs from "dayjs";
+import { Input } from "../ui/input";
+dayjs.extend(require("dayjs/plugin/utc"));
+dayjs.extend(require("dayjs/plugin/localizedFormat"));
+dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
 interface Props {
 	control: Control<InvoiceSchema>;
-	register: UseFormRegister<InvoiceSchema>;
 	getValues: UseFormGetValues<InvoiceSchema>;
 	setValue: UseFormSetValue<InvoiceSchema>;
 	watch: UseFormWatch<InvoiceSchema>;
@@ -36,7 +52,6 @@ interface Props {
 
 const InvoiceActivityCreationForm = ({
 	control,
-	register,
 	getValues,
 	setValue,
 	watch,
@@ -114,17 +129,39 @@ const InvoiceActivityCreationForm = ({
 					{fields.map((field, index) => (
 						<div key={field.id} className="flex flex-col">
 							<div className="flex items-center gap-2">
-								<SupportItemSelect
+								<FormField
 									name={`activitiesToCreate.${index}.supportItemId`}
 									control={control}
+									render={() => (
+										<FormItem className="shrink grow basis-1/2">
+											<FormControl>
+												<SupportItemSelect
+													name={`activitiesToCreate.${index}.supportItemId`}
+													control={control}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
 								/>
 								{isGroupSupportItem(
 									watch("activitiesToCreate")[index].supportItemId
 								) && (
-									<ClientSelect
+									<FormField
 										name={`activitiesToCreate.${index}.groupClientId`}
-										excludeClientId={watch("clientId")}
 										control={control}
+										render={() => (
+											<FormItem className="shrink grow basis-1/2">
+												<FormControl>
+													<ClientSelect
+														name={`activitiesToCreate.${index}.groupClientId`}
+														excludeClientId={watch("clientId")}
+														control={control}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
 									/>
 								)}
 								<button
@@ -169,22 +206,80 @@ const InvoiceActivityCreationForm = ({
 										)}
 										<span className="flex items-center gap-2">
 											<FontAwesomeIcon icon={faCalendar} />
-											<DatePicker
-												register={register}
-												name={`activitiesToCreate.${index}.activities.${activityFieldIndex}.date`}
+											<FormField
+												control={control}
+												name="date"
+												render={({ field }) => (
+													<FormItem className="flex shrink grow basis-1/2 flex-col gap-1 pt-1">
+														<Popover>
+															<PopoverTrigger asChild>
+																<FormControl>
+																	<Button
+																		variant={"outline"}
+																		className={cn(
+																			"pl-3 text-left font-normal",
+																			!field.value && "text-muted-foreground"
+																		)}
+																	>
+																		{field.value ? (
+																			<span>
+																				{dayjs.utc(field.value).format("LL")}
+																			</span>
+																		) : (
+																			<span>Pick a date</span>
+																		)}
+																		<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+																	</Button>
+																</FormControl>
+															</PopoverTrigger>
+															<PopoverContent
+																className="w-auto p-0"
+																align="start"
+															>
+																<Calendar
+																	mode="single"
+																	selected={field.value}
+																	onSelect={field.onChange}
+																	disabled={(date) =>
+																		date > new Date() ||
+																		date < new Date("1900-01-01")
+																	}
+																	initialFocus
+																/>
+															</PopoverContent>
+														</Popover>
+														<FormMessage />
+													</FormItem>
+												)}
 											/>
 										</span>
 										<span className="flex items-center gap-2">
 											<FontAwesomeIcon icon={faClock} />
-											<TimeInput
-												register={register}
+											<FormField
 												name={`activitiesToCreate.${index}.activities.${activityFieldIndex}.startTime`}
+												control={control}
+												render={({ field }) => (
+													<FormItem className="shrink grow basis-1/2">
+														<FormControl>
+															<Input type="time" {...field} />
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
 											/>
 
 											<FontAwesomeIcon icon={faArrowRight} />
-											<TimeInput
-												register={register}
+											<FormField
 												name={`activitiesToCreate.${index}.activities.${activityFieldIndex}.endTime`}
+												control={control}
+												render={({ field }) => (
+													<FormItem className="shrink grow basis-1/2">
+														<FormControl>
+															<Input type="time" {...field} />
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
 											/>
 										</span>
 										<button
@@ -197,7 +292,7 @@ const InvoiceActivityCreationForm = ({
 								))}
 								<li>
 									<Button
-										onClick={() => field.activities.push({ date: "" })}
+										onClick={() => field.activities.push({ date: new Date() })}
 										className="mt-2 w-16 px-8 py-2"
 										variant="secondary"
 									>
@@ -215,7 +310,7 @@ const InvoiceActivityCreationForm = ({
 					appendActivity({
 						supportItemId: "",
 						groupClientId: "",
-						activities: [{ date: "" }],
+						activities: [{ date: new Date() }],
 					})
 				}
 				className="mx-auto w-full"

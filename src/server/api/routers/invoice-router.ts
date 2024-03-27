@@ -48,7 +48,7 @@ const generateNestedWriteForActivities = (
 	data: activitiesToCreate.flatMap(({ supportItemId, activities }) =>
 		activities.map((activity) => ({
 			...activity,
-			date: dayjs.utc(activity.date, "YYYY-MM-DD").toDate(),
+			date: activity.date,
 			startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
 			endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
 			clientId: client.id,
@@ -210,9 +210,7 @@ export const invoiceRouter = router({
 					invoiceNo: inputInvoice.invoiceNo,
 					billTo: inputInvoice.billTo,
 					clientId: inputInvoice.clientId,
-					date: inputInvoice.date
-						? dayjs.utc(inputInvoice.date).toDate()
-						: new Date(),
+					date: inputInvoice.date ? inputInvoice.date : new Date(),
 					ownerId: ctx.session.user.id,
 					activities: {
 						connect: inputInvoice.activityIds?.map((id) => ({ id })),
