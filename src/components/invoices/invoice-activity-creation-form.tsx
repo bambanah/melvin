@@ -27,7 +27,6 @@ import {
 	faX,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import classNames from "classnames";
 import { CalendarIcon } from "lucide-react";
 import { useMemo } from "react";
 import {
@@ -181,7 +180,7 @@ const InvoiceActivityCreationForm = ({
 										{fields.length > 1 && (
 											<div className="flex flex-col justify-center gap-0">
 												<button
-													className={classNames([
+													className={cn([
 														"px-2 py-0 text-zinc-500 transition-colors hover:text-zinc-900 hover:shadow",
 														index === 0 && "hidden",
 													])}
@@ -192,7 +191,7 @@ const InvoiceActivityCreationForm = ({
 													<FontAwesomeIcon icon={faArrowUp} />
 												</button>
 												<button
-													className={classNames([
+													className={cn([
 														"px-2 py-0 text-zinc-500 transition-colors hover:text-zinc-900 hover:shadow",
 														index === fields.length - 1 && "hidden",
 													])}

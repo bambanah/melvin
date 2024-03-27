@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import { cn } from "@/lib/utils";
 import { HTMLAttributes } from "react";
 
 type Variant = "XSMALL" | "SMALL" | "MEDIUM" | "LARGE" | "XLARGE";
@@ -23,7 +23,7 @@ const Logo = ({
 }: HTMLAttributes<HTMLHeadingElement> & Props) => {
 	return (
 		<h1
-			className={classNames(
+			className={cn(
 				"text- text-display m-0 font-display",
 				variantStyles[variant],
 				className

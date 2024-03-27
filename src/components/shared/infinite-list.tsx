@@ -1,6 +1,6 @@
 import Loading from "@/components/ui/loading";
+import { cn } from "@/lib/utils";
 import { UseTRPCInfiniteQueryResult } from "@trpc/react-query/shared";
-import classNames from "classnames";
 import React, { Fragment, useEffect, useRef } from "react";
 
 interface InfiniteListProps<TData, TError, TKey extends keyof TData> {
@@ -38,7 +38,7 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 
 	return (
 		<div
-			className={classNames([
+			className={cn([
 				"mx-auto flex h-full w-full max-w-4xl flex-col pb-16",
 				className,
 			])}

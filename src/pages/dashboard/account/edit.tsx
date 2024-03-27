@@ -1,13 +1,13 @@
+import AccountForm from "@/components/account/account-form";
+import Layout from "@/components/shared/layout";
 import { Button } from "@/components/ui/button";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
-import AccountForm from "@/components/account/account-form";
-import Layout from "@/components/shared/layout";
+import { trpc } from "@/lib/trpc";
+import { cn } from "@/lib/utils";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { trpc } from "@/lib/trpc";
-import classNames from "classnames";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -66,7 +66,7 @@ const EditAccountPage = () => {
 					>
 						<FontAwesomeIcon
 							icon={faChevronRight}
-							className={classNames([
+							className={cn([
 								"duration-75",
 								isAdvancedExpanded ? "rotate-90" : "",
 							])}

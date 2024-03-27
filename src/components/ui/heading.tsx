@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import { cn } from "@/lib/utils";
 
 type Size = "xsmall" | "small" | "medium" | "large" | "xlarge";
 
@@ -19,7 +19,7 @@ interface Props {
 const Heading = ({ children, className, size = "medium" }: Props) => {
 	return (
 		<h2
-			className={classNames(
+			className={cn(
 				"text-fg m-0 break-words font-semibold",
 				variantStyles[size],
 				className

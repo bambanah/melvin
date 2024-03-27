@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import { cn } from "@/lib/utils";
 import { HTMLAttributes } from "react";
 
 interface Props {
@@ -13,7 +13,7 @@ const ListFilterRow = ({ items }: Props) => {
 					<button
 						key={idx}
 						type="button"
-						className={classNames([
+						className={cn([
 							"basis-1/2 border-b px-4 py-2 text-center transition-all",
 							className,
 							active && "border-orange-700 text-orange-700",
