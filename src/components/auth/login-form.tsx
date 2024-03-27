@@ -1,11 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { FormControl, FormField, FormItem, FormMessage } from "../ui/form";
 
 const loginFormSchema = z.object({
 	email: z.string().email(),
