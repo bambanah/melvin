@@ -3,10 +3,6 @@
 @tailwind utilities;
 
 @layer components {
-	.input {
-		@apply w-full rounded-md border bg-white p-3 shadow-md outline-none focus-within:border-orange-500;
-	}
-
 	.tree {
 		@apply z-0 m-0 flex flex-col p-0 pl-4;
 

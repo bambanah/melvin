@@ -4,31 +4,26 @@ import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { trpc } from "@/lib/trpc";
-import {
-	faClock,
-	faPaperPlane,
-	faUser,
-} from "@fortawesome/free-regular-svg-icons";
-import {
-	faDollarSign,
-	faDownload,
-	faMagnifyingGlassPlus,
-	faRunning,
-	faUndo,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { cn } from "@/lib/utils";
 import { Dialog, Transition } from "@headlessui/react";
 import { InvoiceStatus } from "@prisma/client";
+import dayjs from "dayjs";
+import {
+	Clock,
+	DollarSign,
+	Download,
+	Dumbbell,
+	Plane,
+	Search,
+	Undo,
+	User,
+} from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 import { toast } from "react-toastify";
-
-import { cn } from "@/lib/utils";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-dayjs.extend(utc);
+dayjs.extend(require("dayjs/plugin/utc"));
 
 const PdfPreview = dynamic(() => import("@/components/invoices/pdf-preview"));
 const ConfirmDialog = dynamic(() => import("@/components/ui/confirm-dialog"));
@@ -121,9 +116,9 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 			<div className="flex flex-col items-stretch justify-between md:h-[15rem] md:flex-row-reverse">
 				<div
 					className={cn([
-						"group relative h-full max-h-[12rem] min-h-[12rem] basis-1/2 overflow-hidden md:h-[15rem]",
+						"group relative h-full max-h-[12rem] min-h-[12rem] basis-1/2 overflow-hidden md:max-h-[15rem]",
 						invoice.activities.length > 0 &&
-							"cursor-pointer bg-zinc-200 shadow-inner",
+							"cursor-pointer bg-foreground/10 shadow-inner",
 					])}
 				>
 					{invoice.activities.length > 0 ? (
@@ -136,14 +131,14 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 								onClick={() => setIsPdfPreviewExpanded(true)}
 							>
 								<div className="flex items-center justify-center gap-2 rounded-full bg-zinc-900 bg-opacity-90 px-4 py-3 text-zinc-50 transition-transform group-hover:scale-110 md:px-3 md:py-2 md:text-lg">
-									<FontAwesomeIcon icon={faMagnifyingGlassPlus} />
+									<Search className="h-4 w-4" />
 									Preview
 								</div>
 							</div>
 						</>
 					) : (
-						<div className="flex h-[12rem] w-full items-center justify-center bg-zinc-200 md:h-[15rem]">
-							<p className="text-4xl text-zinc-400">DRAFT</p>
+						<div className="flex h-full w-full items-center justify-center bg-foreground/10 md:h-[15rem]">
+							<p className="text-4xl text-foreground/50">DRAFT</p>
 						</div>
 					)}
 				</div>
@@ -157,7 +152,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 							EDIT
 						</Link>
 					</div>
-					<p className="text-sm text-zinc-700">Total</p>
+					<p className="text-sm text-foreground/80">Total</p>
 					<div className="flex items-center justify-between">
 						<p className="text-xl">
 							{getTotalCostOfActivities(invoice.activities).toLocaleString(
@@ -178,7 +173,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 										}}
 										className="w-1/2 grow"
 									>
-										<FontAwesomeIcon icon={faPaperPlane} /> Mark as Sent
+										<Plane className="mr-2 h-4 w-4" /> Mark as Sent
 									</Button>
 								)}
 							{invoice.status === InvoiceStatus.SENT && (
@@ -187,7 +182,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 									variant="secondary"
 									className="w-1/2 grow"
 								>
-									<FontAwesomeIcon icon={faDollarSign} /> Mark as Paid
+									<DollarSign className="mr-2 h-4 w-4" /> Mark as Paid
 								</Button>
 							)}
 							{invoice.status === InvoiceStatus.PAID && (
@@ -196,20 +191,29 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 										markInvoiceAs("CREATED");
 									}}
 									className="w-1/2 grow"
+									variant="secondary"
 								>
-									<FontAwesomeIcon icon={faUndo} />
+									<Undo className="mr-2 h-4 w-4" />
 									Revert to Created
 								</Button>
 							)}
-							<Button asChild className="w-1/2 grow">
+							<Button
+								asChild
+								className="w-1/2 grow"
+								variant={
+									invoice.status === InvoiceStatus.CREATED
+										? "secondary"
+										: "default"
+								}
+							>
 								<a href={`/api/invoices/generate-pdf/${invoiceId}`}>
-									<FontAwesomeIcon icon={faDownload} />
+									<Download className="mr-2 h-4 w-4" />
 									Download PDF
 								</a>
 							</Button>
 						</div>
 						{invoice.sentAt && (
-							<div className="flex flex-col gap-1 text-zinc-600">
+							<div className="flex flex-col gap-1 text-foreground/80">
 								<p>Sent on: {dayjs.utc(invoice.sentAt).format("DD/MM/YYYY")}</p>
 							</div>
 						)}
@@ -220,18 +224,18 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 				<div className="flex basis-1/2 flex-col gap-0 p-2 px-4">
 					<p className="font-semibold">Info</p>
 					<div className="flex items-center gap-4 p-2">
-						<FontAwesomeIcon icon={faClock} className="text-fg w-4" />
+						<Clock className="h-4 w-4" />
 						<p>{dayjs.utc(invoice.date).format("DD/MM/YYYY")}</p>
 					</div>
 					<Link
-						className="text-fg flex w-full items-center gap-4 p-2 text-left hover:bg-zinc-200"
+						className="text-fg flex w-full items-center gap-4 rounded-md p-2 text-left hover:bg-foreground/15"
 						href={`/dashboard/clients/${invoice.client.id}`}
 					>
-						<FontAwesomeIcon icon={faUser} className="text-fg w-4" />
+						<User className="h-4 w-4" />
 						{invoice.client.name}
 					</Link>
 					<div className="flex items-center gap-4 p-2">
-						<FontAwesomeIcon icon={faRunning} className="text-fg w-4" />
+						<Dumbbell className="h-4 w-4" />
 						<p>
 							{invoice.activities.length} Activit
 							{invoice.activities.length > 1 ? "ies" : "y"}
@@ -239,7 +243,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					</div>
 					{invoice.paidAt && (
 						<div className="flex items-center gap-4 p-2">
-							<FontAwesomeIcon icon={faDollarSign} className="text-fg w-4" />
+							<DollarSign className="h-4 w-4" />
 							<p>Paid {dayjs.utc(invoice.paidAt).format("DD/MM/YYYY")}</p>
 						</div>
 					)}
