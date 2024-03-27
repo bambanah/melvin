@@ -11,10 +11,10 @@ test("Can create, edit, and delete clients", async ({ page }) => {
 	const client = randomClient();
 	const updatedClient = randomClient({ avoidName: client.name });
 
-	await page.locator("#name").fill(client.name);
-	await page.locator("#number").fill(client.number);
-	await page.locator("#invoiceNumberPrefix").fill(client.invoiceNumberPrefix);
-	await page.locator("#billTo").fill(client.billTo);
+	await page.getByLabel("Participant Name").fill(client.name);
+	await page.getByLabel("Participant Number").fill(client.number);
+	await page.getByLabel("Invoice Number").fill(client.invoiceNumberPrefix);
+	await page.getByLabel("Bill To").fill(client.billTo);
 
 	await page.getByRole("button", { name: "Create" }).click();
 
@@ -26,7 +26,7 @@ test("Can create, edit, and delete clients", async ({ page }) => {
 	await page.locator("button#options-dropdown").click();
 	await page.getByRole("menuitem", { name: "Edit" }).click();
 
-	await page.locator("#name").fill(updatedClient.name);
+	await page.getByLabel("Participant Name").fill(updatedClient.name);
 	await page.getByRole("button", { name: "Update" }).click();
 	await waitForAlert(page, "Client Updated");
 

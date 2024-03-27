@@ -169,9 +169,9 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 							control={form.control}
 							render={({ field }) => (
 								<FormItem className="grow basis-1/2">
-									<FormLabel required>Bill To</FormLabel>
+									<FormLabel>Bill To</FormLabel>
 									<FormControl>
-										<Input placeholder="" {...field} />
+										<Input {...field} />
 									</FormControl>
 									<FormDescription
 										className={cn([
@@ -227,7 +227,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 						<Button
 							type="submit"
 							variant={form.formState.isValid ? "default" : "secondary"}
-							disabled={!form.formState.isDirty || form.formState.isSubmitting}
+							disabled={form.formState.isSubmitting}
 						>
 							{existingInvoice ? "Update" : "Create"}
 						</Button>

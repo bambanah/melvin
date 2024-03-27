@@ -57,7 +57,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 					</Head>
 					<Component {...pageProps} />
 
-					<ToastContainer />
+					<ToastContainer position="bottom-right" stacked={true} />
 				</SessionProvider>
 
 				<SpeedInsights />

@@ -3,7 +3,11 @@ import { randomClient } from "./random/random-client";
 import { randomSupportItem } from "./random/random-support-item";
 
 export async function waitForAlert(page: Page, text: string) {
-	return await page.getByRole("alert").filter({ hasText: text }).click();
+	return await page
+		.locator(".Toastify__toast")
+		.filter({ hasText: text })
+		.getByLabel("close")
+		.click();
 }
 
 export async function createRandomSupportItem(page: Page) {
@@ -13,9 +17,12 @@ export async function createRandomSupportItem(page: Page) {
 	await expect(page).toHaveURL("/dashboard/support-items");
 	await page.getByRole("link", { name: "Add" }).click();
 
-	await page.locator("#description").fill(supportItem.description);
-	await page.locator("#weekdayCode").fill(supportItem.weekdayCode);
-	await page.locator("#weekdayRate").fill(supportItem.weekdayRate);
+	await page.getByLabel("Description").fill(supportItem.description);
+	await page
+		.getByPlaceholder("XX_XXX_XXXX_X_X")
+		.first()
+		.fill(supportItem.weekdayCode);
+	await page.getByPlaceholder("rate").first().fill(supportItem.weekdayRate);
 	await page.getByRole("button", { name: "Create" }).click();
 
 	await waitForAlert(page, "support item created");
@@ -30,7 +37,7 @@ export async function createRandomClient(page: Page) {
 	await expect(page).toHaveURL("/dashboard/clients");
 	await page.getByRole("link", { name: "Add" }).click();
 
-	await page.locator("#name").fill(client.name);
+	await page.getByLabel("Participant Name").fill(client.name);
 	await page.getByRole("button", { name: "Create" }).click();
 
 	await waitForAlert(page, "client created");
@@ -47,13 +54,13 @@ export async function createRandomActivity(
 	await expect(page).toHaveURL("/dashboard/activities");
 	await page.getByRole("link", { name: "Add" }).click();
 
-	await page.locator(".react-select").nth(0).click();
-	await page.getByText(supportItemDescription, { exact: true }).click();
-	await page.locator(".react-select").nth(1).click();
-	await page.getByText(clientName, { exact: true }).first().click();
+	await page.getByText("Select a support item...").click();
+	await page.getByLabel(supportItemDescription).click();
+	await page.getByText("Select a client...").click();
+	await page.getByLabel(clientName).first().click();
 
-	await page.locator("#startTime").fill("09:15");
-	await page.locator("#endTime").fill("15:23");
+	await page.getByLabel("Start Time").fill("09:15");
+	await page.getByLabel("End Time").fill("15:23");
 	await page.getByRole("button", { name: "Create" }).click();
 
 	await waitForAlert(page, "activity created");

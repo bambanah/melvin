@@ -20,10 +20,10 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 	await expect(page).toHaveURL("/dashboard/invoices");
 	await page.getByRole("link", { name: "Add" }).click();
 
-	await page.locator(".react-select").click();
-	await page.getByText(client.name, { exact: true }).click();
+	await page.getByText("Select a client...").click();
+	await page.getByLabel(client.name).click();
 
-	await page.locator("#invoiceNo").fill(invoice.invoiceNo);
+	await page.getByLabel("Invoice Number").fill(invoice.invoiceNo);
 	await page
 		.getByText(supportItem.description, { exact: true })
 		.first()
@@ -36,7 +36,7 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 
 	await page.getByRole("link", { name: "Edit" }).click();
 
-	await page.locator("#invoiceNo").fill(newRandomInvoice.invoiceNo);
+	await page.getByLabel("Invoice Number").fill(newRandomInvoice.invoiceNo);
 	await page.getByRole("button", { name: "Update" }).click();
 	await waitForAlert(page, "invoice updated");
 	await page.getByRole("link", { name: "Invoices" }).click();
