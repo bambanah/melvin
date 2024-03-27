@@ -1,5 +1,6 @@
 import NavAuth from "@/components/auth/nav-auth";
 import NavLink from "@/components/navigation/nav-link";
+import { ModeToggle } from "@/components/theme-toggle";
 import {
 	faFile,
 	faRunning,
@@ -7,7 +8,6 @@ import {
 	faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import { useSession } from "next-auth/react";
-import { ModeToggle } from "../theme-toggle";
 
 const Navbar = () => {
 	const session = useSession();
