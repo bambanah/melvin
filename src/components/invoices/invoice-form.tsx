@@ -1,25 +1,39 @@
 import ClientSelect from "@/components/forms/client-select";
-import ErrorMessage from "@/components/forms/error-message";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
-import Label from "@/components/ui/label-old";
-import Subheading from "@/components/ui/subheading";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
+import { cn } from "@/lib/utils";
 import { InvoiceSchema, invoiceSchema } from "@/schema/invoice-schema";
 import { InvoiceByIdOutput } from "@/server/api/routers/invoice-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import classNames from "classnames";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
+import { CalendarIcon } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { Calendar } from "../ui/calendar";
 import InvoiceActivityCreationForm from "./invoice-activity-creation-form";
 import UnassignedActivities from "./unnassigned-activities";
 
-dayjs.extend(utc);
+import dayjs from "dayjs";
+dayjs.extend(require("dayjs/plugin/utc"));
+dayjs.extend(require("dayjs/plugin/localizedFormat"));
+dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
 interface Props {
 	onSubmit: (invoiceData: InvoiceSchema) => void;
@@ -34,7 +48,8 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 		defaultValues: {
 			...existingInvoice,
 			clientId: existingInvoice?.clientId ?? "",
-			date: existingInvoice?.date ?? dayjs().format("YYYY-MM-DD"),
+			date:
+				dayjs.utc(existingInvoice?.date, "YYYY-MM-DD").toDate() ?? new Date(),
 			invoiceNo: existingInvoice?.invoiceNo ?? "",
 			billTo: existingInvoice?.billTo ?? "",
 			activityIds: existingInvoice?.activities.map((a) => a.id) ?? [],
@@ -86,55 +101,111 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 					: "Create Invoice"}
 			</Heading>
 			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)}>
-					<div className="flex flex-col gap-6 md:flex-row">
-						<Label className="basis-1/2" required>
-							<span>Client</span>
-							<Subheading>Who will this invoice be for?</Subheading>
-							<ClientSelect control={form.control} name="clientId" />
-							<ErrorMessage error={form.formState.errors.clientId?.message} />
-						</Label>
+				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+					<div className="flex flex-col gap-4 md:flex-row">
+						<FormField
+							name="clientId"
+							control={form.control}
+							render={() => (
+								<FormItem className="shrink grow basis-1/2">
+									<FormLabel required>Client</FormLabel>
+									<FormControl>
+										<ClientSelect name="clientId" control={form.control} />
+									</FormControl>
+									<FormDescription>
+										Who will this invoice be for?
+									</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-						<Label className="basis-1/2">
-							<span>Date</span>
-							<Subheading>Date to display on invoice</Subheading>
-							<Input name="date" type="date" register={form.register} />
-							<ErrorMessage error={form.formState.errors.date?.message} />
-						</Label>
+						<FormField
+							control={form.control}
+							name="date"
+							render={({ field }) => (
+								<FormItem className="flex shrink grow basis-1/2 flex-col gap-1 pt-1">
+									<FormLabel required>Date</FormLabel>
+									<Popover>
+										<PopoverTrigger asChild>
+											<FormControl>
+												<Button
+													variant={"outline"}
+													className={cn(
+														"pl-3 text-left font-normal",
+														!field.value && "text-muted-foreground"
+													)}
+												>
+													{field.value ? (
+														<span>{dayjs.utc(field.value).format("LL")}</span>
+													) : (
+														<span>Pick a date</span>
+													)}
+													<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+												</Button>
+											</FormControl>
+										</PopoverTrigger>
+										<PopoverContent className="w-auto p-0" align="start">
+											<Calendar
+												mode="single"
+												selected={field.value}
+												onSelect={field.onChange}
+												disabled={(date) =>
+													date > new Date() || date < new Date("1900-01-01")
+												}
+												initialFocus
+											/>
+										</PopoverContent>
+									</Popover>
+									<FormDescription>Date to display on invoice</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 					</div>
 					<div className="flex flex-col gap-6 md:flex-row">
-						<Label className="basis-1/2">
-							<span>Bill To</span>
-							<Subheading
-								className={classNames([
-									"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
-									billTo ? "max-h-5" : "max-h-0",
-								])}
-							>
-								{billTo ? "Loaded from client information" : <br />}
-							</Subheading>
-							<Input name="billTo" register={form.register} />
-							<ErrorMessage error={form.formState.errors.billTo?.message} />
-						</Label>
-						<Label className="basis-1/2" required>
-							<span>Invoice Number</span>
-
-							<Subheading
-								className={classNames([
-									"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
-									billTo ? "max-h-5" : "max-h-0",
-								])}
-							>
-								Previous invoice was {latestInvoiceNo}
-							</Subheading>
-
-							<Input
-								name="invoiceNo"
-								placeholder={"Smith-XX"}
-								register={form.register}
-							/>
-							<ErrorMessage error={form.formState.errors.invoiceNo?.message} />
-						</Label>
+						<FormField
+							name="billTo"
+							control={form.control}
+							render={({ field }) => (
+								<FormItem className="grow basis-1/2">
+									<FormLabel required>Bill To</FormLabel>
+									<FormControl>
+										<Input placeholder="" {...field} />
+									</FormControl>
+									<FormDescription
+										className={classNames([
+											"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
+											billTo ? "max-h-5" : "max-h-0",
+										])}
+									>
+										{billTo ? "Loaded from client information" : <br />}
+									</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							name="invoiceNo"
+							control={form.control}
+							render={({ field }) => (
+								<FormItem className="grow basis-1/2">
+									<FormLabel required>Invoice Number</FormLabel>
+									<FormControl>
+										<Input placeholder={"Smith-XX"} {...field} />
+									</FormControl>
+									<FormDescription
+										className={classNames([
+											"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
+											billTo ? "max-h-5" : "max-h-0",
+										])}
+									>
+										Previous invoice was {latestInvoiceNo}
+									</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 					</div>
 
 					{form.watch("clientId") && !!activities?.length && (
@@ -156,18 +227,15 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 					<div className="mt-4 flex justify-center gap-4">
 						<Button
 							type="submit"
-							disabled={
-								!form.formState.isDirty ||
-								!form.formState.isValid ||
-								form.formState.isSubmitting
-							}
+							variant={form.formState.isValid ? "default" : "secondary"}
+							disabled={!form.formState.isDirty || form.formState.isSubmitting}
 						>
 							{existingInvoice ? "Update" : "Create"}
 						</Button>
 						<Button
 							type="button"
 							onClick={() => router.back()}
-							variant="secondary"
+							variant="outline"
 						>
 							Cancel
 						</Button>

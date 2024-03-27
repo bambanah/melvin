@@ -1,12 +1,9 @@
 import { z } from "zod";
 
 export const invoiceSchema = z.object({
-	date: z
-		.string()
-		.regex(/^\d{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\d|3[01])$/)
-		.optional(),
+	date: z.date().optional(),
 	clientId: z.string().min(1, "Client is required"),
-	billTo: z.string().nullish(),
+	billTo: z.string().optional(),
 	invoiceNo: z.string().min(1, "Invoice number is required"),
 	activityIds: z.array(z.string()).optional(),
 	activitiesToCreate: z.array(
@@ -25,8 +22,8 @@ export const invoiceSchema = z.object({
 						startTime: z.string(),
 						endTime: z.string(),
 						itemDistance: z.number(),
-						transitDistance: z.number().nullish(),
-						transitDuration: z.number().nullish(),
+						transitDistance: z.number().optional(),
+						transitDuration: z.number().optional(),
 					})
 					.partial({ startTime: true, endTime: true, itemDistance: true })
 					.refine(
