@@ -221,10 +221,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 					</div>
 
 					<div className="mt-4 flex justify-center gap-4">
-						<Button
-							type="submit"
-							disabled={form.formState.isSubmitting || !form.formState.isDirty}
-						>
+						<Button type="submit" disabled={form.formState.isSubmitting}>
 							{formPurpose.charAt(0).toUpperCase() + formPurpose.slice(1)}
 						</Button>
 						<Button

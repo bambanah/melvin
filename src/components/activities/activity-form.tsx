@@ -288,14 +288,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					</div>
 
 					<div className="mt-4 flex justify-center gap-4">
-						<Button
-							type="submit"
-							disabled={
-								form.formState.isSubmitting ||
-								!form.formState.isDirty ||
-								!form.formState.isValid
-							}
-						>
+						<Button type="submit" disabled={form.formState.isSubmitting}>
 							{existingActivity ? "Update" : "Create"}
 						</Button>
 						<Button type="button" onClick={() => router.back()}>

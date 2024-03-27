@@ -178,14 +178,7 @@ const ClientForm = ({ existingClient }: Props) => {
 					/>
 
 					<div className="mt-4 flex justify-center gap-4">
-						<Button
-							type="submit"
-							disabled={
-								form.formState.isSubmitting ||
-								!form.formState.isDirty ||
-								!form.formState.isValid
-							}
-						>
+						<Button type="submit" disabled={form.formState.isSubmitting}>
 							{formPurpose.charAt(0).toUpperCase() + formPurpose.slice(1)}
 						</Button>
 						<Button asChild type="button" variant="secondary">

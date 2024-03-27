@@ -147,11 +147,7 @@ const AccountForm = ({ existingUser }: Props) => {
 						<Button
 							type="submit"
 							variant="secondary"
-							disabled={
-								form.formState.isSubmitting ||
-								!form.formState.isDirty ||
-								!form.formState.isValid
-							}
+							disabled={form.formState.isSubmitting}
 						>
 							Save
 						</Button>
