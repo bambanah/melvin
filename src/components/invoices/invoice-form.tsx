@@ -23,10 +23,10 @@ import { InvoiceByIdOutput } from "@/server/api/routers/invoice-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import classNames from "classnames";
 import { CalendarIcon } from "lucide-react";
+import { Calendar } from "../ui/calendar";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Calendar } from "../ui/calendar";
 import InvoiceActivityCreationForm from "./invoice-activity-creation-form";
 import UnassignedActivities from "./unnassigned-activities";
 
@@ -48,8 +48,9 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 		defaultValues: {
 			...existingInvoice,
 			clientId: existingInvoice?.clientId ?? "",
-			date:
-				dayjs.utc(existingInvoice?.date, "YYYY-MM-DD").toDate() ?? new Date(),
+			date: existingInvoice?.date
+				? dayjs.utc(existingInvoice?.date, "YYYY-MM-DD").toDate()
+				: new Date(),
 			invoiceNo: existingInvoice?.invoiceNo ?? "",
 			billTo: existingInvoice?.billTo ?? "",
 			activityIds: existingInvoice?.activities.map((a) => a.id) ?? [],
@@ -218,7 +219,6 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 
 					<InvoiceActivityCreationForm
 						control={form.control}
-						register={form.register}
 						getValues={form.getValues}
 						setValue={form.setValue}
 						watch={form.watch}

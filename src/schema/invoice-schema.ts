@@ -13,12 +13,7 @@ export const invoiceSchema = z.object({
 			activities: z.array(
 				z
 					.object({
-						date: z
-							.string()
-							.regex(
-								/^\d{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\d|3[01])$/,
-								"Date is required"
-							),
+						date: z.date(),
 						startTime: z.string(),
 						endTime: z.string(),
 						itemDistance: z.number(),
