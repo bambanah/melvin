@@ -14,7 +14,7 @@ export const supportItemSchema = z.object({
 	isGroup: z.boolean().optional(),
 
 	weekdayCode: zodItemCode.min(1, "Required"),
-	weekdayRate: z
+	weekdayRate: z.coerce
 		.number({ invalid_type_error: "Must be number" })
 		.min(0.01, "Required")
 		.step(0.01, "Can't be more than 2 decimal places (x.xx)"),
