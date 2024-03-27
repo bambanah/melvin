@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import { cn } from "@/lib/utils";
 import Link, { LinkProps } from "next/link";
 import { ReactNode } from "react";
 
@@ -15,7 +15,7 @@ const Item = ({
 }: Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps> &
 	LinkProps) => (
 	<Link
-		className={classNames([
+		className={cn([
 			"flex w-full justify-between gap-2 p-4 text-sm text-neutral-900 transition-colors duration-75 hover:bg-orange-100",
 			className,
 		])}
@@ -32,7 +32,7 @@ interface PageComponentProps {
 const PageComponent = ({ children, className }: PageComponentProps) => {
 	return (
 		<div
-			className={classNames([
+			className={cn([
 				"mx-auto flex h-full w-full max-w-4xl flex-col pb-16",
 				className,
 			])}

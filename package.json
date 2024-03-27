@@ -68,7 +68,6 @@
 		"@trpc/server": "^10.45.2",
 		"@vercel/speed-insights": "^1.0.10",
 		"class-variance-authority": "^0.7.0",
-		"classnames": "^2.5.1",
 		"clsx": "^2.1.0",
 		"date-fns": "^3.6.0",
 		"dayjs": "^1.11.10",

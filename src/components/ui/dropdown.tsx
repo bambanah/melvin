@@ -1,5 +1,5 @@
+import { cn } from "@/lib/utils";
 import { Menu } from "@headlessui/react";
-import classNames from "classnames";
 import { HTMLAttributes, ReactNode } from "react";
 
 const DropdownButton = ({
@@ -8,10 +8,7 @@ const DropdownButton = ({
 	...rest
 }: HTMLAttributes<HTMLButtonElement>) => (
 	<Menu.Button
-		className={classNames([
-			"px-4 py-2 text-xl hover:bg-neutral-100",
-			className,
-		])}
+		className={cn(["px-4 py-2 text-xl hover:bg-neutral-100", className])}
 		{...rest}
 	>
 		{children}
@@ -36,7 +33,7 @@ const Dropdown = ({
 	return (
 		<Menu
 			as="div"
-			className={classNames(["relative inline-block", className])}
+			className={cn(["relative inline-block", className])}
 			{...rest}
 		>
 			{children}

@@ -2,10 +2,10 @@ import { Button } from "@/components/ui/button";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { debounce } from "@/lib/generic-utils";
 import { trpc } from "@/lib/trpc";
+import { cn } from "@/lib/utils";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog } from "@headlessui/react";
-import classNames from "classnames";
 import dayjs from "dayjs";
 import { Wallet } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
@@ -68,7 +68,7 @@ const LogPayment = () => {
 
 		return (
 			<label
-				className={classNames([
+				className={cn([
 					"flex cursor-pointer items-center gap-4 rounded-md border px-4 py-2 hover:border-orange-500",
 					checked ? "border-orange-500 bg-orange-100" : "bg-white",
 				])}
@@ -149,7 +149,7 @@ const LogPayment = () => {
 								</Dialog.Title>
 
 								<div
-									className={classNames([
+									className={cn([
 										"text-fg flex items-center overflow-hidden rounded-md border bg-white px-3 shadow-md focus-within:border-orange-500",
 									])}
 								>

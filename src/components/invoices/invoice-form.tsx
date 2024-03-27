@@ -22,7 +22,6 @@ import { cn } from "@/lib/utils";
 import { InvoiceSchema, invoiceSchema } from "@/schema/invoice-schema";
 import { InvoiceByIdOutput } from "@/server/api/routers/invoice-router";
 import { zodResolver } from "@hookform/resolvers/zod";
-import classNames from "classnames";
 import { CalendarIcon } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -175,7 +174,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 										<Input placeholder="" {...field} />
 									</FormControl>
 									<FormDescription
-										className={classNames([
+										className={cn([
 											"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
 											billTo ? "max-h-5" : "max-h-0",
 										])}
@@ -196,7 +195,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 										<Input placeholder={"Smith-XX"} {...field} />
 									</FormControl>
 									<FormDescription
-										className={classNames([
+										className={cn([
 											"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
 											billTo ? "max-h-5" : "max-h-0",
 										])}

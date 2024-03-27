@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { InvoiceStatusBadge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
@@ -19,13 +19,13 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog, Transition } from "@headlessui/react";
 import { InvoiceStatus } from "@prisma/client";
-import classNames from "classnames";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 import { toast } from "react-toastify";
 
+import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
@@ -120,7 +120,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 
 			<div className="flex flex-col items-stretch justify-between md:h-[15rem] md:flex-row-reverse">
 				<div
-					className={classNames([
+					className={cn([
 						"group relative h-full max-h-[12rem] min-h-[12rem] basis-1/2 overflow-hidden md:h-[15rem]",
 						invoice.activities.length > 0 &&
 							"cursor-pointer bg-zinc-200 shadow-inner",

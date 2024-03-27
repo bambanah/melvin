@@ -1,6 +1,6 @@
+import { cn } from "@/lib/utils";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import classNames from "classnames";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 
@@ -17,7 +17,7 @@ const Link = ({ href, icon, children, className }: Props) => {
 	return (
 		<NextLink
 			href={href}
-			className={classNames([
+			className={cn([
 				active ? "text-orange-700" : "text-foreground",
 				"flex flex-col gap-1 whitespace-nowrap p-2 text-xs hover:text-orange-700 md:text-base",
 				className,

@@ -1,11 +1,10 @@
 import Heading from "@/components/ui/heading";
-import { faCalendar, faClock, faCar } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { cn } from "@/lib/utils";
 import { InvoiceSchema } from "@/schema/invoice-schema";
 import { ActivityListOutput } from "@/server/api/routers/activity-router";
-import classNames from "classnames";
+import { faCalendar, faCar, faClock } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
-import React from "react";
 import { UseFormGetValues, UseFormSetValue } from "react-hook-form";
 
 interface Props {
@@ -24,7 +23,7 @@ const UnassignedActivities = ({ activities, getValues, setValue }: Props) => {
 					activities.map((activity) => (
 						<label
 							key={activity.id}
-							className={classNames([
+							className={cn([
 								"flex cursor-pointer gap-2 rounded-md border px-2 py-3 shadow-md transition-shadow hover:border-orange-500 md:p-4",
 								getValues("activityIds")?.some((c) => c === activity.id)
 									? "border-orange-300 bg-orange-50"

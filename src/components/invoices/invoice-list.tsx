@@ -8,7 +8,6 @@ import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { trpc } from "@/lib/trpc";
 import { faDownload, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import classNames from "classnames";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -20,6 +19,7 @@ import {
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
 dayjs.extend(utc);
 
 interface Props {
@@ -75,7 +75,7 @@ export default function InvoiceList({
 					invoices.map((invoice) => (
 						<div
 							key={invoice.id}
-							className={classNames([
+							className={cn([
 								"flex w-full justify-between gap-2 p-4 text-sm text-foreground",
 							])}
 						>
