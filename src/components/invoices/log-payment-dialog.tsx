@@ -1,20 +1,39 @@
 import { Button } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { debounce } from "@/lib/generic-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Dialog } from "@headlessui/react";
 import dayjs from "dayjs";
 import { Wallet } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { Input } from "../ui/input";
+import { Checkbox } from "../ui/checkbox";
 
-const LogPayment = () => {
-	const [isOpen, setIsOpen] = useState(false);
-	const [amountPaid, setAmountPaid] = useState<number>(0);
+const LogPaymentDialog = () => {
+	const [amountPaid, setAmountPaid] = useState(0);
 	const [invoicesToUpdate, setInvoicesToUpdate] = useState<string[]>([]);
+
+	const handleOpenChange = (open: boolean) => {
+		if (!open) {
+			// Use timeout to prevent layout shifts when clearing before closing animation complete
+			setTimeout(() => {
+				setAmountPaid(0);
+				setInvoicesToUpdate([]);
+			}, 100);
+		}
+	};
 
 	const {
 		data: { invoiceIds, invoiceDetails } = {},
@@ -26,11 +45,9 @@ const LogPayment = () => {
 	const trpcUtils = trpc.useUtils();
 	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
 
-	const closeModal = () => {
-		setAmountPaid(0);
+	useEffect(() => {
 		setInvoicesToUpdate([]);
-		setIsOpen(false);
-	};
+	}, [invoiceIds]);
 
 	const updateAmountPaid = debounce(
 		(value: number) => setAmountPaid(value),
@@ -48,7 +65,6 @@ const LogPayment = () => {
 				trpcUtils.invoice.list.invalidate();
 				trpcUtils.invoice.matchByPayment.invalidate();
 				toast.success("Invoices updated");
-				closeModal();
 			});
 	};
 
@@ -69,17 +85,16 @@ const LogPayment = () => {
 		return (
 			<label
 				className={cn([
-					"flex cursor-pointer items-center gap-4 rounded-md border px-4 py-2 hover:border-orange-500",
-					checked ? "border-orange-500 bg-orange-100" : "bg-white",
+					"flex cursor-pointer items-center gap-4 rounded-md border px-4 py-2 hover:border-primary/50",
+					checked ? "border-primary/20 bg-primary/10" : "bg-background",
 				])}
 				htmlFor={invoiceId}
 			>
-				<input
+				<Checkbox
 					id={invoiceId}
-					type="checkbox"
 					checked={checked}
-					onChange={(val) => {
-						if (val.target.checked) {
+					onCheckedChange={(checked) => {
+						if (checked) {
 							setInvoicesToUpdate([...invoicesToUpdate, invoiceId]);
 						} else {
 							setInvoicesToUpdate(
@@ -87,7 +102,6 @@ const LogPayment = () => {
 							);
 						}
 					}}
-					className="w-5 cursor-pointer border bg-white outline-none ring-0"
 				/>
 				<div>
 					<p className="font-semibold">{invoice.invoiceNo}</p>
@@ -133,77 +147,53 @@ const LogPayment = () => {
 	}
 
 	return (
-		<>
-			<Button onClick={() => setIsOpen(true)} variant="outline">
-				<Wallet className="mr-2 h-4 w-4" /> Payment
-			</Button>
-			<Dialog open={isOpen} onClose={() => closeModal()}>
-				<div className="fixed inset-0 z-30 bg-black bg-opacity-25" />
+		<Dialog onOpenChange={handleOpenChange}>
+			<DialogTrigger asChild>
+				<Button variant="outline">
+					<Wallet className="mr-2 h-4 w-4" /> Payment
+				</Button>
+			</DialogTrigger>
+			<DialogContent className="sm:max-w-[425px]">
+				<DialogHeader>
+					<DialogTitle>How much were you paid?</DialogTitle>
+				</DialogHeader>
 
-				<div className="fixed inset-0 z-40 overflow-y-auto">
-					<div className="flex min-h-full items-center justify-center p-4 text-center">
-						<Dialog.Panel className="flex w-full max-w-lg transform flex-col gap-8 overflow-hidden rounded-md bg-neutral-50 p-6 text-left align-middle shadow-xl transition-all">
-							<div className="flex flex-col gap-4">
-								<Dialog.Title as="h3" className="text-xl">
-									How much were you paid?
-								</Dialog.Title>
+				<Input
+					id="name"
+					type="number"
+					step={0.01}
+					placeholder="Payment Amount"
+					onChange={(e) =>
+						updateAmountPaid(Number.parseFloat(e.target.value) || 0)
+					}
+				/>
 
-								<div
-									className={cn([
-										"text-fg flex items-center overflow-hidden rounded-md border bg-white px-3 shadow-md focus-within:border-orange-500",
-									])}
-								>
-									<span className="font-light text-zinc-500">$</span>
-									<input
-										type="number"
-										step="0.01"
-										className="text-fg w-full border-none py-3 pl-1 outline-none"
-										onChange={(e) =>
-											updateAmountPaid(Number.parseFloat(e.target.value) || 0)
-										}
-									/>
-								</div>
-							</div>
-
-							{invoiceDetails &&
-								amountPaid !== undefined &&
-								amountPaid > 0 &&
-								invoiceIds &&
-								invoiceIds.length > 0 && (
-									<>
-										<hr />
-										<div className="flex flex-col gap-2 divide-y">
-											{invoiceIds.length > 1 && (
-												<p>Found multiple candidates.</p>
-											)}
-											{invoiceIds.map((candidates, idx) => (
-												<CombinationDisplay ids={candidates} key={idx} />
-											))}
-										</div>
-									</>
-								)}
-
-							<div className="mt-0 flex justify-center gap-4">
-								<Button
-									type="button"
-									onClick={() => {
-										updateMatchingInvoices();
-										closeModal();
-									}}
-									disabled={invoicesToUpdate.length === 0}
-								>
-									Mark as Paid
-								</Button>
-								<Button type="button" onClick={() => closeModal()}>
-									Cancel
-								</Button>
-							</div>
-						</Dialog.Panel>
+				{amountPaid > 0 && !!invoiceIds?.length && (
+					<div className="flex flex-col gap-2 divide-y">
+						{invoiceIds.length > 1 && <p>Found multiple candidates.</p>}
+						{invoiceIds.map((candidates, idx) => (
+							<CombinationDisplay ids={candidates} key={idx} />
+						))}
 					</div>
-				</div>
-			</Dialog>
-		</>
+				)}
+				{amountPaid > 0 && !invoiceIds?.length && (
+					<p>No matching invoices found.</p>
+				)}
+
+				<DialogFooter>
+					<DialogClose asChild>
+						<Button
+							type="submit"
+							onClick={() => updateMatchingInvoices()}
+							disabled={invoicesToUpdate.length === 0}
+						>
+							Mark as Paid
+						</Button>
+					</DialogClose>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
 	);
 };
 
-export default LogPayment;
+export default LogPaymentDialog;

@@ -1,4 +1,3 @@
-import LogPayment from "@/components/invoices/log-payment-modal";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListFilterRow from "@/components/shared/list-filter-row";
 import ListPage from "@/components/shared/list-page";
@@ -16,10 +15,11 @@ import {
 	statusFilters,
 } from "./invoice-list.constants";
 
+import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
+import LogPaymentDialog from "./log-payment-dialog";
 dayjs.extend(utc);
 
 interface Props {
@@ -46,7 +46,7 @@ export default function InvoiceList({
 			<ListPage.Header>
 				<h2 className="mr-auto text-2xl font-bold">Invoices</h2>
 
-				<LogPayment />
+				<LogPaymentDialog />
 
 				<Button asChild variant="inverted">
 					<Link
