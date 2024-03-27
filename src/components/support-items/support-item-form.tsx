@@ -1,18 +1,29 @@
 import { Button } from "@/components/ui/button";
-import Form from "@/components/ui/form-old";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
-import Label from "@/components/ui/label-old";
-import Subheading from "@/components/ui/subheading";
-import Checkbox from "@/components/forms/checkbox";
-import ErrorMessage from "@/components/forms/error-message";
 import { Input } from "@/components/ui/input";
-import Select from "@/components/ui/select-old";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { RateType } from "@prisma/client";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { trpc } from "@/lib/trpc";
 import type { SupportItemSchema } from "@/schema/support-item-schema";
 import { supportItemSchema } from "@/schema/support-item-schema";
 import { SupportItemByIdOutput } from "@/server/api/routers/support-item-router";
-import { trpc } from "@/lib/trpc";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { RateType } from "@prisma/client";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -30,12 +41,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 	const createSupportItemMutation = trpc.supportItem.create.useMutation();
 	const updateSupportItemMutation = trpc.supportItem.update.useMutation();
 
-	const {
-		register,
-		handleSubmit,
-		formState: { errors, isSubmitting, isDirty, isValid },
-		control,
-	} = useForm<SupportItemSchema>({
+	const form = useForm<SupportItemSchema>({
 		resolver: zodResolver(supportItemSchema),
 		defaultValues: {
 			description: existingSupportItem?.description ?? "",
@@ -87,99 +93,149 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 					? `Updating ${existingSupportItem.description}`
 					: "Create New Support Item"}
 			</Heading>
-			<Form onSubmit={handleSubmit(onSubmit)}>
-				<div className="flex shrink flex-col gap-4">
-					<Heading size="small">General</Heading>
-					<div className="flex gap-4">
-						<Label htmlFor="description" required>
-							<span>Description</span>
-							<Subheading>
-								The official description from the{" "}
-								<a href="/price-guide-22-23.pdf">Price Guide</a>
-							</Subheading>
-							<Input
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)}>
+					<div className="flex shrink flex-col gap-4">
+						<Heading size="small">General</Heading>
+						<div className="flex w-full gap-4">
+							<FormField
 								name="description"
-								register={register}
-								type="text"
-								placeholder="Description"
+								control={form.control}
+								render={({ field }) => (
+									<FormItem className="grow basis-1/2">
+										<FormLabel required>Description</FormLabel>
+										<FormControl>
+											<Input placeholder="Description" {...field} />
+										</FormControl>
+										<FormDescription>
+											The official description from the{" "}
+											<a href="/price-guide-22-23.pdf">Price Guide</a>
+										</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
 							/>
-							<ErrorMessage error={errors.description?.message} />
-						</Label>
 
-						<Label required>
-							<span>Rate Type</span>
-							<Subheading>This will almost always be per hour</Subheading>
-							<Select
+							<FormField
+								control={form.control}
 								name="rateType"
-								control={control}
-								options={[
-									{ label: "per hour", value: RateType.HOUR },
-									{ label: "per km", value: RateType.KM },
-								]}
+								render={({ field }) => (
+									<FormItem className="grow basis-1/2">
+										<FormLabel required>Rate Type</FormLabel>
+										<Select
+											onValueChange={field.onChange}
+											defaultValue={field.value}
+										>
+											<FormControl>
+												<SelectTrigger>
+													<SelectValue placeholder="Select a verified email to display" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												<SelectItem value={RateType.HOUR}>per hour</SelectItem>
+												<SelectItem value={RateType.KM}>per km</SelectItem>
+											</SelectContent>
+										</Select>
+										<FormDescription>
+											This will almost always be per hour
+										</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
 							/>
-							<ErrorMessage error={errors.rateType?.message} />
-						</Label>
+						</div>
+						<FormField
+							control={form.control}
+							name="isGroup"
+							render={({ field }) => (
+								<FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border px-4 py-3">
+									<FormControl>
+										<Checkbox
+											checked={field.value}
+											onCheckedChange={field.onChange}
+										/>
+									</FormControl>
+									<FormLabel className="w-full cursor-pointer">
+										Is this a group activity?
+									</FormLabel>
+								</FormItem>
+							)}
+						/>
 					</div>
-					<Checkbox name="isGroup" register={register}>
-						Is this a group activity?
-					</Checkbox>
-				</div>
 
-				<div className="flex flex-col gap-4">
-					<Heading size="small">Rates</Heading>
-					<Subheading>
-						Only the weekday information is required, and will be used in the
-						event of another rate not being entered
-					</Subheading>
+					<div className="mt-4 flex flex-col gap-4">
+						<Heading size="small">Rates</Heading>
+						<FormDescription>
+							Only the weekday information is required, and will be used in the
+							event of another rate not being entered
+						</FormDescription>
 
-					{(["weekday", "weeknight", "saturday", "sunday"] as const).map(
-						(day) => (
-							<div className="flex items-start gap-4" key={day}>
-								<p className="mt-3 flex w-16 shrink-0 gap-1 text-sm font-semibold md:w-24 md:text-base">
-									{day.charAt(0).toUpperCase() + day.slice(1)}{" "}
-									<span className="text-red-500">
-										{day === "weekday" && "*"}
-									</span>
-								</p>
-								<div className="flex gap-2">
-									<span className="flex flex-col">
-										<Input
+						{(["weekday", "weeknight", "saturday", "sunday"] as const).map(
+							(day) => (
+								<div className="flex w-full items-start gap-4" key={day}>
+									<p className="mt-3 flex w-16 shrink-0 gap-1 text-sm font-semibold md:w-24 md:text-base">
+										{day.charAt(0).toUpperCase() + day.slice(1)}{" "}
+										<span className="text-red-500">
+											{day === "weekday" && "*"}
+										</span>
+									</p>
+									<div className="flex w-full gap-2">
+										<FormField
 											name={`${day}Code`}
-											register={register}
-											type="text"
-											placeholder="XX_XXX_XXXX_X_X"
+											control={form.control}
+											render={({ field }) => (
+												<FormItem className="grow basis-1/2">
+													<FormControl>
+														<Input placeholder="XX_XXX_XXXX_X_X" {...field} />
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
 										/>
-										<ErrorMessage error={errors[`${day}Code`]?.message} />
-									</span>
-									<span className="flex flex-col">
-										<Input
+										<FormField
 											name={`${day}Rate`}
-											register={register}
-											rules={{
-												setValueAs: (v) => (v === "" ? "" : Number(v)),
-											}}
-											prefix="$"
+											control={form.control}
+											render={({ field }) => (
+												<FormItem className="grow basis-1/2">
+													<FormControl>
+														<Input
+															type="number"
+															step={0.01}
+															register={form.register}
+															rules={{
+																setValueAs: (v) =>
+																	v === "" ? undefined : Number(v),
+															}}
+															placeholder="rate"
+															{...field}
+														/>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
 										/>
-										<ErrorMessage error={errors[`${day}Rate`]?.message} />
-									</span>
+									</div>
 								</div>
-							</div>
-						)
-					)}
-				</div>
+							)
+						)}
+					</div>
 
-				<div className="mt-4 flex justify-center gap-4">
-					<Button type="submit" disabled={isSubmitting || !isDirty || !isValid}>
-						{formPurpose.charAt(0).toUpperCase() + formPurpose.slice(1)}
-					</Button>
-					<Button
-						type="button"
-						variant="secondary"
-						onClick={() => router.back()}
-					>
-						Cancel
-					</Button>
-				</div>
+					<div className="mt-4 flex justify-center gap-4">
+						<Button
+							type="submit"
+							disabled={form.formState.isSubmitting || !form.formState.isDirty}
+						>
+							{formPurpose.charAt(0).toUpperCase() + formPurpose.slice(1)}
+						</Button>
+						<Button
+							type="button"
+							variant="secondary"
+							onClick={() => router.back()}
+						>
+							Cancel
+						</Button>
+					</div>
+				</form>
 			</Form>
 		</div>
 	);
