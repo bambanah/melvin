@@ -1,9 +1,8 @@
-import { Button } from "@/components/ui/button";
-import Logo from "@/components/ui/logo";
 import AuthModal from "@/components/auth/auth-modal";
 import LoginForm from "@/components/auth/login-form";
-import { faGoogle } from "@fortawesome/free-brands-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Icons } from "@/components/icons";
+import { Button } from "@/components/ui/button";
+import Logo from "@/components/ui/logo";
 import { BuiltInProviderType } from "next-auth/providers";
 import { ClientSafeProvider, LiteralUnion, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -43,7 +42,7 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 							variant="outline"
 							className="w-full"
 						>
-							<FontAwesomeIcon icon={faGoogle} className="mr-2 h-4 w-4" />
+							<Icons.google className="mr-2 h-4 w-4 fill-current" />
 							Sign in with {provider.name}
 						</Button>
 					))}

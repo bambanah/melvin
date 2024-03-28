@@ -1,9 +1,8 @@
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Dropdown from "@/components/ui/dropdown";
 import Heading from "@/components/ui/heading";
-import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { trpc } from "@/lib/trpc";
+import { EllipsisVertical } from "lucide-react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -63,7 +62,7 @@ const SupportItemPage = ({ supportItemId }: { supportItemId: string }) => {
 
 					<Dropdown>
 						<Dropdown.Button id="options-dropdown">
-							<FontAwesomeIcon icon={faEllipsisV} />
+							<EllipsisVertical className="h-5 w-5" />
 						</Dropdown.Button>
 						<Dropdown.Items>
 							<Dropdown.Item>
