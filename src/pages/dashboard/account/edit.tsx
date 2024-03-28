@@ -6,8 +6,7 @@ import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
-import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -64,8 +63,7 @@ const EditAccountPage = () => {
 						onClick={() => setAdvancedExpanded(!isAdvancedExpanded)}
 						className="mb-5 flex items-center gap-2"
 					>
-						<FontAwesomeIcon
-							icon={faChevronRight}
+						<ChevronRight
 							className={cn([
 								"duration-75",
 								isAdvancedExpanded ? "rotate-90" : "",

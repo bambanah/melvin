@@ -18,16 +18,15 @@ import {
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { InvoiceSchema } from "@/schema/invoice-schema";
-import { faCalendar, faClock } from "@fortawesome/free-regular-svg-icons";
 import {
-	faArrowDown,
-	faArrowRight,
-	faArrowUp,
-	faPlus,
-	faX,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { CalendarIcon } from "lucide-react";
+	ArrowDown,
+	ArrowRight,
+	ArrowUp,
+	CalendarIcon,
+	Clock,
+	Plus,
+	X,
+} from "lucide-react";
 import { useMemo } from "react";
 import {
 	Control,
@@ -167,7 +166,7 @@ const InvoiceActivityCreationForm = ({
 									className="px-2 py-1 hover:shadow"
 									onClick={() => remove(index)}
 								>
-									<FontAwesomeIcon icon={faX} />
+									<X className="h-6 w-6" />
 								</button>
 							</div>
 
@@ -188,7 +187,7 @@ const InvoiceActivityCreationForm = ({
 														handleMove("UP", index, activityFieldIndex)
 													}
 												>
-													<FontAwesomeIcon icon={faArrowUp} />
+													<ArrowUp className="h-6 w-6" />
 												</button>
 												<button
 													className={cn([
@@ -199,12 +198,12 @@ const InvoiceActivityCreationForm = ({
 														handleMove("DOWN", index, activityFieldIndex)
 													}
 												>
-													<FontAwesomeIcon icon={faArrowDown} />
+													<ArrowDown className="h-6 w-6" />
 												</button>
 											</div>
 										)}
 										<span className="flex items-center gap-2">
-											<FontAwesomeIcon icon={faCalendar} />
+											<CalendarIcon className="h-4 w-4" />
 											<FormField
 												control={control}
 												name="date"
@@ -227,7 +226,6 @@ const InvoiceActivityCreationForm = ({
 																		) : (
 																			<span>Pick a date</span>
 																		)}
-																		<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
 																	</Button>
 																</FormControl>
 															</PopoverTrigger>
@@ -253,7 +251,7 @@ const InvoiceActivityCreationForm = ({
 											/>
 										</span>
 										<span className="flex items-center gap-2">
-											<FontAwesomeIcon icon={faClock} />
+											<Clock className="h-6 w-6" />
 											<FormField
 												name={`activitiesToCreate.${index}.activities.${activityFieldIndex}.startTime`}
 												control={control}
@@ -267,7 +265,7 @@ const InvoiceActivityCreationForm = ({
 												)}
 											/>
 
-											<FontAwesomeIcon icon={faArrowRight} />
+											<ArrowRight className="h-6 w-6" />
 											<FormField
 												name={`activitiesToCreate.${index}.activities.${activityFieldIndex}.endTime`}
 												control={control}
@@ -285,17 +283,17 @@ const InvoiceActivityCreationForm = ({
 											className="ml-auto px-2 py-1 hover:shadow"
 											onClick={() => handleDelete(index, activityFieldIndex)}
 										>
-											<FontAwesomeIcon icon={faX} />
+											<X className="h-6 w-6" />
 										</button>
 									</li>
 								))}
 								<li>
 									<Button
 										onClick={() => field.activities.push({ date: new Date() })}
-										className="mt-2 w-16 px-8 py-2"
+										className="mt-2 px-6"
 										variant="secondary"
 									>
-										<FontAwesomeIcon icon={faPlus} />
+										<Plus className="h-4 w-4" />
 									</Button>
 								</li>
 							</ul>

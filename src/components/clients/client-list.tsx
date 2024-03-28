@@ -1,17 +1,9 @@
-import { Button } from "@/components/ui/button";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListPage from "@/components/shared/list-page";
-import {
-	faBuilding,
-	faClock,
-	faFileAlt,
-	faPenToSquare,
-	faPlus,
-	faUser,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import dayjs from "dayjs";
+import { Building, Clock, FileText, Plus, SquarePen, User } from "lucide-react";
 import Link from "next/link";
 
 const ClientList = () => {
@@ -25,10 +17,10 @@ const ClientList = () => {
 			<ListPage.Header>
 				<h2 className="mr-auto text-2xl font-bold">Clients</h2>
 
-				<Button asChild>
+				<Button asChild variant="inverted">
 					<Link href="/dashboard/clients/create">
-						<FontAwesomeIcon icon={faPlus} />
-						<span>Add</span>
+						<Plus className="mr-2 h-4 w-4" />
+						Add
 					</Link>
 				</Button>
 			</ListPage.Header>
@@ -37,7 +29,7 @@ const ClientList = () => {
 					clients.map((client) => (
 						<div
 							key={client.id}
-							className="flex w-full justify-between gap-2 p-4 text-sm"
+							className="flex w-full justify-between gap-2 p-4 text-sm text-foreground"
 						>
 							<div className="flex min-h-[2.5rem] flex-col gap-2">
 								<Link href={`/dashboard/clients/${client.id}`}>
@@ -45,12 +37,12 @@ const ClientList = () => {
 								</Link>
 								{client.invoices.length > 0 && (
 									<>
-										<span className="flex items-center gap-2 text-zinc-600">
-											<FontAwesomeIcon icon={faFileAlt} size="sm" />
+										<span className="flex items-center gap-2">
+											<FileText className="h-4 w-4" />
 											{client.invoices.length}
 										</span>
-										<div className="flex items-center gap-2 text-zinc-600">
-											<FontAwesomeIcon icon={faClock} size="sm" />
+										<div className="flex items-center gap-2">
+											<Clock className="h-4 w-4" />
 											<span>
 												{dayjs(client.invoices[0].date).format("DD/MM")} -
 											</span>
@@ -59,21 +51,21 @@ const ClientList = () => {
 									</>
 								)}
 							</div>
-							<div className="flex flex-col items-end gap-2 pt-[0.5rem] text-zinc-600">
+							<div className="flex flex-col items-end gap-2 pt-[0.5rem]">
 								<span className="flex items-center gap-2">
 									{client.number}
-									<FontAwesomeIcon icon={faUser} size="sm" />
+									<User className="h-4 w-4" />
 								</span>
 								{client.billTo && (
 									<span className="flex items-center gap-2">
 										{client.billTo}
-										<FontAwesomeIcon icon={faBuilding} size="sm" />
+										<Building className="h-4 w-4" />
 									</span>
 								)}
 								{client.invoiceNumberPrefix && (
 									<span className="flex items-center gap-2">
 										{client.invoiceNumberPrefix}##
-										<FontAwesomeIcon icon={faPenToSquare} size="sm" />
+										<SquarePen className="h-4 w-4" />
 									</span>
 								)}
 							</div>

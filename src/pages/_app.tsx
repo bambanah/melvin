@@ -12,10 +12,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { config } from "@fortawesome/fontawesome-svg-core";
-import "@fortawesome/fontawesome-svg-core/styles.css";
 import { ThemeProvider } from "@/components/theme-provider";
-config.autoAddCss = false;
 
 // Google fonts
 const inter = Inter({

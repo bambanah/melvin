@@ -1,10 +1,9 @@
-import { Button } from "@/components/ui/button";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListPage from "@/components/shared/list-page";
-import { faPlus, faUserGroup } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Prisma, RateType } from "@prisma/client";
+import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
+import { Prisma, RateType } from "@prisma/client";
+import { Plus, Users } from "lucide-react";
 import Link from "next/link";
 
 const ItemCode = ({
@@ -44,10 +43,10 @@ function SupportItemList() {
 			<ListPage.Header>
 				<h2 className="mr-auto text-2xl font-bold">Support Items</h2>
 
-				<Button asChild>
+				<Button asChild variant="inverted">
 					<Link href="/dashboard/support-items/create">
-						<FontAwesomeIcon icon={faPlus} />
-						<span>Add</span>
+						<Plus className="mr-2 h-4 w-4" />
+						Add
 					</Link>
 				</Button>
 			</ListPage.Header>
@@ -55,18 +54,12 @@ function SupportItemList() {
 				{(supportItems) =>
 					supportItems.map((supportItem) => (
 						<div key={supportItem.id} className="flex flex-col gap-4 p-4">
-							<Link href={`/dashboard/support-items/${supportItem.id}`}>
-								<p className="font-semibold sm:text-lg">
-									{supportItem.description}{" "}
-									{supportItem.isGroup && (
-										<FontAwesomeIcon
-											icon={faUserGroup}
-											size="2xs"
-											className="ml-2"
-											title="Group Activity"
-										/>
-									)}
-								</p>
+							<Link
+								href={`/dashboard/support-items/${supportItem.id}`}
+								className="flex items-center gap-2 sm:text-lg"
+							>
+								{supportItem.description}
+								{supportItem.isGroup && <Users className="h-4 w-4" />}
 							</Link>
 							<ItemCode
 								descriptor="Base"

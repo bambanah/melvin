@@ -1,14 +1,10 @@
+import InvoiceList from "@/components/invoices/invoice-list";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Dropdown from "@/components/ui/dropdown";
 import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
-import InvoiceList from "@/components/invoices/invoice-list";
-import {
-	faArrowUpRightFromSquare,
-	faEllipsisV,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { trpc } from "@/lib/trpc";
+import { EllipsisVertical, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -63,7 +59,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 
 					<Dropdown>
 						<Dropdown.Button id="options-dropdown">
-							<FontAwesomeIcon icon={faEllipsisV} />
+							<EllipsisVertical className="h-5 w-5" />
 						</Dropdown.Button>
 						<Dropdown.Items>
 							<Dropdown.Item>
@@ -143,7 +139,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 							href={`mailto:${client.invoiceEmail}`}
 						>
 							{client.invoiceEmail}
-							<FontAwesomeIcon icon={faArrowUpRightFromSquare} size="xs" />
+							<ExternalLink className="h-4 w-4" />
 						</a>
 					) : (
 						<p className="text-neutral-500">Not set</p>
