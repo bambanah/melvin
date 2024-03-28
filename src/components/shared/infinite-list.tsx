@@ -39,7 +39,7 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 	return (
 		<div
 			className={cn([
-				"mx-auto flex h-full w-full max-w-4xl flex-col pb-16",
+				"mx-auto flex h-full w-full max-w-4xl flex-col",
 				className,
 			])}
 		>

@@ -1,49 +1,22 @@
 import NavAuth from "@/components/auth/nav-auth";
-import NavLink from "@/components/navigation/nav-link";
 import { ModeToggle } from "@/components/theme-toggle";
-import {
-	faFile,
-	faRunning,
-	faShoePrints,
-	faUsers,
-} from "@fortawesome/free-solid-svg-icons";
-import { useSession } from "next-auth/react";
+import MainNav from "./main-nav";
+import MobileNav from "./mobile-nav";
 
-const Navbar = () => {
-	const session = useSession();
-
+export function Navbar() {
 	return (
-		<div className="shadow-top fixed bottom-0 flex h-14 w-full items-center gap-8 border-b border-t bg-inherit md:relative md:h-16 md:px-10">
-			<div className="mx-auto flex w-full max-w-5xl items-center justify-between">
-				<div className="flex w-full items-center justify-evenly md:mx-auto md:flex-row md:content-end md:justify-start md:gap-3 md:p-0">
-					<NavLink href="/dashboard/invoices" icon={faFile} className="order-1">
-						Invoices
-					</NavLink>
-					<NavLink href="/dashboard/clients" icon={faUsers} className="order-2">
-						Clients
-					</NavLink>
-					<NavLink
-						href="/dashboard/activities"
-						icon={faRunning}
-						className="order-4"
-					>
-						Activities
-					</NavLink>
-					<NavLink
-						href="/dashboard/support-items"
-						icon={faShoePrints}
-						className="order-5"
-					>
-						Items
-					</NavLink>
-				</div>
-				<div className="flex items-center gap-2">
+		<header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/60">
+			<div className="container flex h-14 max-w-screen-lg items-center">
+				<MainNav />
+				<MobileNav />
+
+				<nav className="flex flex-1 items-center justify-end space-x-2">
 					<ModeToggle />
-					<NavAuth user={session.data?.user} />
-				</div>
+					<NavAuth />
+				</nav>
 			</div>
-		</div>
+		</header>
 	);
-};
+}
 
 export default Navbar;
