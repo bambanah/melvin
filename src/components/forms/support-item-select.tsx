@@ -1,8 +1,7 @@
 import { FormSelect } from "@/components/ui/select";
-import { faUserGroup } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SupportItemListOutput } from "@/server/api/routers/support-item-router";
 import { trpc } from "@/lib/trpc";
+import { SupportItemListOutput } from "@/server/api/routers/support-item-router";
+import { Users } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Control, FieldValues, Path } from "react-hook-form";
 
@@ -31,16 +30,10 @@ const SupportItemSelect = <T extends FieldValues>({
 				supportItems.map((supportItem) => ({
 					label: (
 						<span className="flex items-center gap-2">
-							{supportItem.description}
-							{supportItem.isGroup ? (
-								<FontAwesomeIcon
-									icon={faUserGroup}
-									size="xs"
-									className="text-zinc-600"
-								/>
-							) : (
-								""
+							{supportItem.isGroup && (
+								<Users className="h-4 w-4 text-foreground/80" />
 							)}
+							{supportItem.description}
 						</span>
 					),
 					value: supportItem.id,

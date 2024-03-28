@@ -1,15 +1,6 @@
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Dropdown from "@/components/ui/dropdown";
 import Heading from "@/components/ui/heading";
-import {
-	faCalendar,
-	faCar,
-	faClock,
-	faEllipsisV,
-	faFileAlt,
-	faUser,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { trpc } from "@/lib/trpc";
 import Head from "next/head";
 import Link from "next/link";
@@ -18,6 +9,14 @@ import { toast } from "react-toastify";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import {
+	Calendar,
+	Car,
+	Clock,
+	EllipsisVertical,
+	FileText,
+	User,
+} from "lucide-react";
 import { useRouter } from "next/router";
 dayjs.extend(utc);
 
@@ -75,7 +74,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 
 					<Dropdown>
 						<Dropdown.Button id="options-dropdown">
-							<FontAwesomeIcon icon={faEllipsisV} />
+							<EllipsisVertical className="h-5 w-5" />
 						</Dropdown.Button>
 						<Dropdown.Items>
 							<Dropdown.Item>
@@ -100,14 +99,14 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 				</div>
 
 				<div className="flex items-center gap-2">
-					<FontAwesomeIcon icon={faCalendar} />
+					<Calendar className="h-4 w-4" />
 					<p>{dayjs.utc(activity.date).format("DD/MM/YY")}</p>
 				</div>
 
 				<div className="flex items-center gap-2">
 					{activity.startTime && activity.endTime ? (
 						<>
-							<FontAwesomeIcon icon={faClock} />
+							<Clock className="h-4 w-4" />
 							<p>
 								{dayjs.utc(activity.startTime).format("hh:mma")} -{" "}
 								{dayjs.utc(activity.endTime).format("hh:mma")}
@@ -115,14 +114,14 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 						</>
 					) : (
 						<>
-							<FontAwesomeIcon icon={faCar} />
+							<Car className="h-4 w-4" />
 							<p>{activity.itemDistance} km</p>
 						</>
 					)}
 				</div>
 
 				<div className="flex items-center gap-2">
-					<FontAwesomeIcon icon={faUser} />
+					<User className="h-4 w-4" />
 					<Link href={`/dashboard/clients/${activity.client?.id}`}>
 						{activity.client?.name}
 					</Link>
@@ -130,7 +129,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 
 				{activity.invoice && (
 					<div className="flex items-center gap-2">
-						<FontAwesomeIcon icon={faFileAlt} />
+						<FileText className="h-4 w-4" />
 						<Link href={`/dashboard/clients/${activity.client?.id}`}>
 							{activity.invoice.invoiceNo}
 						</Link>

@@ -5,8 +5,6 @@ import { InvoiceStatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { trpc } from "@/lib/trpc";
-import { faDownload, faEnvelope } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -18,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { Plus } from "lucide-react";
+import { Download, Mail, Plus } from "lucide-react";
 import LogPaymentDialog from "./log-payment-dialog";
 dayjs.extend(utc);
 
@@ -91,14 +89,14 @@ export default function InvoiceList({
 										href={`/api/invoices/generate-pdf/${invoice.id}`}
 										target="_blank"
 									>
-										<FontAwesomeIcon icon={faDownload} size="sm" />
+										<Download className="h-4 w-4" />
 									</a>
 									{invoice.client.invoiceEmail && (
 										<a
 											href={`mailto:${invoice.client.invoiceEmail}`}
 											target="_blank"
 										>
-											<FontAwesomeIcon icon={faEnvelope} size="sm" />
+											<Mail className="h-4 w-4" />
 										</a>
 									)}
 								</div>

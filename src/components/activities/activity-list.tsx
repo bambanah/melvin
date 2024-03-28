@@ -1,17 +1,8 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListFilterRow from "@/components/shared/list-filter-row";
 import ListPage from "@/components/shared/list-page";
-import {
-	faCar,
-	faClock,
-	faMoneyBillWave,
-	faPlus,
-	faUser,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ActivityListOutput } from "@/server/api/routers/activity-router";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import {
 	formatDuration,
@@ -20,7 +11,9 @@ import {
 } from "@/lib/date-utils";
 import { groupBy } from "@/lib/generic-utils";
 import { trpc } from "@/lib/trpc";
+import { ActivityListOutput } from "@/server/api/routers/activity-router";
 import dayjs from "dayjs";
+import { Car, CircleDollarSign, Clock, Plus, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { assignedFilterMap, assignedFilters } from "./activity-list.constants";
@@ -56,10 +49,10 @@ function ActivityList({
 				<h2 className="mr-auto text-2xl font-bold">Activities</h2>
 
 				{displayCreateButton ? (
-					<Button asChild>
+					<Button asChild variant="inverted">
 						<Link href="/dashboard/activities/create">
-							<FontAwesomeIcon icon={faPlus} />
-							<span>Add</span>
+							<Plus className="mr-2 h-4 w-4" />
+							Add
 						</Link>
 					</Button>
 				) : undefined}
@@ -100,20 +93,16 @@ function ActivityList({
 													</p>
 												</Link>
 												{activity.itemDistance ? (
-													<div className="flex items-center gap-2 whitespace-nowrap">
-														<FontAwesomeIcon
-															icon={faCar}
-															className="w-4 text-zinc-600"
-														/>
+													<div className="flex items-center gap-2 whitespace-nowrap text-foreground/80">
+														<Car className="h-4 w-4" />
 														{activity.itemDistance}km
 													</div>
 												) : (
-													<div className="flex items-center gap-2 whitespace-nowrap">
-														<FontAwesomeIcon
-															icon={faClock}
-															className="w-4 text-foreground text-opacity-30"
-														/>
-														{dayjs.utc(activity.startTime).format("HH:mm")} -{" "}
+													<div className="flex items-center gap-2 whitespace-nowrap text-foreground/80">
+														<Clock className="h-4 w-4" />
+														{dayjs
+															.utc(activity.startTime)
+															.format("HH:mm")} -{" "}
 														{dayjs.utc(activity.endTime).format("HH:mm")}
 														<span className="hidden md:inline">
 															(
@@ -136,19 +125,13 @@ function ActivityList({
 														href={`/dashboard/clients/${activity.client.id}`}
 													>
 														<div className="flex items-center gap-2 md:flex-row-reverse md:font-semibold">
-															<FontAwesomeIcon
-																icon={faUser}
-																className="w-4 text-zinc-600"
-															/>
+															<User className="h-4 w-4" />
 															<span>{activity.client.name}</span>
 														</div>
 													</Link>
 												)}
-												<div className="flex items-center gap-2 md:flex-row-reverse">
-													<FontAwesomeIcon
-														icon={faMoneyBillWave}
-														className="w-4 text-zinc-600"
-													/>
+												<div className="flex items-center gap-2 text-foreground/80 md:flex-row-reverse">
+													<CircleDollarSign className="h-4 w-4" />
 													<span>
 														{getTotalCostOfActivities([
 															activity,

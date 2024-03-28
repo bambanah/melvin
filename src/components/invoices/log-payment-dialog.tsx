@@ -12,14 +12,12 @@ import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { debounce } from "@/lib/generic-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
-import { Wallet } from "lucide-react";
+import { Plus, Wallet } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
+import { Input } from "../ui/input";
 
 const LogPaymentDialog = () => {
 	const [amountPaid, setAmountPaid] = useState(0);
@@ -138,7 +136,7 @@ const LogPaymentDialog = () => {
 						)}
 
 						{idx < ids.length - 1 && (
-							<FontAwesomeIcon icon={faPlus} size="xl" key={`${idx}-icon`} />
+							<Plus className="mx-auto h-8 w-8" key={`${idx}-icon`} />
 						)}
 					</Fragment>
 				))}

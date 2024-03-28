@@ -28,7 +28,7 @@ const LoginForm = () => {
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)}>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
 				<FormField
 					control={form.control}
 					name="email"
