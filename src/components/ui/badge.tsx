@@ -32,16 +32,21 @@ export interface BadgeProps
 
 function InvoiceStatusBadge({
 	invoiceStatus,
+	...props
 }: {
 	invoiceStatus: InvoiceStatus;
-}) {
+} & BadgeProps) {
 	let variant: VariantProps<typeof badgeVariants>["variant"];
 
 	if (invoiceStatus === "PAID") variant = "default";
 	else if (invoiceStatus === "SENT") variant = "success";
 	else variant = "secondary";
 
-	return <Badge variant={variant}>{invoiceStatus}</Badge>;
+	return (
+		<Badge variant={variant} {...props}>
+			{invoiceStatus}
+		</Badge>
+	);
 }
 
 function Badge({ className, variant, ...props }: BadgeProps) {
