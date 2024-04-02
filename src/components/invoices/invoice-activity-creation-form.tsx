@@ -29,7 +29,7 @@ import {
 	Plus,
 	X,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
 	Control,
 	UseFormGetValues,
@@ -119,6 +119,14 @@ const InvoiceActivityCreationForm = ({
 
 	const isGroupSupportItem = (supportItemId?: string) =>
 		supportItemId && groupSupportItemIds?.includes(supportItemId);
+
+	useEffect(() => {
+		watch("activitiesToCreate").forEach((activity, idx) => {
+			if (isGroupSupportItem(activity.supportItemId)) {
+				setValue(`activitiesToCreate.${idx}.groupClientId`, "");
+			}
+		});
+	}, [watch("activitiesToCreate")]);
 
 	return (
 		<div className="flex flex-col gap-4">
