@@ -232,8 +232,8 @@ const InvoiceActivityCreationForm = ({
 																		field.onChange(stripTimezone(day));
 																	}}
 																	disabled={(date) =>
-																		date > new Date() ||
-																		date < new Date("1900-01-01")
+																		date > stripTimezone(new Date()) ||
+																		date < stripTimezone(new Date("1900-01-01"))
 																	}
 																/>
 															</PopoverContent>
@@ -282,7 +282,9 @@ const InvoiceActivityCreationForm = ({
 								))}
 								<li>
 									<Button
-										onClick={() => field.activities.push({ date: new Date() })}
+										onClick={() =>
+											field.activities.push({ date: stripTimezone(new Date()) })
+										}
 										className="mt-2 px-6"
 										variant="secondary"
 									>
@@ -300,7 +302,7 @@ const InvoiceActivityCreationForm = ({
 					appendActivity({
 						supportItemId: "",
 						groupClientId: "",
-						activities: [{ date: new Date() }],
+						activities: [{ date: stripTimezone(new Date()) }],
 					})
 				}
 				className="mx-auto w-full"

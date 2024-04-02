@@ -54,7 +54,9 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 		resolver: zodResolver(activitySchema),
 		mode: "onBlur",
 		defaultValues: {
-			date: existingActivity?.date ? existingActivity.date : new Date(),
+			date: existingActivity?.date
+				? existingActivity.date
+				: stripTimezone(new Date()),
 			supportItemId: existingActivity?.supportItem.id ?? "",
 			clientId: existingActivity?.client?.id ?? "",
 			startTime: existingActivity?.startTime
@@ -176,7 +178,8 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 													field.onChange(stripTimezone(day));
 												}}
 												disabled={(date) =>
-													date > new Date() || date < new Date("1900-01-01")
+													date > stripTimezone(new Date()) ||
+													date < stripTimezone(new Date("1900-01-01"))
 												}
 											/>
 										</PopoverContent>
