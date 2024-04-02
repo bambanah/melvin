@@ -72,7 +72,7 @@ const generateNestedWriteForGroupActivities = (
 			return activities.map((activity) => ({
 				...activity,
 				supportItemId,
-				date: dayjs.utc(activity.date, "YYYY-MM-DD").toDate(),
+				date: activity.date,
 				startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
 				endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
 				clientId: groupClientId,

@@ -51,7 +51,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 			clientId: existingInvoice?.clientId ?? "",
 			date: existingInvoice?.date
 				? dayjs.utc(existingInvoice?.date, "YYYY-MM-DD").toDate()
-				: new Date(),
+				: stripTimezone(new Date()),
 			invoiceNo: existingInvoice?.invoiceNo ?? "",
 			billTo: existingInvoice?.billTo ?? "",
 			activityIds: existingInvoice?.activities.map((a) => a.id) ?? [],
@@ -153,7 +153,8 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 													field.onChange(stripTimezone(day));
 												}}
 												disabled={(date) =>
-													date > new Date() || date < new Date("1900-01-01")
+													date > stripTimezone(new Date()) ||
+													date < stripTimezone(new Date("1900-01-01"))
 												}
 											/>
 										</PopoverContent>
