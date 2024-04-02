@@ -1,7 +1,7 @@
 {
 	"name": "melvin",
 	"private": true,
-	"packageManager": "pnpm@8.15.5",
+	"packageManager": "pnpm@8.15.6",
 	"scripts": {
 		"preinstall": "npx only-allow pnpm",
 		"prepare": "husky",
