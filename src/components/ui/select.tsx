@@ -1,17 +1,9 @@
+import { cn } from "@/lib/utils";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import * as React from "react";
-
-import { cn } from "@/lib/utils";
-import { FieldValues, UseControllerProps } from "react-hook-form";
-import {
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from "./form";
+import { ControllerRenderProps, FieldValues, Path } from "react-hook-form";
+import { FormControl } from "./form";
 
 const Select = SelectPrimitive.Root;
 
@@ -153,46 +145,37 @@ const SelectSeparator = React.forwardRef<
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
-const FormSelect = <T extends FieldValues>({
-	options,
-	label,
-	description,
-	placeholder,
-	...rest
-}: {
+type FormSelectProps<T extends FieldValues> = {
 	options: {
 		label: string | JSX.Element;
 		value: string;
 	}[];
-	label?: React.ReactNode;
-	description?: React.ReactNode;
 	placeholder?: string;
-} & UseControllerProps<T>) => {
+} & SelectPrimitive.SelectProps &
+	ControllerRenderProps<T, Path<T>>;
+
+const FormSelect = <T extends FieldValues>({
+	options,
+	placeholder,
+	onChange,
+	value,
+	...rest
+}: FormSelectProps<T>) => {
 	return (
-		<FormField
-			{...rest}
-			render={({ field }) => (
-				<FormItem>
-					{label && <FormLabel>{label}</FormLabel>}
-					<Select onValueChange={field.onChange} defaultValue={field.value}>
-						<FormControl>
-							<SelectTrigger>
-								<SelectValue placeholder={placeholder} />
-							</SelectTrigger>
-						</FormControl>
-						<SelectContent>
-							{options.map(({ value, label }) => (
-								<SelectItem key={value} value={value}>
-									{label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-					{description && <FormDescription>{description}</FormDescription>}
-					<FormMessage />
-				</FormItem>
-			)}
-		/>
+		<Select onValueChange={onChange} defaultValue={value} {...rest}>
+			<FormControl>
+				<SelectTrigger>
+					<SelectValue placeholder={placeholder} />
+				</SelectTrigger>
+			</FormControl>
+			<SelectContent>
+				{options.map(({ value, label }) => (
+					<SelectItem key={value} value={value}>
+						{label}
+					</SelectItem>
+				))}
+			</SelectContent>
+		</Select>
 	);
 };
 
@@ -209,3 +192,5 @@ export {
 	SelectTrigger,
 	SelectValue,
 };
+
+export type { FormSelectProps };

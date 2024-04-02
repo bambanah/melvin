@@ -55,3 +55,14 @@ const HOLIDAYS = new Set([
 export function isHoliday(date: Date | string) {
 	return HOLIDAYS.has(dayjs(date).format("DD/MM/YYYY"));
 }
+
+/**
+ * Strips the timezone from a locally instantiated Date object.
+ * @param date A Date object with timezone offset
+ * @returns Date object reset to UTC without changing the time
+ */
+export const stripTimezone = (date: Date) => {
+	return new Date(
+		Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0)
+	);
+};

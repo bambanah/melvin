@@ -18,12 +18,14 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { stripTimezone } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { ActivitySchema, activitySchema } from "@/schema/activity-schema";
 import { ActivityByIdOutput } from "@/server/api/routers/activity-router";
 import { SupportItemListOutput } from "@/server/api/routers/support-item-router";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -118,16 +120,14 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 					<FormField
 						name="supportItemId"
 						control={form.control}
-						render={() => (
+						render={({ field }) => (
 							<FormItem className="w-full">
 								<FormLabel required>Support Item</FormLabel>
-								<FormControl>
-									<SupportItemSelect
-										name="supportItemId"
-										control={form.control}
-										setSupportItems={setSupportItems}
-									/>
-								</FormControl>
+								<SupportItemSelect
+									setSupportItems={setSupportItems}
+									{...field}
+								/>
+								<FormMessage />
 							</FormItem>
 						)}
 					/>
@@ -135,12 +135,11 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 						<FormField
 							name="clientId"
 							control={form.control}
-							render={() => (
+							render={({ field }) => (
 								<FormItem className="shrink grow basis-1/2">
 									<FormLabel required>Client</FormLabel>
-									<FormControl>
-										<ClientSelect name="clientId" control={form.control} />
-									</FormControl>
+									<ClientSelect {...field} />
+									<FormMessage />
 								</FormItem>
 							)}
 						/>
@@ -161,7 +160,7 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 													)}
 												>
 													{field.value ? (
-														<span>{dayjs.utc(field.value).format("LL")}</span>
+														format(field.value, "PP")
 													) : (
 														<span>Pick a date</span>
 													)}
@@ -173,11 +172,12 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 											<Calendar
 												mode="single"
 												selected={field.value}
-												onSelect={field.onChange}
+												onSelect={(_, day) => {
+													field.onChange(stripTimezone(day));
+												}}
 												disabled={(date) =>
 													date > new Date() || date < new Date("1900-01-01")
 												}
-												initialFocus
 											/>
 										</PopoverContent>
 									</Popover>
@@ -291,7 +291,11 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 						<Button type="submit" disabled={form.formState.isSubmitting}>
 							{existingActivity ? "Update" : "Create"}
 						</Button>
-						<Button type="button" onClick={() => router.back()}>
+						<Button
+							type="button"
+							onClick={() => router.back()}
+							variant="secondary"
+						>
 							Cancel
 						</Button>
 					</div>

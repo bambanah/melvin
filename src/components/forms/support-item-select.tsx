@@ -1,13 +1,11 @@
-import { FormSelect } from "@/components/ui/select";
+import { FormSelect, FormSelectProps } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { SupportItemListOutput } from "@/server/api/routers/support-item-router";
 import { Users } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Control, FieldValues, Path } from "react-hook-form";
+import { FieldValues } from "react-hook-form";
 
-interface Props<T extends FieldValues> {
-	name: Path<T>;
-	control: Control<T>;
+interface Props {
 	setSupportItems?: Dispatch<
 		SetStateAction<SupportItemListOutput[] | undefined>
 	>;
@@ -16,7 +14,7 @@ interface Props<T extends FieldValues> {
 const SupportItemSelect = <T extends FieldValues>({
 	setSupportItems,
 	...props
-}: Props<T>) => {
+}: Props & Omit<FormSelectProps<T>, "placeholder" | "options">) => {
 	const [options, setOptions] = useState<
 		{ label: JSX.Element; value: string }[]
 	>([]);

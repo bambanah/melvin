@@ -2,9 +2,9 @@ import { baseListQueryInput } from "@/lib/trpc";
 import { activitySchema } from "@/schema/activity-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
-import dayjs from "dayjs";
 import { z } from "zod";
 
+import dayjs from "dayjs";
 dayjs.extend(require("dayjs/plugin/utc"));
 dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
