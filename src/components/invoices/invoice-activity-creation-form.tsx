@@ -15,9 +15,11 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { stripTimezone } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { InvoiceSchema } from "@/schema/invoice-schema";
+import { format } from "date-fns";
 import {
 	ArrowDown,
 	ArrowRight,
@@ -130,14 +132,9 @@ const InvoiceActivityCreationForm = ({
 								<FormField
 									name={`activitiesToCreate.${index}.supportItemId`}
 									control={control}
-									render={() => (
+									render={({ field }) => (
 										<FormItem className="shrink grow basis-1/2">
-											<FormControl>
-												<SupportItemSelect
-													name={`activitiesToCreate.${index}.supportItemId`}
-													control={control}
-												/>
-											</FormControl>
+											<SupportItemSelect {...field} />
 											<FormMessage />
 										</FormItem>
 									)}
@@ -148,15 +145,12 @@ const InvoiceActivityCreationForm = ({
 									<FormField
 										name={`activitiesToCreate.${index}.groupClientId`}
 										control={control}
-										render={() => (
+										render={({ field }) => (
 											<FormItem className="shrink grow basis-1/2">
-												<FormControl>
-													<ClientSelect
-														name={`activitiesToCreate.${index}.groupClientId`}
-														excludeClientId={watch("clientId")}
-														control={control}
-													/>
-												</FormControl>
+												<ClientSelect
+													excludeClientId={watch("clientId")}
+													{...field}
+												/>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -206,7 +200,7 @@ const InvoiceActivityCreationForm = ({
 											<CalendarIcon className="h-4 w-4" />
 											<FormField
 												control={control}
-												name="date"
+												name={`activitiesToCreate.${index}.activities.${activityFieldIndex}.date`}
 												render={({ field }) => (
 													<FormItem className="flex shrink grow basis-1/2 flex-col gap-1 pt-1">
 														<Popover>
@@ -220,9 +214,7 @@ const InvoiceActivityCreationForm = ({
 																		)}
 																	>
 																		{field.value ? (
-																			<span>
-																				{dayjs.utc(field.value).format("LL")}
-																			</span>
+																			format(field.value, "PP")
 																		) : (
 																			<span>Pick a date</span>
 																		)}
@@ -236,12 +228,13 @@ const InvoiceActivityCreationForm = ({
 																<Calendar
 																	mode="single"
 																	selected={field.value}
-																	onSelect={field.onChange}
+																	onSelect={(_, day) => {
+																		field.onChange(stripTimezone(day));
+																	}}
 																	disabled={(date) =>
 																		date > new Date() ||
 																		date < new Date("1900-01-01")
 																	}
-																	initialFocus
 																/>
 															</PopoverContent>
 														</Popover>
