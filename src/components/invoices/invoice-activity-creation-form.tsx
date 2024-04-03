@@ -139,7 +139,7 @@ const InvoiceActivityCreationForm = ({
 				<div className="mb-4 flex flex-col gap-6">
 					{fields.map((field, index) => (
 						<div key={field.id} className="flex flex-col">
-							<div className="flex items-center gap-2">
+							<div className="flex items-start gap-2">
 								<FormField
 									name={`activitiesToCreate.${index}.supportItemId`}
 									control={control}
@@ -167,12 +167,14 @@ const InvoiceActivityCreationForm = ({
 										)}
 									/>
 								)}
-								<button
-									className="px-2 py-1 hover:shadow"
+								<Button
+									variant="ghost"
+									size="icon"
 									onClick={() => remove(index)}
+									type="button"
 								>
 									<X className="h-6 w-6" />
-								</button>
+								</Button>
 							</div>
 
 							<ul className="tree">
@@ -183,28 +185,28 @@ const InvoiceActivityCreationForm = ({
 									>
 										{fields.length > 1 && (
 											<div className="flex flex-col justify-center gap-0">
-												<button
-													className={cn([
-														"px-2 py-0 text-zinc-500 transition-colors hover:text-zinc-900 hover:shadow",
-														index === 0 && "hidden",
-													])}
+												<Button
+													className={index === 0 ? "hidden" : ""}
+													variant="ghost"
+													size="icon"
 													onClick={() =>
 														handleMove("UP", index, activityFieldIndex)
 													}
+													type="button"
 												>
 													<ArrowUp className="h-6 w-6" />
-												</button>
-												<button
-													className={cn([
-														"px-2 py-0 text-zinc-500 transition-colors hover:text-zinc-900 hover:shadow",
-														index === fields.length - 1 && "hidden",
-													])}
+												</Button>
+												<Button
+													className={index === 0 ? "hidden" : ""}
+													variant="ghost"
+													size="icon"
 													onClick={() =>
 														handleMove("DOWN", index, activityFieldIndex)
 													}
+													type="button"
 												>
 													<ArrowDown className="h-6 w-6" />
-												</button>
+												</Button>
 											</div>
 										)}
 										<span className="flex items-center gap-2">
@@ -283,12 +285,15 @@ const InvoiceActivityCreationForm = ({
 												)}
 											/>
 										</span>
-										<button
-											className="ml-auto px-2 py-1 hover:shadow"
+										<Button
+											className="ml-auto"
+											variant="ghost"
+											size="icon"
 											onClick={() => handleDelete(index, activityFieldIndex)}
+											type="button"
 										>
 											<X className="h-6 w-6" />
-										</button>
+										</Button>
 									</li>
 								))}
 								<li>
@@ -298,6 +303,7 @@ const InvoiceActivityCreationForm = ({
 										}
 										className="mt-2 px-6"
 										variant="secondary"
+										type="button"
 									>
 										<Plus className="h-4 w-4" />
 									</Button>
@@ -316,7 +322,9 @@ const InvoiceActivityCreationForm = ({
 						activities: [{ date: stripTimezone(new Date()) }],
 					})
 				}
-				className="mx-auto w-full"
+				className="mr-auto"
+				variant="outline"
+				type="button"
 			>
 				+ Add Support Item
 			</Button>

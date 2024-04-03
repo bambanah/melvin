@@ -7,10 +7,10 @@
 		@apply z-0 m-0 flex flex-col p-0 pl-4;
 
 		li {
-			@apply relative border-l border-zinc-500 py-1 pl-6;
+			@apply relative border-l border-foreground/50 py-1 pl-6;
 
 			&:before {
-				@apply absolute left-0 top-0 border-b border-b-zinc-500 content-[""];
+				@apply absolute left-0 top-0 border-b border-b-foreground/50 content-[""];
 				@apply h-8 w-2;
 			}
 
@@ -19,7 +19,7 @@
 				@apply border-l-0 py-0;
 
 				&:before {
-					@apply h-6 w-4 border-l border-dashed border-l-zinc-500;
+					@apply h-6 w-4 border-l border-dashed border-l-foreground/50;
 				}
 			}
 		}

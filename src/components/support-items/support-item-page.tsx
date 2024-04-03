@@ -1,18 +1,20 @@
-import ConfirmDialog from "@/components/ui/confirm-dialog";
-import Dropdown from "@/components/ui/dropdown";
+import { Button } from "@/components/ui/button";
 import Heading from "@/components/ui/heading";
 import { trpc } from "@/lib/trpc";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, Pencil, Trash } from "lucide-react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { toast } from "react-toastify";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 const SupportItemPage = ({ supportItemId }: { supportItemId: string }) => {
 	const router = useRouter();
-
-	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	const trpcUtils = trpc.useUtils();
 	const { data: supportItem, error } = trpc.supportItem.byId.useQuery({
@@ -21,7 +23,7 @@ const SupportItemPage = ({ supportItemId }: { supportItemId: string }) => {
 	const deletesupportItemMutation = trpc.supportItem.delete.useMutation();
 
 	const deletesupportItem = () => {
-		if (supportItemId)
+		if (confirm("Are you sure?"))
 			deletesupportItemMutation
 				.mutateAsync({ id: supportItemId })
 				.then(() => {
@@ -47,43 +49,32 @@ const SupportItemPage = ({ supportItemId }: { supportItemId: string }) => {
 			</Head>
 
 			<div className="flex w-full max-w-4xl flex-col gap-4 md:gap-8">
-				<ConfirmDialog
-					title="Are you sure you want to delete this Support Item?"
-					description="This cannot be undone."
-					isOpen={isDeleteDialogOpen}
-					setIsOpen={setIsDeleteDialogOpen}
-					confirmText="Delete"
-					cancelText="Cancel"
-					confirmAction={deletesupportItem}
-				/>
-
 				<div className="my-5 mb-2 flex items-center justify-between px-5">
 					<Heading>{supportItem.description}</Heading>
 
-					<Dropdown>
-						<Dropdown.Button id="options-dropdown">
-							<EllipsisVertical className="h-5 w-5" />
-						</Dropdown.Button>
-						<Dropdown.Items>
-							<Dropdown.Item>
-								<Link
-									href={`/dashboard/support-items/${supportItem.id}/edit`}
-									className="px-3 py-4 text-neutral-900 hover:bg-neutral-100 sm:py-2"
-								>
-									Edit
-								</Link>
-							</Dropdown.Item>
-							<Dropdown.Item>
-								<button
-									type="button"
-									className="px-3 py-4 text-left text-neutral-900 hover:bg-neutral-100 sm:py-2"
-									onClick={() => setIsDeleteDialogOpen(true)}
-								>
-									Delete
-								</button>
-							</Dropdown.Item>
-						</Dropdown.Items>
-					</Dropdown>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild className="grow-0 ">
+							<Button variant="ghost" size="icon">
+								<EllipsisVertical />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent>
+							<Link href={`/dashboard/support-items/${supportItem.id}/edit`}>
+								<DropdownMenuItem className="cursor-pointer">
+									<Pencil className="mr-2 h-4 w-4" />
+									<span>Edit</span>
+								</DropdownMenuItem>
+							</Link>
+
+							<DropdownMenuItem
+								onClick={() => deletesupportItem()}
+								className="cursor-pointer"
+							>
+								<Trash className="mr-2 h-4 w-4" />
+								<span>Delete</span>
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 
 				<table className="mt-8 w-full table-auto border-collapse text-sm md:text-base [&_td]:border-t [&_td]:p-2 [&_th]:px-2 [&_th]:py-1">
