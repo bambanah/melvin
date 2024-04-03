@@ -3,7 +3,7 @@ import prisma from "@/server/prisma";
 import generatePDF from "@/lib/pdf-generation";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export default async (request: NextApiRequest, response: NextApiResponse) => {
+const request = async (request: NextApiRequest, response: NextApiResponse) => {
 	if (request.method === "GET") {
 		const { id, base64 } = request.query;
 
@@ -49,3 +49,5 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
 		response.end(pdfContent);
 	}
 };
+
+export default request;
