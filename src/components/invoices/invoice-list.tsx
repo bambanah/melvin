@@ -108,6 +108,7 @@ export default function InvoiceList({
 							className={cn([
 								"flex w-full items-center gap-2 p-4 text-sm text-foreground",
 							])}
+							data-testid="invoice-list-item"
 						>
 							<div className="flex flex-col gap-2">
 								<div className="flex items-center gap-4 font-medium sm:text-lg">
@@ -158,7 +159,7 @@ export default function InvoiceList({
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent>
-									<Link href={`/invoices/${invoice.id}/edit`}>
+									<Link href={`/dashboard/invoices/${invoice.id}/edit`}>
 										<DropdownMenuItem className="cursor-pointer">
 											<Pencil className="mr-2 h-4 w-4" />
 											<span>Edit</span>
