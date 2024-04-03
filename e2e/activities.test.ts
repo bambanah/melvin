@@ -33,7 +33,11 @@ test("Can create, update, and delete activities", async ({ page }) => {
 		.filter({ hasText: supportItem.description })
 		.click();
 
-	await page.locator("button#options-dropdown").click();
+	await page
+		.locator("div")
+		.filter({ hasText: new RegExp(`^${supportItem.description}$`) })
+		.getByRole("button")
+		.click();
 	await page.getByRole("menuitem", { name: "Edit" }).click();
 
 	await page.getByLabel("Start Time").fill("13:25");
@@ -49,8 +53,14 @@ test("Can create, update, and delete activities", async ({ page }) => {
 		.filter({ hasText: supportItem.description })
 		.click();
 
-	await page.locator("button#options-dropdown").click();
-	await page.locator("button").filter({ hasText: "Delete" }).click();
-	await page.locator("button").filter({ hasText: "Delete" }).click();
+	await page
+		.locator("div")
+		.filter({ hasText: new RegExp(`^${supportItem.description}$`) })
+		.getByRole("button")
+		.click();
+	page.once("dialog", (dialog) => {
+		dialog.accept().catch(() => {});
+	});
+	await page.getByRole("menuitem", { name: "Delete" }).click();
 	await waitForAlert(page, "activity deleted");
 });

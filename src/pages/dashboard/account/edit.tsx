@@ -1,7 +1,17 @@
 import AccountForm from "@/components/account/account-form";
 import Layout from "@/components/shared/layout";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
 import { trpc } from "@/lib/trpc";
@@ -15,7 +25,6 @@ const EditAccountPage = () => {
 	const router = useRouter();
 
 	const [isAdvancedExpanded, setAdvancedExpanded] = useState(false);
-	const [isAccountResetDialogOpen, setAccountResetDialogOpen] = useState(false);
 
 	const { data: user, error } = trpc.user.fetch.useQuery();
 	const resetAccountMutation = trpc.user.reset.useMutation();
@@ -50,13 +59,6 @@ const EditAccountPage = () => {
 		<Layout>
 			<div className="mx-auto flex w-full max-w-xl flex-col items-center">
 				<AccountForm existingUser={user} />
-				<ConfirmDialog
-					title="Are you sure you want to reset your account?"
-					description="This is a destructive action and cannot be undone."
-					isOpen={isAccountResetDialogOpen}
-					setIsOpen={setAccountResetDialogOpen}
-					confirmAction={resetAccount}
-				/>
 				<div className="mx-auto w-full">
 					<button
 						type="button"
@@ -72,14 +74,26 @@ const EditAccountPage = () => {
 						<Heading size="small">Advanced Options</Heading>
 					</button>
 					{isAdvancedExpanded && (
-						<div>
-							<Button
-								variant="destructive"
-								onClick={() => setAccountResetDialogOpen(true)}
-							>
-								Reset Account
-							</Button>
-						</div>
+						<AlertDialog>
+							<AlertDialogTrigger asChild>
+								<Button variant="destructive">Reset Account</Button>
+							</AlertDialogTrigger>
+							<AlertDialogContent>
+								<AlertDialogHeader>
+									<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+									<AlertDialogDescription>
+										This action cannot be undone. This will reset your account
+										and remove your data from our servers.
+									</AlertDialogDescription>
+								</AlertDialogHeader>
+								<AlertDialogFooter>
+									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<Button variant="destructive" onClick={resetAccount} asChild>
+										<AlertDialogAction>Delete</AlertDialogAction>
+									</Button>
+								</AlertDialogFooter>
+							</AlertDialogContent>
+						</AlertDialog>
 					)}
 				</div>
 			</div>

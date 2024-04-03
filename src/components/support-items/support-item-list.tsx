@@ -23,7 +23,7 @@ const ItemCode = ({
 			<p className="font-semibold">{descriptor}:</p> {code}{" "}
 			{rate && (
 				<>
-					<span className="font-semibold text-neutral-400">{"// "}</span>
+					<span className="text-foreground/40">{"// "}</span>
 					{Number(rate).toLocaleString(undefined, {
 						style: "currency",
 						currency: "AUD",

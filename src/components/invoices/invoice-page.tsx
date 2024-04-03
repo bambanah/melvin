@@ -20,44 +20,23 @@ import {
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
-import { toast } from "react-toastify";
+
 dayjs.extend(require("dayjs/plugin/utc"));
 
 const PdfPreview = dynamic(() => import("@/components/invoices/pdf-preview"));
-const ConfirmDialog = dynamic(() => import("@/components/ui/confirm-dialog"));
 const ActivityList = dynamic(
 	() => import("@/components/activities/activity-list")
 );
 
 const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
-	const router = useRouter();
-
 	const [isPdfPreviewExpanded, setIsPdfPreviewExpanded] = useState(false);
-	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	const trpcUtils = trpc.useUtils();
 	const { data: invoice, error } = trpc.invoice.byId.useQuery({
 		id: invoiceId,
 	});
 	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
-	const deleteInvoiceMutation = trpc.invoice.delete.useMutation();
-
-	const deleteInvoice = () => {
-		if (invoiceId)
-			deleteInvoiceMutation
-				.mutateAsync({ id: invoiceId })
-				.then(() => {
-					trpcUtils.invoice.list.invalidate();
-
-					toast.success("Invoice deleted");
-					router.push("/dashboard/invoices");
-				})
-				.catch(() => {
-					toast.error("An error occured. Please refresh and try again.");
-				});
-	};
 
 	const markInvoiceAs = (invoiceStatus: InvoiceStatus) => {
 		if (invoiceId)
@@ -103,15 +82,6 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					</div>
 				</Dialog>
 			</Transition>
-			<ConfirmDialog
-				title="Are you sure you want to delete this invoice?"
-				description="Note: This cannot be undone."
-				isOpen={isDeleteDialogOpen}
-				setIsOpen={setIsDeleteDialogOpen}
-				confirmText="Delete"
-				cancelText="Cancel"
-				confirmAction={deleteInvoice}
-			/>
 
 			<div className="flex flex-col items-stretch justify-between md:h-[15rem] md:flex-row-reverse">
 				<div

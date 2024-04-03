@@ -1,19 +1,21 @@
 import InvoiceList from "@/components/invoices/invoice-list";
-import ConfirmDialog from "@/components/ui/confirm-dialog";
-import Dropdown from "@/components/ui/dropdown";
+import { Button } from "@/components/ui/button";
 import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
 import { trpc } from "@/lib/trpc";
-import { EllipsisVertical, ExternalLink } from "lucide-react";
+import { EllipsisVertical, ExternalLink, Pencil, Trash } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { toast } from "react-toastify";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 const ClientPage = ({ clientId }: { clientId: string }) => {
 	const router = useRouter();
-
-	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	const trpcUtils = trpc.useUtils();
 	const { data: client, error } = trpc.clients.byId.useQuery({
@@ -22,7 +24,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 	const deleteClientMutation = trpc.clients.delete.useMutation();
 
 	const deleteClient = () => {
-		if (clientId)
+		if (confirm("Are you sure?"))
 			deleteClientMutation
 				.mutateAsync({ id: clientId })
 				.then(() => {
@@ -43,44 +45,33 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 
 	return (
 		<div className="mx-auto flex w-full max-w-4xl flex-col items-start justify-center p-4">
-			<ConfirmDialog
-				title="Are you sure you want to delete this client?"
-				description="This cannot be undone."
-				isOpen={isDeleteDialogOpen}
-				setIsOpen={setIsDeleteDialogOpen}
-				confirmText="Delete"
-				cancelText="Cancel"
-				confirmAction={deleteClient}
-			/>
-
 			<div className="my-2 flex w-full flex-col gap-2 px-4 sm:my-8">
 				<div className="mb-2 flex items-center justify-between">
 					<Heading>{client.name}</Heading>
 
-					<Dropdown>
-						<Dropdown.Button id="options-dropdown">
-							<EllipsisVertical className="h-5 w-5" />
-						</Dropdown.Button>
-						<Dropdown.Items>
-							<Dropdown.Item>
-								<Link
-									href={`/dashboard/clients/${client.id}/edit`}
-									className="px-3 py-4 text-neutral-900 hover:bg-neutral-100 sm:py-2"
-								>
-									Edit
-								</Link>
-							</Dropdown.Item>
-							<Dropdown.Item>
-								<button
-									type="button"
-									className="px-3 py-4 text-left text-neutral-900 hover:bg-neutral-100 sm:py-2"
-									onClick={() => setIsDeleteDialogOpen(true)}
-								>
-									Delete
-								</button>
-							</Dropdown.Item>
-						</Dropdown.Items>
-					</Dropdown>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild className="grow-0 ">
+							<Button variant="ghost" size="icon">
+								<EllipsisVertical />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent>
+							<Link href={`/dashboard/clients/${client.id}/edit`}>
+								<DropdownMenuItem className="cursor-pointer">
+									<Pencil className="mr-2 h-4 w-4" />
+									<span>Edit</span>
+								</DropdownMenuItem>
+							</Link>
+
+							<DropdownMenuItem
+								onClick={() => deleteClient()}
+								className="cursor-pointer"
+							>
+								<Trash className="mr-2 h-4 w-4" />
+								<span>Delete</span>
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 
 				<div className="flex flex-col">
@@ -88,7 +79,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 					{client.number ? (
 						<p>{client.number}</p>
 					) : (
-						<p className="text-neutral-500">Not set</p>
+						<p className="text-foreground/50">Not set</p>
 					)}
 				</div>
 
@@ -97,7 +88,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 					{client.billTo ? (
 						<p>{client.billTo}</p>
 					) : (
-						<p className="text-neutral-500">Not set</p>
+						<p className="text-foreground/50">Not set</p>
 					)}
 				</div>
 
@@ -106,10 +97,10 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 					{client.invoiceNumberPrefix ? (
 						<p>
 							{client.invoiceNumberPrefix}
-							<span className="text-neutral-500">##</span>
+							<span className="text-foreground/50">##</span>
 						</p>
 					) : (
-						<p className="text-neutral-500">Not set</p>
+						<p className="text-foreground/50">Not set</p>
 					)}
 				</div>
 
@@ -118,7 +109,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 					{client.defaultTransitDistance ? (
 						<p>{client.defaultTransitDistance.toString()}</p>
 					) : (
-						<p className="text-neutral-500">Not set</p>
+						<p className="text-foreground/50">Not set</p>
 					)}
 				</div>
 
@@ -127,7 +118,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 					{client.defaultTransitTime ? (
 						<p>{client.defaultTransitTime.toString()}</p>
 					) : (
-						<p className="text-neutral-500">Not set</p>
+						<p className="text-foreground/50">Not set</p>
 					)}
 				</div>
 
@@ -142,7 +133,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 							<ExternalLink className="h-4 w-4" />
 						</a>
 					) : (
-						<p className="text-neutral-500">Not set</p>
+						<p className="text-foreground/50">Not set</p>
 					)}
 				</div>
 			</div>

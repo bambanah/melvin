@@ -8,7 +8,7 @@ export const invoiceSchema = z.object({
 	activityIds: z.array(z.string()).optional(),
 	activitiesToCreate: z.array(
 		z.object({
-			supportItemId: z.string().min(1),
+			supportItemId: z.string().min(1, "Support item is required"),
 			groupClientId: z.string(),
 			activities: z.array(
 				z
