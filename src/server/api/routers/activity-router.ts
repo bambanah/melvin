@@ -5,6 +5,7 @@ import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { z } from "zod";
 
 import dayjs from "dayjs";
+import { DEFAULT_LIST_LIMIT } from "./router.constants";
 dayjs.extend(require("dayjs/plugin/utc"));
 dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
@@ -41,7 +42,7 @@ export const activityRouter = router({
 			})
 		)
 		.query(async ({ ctx, input }) => {
-			const limit = input.limit ?? 50;
+			const limit = input.limit ?? DEFAULT_LIST_LIMIT;
 			const { assigned, invoiceId, clientId, cursor } = input;
 
 			const activities = await ctx.prisma.activity.findMany({

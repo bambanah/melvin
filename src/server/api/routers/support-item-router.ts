@@ -1,9 +1,10 @@
-import { Prisma } from "@prisma/client";
+import { baseListQueryInput } from "@/lib/trpc";
 import { supportItemSchema } from "@/schema/support-item-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
+import { Prisma } from "@prisma/client";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
-import { baseListQueryInput } from "@/lib/trpc";
 import { z } from "zod";
+import { DEFAULT_LIST_LIMIT } from "./router.constants";
 
 const defaultSupportItemSelect = {
 	id: true,
@@ -24,7 +25,7 @@ export const supportItemRouter = router({
 	list: authedProcedure
 		.input(baseListQueryInput.extend({ description: z.string().optional() }))
 		.query(async ({ ctx, input }) => {
-			const limit = input.limit ?? 50;
+			const limit = input.limit ?? DEFAULT_LIST_LIMIT;
 			const { cursor, description } = input;
 
 			const supportItems = await ctx.prisma.supportItem.findMany({

@@ -1,13 +1,14 @@
+import { getTotalCostOfActivities } from "@/lib/activity-utils";
+import { invoiceCandidatesFromPaymentAmount } from "@/lib/invoice-utils";
+import { baseListQueryInput } from "@/lib/trpc";
 import { activitySchema } from "@/schema/activity-schema";
 import { InvoiceSchema, invoiceSchema } from "@/schema/invoice-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
 import { Client, Invoice, InvoiceStatus } from "@prisma/client";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
-import { getTotalCostOfActivities } from "@/lib/activity-utils";
-import { invoiceCandidatesFromPaymentAmount } from "@/lib/invoice-utils";
-import { baseListQueryInput } from "@/lib/trpc";
 import dayjs from "dayjs";
 import { z } from "zod";
+import { DEFAULT_LIST_LIMIT } from "./router.constants";
 
 const defaultInvoiceSelect = {
 	id: true,
@@ -93,7 +94,7 @@ export const invoiceRouter = router({
 			})
 		)
 		.query(async ({ ctx, input }) => {
-			const limit = input.limit ?? 50;
+			const limit = input.limit ?? DEFAULT_LIST_LIMIT;
 			const { cursor, status, clientId } = input;
 
 			const invoices = await ctx.prisma.invoice.findMany({
