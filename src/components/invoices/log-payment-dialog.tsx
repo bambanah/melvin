@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Dialog,
 	DialogClose,
@@ -8,6 +9,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { debounce } from "@/lib/generic-utils";
 import { trpc } from "@/lib/trpc";
@@ -16,8 +18,6 @@ import dayjs from "dayjs";
 import { Plus, Wallet } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { Checkbox } from "../ui/checkbox";
-import { Input } from "../ui/input";
 
 const LogPaymentDialog = () => {
 	const [amountPaid, setAmountPaid] = useState(0);

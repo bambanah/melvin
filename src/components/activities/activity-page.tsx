@@ -1,4 +1,10 @@
 import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Heading from "@/components/ui/heading";
 import { trpc } from "@/lib/trpc";
 import {
@@ -15,12 +21,6 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 
 import dayjs from "dayjs";
 dayjs.extend(require("dayjs/plugin/utc"));

@@ -1,3 +1,4 @@
+import { Checkbox } from "@/components/ui/checkbox";
 import Heading from "@/components/ui/heading";
 import { cn } from "@/lib/utils";
 import { InvoiceSchema } from "@/schema/invoice-schema";
@@ -5,7 +6,6 @@ import { ActivityListOutput } from "@/server/api/routers/activity-router";
 import dayjs from "dayjs";
 import { Calendar, Car, Clock } from "lucide-react";
 import { UseFormGetValues, UseFormSetValue } from "react-hook-form";
-import { Checkbox } from "../ui/checkbox";
 
 interface Props {
 	activities: ActivityListOutput["activities"];
