@@ -1,9 +1,8 @@
 import InfiniteList from "@/components/shared/infinite-list";
 import ListPage from "@/components/shared/list-page";
-import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { Prisma, RateType } from "@prisma/client";
-import { Plus, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import Link from "next/link";
 
 const ItemCode = ({
@@ -40,16 +39,11 @@ function SupportItemList() {
 
 	return (
 		<ListPage>
-			<ListPage.Header>
-				<h2 className="mr-auto text-2xl font-bold">Support Items</h2>
+			<ListPage.Header
+				title="Support Items"
+				createNewHref="/dashboard/support-items/create"
+			/>
 
-				<Button asChild variant="inverted">
-					<Link href="/dashboard/support-items/create">
-						<Plus className="mr-2 h-4 w-4" />
-						Add
-					</Link>
-				</Button>
-			</ListPage.Header>
 			<InfiniteList queryResult={queryResult} dataKey="supportItems">
 				{(supportItems) =>
 					supportItems.map((supportItem) => (

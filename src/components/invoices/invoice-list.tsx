@@ -1,34 +1,26 @@
+import { DeleteEntityButton } from "@/components/shared/delete-entity-button";
 import InfiniteList from "@/components/shared/infinite-list";
 import ListFilterRow from "@/components/shared/list-filter-row";
 import ListPage from "@/components/shared/list-page";
 import { InvoiceStatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getTotalCostOfActivities } from "@/lib/activity-utils";
-import { trpc } from "@/lib/trpc";
-import { cn } from "@/lib/utils";
-import {
-	Download,
-	EllipsisVertical,
-	Mail,
-	Pencil,
-	Plus,
-	Trash,
-} from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { toast } from "react-toastify";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
+import { getTotalCostOfActivities } from "@/lib/activity-utils";
+import { trpc } from "@/lib/trpc";
+import { cn } from "@/lib/utils";
+import { Download, EllipsisVertical, Mail, Pencil } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import {
 	StatusFilter,
 	statusFilterMap,
 	statusFilters,
 } from "./invoice-list.constants";
-import LogPaymentDialog from "./log-payment-dialog";
 
 import dayjs from "dayjs";
 dayjs.extend(require("dayjs/plugin/utc"));
@@ -44,8 +36,6 @@ export default function InvoiceList({
 }: Props) {
 	const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
 
-	const trpcUtils = trpc.useUtils();
-
 	const queryResult = trpc.invoice.list.useInfiniteQuery(
 		{
 			status: statusFilterMap[statusFilter],
@@ -54,41 +44,12 @@ export default function InvoiceList({
 		{ getNextPageParam: (lastPage) => lastPage.nextCursor }
 	);
 
-	const deleteInvoiceMutation = trpc.invoice.delete.useMutation();
-
-	const deleteInvoice = (invoiceId: string) => {
-		if (confirm("Are you sure?")) {
-			deleteInvoiceMutation
-				.mutateAsync({ id: invoiceId })
-				.then(() => {
-					trpcUtils.invoice.list.invalidate();
-
-					toast.success("Invoice deleted");
-				})
-				.catch(() => {
-					toast.error("An error occured. Please refresh and try again.");
-				});
-		}
-	};
-
 	return (
 		<ListPage>
-			<ListPage.Header>
-				<h2 className="mr-auto text-2xl font-bold">Invoices</h2>
-
-				<LogPaymentDialog />
-
-				<Button asChild variant="inverted">
-					<Link
-						href={`/dashboard/invoices/create${
-							clientId ? `?clientId=${clientId}` : ""
-						}`}
-					>
-						<Plus className="mr-2 h-4 w-4" />
-						Add
-					</Link>
-				</Button>
-			</ListPage.Header>
+			<ListPage.Header
+				title="Invoices"
+				createNewHref="/dashboard/invoices/create"
+			/>
 
 			{groupByAssignedStatus && (
 				<ListFilterRow
@@ -166,13 +127,10 @@ export default function InvoiceList({
 										</DropdownMenuItem>
 									</Link>
 
-									<DropdownMenuItem
-										onClick={() => deleteInvoice(invoice.id)}
-										className="cursor-pointer"
-									>
-										<Trash className="mr-2 h-4 w-4" />
-										<span>Delete</span>
-									</DropdownMenuItem>
+									<DeleteEntityButton
+										entityId={invoice.id}
+										entityType={"invoice"}
+									/>
 								</DropdownMenuContent>
 							</DropdownMenu>
 						</div>

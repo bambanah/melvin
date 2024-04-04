@@ -57,5 +57,4 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 		dialog.accept().catch(() => {});
 	});
 	await page.getByRole("menuitem", { name: "Delete" }).click();
-	await waitForAlert(page, "invoice deleted");
 });

@@ -2,7 +2,6 @@ import InfiniteList from "@/components/shared/infinite-list";
 import ListFilterRow from "@/components/shared/list-filter-row";
 import ListPage from "@/components/shared/list-page";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import {
 	formatDuration,
@@ -13,7 +12,7 @@ import { groupBy } from "@/lib/generic-utils";
 import { trpc } from "@/lib/trpc";
 import { ActivityListOutput } from "@/server/api/routers/activity-router";
 import dayjs from "dayjs";
-import { Car, CircleDollarSign, Clock, Plus, User } from "lucide-react";
+import { Car, CircleDollarSign, Clock, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { assignedFilterMap, assignedFilters } from "./activity-list.constants";
@@ -45,18 +44,12 @@ function ActivityList({
 
 	return (
 		<ListPage>
-			<ListPage.Header>
-				<h2 className="mr-auto text-2xl font-bold">Activities</h2>
-
-				{displayCreateButton ? (
-					<Button asChild variant="inverted">
-						<Link href="/dashboard/activities/create">
-							<Plus className="mr-2 h-4 w-4" />
-							Add
-						</Link>
-					</Button>
-				) : undefined}
-			</ListPage.Header>
+			<ListPage.Header
+				title="Activities"
+				createNewHref={
+					displayCreateButton ? "/dashboard/activities/create" : undefined
+				}
+			/>
 
 			{groupByAssignedStatus && (
 				<ListFilterRow

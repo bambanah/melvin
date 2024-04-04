@@ -1,19 +1,12 @@
 import Skeleton from "react-loading-skeleton";
-import ListPage from "./list-page";
 import ListFilterRow from "./list-filter-row";
+import ListPage from "./list-page";
 
 const SkeletonLayout = () => {
 	return (
 		<ListPage>
-			<ListPage.Header>
-				<h2 className="mr-auto w-32 text-3xl font-bold">
-					<Skeleton />
-				</h2>
+			<ListPage.Header variant="skeleton" />
 
-				<div className="box-content h-6 w-24 border border-transparent py-2 text-4xl">
-					<Skeleton />
-				</div>
-			</ListPage.Header>
 			<ListFilterRow
 				items={Array.from({ length: 2 }).map(() => ({
 					children: <Skeleton />,

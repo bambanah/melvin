@@ -1,5 +1,11 @@
 import InvoiceList from "@/components/invoices/invoice-list";
 import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
 import { trpc } from "@/lib/trpc";
@@ -7,12 +13,6 @@ import { EllipsisVertical, ExternalLink, Pencil, Trash } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 
 const ClientPage = ({ clientId }: { clientId: string }) => {
 	const router = useRouter();
