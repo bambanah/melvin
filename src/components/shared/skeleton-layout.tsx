@@ -1,4 +1,4 @@
-import Skeleton from "react-loading-skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import ListFilterRow from "./list-filter-row";
 import ListPage from "./list-page";
 

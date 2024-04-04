@@ -7,8 +7,6 @@ import type { AppProps } from "next/app";
 import { Inter, Patua_One, Roboto_Mono } from "next/font/google";
 import Head from "next/head";
 
-import "react-loading-skeleton/dist/skeleton.css";
-
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
