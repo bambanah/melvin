@@ -1,9 +1,10 @@
-import { clientSchema } from "@/schema/client-schema";
-import { authedProcedure, router } from "@/server/api/trpc";
-import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { getNextInvoiceNo } from "@/lib/invoice-utils";
 import { baseListQueryInput } from "@/lib/trpc";
+import { clientSchema } from "@/schema/client-schema";
+import { authedProcedure, router } from "@/server/api/trpc";
+import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { z } from "zod";
+import { DEFAULT_LIST_LIMIT } from "./router.constants";
 
 const defaultClientSelect = {
 	id: true,
@@ -23,7 +24,7 @@ export const clientRouter = router({
 	list: authedProcedure
 		.input(baseListQueryInput)
 		.query(async ({ ctx, input }) => {
-			const limit = input.limit ?? 50;
+			const limit = input.limit ?? DEFAULT_LIST_LIMIT;
 			const { cursor } = input;
 
 			const clients = await ctx.prisma.client.findMany({

@@ -1,7 +1,7 @@
 import { DeleteEntityButton } from "@/components/shared/delete-entity-button";
 import ListPage from "@/components/shared/list-page";
 import { Button } from "@/components/ui/button";
-import DataTable from "@/components/ui/data-table";
+import DataTable, { SortingHeader } from "@/components/ui/data-table";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -17,20 +17,33 @@ import Link from "next/link";
 const columns: ColumnDef<ClientListOutput>[] = [
 	{
 		accessorKey: "name",
-		header: "Name",
+		header: ({ column }) => <SortingHeader column={column}>Name</SortingHeader>,
 		cell: ({ row }) => (
 			<Link href={`/dashboard/clients/${row.original.id}`}>
 				{row.getValue("name")}
 			</Link>
 		),
 	},
-	{ accessorKey: "number", header: "Number" },
+	{
+		accessorKey: "number",
+		header: ({ column }) => (
+			<SortingHeader column={column}>Number</SortingHeader>
+		),
+	},
 	{
 		accessorKey: "invoiceNumberPrefix",
-		header: "Invoice Prefix",
+		header: ({ column }) => (
+			<SortingHeader column={column}>Invoice Prefix</SortingHeader>
+		),
 		cell: ({ row }) => <div>{row.getValue("invoiceNumberPrefix")}##</div>,
 	},
-	{ accessorFn: (client) => client.invoices.length, header: "Invoices" },
+	{
+		id: "invoice-no",
+		accessorFn: (client) => client.invoices.length,
+		header: ({ column }) => (
+			<SortingHeader column={column}># Invoices</SortingHeader>
+		),
+	},
 	{
 		id: "actions",
 		cell: ({ row }) => {
