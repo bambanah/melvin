@@ -3,23 +3,33 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import Link, { LinkProps } from "next/link";
+import React from "react";
 
 type HeaderProps = {
 	title?: string;
 	createNewHref?: string;
 	variant?: "default" | "skeleton";
+	extraButtons?: React.ReactNode;
 };
 
-const Header = ({ title, createNewHref, variant = "default" }: HeaderProps) => (
+const Header = ({
+	title,
+	createNewHref,
+	extraButtons,
+	variant = "default",
+}: HeaderProps) => (
 	<div className="flex items-center justify-between gap-2 px-4 py-2">
 		{title && <h2 className="mr-auto text-2xl font-bold">{title}</h2>}
 		{createNewHref && (
-			<Button asChild variant="inverted">
-				<Link href={createNewHref}>
-					<Plus className="mr-2 h-4 w-4" />
-					Add
-				</Link>
-			</Button>
+			<>
+				{extraButtons}
+				<Button asChild variant="inverted">
+					<Link href={createNewHref}>
+						<Plus className="mr-2 h-4 w-4" />
+						Add
+					</Link>
+				</Button>
+			</>
 		)}
 
 		{variant === "skeleton" && (
@@ -61,7 +71,7 @@ const PageComponent = ({ children, className }: PageComponentProps) => {
 	return (
 		<div
 			className={cn([
-				"mx-auto flex w-full max-w-4xl flex-col gap-8",
+				"mx-auto flex w-full max-w-4xl flex-col gap-4",
 				className,
 			])}
 		>
