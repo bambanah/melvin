@@ -1,6 +1,33 @@
-import { Page, expect } from "@playwright/test";
+import prisma from "@/server/prisma";
+import { Page } from "@playwright/test";
+import { randomUUID } from "crypto";
+import { parse } from "date-fns";
+import dayjs from "dayjs";
 import { randomClient } from "./random/random-client";
 import { randomSupportItem } from "./random/random-support-item";
+
+export const testUser = {
+	id: "aa550280-2273-4e02-9a92-e0a99b3f67ba",
+	name: "Test User",
+	email: "test@user.com",
+	sessions: {
+		create: {
+			expires: dayjs().add(1, "month").toDate(),
+			sessionToken: randomUUID(),
+		},
+	},
+	account: {
+		create: {
+			type: "oauth",
+			provider: "google",
+			providerAccountId: randomUUID(),
+			access_token: "ggg_zZl1pWIvKkf3UDynZ09zLvuyZsm1yC0YoRPt",
+			token_type: "Bearer",
+			scope:
+				"https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile",
+		},
+	},
+};
 
 export async function waitForAlert(page: Page, text: string) {
 	return await page
@@ -10,58 +37,42 @@ export async function waitForAlert(page: Page, text: string) {
 		.click();
 }
 
-export async function createRandomSupportItem(page: Page) {
+export async function createRandomSupportItem() {
 	const supportItem = randomSupportItem();
 
-	await page.getByRole("link", { name: "Items" }).click();
-	await expect(page).toHaveURL("/dashboard/support-items");
-	await page.getByRole("link", { name: "Add" }).click();
-
-	await page.getByLabel("Description").fill(supportItem.description);
-	await page
-		.getByPlaceholder("XX_XXX_XXXX_X_X")
-		.first()
-		.fill(supportItem.weekdayCode);
-	await page.getByPlaceholder("rate").first().fill(supportItem.weekdayRate);
-	await page.getByRole("button", { name: "Create" }).click();
-
-	await waitForAlert(page, "support item created");
-
-	return supportItem;
+	return await prisma.supportItem.create({
+		data: {
+			...supportItem,
+			ownerId: testUser.id,
+		},
+	});
 }
 
-export async function createRandomClient(page: Page) {
+export async function createRandomClient() {
 	const client = randomClient();
 
-	await page.getByRole("link", { name: "Clients" }).click();
-	await expect(page).toHaveURL("/dashboard/clients");
-	await page.getByRole("link", { name: "Add" }).click();
+	const createdClient = await prisma.client.create({
+		data: {
+			...client,
+			ownerId: testUser.id,
+		},
+	});
 
-	await page.getByLabel("Participant Name").fill(client.name);
-	await page.getByRole("button", { name: "Create" }).click();
-
-	await waitForAlert(page, "client created");
-
-	return client;
+	return createdClient;
 }
 
 export async function createRandomActivity(
-	page: Page,
-	clientName: string,
-	supportItemDescription: string
+	clientId: string,
+	supportItemId: string
 ) {
-	await page.getByRole("link", { name: "Activities" }).nth(0).click();
-	await expect(page).toHaveURL("/dashboard/activities");
-	await page.getByRole("link", { name: "Add" }).click();
-
-	await page.getByText("Select a support item...").click();
-	await page.getByLabel(supportItemDescription).click();
-	await page.getByText("Select a client...").click();
-	await page.getByLabel(clientName).first().click();
-
-	await page.getByLabel("Start Time").fill("09:15");
-	await page.getByLabel("End Time").fill("15:23");
-	await page.getByRole("button", { name: "Create" }).click();
-
-	await waitForAlert(page, "activity created");
+	return await prisma.activity.create({
+		data: {
+			clientId,
+			supportItemId,
+			date: new Date(),
+			startTime: parse("09:15", "HH:mm", new Date()).toISOString(),
+			endTime: parse("15:23", "HH:mm", new Date()).toISOString(),
+			ownerId: testUser.id,
+		},
+	});
 }

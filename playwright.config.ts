@@ -1,7 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
-	globalSetup: "./e2e/setup/global-setup.ts",
+	globalSetup: "./e2e/setup/global.setup.ts",
 	use: {
 		headless: !!process.env.CI,
 		baseURL: "http://localhost:3000",

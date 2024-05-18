@@ -8,8 +8,8 @@ import {
 test("Can create, update, and delete activities", async ({ page }) => {
 	await page.goto("/dashboard");
 
-	const client = await createRandomClient(page);
-	const supportItem = await createRandomSupportItem(page);
+	const client = await createRandomClient();
+	const supportItem = await createRandomSupportItem();
 
 	await page.getByRole("link", { name: "Activities" }).nth(0).click();
 	await expect(page).toHaveURL("/dashboard/activities");
