@@ -21,10 +21,10 @@ import { cn } from "@/lib/utils";
 import { InvoiceSchema } from "@/schema/invoice-schema";
 import { format } from "date-fns";
 import {
-	ArrowDown,
 	ArrowRight,
-	ArrowUp,
 	CalendarIcon,
+	ChevronDown,
+	ChevronUp,
 	Clock,
 	Plus,
 	X,
@@ -66,7 +66,7 @@ const InvoiceActivityCreationForm = ({
 
 	const {
 		fields,
-		append: appendActivity,
+		append: appendActivityGroup,
 		remove,
 		update,
 	} = useFieldArray({
@@ -100,6 +100,16 @@ const InvoiceActivityCreationForm = ({
 			activities: [
 				...getValues().activitiesToCreate[newIndex].activities,
 				activityToMove,
+			],
+		});
+	};
+
+	const appendActivity = (idx: number) => {
+		update(idx, {
+			...getValues().activitiesToCreate[idx],
+			activities: [
+				...getValues().activitiesToCreate[idx].activities,
+				{ date: stripTimezone(new Date()) },
 			],
 		});
 	};
@@ -194,10 +204,12 @@ const InvoiceActivityCreationForm = ({
 													}
 													type="button"
 												>
-													<ArrowUp className="h-6 w-6" />
+													<ChevronUp className="h-6 w-6" />
 												</Button>
 												<Button
-													className={index === 0 ? "hidden" : ""}
+													className={
+														index === fields.length - 1 ? "hidden" : ""
+													}
 													variant="ghost"
 													size="icon"
 													onClick={() =>
@@ -205,7 +217,7 @@ const InvoiceActivityCreationForm = ({
 													}
 													type="button"
 												>
-													<ArrowDown className="h-6 w-6" />
+													<ChevronDown className="h-6 w-6" />
 												</Button>
 											</div>
 										)}
@@ -298,9 +310,7 @@ const InvoiceActivityCreationForm = ({
 								))}
 								<li>
 									<Button
-										onClick={() =>
-											field.activities.push({ date: stripTimezone(new Date()) })
-										}
+										onClick={() => appendActivity(index)}
 										className="mt-2 px-6"
 										variant="secondary"
 										type="button"
@@ -316,7 +326,7 @@ const InvoiceActivityCreationForm = ({
 
 			<Button
 				onClick={() =>
-					appendActivity({
+					appendActivityGroup({
 						supportItemId: "",
 						groupClientId: "",
 						activities: [{ date: stripTimezone(new Date()) }],
