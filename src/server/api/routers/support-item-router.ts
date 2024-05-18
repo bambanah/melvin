@@ -23,10 +23,15 @@ const defaultSupportItemSelect = {
 
 export const supportItemRouter = router({
 	list: authedProcedure
-		.input(baseListQueryInput.extend({ description: z.string().optional() }))
+		.input(
+			baseListQueryInput.extend({
+				description: z.string().optional(),
+				isGroup: z.boolean().optional(),
+			})
+		)
 		.query(async ({ ctx, input }) => {
 			const limit = input.limit ?? DEFAULT_LIST_LIMIT;
-			const { cursor, description } = input;
+			const { cursor, description, isGroup } = input;
 
 			const supportItems = await ctx.prisma.supportItem.findMany({
 				select: defaultSupportItemSelect,
@@ -39,6 +44,7 @@ export const supportItemRouter = router({
 								mode: "insensitive",
 							}
 						: undefined,
+					isGroup,
 				},
 				cursor: cursor ? { id: cursor } : undefined,
 				orderBy: {
