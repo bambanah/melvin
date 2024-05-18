@@ -32,7 +32,7 @@ async function globalSetup(config: FullConfig) {
 	await browser.close();
 
 	const globalTeardown = async () => {
-		await prisma.user.deleteMany({ where: { id: user.id } });
+		await prisma.user.delete({ where: { id: user.id } });
 	};
 
 	return globalTeardown;

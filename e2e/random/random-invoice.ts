@@ -1,7 +1,5 @@
+import { faker } from "@faker-js/faker";
 import dayjs from "dayjs";
-import { pickRandomFrom } from "@/lib/generic-utils";
-
-const BILL_TO = ["Corp Enterprises", "Enterprise Corp", "Company Two"];
 
 export const randomInvoice = ({
 	invoiceNo,
@@ -18,8 +16,8 @@ export const randomInvoice = ({
 } = {}) => ({
 	invoiceNo:
 		invoiceNo?.toString() ??
-		Math.floor(Math.random() * 999_999_999 + 1).toString(),
-	billTo: billTo ?? pickRandomFrom(BILL_TO),
+		faker.number.int({ min: 10000, max: 99999 }).toString(),
+	billTo: billTo ?? faker.company.name(),
 	activities: [
 		{
 			supportItemId: supportItemId ?? "",
@@ -28,8 +26,8 @@ export const randomInvoice = ({
 			date: dayjs().format("YYYY-MM-DD"),
 			startTime: "13:00",
 			endTime: "14:00",
-			transitDistance: "10",
-			transitDuration: "20",
+			transitDistance: faker.number.int({ min: 1, max: 20 }),
+			transitDuration: faker.number.int({ min: 1, max: 20 }),
 		},
 	],
 });
