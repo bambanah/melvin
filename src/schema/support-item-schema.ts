@@ -10,7 +10,7 @@ export const supportItemSchema = z.object({
 	id: z.string().optional(),
 
 	description: z.string().min(1, "Required"),
-	rateType: z.nativeEnum(RateType),
+	rateType: z.nativeEnum(RateType).default("HOUR"),
 	isGroup: z.boolean().optional(),
 
 	weekdayCode: zodItemCode.min(1, "Required"),

@@ -141,7 +141,7 @@ export default function InvoiceList({ clientId }: Props) {
 						</Tooltip>
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<Button variant="ghost" size="icon">
+								<Button variant="ghost" size="icon" data-testid="more-actions">
 									<MoreHorizontal />
 								</Button>
 							</DropdownMenuTrigger>

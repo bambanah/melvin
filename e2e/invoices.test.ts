@@ -9,9 +9,9 @@ import {
 
 test("Can create, update, and delete invoices", async ({ page }) => {
 	await page.goto("/dashboard");
-	const client = await createRandomClient(page);
-	const supportItem = await createRandomSupportItem(page);
-	await createRandomActivity(page, client.name, supportItem.description);
+	const client = await createRandomClient();
+	const supportItem = await createRandomSupportItem();
+	await createRandomActivity(client.id, supportItem.id);
 
 	const invoice = randomInvoice();
 	const newRandomInvoice = randomInvoice();
@@ -21,9 +21,14 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 	await page.getByRole("link", { name: "Add" }).click();
 
 	await page.getByLabel("Client").click();
-	await page.getByLabel(client.name).click();
+	await page.getByLabel(client.name).first().click();
 
-	await page.getByLabel("Invoice Number").fill(invoice.invoiceNo);
+	const invoiceNoInput = page.getByLabel("Invoice Number");
+	await expect(invoiceNoInput).toHaveValue(
+		client.invoiceNumberPrefix ? `${client.invoiceNumberPrefix}1` : ""
+	);
+	await invoiceNoInput.fill(invoice.invoiceNo);
+
 	await page
 		.getByText(supportItem.description, { exact: true })
 		.first()
@@ -33,11 +38,9 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 	await waitForAlert(page, "invoice created");
 
 	await page
-		.getByTestId("invoice-list-item")
-		.filter({
-			hasText: `${invoice.invoiceNo}: ${client.name}`,
-		})
-		.getByRole("button")
+		.getByRole("row")
+		.filter({ hasText: invoice.invoiceNo })
+		.getByTestId("more-actions")
 		.click();
 	await page.getByRole("menuitem", { name: "Edit" }).click();
 
@@ -47,11 +50,9 @@ test("Can create, update, and delete invoices", async ({ page }) => {
 	await page.getByRole("link", { name: "Invoices" }).click();
 
 	await page
-		.getByTestId("invoice-list-item")
-		.filter({
-			hasText: `${newRandomInvoice.invoiceNo}: ${client.name}`,
-		})
-		.getByRole("button")
+		.getByRole("row")
+		.filter({ hasText: newRandomInvoice.invoiceNo })
+		.getByTestId("more-actions")
 		.click();
 	page.once("dialog", (dialog) => {
 		dialog.accept().catch(() => {});
