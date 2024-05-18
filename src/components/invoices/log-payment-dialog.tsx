@@ -36,6 +36,7 @@ const LogPaymentDialog = () => {
 	const {
 		data: { invoiceIds, invoiceDetails } = {},
 		refetch: fetchMatchingInvoiceIds,
+		isLoading,
 	} = trpc.invoice.matchByPayment.useQuery(
 		{ paymentAmount: amountPaid ?? 0 },
 		{ enabled: false }
@@ -166,17 +167,18 @@ const LogPaymentDialog = () => {
 					}
 				/>
 
-				{amountPaid > 0 && !!invoiceIds?.length && (
-					<div className="flex flex-col gap-2 divide-y">
-						{invoiceIds.length > 1 && <p>Found multiple candidates.</p>}
-						{invoiceIds.map((candidates, idx) => (
-							<CombinationDisplay ids={candidates} key={idx} />
-						))}
-					</div>
-				)}
-				{amountPaid > 0 && !invoiceIds?.length && (
-					<p>No matching invoices found.</p>
-				)}
+				{amountPaid > 0 &&
+					!isLoading &&
+					(!!invoiceIds?.length ? (
+						<div className="flex flex-col gap-2 divide-y">
+							{invoiceIds.length > 1 && <p>Found multiple candidates.</p>}
+							{invoiceIds.map((candidates, idx) => (
+								<CombinationDisplay ids={candidates} key={idx} />
+							))}
+						</div>
+					) : (
+						<p>No matching invoices found.</p>
+					))}
 
 				<DialogFooter>
 					<DialogClose asChild>

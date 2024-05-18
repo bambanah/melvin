@@ -1,4 +1,3 @@
-import { ClientListOutput } from "@/server/api/routers/client-router";
 import {
 	Column,
 	ColumnDef,
@@ -31,12 +30,16 @@ const SortingIcon = ({ sorted }: { sorted: false | SortDirection }) => {
 	return <ArrowUpDown className="ml-2 h-4 w-4" />;
 };
 
-const SortingHeader = React.forwardRef<
-	HTMLButtonElement,
-	React.HTMLAttributes<HTMLButtonElement> & {
-		column: Column<ClientListOutput>;
-	}
->(({ column, children, ...props }, ref) => {
+const SortingHeaderInner = <T extends { id: string }>(
+	{
+		column,
+		children,
+		...props
+	}: React.HTMLAttributes<HTMLButtonElement> & {
+		column: Column<T>;
+	},
+	ref: React.ForwardedRef<HTMLButtonElement>
+) => {
 	const getNextSort = (sorted: false | SortDirection): boolean | undefined => {
 		if (sorted === false) return false;
 		if (sorted === "asc") return true;
@@ -56,8 +59,13 @@ const SortingHeader = React.forwardRef<
 			<SortingIcon sorted={column.getIsSorted()} />
 		</Button>
 	);
-});
-SortingHeader.displayName = "SortingHeader";
+};
+
+const SortingHeader = React.forwardRef(SortingHeaderInner) as <T>(
+	props: React.HTMLAttributes<HTMLButtonElement> & {
+		column: Column<T>;
+	} & { ref?: React.ForwardedRef<HTMLInputElement> }
+) => ReturnType<typeof SortingHeaderInner>;
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];

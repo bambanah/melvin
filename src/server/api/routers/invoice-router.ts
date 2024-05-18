@@ -431,7 +431,7 @@ export const invoiceRouter = router({
 
 export type InvoiceListOutput = inferRouterOutputs<
 	typeof invoiceRouter
->["list"];
+>["list"]["invoices"][0];
 
 export type InvoiceByIdOutput = inferRouterOutputs<
 	typeof invoiceRouter
