@@ -1,7 +1,4 @@
-import { pickRandomFrom } from "@/lib/generic-utils";
 import { faker } from "@faker-js/faker";
-
-const BILL_TO = ["Corp Enterprises", "Enterprise Corp", "Company Two"];
 
 export const randomClient = ({
 	name,
@@ -20,6 +17,6 @@ export const randomClient = ({
 			number?.toString() ??
 			Math.floor(Math.random() * 999_999_999 + 1).toString(),
 		invoiceNumberPrefix: `${clientName.split(" ").slice(-1)}-`,
-		billTo: billTo ?? pickRandomFrom(BILL_TO),
+		billTo: billTo ?? faker.company.name(),
 	};
 };
