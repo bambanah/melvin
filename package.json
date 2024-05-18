@@ -80,7 +80,7 @@
 		"react-day-picker": "^8.10.1",
 		"react-dom": "^18.3.1",
 		"react-hook-form": "^7.51.4",
-		"react-pdf": "^7.7.1",
+		"react-pdf": "^8.0.2",
 		"react-sizeme": "^3.0.2",
 		"react-toastify": "^10.0.5",
 		"superjson": "^2.0.0",

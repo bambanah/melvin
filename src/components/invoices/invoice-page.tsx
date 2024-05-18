@@ -5,7 +5,7 @@ import Loading from "@/components/ui/loading";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog, DialogPanel, Transition } from "@headlessui/react";
 import { InvoiceStatus } from "@prisma/client";
 import dayjs from "dayjs";
 import {
@@ -76,9 +76,9 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 						onClick={() => setIsPdfPreviewExpanded(false)}
 					/>
 					<div className="fixed inset-0 box-border flex w-screen justify-center overflow-y-auto">
-						<Dialog.Panel className="box-border h-full w-full max-w-4xl">
+						<DialogPanel className="box-border h-full w-full max-w-4xl">
 							<PdfPreview invoiceId={invoice.id} className="my-10" />
-						</Dialog.Panel>
+						</DialogPanel>
 					</div>
 				</Dialog>
 			</Transition>
