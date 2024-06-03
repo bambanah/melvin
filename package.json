@@ -96,7 +96,7 @@
 		"@next/bundle-analyzer": "^14.2.3",
 		"@playwright/test": "^1.44.0",
 		"@testing-library/jest-dom": "^6.4.5",
-		"@testing-library/react": "^15.0.7",
+		"@testing-library/react": "^16.0.0",
 		"@types/eslint": "^8.56.10",
 		"@types/file-saver": "^2.0.7",
 		"@types/jest": "^29.5.12",
