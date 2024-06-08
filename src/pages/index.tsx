@@ -8,7 +8,7 @@ const DashboardPage = () => {
 	return (
 		<main className="mx-auto flex w-full max-w-6xl flex-col items-stretch">
 			<nav className="flex items-center justify-between px-8 py-4">
-				<Logo>Melvin</Logo>
+				<Logo>melvin</Logo>
 				<ul className="flex items-center gap-4">
 					<li>
 						<Link href="/login">Log In</Link>
