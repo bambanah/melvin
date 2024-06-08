@@ -15,4 +15,5 @@ module.exports = withBundleAnalyzer({
 			},
 		];
 	},
+	output: "standalone",
 });
