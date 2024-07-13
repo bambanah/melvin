@@ -52,7 +52,7 @@ importers:
         version: 4.36.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-table':
         specifier: ^8.17.3
-        version: 8.19.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 8.19.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@trpc/client':
         specifier: ^10.45.2
         version: 10.45.2(@trpc/server@10.45.2)
@@ -425,6 +425,10 @@ packages:
 
   '@babel/runtime@7.24.7':
     resolution: {integrity: sha512-UwgBRMjJP+xv857DCngvqXI3Iq6J4v0wXmwc6sapg+zyhbwmQX67LUEFrkK5tbyJ30jGuG3ZvWpBiB9LCy1kWw==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/runtime@7.24.8':
+    resolution: {integrity: sha512-5F7SDGs1T72ZczbRwbGO9lQi0NLjQxzl6i4lJxLxfW9U5UluCSyEJeniWvnhl3/euNiqQVbo8zruhsDfid0esA==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.24.0':
@@ -1392,8 +1396,8 @@ packages:
       react-native:
         optional: true
 
-  '@tanstack/react-table@8.19.1':
-    resolution: {integrity: sha512-2jWJ2mhaXtBZ2h4k6azADFFrAPOGHw/fy/obIXwfCMFf63BKW/tHLp87oWDotFN/aKUo5Vj2cGBDRXfwTgiYPg==}
+  '@tanstack/react-table@8.19.2':
+    resolution: {integrity: sha512-itoSIAkA/Vsg+bjY23FSemcTyPhc5/1YjYyaMsr9QSH/cdbZnQxHVWrpWn0Sp2BWN71qkzR7e5ye8WuMmwyOjg==}
     engines: {node: '>=12'}
     peerDependencies:
       react: '>=16.8'
@@ -1405,8 +1409,8 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
 
-  '@tanstack/table-core@8.19.1':
-    resolution: {integrity: sha512-HePba/tRC6MCSHi8o9LktxpOfkV8u2hjGHllHNl5E6+/8mgtSuOSRr5VempH33qsYeIfgk42SiiayP777LZ9kQ==}
+  '@tanstack/table-core@8.19.2':
+    resolution: {integrity: sha512-KpRjhgehIhbfH78ARm/GJDXGnpdw4bCg3qas6yjWSi7czJhI/J6pWln7NHtmBkGE9ZbohiiNtLqwGzKmBfixig==}
     engines: {node: '>=12'}
 
   '@tanstack/virtual-core@3.5.0':
@@ -4928,6 +4932,10 @@ snapshots:
     dependencies:
       regenerator-runtime: 0.14.1
 
+  '@babel/runtime@7.24.8':
+    dependencies:
+      regenerator-runtime: 0.14.1
+
   '@babel/template@7.24.0':
     dependencies:
       '@babel/code-frame': 7.24.2
@@ -5987,9 +5995,9 @@ snapshots:
     optionalDependencies:
       react-dom: 18.3.1(react@18.3.1)
 
-  '@tanstack/react-table@8.19.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@tanstack/react-table@8.19.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@tanstack/table-core': 8.19.1
+      '@tanstack/table-core': 8.19.2
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -5999,14 +6007,14 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@tanstack/table-core@8.19.1': {}
+  '@tanstack/table-core@8.19.2': {}
 
   '@tanstack/virtual-core@3.5.0': {}
 
   '@testing-library/dom@10.1.0':
     dependencies:
       '@babel/code-frame': 7.24.7
-      '@babel/runtime': 7.24.7
+      '@babel/runtime': 7.24.8
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       chalk: 4.1.2
