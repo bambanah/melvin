@@ -133,6 +133,7 @@ export default function InvoiceList({ clientId }: Props) {
 							<a
 								href={`/api/invoices/generate-pdf/${invoice.id}`}
 								target="_blank"
+								download
 							>
 								<Button variant="ghost" size="icon">
 									<Download className="h-4 w-4" />
