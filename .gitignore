@@ -12,6 +12,7 @@ yarn-error.log
 e2e/setup/storage-state.json
 .swc
 analyze/
+.idea/
 
 next-env.d.ts
 .vercel

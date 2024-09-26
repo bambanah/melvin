@@ -1,5 +1,15 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": ["config:base"],
-	"schedule": "every weekend"
+	"schedule": "every weekend",
+	"packageRules": [
+		{
+			"enabled": false,
+			"matchPackagePatterns": ["*"]
+		}
+	],
+	"vulnerabilityAlerts": {
+		"enabled": true
+	},
+	"osvVulnerabilityAlerts": true
 }
