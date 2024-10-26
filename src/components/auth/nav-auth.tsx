@@ -34,7 +34,7 @@ const NavAuth = () => {
 							<span>Settings</span>
 						</DropdownMenuItem>
 					</Link>
-					<Link href="/price-guide-22-23.pdf" target="_blank">
+					<Link href="/price-guide-24-25.pdf" target="_blank">
 						<DropdownMenuItem className="cursor-pointer">
 							<File className="mr-2 h-4 w-4" />
 							<span>Price Guide</span>
