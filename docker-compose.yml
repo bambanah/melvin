@@ -1,6 +1,6 @@
 services:
   postgres-db:
-    container_name: postgres-db
+    container_name: melvin-db
     image: postgres:16
     ports:
       - "5432:5432"
