@@ -28,9 +28,11 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 
 			<LoginForm />
 
-			<div className="flex w-full flex-nowrap items-center justify-center gap-4 text-sm text-foreground before:grow before:border-t before:border-foreground/50 before:content-[''] after:grow after:border-t after:border-foreground/50 after:content-['']">
-				OR
-			</div>
+			{providers && (
+				<div className="flex w-full flex-nowrap items-center justify-center gap-4 text-sm text-foreground before:grow before:border-t before:border-foreground/50 before:content-[''] after:grow after:border-t after:border-foreground/50 after:content-['']">
+					OR
+				</div>
+			)}
 
 			{providers &&
 				Object.values(providers)
