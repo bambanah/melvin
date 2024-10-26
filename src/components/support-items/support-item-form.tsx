@@ -109,7 +109,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 										</FormControl>
 										<FormDescription>
 											The official description from the{" "}
-											<a href="/price-guide-22-23.pdf">Price Guide</a>
+											<a href="/price-guide-24-25.pdf">Price Guide</a>
 										</FormDescription>
 										<FormMessage />
 									</FormItem>
