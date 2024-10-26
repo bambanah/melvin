@@ -1,6 +1,7 @@
 import InfiniteList from "@/components/shared/infinite-list";
 import ListPage from "@/components/shared/list-page";
 import { trpc } from "@/lib/trpc";
+import { decimalToCurrencyString } from "@/lib/utils";
 import { Prisma, RateType } from "@prisma/client";
 import { Users } from "lucide-react";
 import Link from "next/link";
@@ -23,11 +24,7 @@ const ItemCode = ({
 			{rate && (
 				<>
 					<span className="text-foreground/40">{"// "}</span>
-					{Number(rate).toLocaleString(undefined, {
-						style: "currency",
-						currency: "AUD",
-					})}
-					/{rateType === "KM" ? "km" : "hr"}
+					{decimalToCurrencyString(rate)}/{rateType === "KM" ? "km" : "hr"}
 				</>
 			)}
 		</div>

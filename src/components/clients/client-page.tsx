@@ -1,3 +1,4 @@
+import SupportItemOverrideDialog from "@/components/clients/support-item-override-dialog";
 import InvoiceList from "@/components/invoices/invoice-list";
 import { Button } from "@/components/ui/button";
 import {
@@ -50,7 +51,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 					<Heading>{client.name}</Heading>
 
 					<DropdownMenu>
-						<DropdownMenuTrigger asChild className="grow-0 ">
+						<DropdownMenuTrigger asChild className="grow-0">
 							<Button variant="ghost" size="icon">
 								<EllipsisVertical />
 							</Button>
@@ -135,6 +136,10 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 					) : (
 						<p className="text-foreground/50">Not set</p>
 					)}
+				</div>
+				<div className="space-y-2">
+					<h3 className="font-semibold">Custom Rates</h3>
+					<SupportItemOverrideDialog />
 				</div>
 			</div>
 
