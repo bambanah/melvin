@@ -11,7 +11,7 @@ import {
 export interface InputProps<T extends FieldValues>
 	extends React.InputHTMLAttributes<HTMLInputElement> {
 	register?: UseFormRegister<T>;
-	rules?: RegisterOptions;
+	rules?: RegisterOptions<T>;
 	name?: Path<T>;
 }
 
