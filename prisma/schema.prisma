@@ -47,23 +47,24 @@ model VerificationToken {
 }
 
 model User {
-  id            String        @id @default(cuid())
-  email         String?       @unique
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @default(now()) @updatedAt
-  name          String?
-  emailVerified DateTime?
-  image         String?
-  abn           BigInt?
-  bankName      String?
-  bankNumber    BigInt?
-  bsb           Int?
-  account       Account?
-  sessions      Session[]
-  clients       Client[]
-  invoices      Invoice[]
-  supportItems  SupportItem[]
-  activities    Activity[]
+  id               String             @id @default(cuid())
+  email            String?            @unique
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @default(now()) @updatedAt
+  name             String?
+  emailVerified    DateTime?
+  image            String?
+  abn              BigInt?
+  bankName         String?
+  bankNumber       BigInt?
+  bsb              Int?
+  account          Account?
+  sessions         Session[]
+  clients          Client[]
+  invoices         Invoice[]
+  supportItems     SupportItem[]
+  activities       Activity[]
+  SupportItemRates SupportItemRates[]
 }
 
 model Client {
@@ -83,7 +84,8 @@ model Client {
   ownerId             String
   invoices            Invoice[]
   activities          Activity[]
-  owner               User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner               User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  SupportItemRates    SupportItemRates[]
 
   @@index([ownerId])
 }
@@ -134,25 +136,49 @@ model Activity {
 }
 
 model SupportItem {
-  id            String     @id @default(cuid())
-  createdAt     DateTime   @default(now()) @map("created")
-  updatedAt     DateTime   @default(now()) @updatedAt
-  description   String
-  rateType      RateType   @default(HOUR)
-  isGroup       Boolean?
-  weekdayCode   String
-  weeknightCode String?
-  saturdayCode  String?
-  sundayCode    String?
-  weekdayRate   Decimal
+  id               String             @id @default(cuid())
+  createdAt        DateTime           @default(now()) @map("created")
+  updatedAt        DateTime           @default(now()) @updatedAt
+  description      String
+  rateType         RateType           @default(HOUR)
+  isGroup          Boolean?
+  weekdayCode      String
+  weeknightCode    String?
+  saturdayCode     String?
+  sundayCode       String?
+  weekdayRate      Decimal
+  weeknightRate    Decimal?
+  saturdayRate     Decimal?
+  sundayRate       Decimal?
+  ownerId          String
+  activities       Activity[]
+  owner            User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  SupportItemRates SupportItemRates[]
+
+  @@index([ownerId])
+}
+
+model SupportItemRates {
+  id String @id @default(cuid())
+
+  supportItemId String
+  ownerId       String?
+  clientId      String?
+
+  supportItem SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
+  owner       User?       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  client      Client?     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  rateType RateType @default(HOUR)
+
+  weekdayRate   Decimal?
   weeknightRate Decimal?
   saturdayRate  Decimal?
   sundayRate    Decimal?
-  ownerId       String
-  activities    Activity[]
-  owner         User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
+  @@index([supportItemId])
   @@index([ownerId])
+  @@index([clientId])
 }
 
 enum InvoiceStatus {

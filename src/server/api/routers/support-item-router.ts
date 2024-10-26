@@ -1,4 +1,5 @@
 import { baseListQueryInput } from "@/lib/trpc";
+import { supportItemRatesSchema } from "@/schema/support-item-rates-schema";
 import { supportItemSchema } from "@/schema/support-item-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
 import { Prisma } from "@prisma/client";
@@ -110,6 +111,57 @@ export const supportItemRouter = router({
 			}
 
 			return supportItem;
+		}),
+	addCustomRates: authedProcedure
+		.input(
+			z.object({
+				supportItemRates: supportItemRatesSchema.extend({
+					clientId: z.string().optional(),
+				}),
+			})
+		)
+		.mutation(async ({ ctx, input }) => {
+			const customRates = await ctx.prisma.supportItemRates.create({
+				data: {
+					...input.supportItemRates,
+					ownerId: ctx.session.user.id,
+				},
+			});
+
+			if (!customRates) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Couldn't create custom support item rates",
+				});
+			}
+
+			return customRates;
+		}),
+	getCustomRatesForClient: authedProcedure
+		.input(z.object({ id: z.string() }))
+		.query(async ({ ctx, input }) => {
+			const customRates = await ctx.prisma.supportItemRates.findMany({
+				where: {
+					ownerId: ctx.session.user.id,
+					clientId: input.id,
+				},
+				include: {
+					supportItem: {
+						select: {
+							description: true,
+						},
+					},
+				},
+			});
+
+			if (!customRates) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Couldn't find custom support item rates",
+				});
+			}
+
+			return customRates;
 		}),
 	update: authedProcedure
 		.input(

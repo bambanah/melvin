@@ -20,21 +20,25 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { trpc } from "@/lib/trpc";
 import { decimalToCurrencyString } from "@/lib/utils";
+import {
+	SupportItemRatesSchema,
+	supportItemRatesSchema,
+} from "@/schema/support-item-rates-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { PlusIcon } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { toast } from "react-toastify";
 
-const formSchema = z.object({
-	supportItemId: z.string(),
-	weekdayRate: z.coerce.number().step(0.01).optional(),
-	weeknightRate: z.coerce.number().step(0.01).optional(),
-	saturdayRate: z.coerce.number().step(0.01).optional(),
-	sundayRate: z.coerce.number().step(0.01).optional(),
-});
+interface Props {
+	clientId: string;
+}
 
-const SupportItemOverrideDialog = () => {
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema),
+const SupportItemOverrideDialog = ({ clientId }: Props) => {
+	const [open, setOpen] = useState(false);
+
+	const form = useForm<SupportItemRatesSchema>({
+		resolver: zodResolver(supportItemRatesSchema),
 		defaultValues: {
 			supportItemId: "",
 		},
@@ -46,13 +50,27 @@ const SupportItemOverrideDialog = () => {
 		},
 		{ enabled: !!form.watch("supportItemId") }
 	);
+	const { mutate: addCustomRates } =
+		trpc.supportItem.addCustomRates.useMutation();
 
-	function onSubmit(values: z.infer<typeof formSchema>) {
-		alert(JSON.stringify(values));
+	function onSubmit(values: SupportItemRatesSchema) {
+		addCustomRates(
+			{ supportItemRates: { ...values, clientId } },
+			{
+				onSuccess: () => {
+					setOpen(false);
+				},
+				onError: (e) => {
+					toast.error(e.message);
+				},
+			}
+		);
 	}
 
 	function handleOpenChange(open: boolean) {
 		if (!open) {
+			setOpen(false);
+
 			// Use timeout to prevent layout shifts when clearing before closing animation complete
 			setTimeout(() => {
 				form.reset();
@@ -61,8 +79,12 @@ const SupportItemOverrideDialog = () => {
 	}
 
 	return (
-		<Dialog onOpenChange={handleOpenChange}>
-			<DialogTrigger>Add Custom Rates</DialogTrigger>
+		<Dialog open={open} onOpenChange={handleOpenChange}>
+			<DialogTrigger asChild>
+				<Button size="sm" onClick={() => setOpen(true)} variant="secondary">
+					<PlusIcon className="mr-2 h-4 w-4" /> Add Custom Rates
+				</Button>
+			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader className="sm:max-w-[425px]">
 					<DialogTitle>Add Custom Rates</DialogTitle>
