@@ -64,7 +64,7 @@ model User {
   invoices         Invoice[]
   supportItems     SupportItem[]
   activities       Activity[]
-  SupportItemRates SupportItemRates[]
+  supportItemRates SupportItemRates[]
 }
 
 model Client {
@@ -159,17 +159,18 @@ model SupportItem {
 }
 
 model SupportItemRates {
-  id String @id @default(cuid())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   supportItemId String
-  ownerId       String?
-  clientId      String?
+  supportItem   SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
 
-  supportItem SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
-  owner       User?       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  client      Client?     @relation(fields: [clientId], references: [id], onDelete: Cascade)
-
-  rateType RateType @default(HOUR)
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   weekdayRate   Decimal?
   weeknightRate Decimal?
