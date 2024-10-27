@@ -7,6 +7,7 @@ import { formatDuration, getDuration } from "./date-utils";
 import { round } from "./generic-utils";
 import { getInvoiceFileName } from "./invoice-utils";
 import { getNonLabourTravelCode } from "./support-item-utils";
+import { parseInvoice } from "@/server/api/routers/invoice-router";
 
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
@@ -15,7 +16,6 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 import "@/fonts/Inter-normal";
-import { parseInvoice } from "@/server/api/routers/invoice-router";
 
 const generatePDF = async (invoiceId: string) => {
 	const client = await prisma.invoice
