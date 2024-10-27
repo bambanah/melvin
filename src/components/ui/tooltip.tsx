@@ -10,7 +10,7 @@ const Tooltip = React.forwardRef<
 >(({ className, children, title, sideOffset = 4, ...props }, ref) => (
 	<TooltipPrimitive.Provider>
 		<TooltipPrimitive.Root>
-			<TooltipPrimitive.Trigger>{children}</TooltipPrimitive.Trigger>
+			<TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
 			<TooltipPrimitive.Content
 				ref={ref}
 				sideOffset={sideOffset}

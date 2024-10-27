@@ -163,6 +163,50 @@ export const supportItemRouter = router({
 
 			return customRates;
 		}),
+	updateCustomRate: authedProcedure
+		.input(
+			z.object({
+				id: z.string(),
+				supportItemRates: supportItemRatesSchema.partial(),
+			})
+		)
+		.mutation(async ({ ctx, input }) => {
+			const customRate = await ctx.prisma.supportItemRates.update({
+				where: {
+					id: input.id,
+				},
+				data: {
+					...input.supportItemRates,
+				},
+			});
+
+			if (!customRate) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Couldn't update custom support item rate",
+				});
+			}
+
+			return customRate;
+		}),
+	deleteCustomRate: authedProcedure
+		.input(z.object({ id: z.string() }))
+		.mutation(async ({ ctx, input }) => {
+			const customRate = await ctx.prisma.supportItemRates.delete({
+				where: {
+					id: input.id,
+				},
+			});
+
+			if (!customRate) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Couldn't delete custom support item rate",
+				});
+			}
+
+			return customRate;
+		}),
 	update: authedProcedure
 		.input(
 			z.object({
