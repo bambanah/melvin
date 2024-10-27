@@ -1,21 +1,25 @@
-import "@/styles/globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
-import { Inter, Patua_One, Roboto_Mono } from "next/font/google";
+import { Inter, Noto_Serif, Patua_One, Roboto_Mono } from "next/font/google";
 import Head from "next/head";
+
+import "@/styles/globals.css";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-import { ThemeProvider } from "@/components/theme-provider";
 
 // Google fonts
 const inter = Inter({
 	subsets: ["latin"],
 	variable: "--font-inter",
+});
+const notoSerif = Noto_Serif({
+	subsets: ["latin"],
+	variable: "--font-noto-serif",
 });
 const patuaOne = Patua_One({
 	subsets: ["latin"],
@@ -29,17 +33,11 @@ const robotoMono = Roboto_Mono({
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 	return (
-		<main
-			className={cn(
-				"min-h-screen bg-background font-sans antialiased",
-				inter.variable,
-				patuaOne.variable,
-				robotoMono.variable
-			)}
-		>
+		<main className={cn("min-h-screen antialiased")}>
 			<style jsx global>{`
 				:root {
 					--font-inter: ${inter.style.fontFamily};
+					--font-noto-serif: ${notoSerif.style.fontFamily};
 					--font-patua-one: ${patuaOne.style.fontFamily};
 					--font-roboto-mono: ${robotoMono.style.fontFamily};
 				}
