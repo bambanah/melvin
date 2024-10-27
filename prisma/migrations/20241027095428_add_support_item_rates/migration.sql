@@ -1,10 +1,11 @@
 -- CreateTable
 CREATE TABLE "SupportItemRates" (
     "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "ownerId" TEXT NOT NULL,
     "supportItemId" TEXT NOT NULL,
-    "ownerId" TEXT,
     "clientId" TEXT,
-    "rateType" "RateType" NOT NULL DEFAULT 'HOUR',
     "weekdayRate" DECIMAL(65,30),
     "weeknightRate" DECIMAL(65,30),
     "saturdayRate" DECIMAL(65,30),

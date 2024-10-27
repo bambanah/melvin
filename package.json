@@ -13,7 +13,7 @@
 		"build-ci": "run-s build:* prisma:deploy",
 		"db:up": "docker compose up -d",
 		"db:down": "docker compose down",
-		"db:nuke": "docker compose down --volumes --remove-orphans",
+		"db:nuke": "docker compose down --volumes --remove-orphans && pnpm db:up",
 		"prisma:push": "prisma db push",
 		"prisma:seed": "prisma db seed",
 		"prisma:generate": "prisma generate",
