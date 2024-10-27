@@ -145,7 +145,7 @@ const SupportItemOverrideDialog = ({ clientId }: Props) => {
 												placeholder={
 													supportItem?.[accessor]
 														? Number(supportItem?.[accessor]).toFixed(2)
-														: "12"
+														: undefined
 												}
 												{...field}
 											/>

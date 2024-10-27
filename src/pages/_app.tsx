@@ -1,6 +1,5 @@
 import { ThemeProvider } from "@/components/theme-provider";
 import { trpc } from "@/lib/trpc";
-import { cn } from "@/lib/utils";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
@@ -33,7 +32,7 @@ const robotoMono = Roboto_Mono({
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 	return (
-		<main className={cn("min-h-screen antialiased")}>
+		<main className="min-h-screen antialiased">
 			<style jsx global>{`
 				:root {
 					--font-inter: ${inter.style.fontFamily};
