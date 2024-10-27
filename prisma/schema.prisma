@@ -85,7 +85,7 @@ model Client {
   invoices            Invoice[]
   activities          Activity[]
   owner               User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  SupportItemRates    SupportItemRates[]
+  supportItemRates    SupportItemRates[]
 
   @@index([ownerId])
 }
@@ -153,7 +153,7 @@ model SupportItem {
   ownerId          String
   activities       Activity[]
   owner            User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  SupportItemRates SupportItemRates[]
+  supportItemRates SupportItemRates[]
 
   @@index([ownerId])
 }

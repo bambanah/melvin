@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, SupportItem, SupportItemRates } from "@prisma/client";
 import { getDuration } from "./date-utils";
 import { round } from "./generic-utils";
 
@@ -13,74 +13,104 @@ interface Activity {
 	itemDistance?: number | null;
 	transitDistance?: Prisma.Decimal | null;
 	transitDuration?: Prisma.Decimal | null;
-	supportItem: {
+	supportItem: Pick<
+		SupportItem,
+		| "weekdayCode"
+		| "weeknightCode"
+		| "saturdayCode"
+		| "sundayCode"
+		| "weekdayRate"
+		| "weeknightRate"
+		| "saturdayRate"
+		| "sundayRate"
+	> & {
+		supportItemRates?: Pick<
+			SupportItemRates,
+			"weekdayRate" | "weeknightRate" | "saturdayRate" | "sundayRate"
+		>[];
 		description?: string;
-		weekdayCode: string;
-		weekdayRate: Prisma.Decimal | string;
-		weeknightCode?: string | null;
-		weeknightRate?: Prisma.Decimal | null;
-		saturdayCode?: string | null;
-		saturdayRate?: Prisma.Decimal | null;
-		sundayCode?: string | null;
-		sundayRate?: Prisma.Decimal | null;
 	};
 }
 
-export const getRate = (activity: Activity): [code: string, rate: number] => {
-	let rate = new Prisma.Decimal(0);
-	let itemCode = "";
+const getRateForDay = (
+	day: "weekday" | "weeknight" | "saturday" | "sunday",
+	supportItem: Activity["supportItem"],
+	supportItemRates?: Activity["supportItem"]["supportItemRates"]
+) => {
+	const customRate = supportItemRates?.find((r) => r[`${day}Rate`])?.[
+		`${day}Rate`
+	];
 
+	return customRate || supportItem[`${day}Rate`];
+};
+
+export const getRateForActivity = (
+	activity: Activity
+): [code: string, rate: number] => {
+	// Saturday
 	if (
 		dayjs.utc(activity.date).day() === 6 &&
-		activity.supportItem.saturdayRate &&
 		activity.supportItem.saturdayCode?.length
 	) {
-		// Saturday
-		rate =
-			typeof activity.supportItem.saturdayRate === "string"
-				? new Prisma.Decimal(activity.supportItem.saturdayRate)
-				: activity.supportItem.saturdayRate;
-		itemCode = activity.supportItem.saturdayCode;
-	} else if (
-		dayjs.utc(activity.date).day() === 0 &&
-		activity.supportItem.sundayRate &&
-		activity.supportItem.sundayRate &&
-		activity.supportItem.sundayCode?.length
-	) {
-		// Sunday
-		rate =
-			typeof activity.supportItem.sundayRate === "string"
-				? new Prisma.Decimal(activity.supportItem.sundayRate)
-				: activity.supportItem.sundayRate;
-		itemCode = activity.supportItem.sundayCode;
-	} else if (
-		activity.endTime &&
-		activity.supportItem.weeknightCode?.length &&
-		activity.supportItem.weeknightRate &&
-		dayjs.utc(activity.endTime).hour() >= 19
-	) {
-		// Day is a weekday and it's after 8pm
-		rate =
-			typeof activity.supportItem.weeknightRate === "string"
-				? new Prisma.Decimal(activity.supportItem.weeknightRate)
-				: activity.supportItem.weeknightRate;
-		itemCode = activity.supportItem.weeknightCode;
-	} else {
-		// Weekday before 8pm
-		rate =
-			typeof activity.supportItem.weekdayRate === "string"
-				? new Prisma.Decimal(activity.supportItem.weekdayRate)
-				: activity.supportItem.weekdayRate;
-		itemCode = activity.supportItem.weekdayCode;
+		const rate = getRateForDay(
+			"saturday",
+			activity.supportItem,
+			activity.supportItem.supportItemRates
+		);
+
+		if (rate) {
+			return [activity.supportItem.saturdayCode, Number(rate)];
+		}
 	}
 
-	return [itemCode, Number(rate)];
+	// Sunday
+	if (
+		dayjs.utc(activity.date).day() === 0 &&
+		activity.supportItem.sundayCode?.length
+	) {
+		const rate = getRateForDay(
+			"sunday",
+			activity.supportItem,
+			activity.supportItem.supportItemRates
+		);
+
+		if (rate) {
+			return [activity.supportItem.sundayCode, Number(rate)];
+		}
+	}
+
+	if (
+		activity.endTime &&
+		dayjs.utc(activity.endTime).hour() >= 19 &&
+		activity.supportItem.weeknightCode?.length &&
+		activity.supportItem.weeknightRate
+	) {
+		// Day is a weekday and it's after 8pm
+		const rate = getRateForDay(
+			"weeknight",
+			activity.supportItem,
+			activity.supportItem.supportItemRates
+		);
+
+		if (rate) {
+			return [activity.supportItem.weeknightCode, Number(rate)];
+		}
+	}
+
+	// Weekday before 8pm
+	const rate = getRateForDay(
+		"weekday",
+		activity.supportItem,
+		activity.supportItem.supportItemRates
+	);
+
+	return [activity.supportItem.weekdayCode, Number(rate)];
 };
 
 export const getTotalCostOfActivities = (activities: Activity[]) => {
 	const grandTotal = activities
 		.map((activity) => {
-			const [, rate] = getRate(activity);
+			const [, rate] = getRateForActivity(activity);
 
 			let subTotal = 0;
 

@@ -32,7 +32,7 @@ const defaultInvoiceSelect = {
 	},
 };
 
-function parseInvoice<T extends Partial<Invoice>>(
+export function parseInvoice<T extends Partial<Invoice>>(
 	invoice: T
 ): Omit<T, "date"> & { date?: string } {
 	return {

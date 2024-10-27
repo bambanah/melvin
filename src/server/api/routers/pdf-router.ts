@@ -1,8 +1,7 @@
+import generatePDF from "@/lib/pdf-generation";
 import { authedProcedure, router } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import generatePDF from "@/lib/pdf-generation";
 import { z } from "zod";
-import { invoiceRouter } from "./invoice-router";
 
 export const pdfRouter = router({
 	forInvoice: authedProcedure
@@ -12,23 +11,16 @@ export const pdfRouter = router({
 				returnBase64: z.boolean().nullish(),
 			})
 		)
-		.query(async ({ ctx, input }) => {
-			const { invoiceId, returnBase64: base64 } = input;
+		.query(async ({ input }) => {
+			const { invoiceId, returnBase64 } = input;
 
-			const invoiceCaller = invoiceRouter.createCaller(ctx);
-			const invoices = await invoiceCaller.byId({ id: invoiceId });
-
-			if (!invoices) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
-
-			const { pdfString } = await generatePDF(invoices);
+			const { pdfString } = await generatePDF(invoiceId);
 
 			if (!pdfString) {
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			if (base64) {
+			if (returnBase64) {
 				return `data:application/pdf;base64,${pdfString}`;
 			}
 

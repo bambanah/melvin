@@ -1,5 +1,8 @@
 import { Prisma } from "@prisma/client";
-import { getRate, getTotalCostOfActivities } from "@/lib/activity-utils";
+import {
+	getRateForActivity,
+	getTotalCostOfActivities,
+} from "@/lib/activity-utils";
 import { formatDuration, getDuration } from "@/lib/date-utils";
 import { round } from "@/lib/generic-utils";
 import { getHighestInvoiceNo, getNextInvoiceNo } from "@/lib/invoice-utils";
@@ -130,56 +133,106 @@ describe("Helpers", () => {
 		expect(round(305.085, 2)).toEqual(305.09);
 	});
 
+	const baseActivity = {
+		date: new Date("2022-01-14"),
+		startTime: dayjs.utc("1970-01-01T15:00").toDate(),
+		endTime: dayjs.utc("1970-01-01T17:00").toDate(),
+		transitDuration: new Prisma.Decimal(7),
+		transitDistance: new Prisma.Decimal(15),
+		itemDistance: null,
+		supportItem: {
+			weekdayCode: "weekday",
+			weekdayRate: new Prisma.Decimal(1),
+			weeknightCode: "weeknight",
+			weeknightRate: new Prisma.Decimal(2),
+			saturdayCode: "saturday",
+			saturdayRate: new Prisma.Decimal(3),
+			sundayCode: "sunday",
+			sundayRate: new Prisma.Decimal(4),
+		},
+	};
+
 	it("Should return correct rates", () => {
-		const activity = {
-			date: new Date("2022-01-14"),
-			startTime: dayjs.utc("1970-01-01T15:00").toDate(),
-			endTime: dayjs.utc("1970-01-01T17:00").toDate(),
-			transitDuration: new Prisma.Decimal(7),
-			transitDistance: new Prisma.Decimal(15),
-			itemDistance: null,
-			supportItem: {
-				weekdayCode: "weekday",
-				weekdayRate: new Prisma.Decimal(1),
-				weeknightCode: "weeknight",
-				weeknightRate: new Prisma.Decimal(2),
-				saturdayCode: "saturday",
-				saturdayRate: new Prisma.Decimal(3),
-				sundayCode: "sunday",
-				sundayRate: new Prisma.Decimal(4),
-			},
-		};
+		const activity = { ...baseActivity };
 
 		// Regular weekday - weekday
-		expect(getRate(activity)).toEqual(["weekday", 1]);
+		expect(getRateForActivity(activity)).toEqual(["weekday", 1]);
 
 		// After 8pm - weeknight
 		activity.endTime = dayjs.utc("1970-01-01T20:10").toDate();
-		expect(getRate(activity)).toEqual(["weeknight", 2]);
+		expect(getRateForActivity(activity)).toEqual(["weeknight", 2]);
 
 		// At 8pm - weeknight
 		activity.endTime = dayjs.utc("1970-01-01T20:00").toDate();
-		expect(getRate(activity)).toEqual(["weeknight", 2]);
+		expect(getRateForActivity(activity)).toEqual(["weeknight", 2]);
 
 		// Saturday - saturday
 		activity.date = new Date("2022-01-15");
 		activity.endTime = dayjs.utc("1970-01-01T15:10").toDate();
-		expect(getRate(activity)).toEqual(["saturday", 3]);
+		expect(getRateForActivity(activity)).toEqual(["saturday", 3]);
 
 		// Saturday night - saturday
 		activity.date = new Date("2022-01-15");
 		activity.endTime = dayjs.utc("1970-01-01T20:10").toDate();
-		expect(getRate(activity)).toEqual(["saturday", 3]);
+		expect(getRateForActivity(activity)).toEqual(["saturday", 3]);
 
 		// Sunday - sunday
 		activity.date = new Date("2022-01-16");
 		activity.endTime = dayjs.utc("1970-01-01T15:10").toDate();
-		expect(getRate(activity)).toEqual(["sunday", 4]);
+		expect(getRateForActivity(activity)).toEqual(["sunday", 4]);
 
 		// Sunday night - sunday
 		activity.date = new Date("2022-01-16");
 		activity.endTime = dayjs.utc("1970-01-01T20:10").toDate();
-		expect(getRate(activity)).toEqual(["sunday", 4]);
+		expect(getRateForActivity(activity)).toEqual(["sunday", 4]);
+	});
+
+	it("Should return correct rates", () => {
+		const activityWithRates = {
+			...baseActivity,
+			supportItem: {
+				...baseActivity.supportItem,
+				supportItemRates: [
+					{
+						weekdayRate: new Prisma.Decimal(5),
+						weeknightRate: new Prisma.Decimal(6),
+						saturdayRate: new Prisma.Decimal(7),
+						sundayRate: new Prisma.Decimal(8),
+					},
+				],
+			},
+		};
+
+		// Regular weekday - weekday
+		expect(getRateForActivity(activityWithRates)).toEqual(["weekday", 5]);
+
+		// After 8pm - weeknight
+		activityWithRates.endTime = dayjs.utc("1970-01-01T20:10").toDate();
+		expect(getRateForActivity(activityWithRates)).toEqual(["weeknight", 6]);
+
+		// At 8pm - weeknight
+		activityWithRates.endTime = dayjs.utc("1970-01-01T20:00").toDate();
+		expect(getRateForActivity(activityWithRates)).toEqual(["weeknight", 6]);
+
+		// Saturday - saturday
+		activityWithRates.date = new Date("2022-01-15");
+		activityWithRates.endTime = dayjs.utc("1970-01-01T15:10").toDate();
+		expect(getRateForActivity(activityWithRates)).toEqual(["saturday", 7]);
+
+		// Saturday night - saturday
+		activityWithRates.date = new Date("2022-01-15");
+		activityWithRates.endTime = dayjs.utc("1970-01-01T20:10").toDate();
+		expect(getRateForActivity(activityWithRates)).toEqual(["saturday", 7]);
+
+		// Sunday - sunday
+		activityWithRates.date = new Date("2022-01-16");
+		activityWithRates.endTime = dayjs.utc("1970-01-01T15:10").toDate();
+		expect(getRateForActivity(activityWithRates)).toEqual(["sunday", 8]);
+
+		// Sunday night - sunday
+		activityWithRates.date = new Date("2022-01-16");
+		activityWithRates.endTime = dayjs.utc("1970-01-01T20:10").toDate();
+		expect(getRateForActivity(activityWithRates)).toEqual(["sunday", 8]);
 	});
 
 	it("Should return correct total", () => {

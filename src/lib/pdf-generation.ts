@@ -1,9 +1,8 @@
-import { RateType } from "@prisma/client";
-import { InvoiceByIdOutput } from "@/server/api/routers/invoice-router";
 import prisma from "@/server/prisma";
+import { RateType } from "@prisma/client";
 import jspdf from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
-import { getRate, getTotalCostOfActivities } from "./activity-utils";
+import { getRateForActivity, getTotalCostOfActivities } from "./activity-utils";
 import { formatDuration, getDuration } from "./date-utils";
 import { round } from "./generic-utils";
 import { getInvoiceFileName } from "./invoice-utils";
@@ -16,8 +15,36 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 import "@/fonts/Inter-normal";
+import { parseInvoice } from "@/server/api/routers/invoice-router";
 
-const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
+const generatePDF = async (invoiceId: string) => {
+	const client = await prisma.invoice
+		.findUnique({
+			where: { id: invoiceId },
+		})
+		.client({ select: { id: true } });
+
+	if (!client) return { pdfString: "", fileName: null };
+
+	const invoice = await prisma.invoice.findFirst({
+		where: { id: invoiceId },
+		include: {
+			client: true,
+			activities: {
+				include: {
+					supportItem: {
+						include: {
+							supportItemRates: { where: { clientId: client.id } },
+						},
+					},
+				},
+			},
+		},
+	});
+
+	if (!invoice || !invoice.client || !invoice.activities)
+		return { pdfString: "", fileName: null };
+
 	const margin = 20;
 
 	const document_ = new jspdf();
@@ -29,12 +56,10 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 
 	document_.setFontSize(10);
 
-	const date = dayjs.utc(invoice.date).format("DD/MM/YY");
-
 	// Write details at top of page
 	const invoiceDetails: string[] = [
 		`Invoice Number: ${invoice.invoiceNo}`,
-		`Invoice Date: ${date}`,
+		`Invoice Date: ${dayjs(invoice.date).format("DD/MM/YY")}`,
 		`Participant Name: ${invoice.client?.name}`,
 	];
 	if (invoice.client?.number)
@@ -51,7 +76,7 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 		invoice.activities.map(async (activity) => {
 			if (activity?.supportItem === null) return;
 
-			const [itemCode, rate] = getRate(activity);
+			const [itemCode, rate] = getRateForActivity(activity);
 
 			let countString = "";
 			let totalCost = 0;
@@ -253,7 +278,7 @@ const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 		},
 	});
 
-	const fileName = getInvoiceFileName(invoice);
+	const fileName = getInvoiceFileName(parseInvoice(invoice));
 
 	return {
 		pdfString: document_
