@@ -1,13 +1,12 @@
+import { CustomRatesRow } from "@/components/clients/custom-rates-row";
 import {
 	Table,
 	TableBody,
-	TableCell,
 	TableHead,
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
-import { decimalToCurrencyString } from "@/lib/utils";
 
 interface Props {
 	clientId: string;
@@ -28,28 +27,12 @@ const CustomRatesTable = ({ clientId }: Props) => {
 					<TableHead className="p-2">Evening</TableHead>
 					<TableHead className="p-2">Saturday</TableHead>
 					<TableHead className="p-2">Sunday</TableHead>
+					<TableHead className="w-28 p-2"></TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
 				{customRates.map((rate) => (
-					<TableRow key={rate.id}>
-						<TableCell className="p-2">
-							{rate.supportItem.description}
-						</TableCell>
-						<TableCell className="p-2">
-							{rate.weekdayRate && decimalToCurrencyString(rate.weekdayRate)}
-						</TableCell>
-						<TableCell className="p-2">
-							{rate.weeknightRate &&
-								decimalToCurrencyString(rate.weeknightRate)}
-						</TableCell>
-						<TableCell className="p-2">
-							{rate.saturdayRate && decimalToCurrencyString(rate.saturdayRate)}
-						</TableCell>
-						<TableCell className="p-2">
-							{rate.sundayRate && decimalToCurrencyString(rate.sundayRate)}
-						</TableCell>
-					</TableRow>
+					<CustomRatesRow key={rate.id} clientId={clientId} rate={rate} />
 				))}
 			</TableBody>
 		</Table>

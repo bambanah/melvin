@@ -10,5 +10,6 @@ export function decimalToCurrencyString(value: Prisma.Decimal) {
 	return Number(value).toLocaleString(undefined, {
 		style: "currency",
 		currency: "AUD",
+		minimumFractionDigits: 0,
 	});
 }

@@ -44,17 +44,19 @@ const SupportItemOverrideDialog = ({ clientId }: Props) => {
 		},
 	});
 
+	const trpcUtils = trpc.useUtils();
+
 	const { data: supportItem } = trpc.supportItem.byId.useQuery(
 		{
 			id: form.watch("supportItemId"),
 		},
 		{ enabled: !!form.watch("supportItemId") }
 	);
-	const { mutate: addCustomRates } =
+	const { mutateAsync: addCustomRates } =
 		trpc.supportItem.addCustomRates.useMutation();
 
-	function onSubmit(values: SupportItemRatesSchema) {
-		addCustomRates(
+	async function onSubmit(values: SupportItemRatesSchema) {
+		await addCustomRates(
 			{ supportItemRates: { ...values, clientId } },
 			{
 				onSuccess: () => {
@@ -65,6 +67,8 @@ const SupportItemOverrideDialog = ({ clientId }: Props) => {
 				},
 			}
 		);
+
+		trpcUtils.supportItem.getCustomRatesForClient.invalidate({ id: clientId });
 	}
 
 	function handleOpenChange(open: boolean) {
