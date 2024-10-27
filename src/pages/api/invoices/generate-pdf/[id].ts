@@ -1,5 +1,3 @@
-import { InvoiceByIdOutput } from "@/server/api/routers/invoice-router";
-import prisma from "@/server/prisma";
 import generatePDF from "@/lib/pdf-generation";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -7,27 +5,10 @@ const request = async (request: NextApiRequest, response: NextApiResponse) => {
 	if (request.method === "GET") {
 		const { id, base64 } = request.query;
 
-		const invoice = await prisma.invoice.findFirst({
-			where: { id: String(id) },
-			include: {
-				client: true,
-				activities: {
-					include: {
-						supportItem: true,
-					},
-				},
-			},
-		});
-
-		if (!invoice || !invoice.client || !invoice.activities)
-			return response.status(404).send("Not found");
-
-		const { pdfString, fileName } = await generatePDF(
-			invoice as unknown as NonNullable<InvoiceByIdOutput>
-		);
+		const { pdfString, fileName } = await generatePDF(String(id));
 
 		if (!pdfString) {
-			return response.status(404).send("Can't find PDF");
+			response.status(404).send("Can't find PDF");
 		}
 
 		if (base64 === "true") {
