@@ -15,10 +15,14 @@ import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+import "@/fonts/Inter-normal";
+
 const generatePDF = async (invoice: NonNullable<InvoiceByIdOutput>) => {
 	const margin = 20;
 
 	const document_ = new jspdf();
+
+	document_.setFont("Inter");
 
 	document_.setFontSize(20);
 	document_.text("Tax Invoice", 150, margin);

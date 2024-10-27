@@ -41,7 +41,7 @@ jobs:
         run: npx playwright install
 
       - name: Initialise database
-        run: pnpm db:push
+        run: pnpm prisma:push
 
       - name: Run tests
         run: pnpm test:e2e

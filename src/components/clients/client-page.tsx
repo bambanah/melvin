@@ -1,3 +1,5 @@
+import CustomRatesTable from "@/components/clients/custom-rates-table";
+import SupportItemOverrideDialog from "@/components/clients/support-item-override-dialog";
 import InvoiceList from "@/components/invoices/invoice-list";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +23,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 	const { data: client, error } = trpc.clients.byId.useQuery({
 		id: clientId ?? "",
 	});
+
 	const deleteClientMutation = trpc.clients.delete.useMutation();
 
 	const deleteClient = () => {
@@ -50,7 +53,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 					<Heading>{client.name}</Heading>
 
 					<DropdownMenu>
-						<DropdownMenuTrigger asChild className="grow-0 ">
+						<DropdownMenuTrigger asChild className="grow-0">
 							<Button variant="ghost" size="icon">
 								<EllipsisVertical />
 							</Button>
@@ -135,6 +138,11 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 					) : (
 						<p className="text-foreground/50">Not set</p>
 					)}
+				</div>
+				<div className="space-y-2">
+					<h3 className="font-semibold">Custom Rates</h3>
+					<CustomRatesTable clientId={client.id} />
+					<SupportItemOverrideDialog clientId={client.id} />
 				</div>
 			</div>
 

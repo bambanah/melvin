@@ -1,7 +1,6 @@
 import { InvoiceStatus, PrismaClient } from "@prisma/client";
 import { randomClient } from "../e2e/random/random-client";
 import { randomInvoice } from "../e2e/random/random-invoice";
-import { randomSupportItem } from "../e2e/random/random-support-item";
 
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -29,19 +28,27 @@ async function main() {
 		},
 	});
 
-	const clientsToCreate = 10;
+	const clientsToCreate = 2;
 	for (let i = 0; i < clientsToCreate; i++) {
 		await prisma.client.create({
 			data: { ...randomClient(), ownerId: user.id },
 		});
 	}
 
-	const supportItemsToCreate = 10;
-	for (let i = 0; i < supportItemsToCreate; i++) {
-		await prisma.supportItem.create({
-			data: { ...randomSupportItem(), ownerId: user.id },
-		});
-	}
+	const supportItem = await prisma.supportItem.create({
+		data: {
+			ownerId: user.id,
+			description: "Access Community Social and Rec Activ - Standard",
+			weekdayCode: "04_104_0125_6_1",
+			weekdayRate: 67.56,
+			weeknightCode: "04_103_0125_6_1",
+			weeknightRate: 74.44,
+			saturdayCode: "04_105_0125_6_1",
+			saturdayRate: 95.07,
+			sundayCode: "04_106_0125_6_1",
+			sundayRate: 122.59,
+		},
+	});
 
 	const invoicesToCreate = 10;
 	for (let i = 0; i < invoicesToCreate; i++) {
@@ -50,22 +57,8 @@ async function main() {
 			take: 1,
 			skip: Math.floor(Math.random() * clientCount),
 			orderBy: { createdAt: "asc" },
-			select: {
-				id: true,
-			},
 		});
 		if (!client) continue;
-
-		const supportItemCount = await prisma.supportItem.count();
-		const supportItem = await prisma.supportItem.findFirst({
-			take: 1,
-			skip: Math.floor(Math.random() * supportItemCount),
-			orderBy: { createdAt: "asc" },
-			select: {
-				id: true,
-			},
-		});
-		if (!supportItem) continue;
 
 		const invoice = randomInvoice({
 			supportItemId: supportItem.id,

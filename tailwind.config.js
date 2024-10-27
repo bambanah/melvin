@@ -22,6 +22,7 @@ module.exports = {
 			fontFamily: {
 				display: ["var(--font-patua-one)", ...fontFamily.sans],
 				sans: ["var(--font-inter)", ...fontFamily.sans],
+				serif: ["var(--font-noto-serif)", ...fontFamily.serif],
 				mono: ["var(--font-roboto-mono)", ...fontFamily.mono],
 			},
 			colors: {

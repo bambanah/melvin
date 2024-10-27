@@ -53,7 +53,7 @@ const SupportItemPage = ({ supportItemId }: { supportItemId: string }) => {
 					<Heading>{supportItem.description}</Heading>
 
 					<DropdownMenu>
-						<DropdownMenuTrigger asChild className="grow-0 ">
+						<DropdownMenuTrigger asChild className="grow-0">
 							<Button variant="ghost" size="icon">
 								<EllipsisVertical />
 							</Button>
