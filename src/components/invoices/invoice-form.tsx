@@ -59,6 +59,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 	});
 
 	const clientId = form.watch("clientId");
+
 	const { data: billTo, refetch: refetchBillTo } =
 		trpc.clients.getBillTo.useQuery(
 			{
@@ -91,7 +92,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 	}, [billTo, existingInvoice, form, nextInvoiceNo]);
 
 	const { data: { activities } = {} } = trpc.activity.list.useQuery({
-		clientId: form.watch("clientId"),
+		clientId,
 		assigned: false,
 	});
 
@@ -210,7 +211,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 						/>
 					</div>
 
-					{form.watch("clientId") && !!activities?.length && (
+					{clientId && !!activities?.length && (
 						<UnassignedActivities
 							activities={activities}
 							setValue={form.setValue}
