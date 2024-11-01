@@ -127,7 +127,8 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 								<FormLabel required>Support Item</FormLabel>
 								<SupportItemSelect
 									setSupportItems={setSupportItems}
-									{...field}
+									onValueChange={field.onChange}
+									value={field.value}
 								/>
 								<FormMessage />
 							</FormItem>
@@ -140,7 +141,10 @@ const CreateActivityForm = ({ existingActivity }: Props) => {
 							render={({ field }) => (
 								<FormItem className="shrink grow basis-1/2">
 									<FormLabel required>Client</FormLabel>
-									<ClientSelect {...field} />
+									<ClientSelect
+										onValueChange={field.onChange}
+										value={field.value}
+									/>
 									<FormMessage />
 								</FormItem>
 							)}

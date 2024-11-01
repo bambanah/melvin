@@ -112,7 +112,10 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 							render={({ field }) => (
 								<FormItem className="shrink grow basis-1/2">
 									<FormLabel required>Client</FormLabel>
-									<ClientSelect {...field} />
+									<ClientSelect
+										onValueChange={field.onChange}
+										value={field.value}
+									/>
 									<FormDescription>
 										Who will this invoice be for?
 									</FormDescription>

@@ -109,7 +109,10 @@ const SupportItemOverrideDialog = ({ clientId }: Props) => {
 								<FormItem>
 									<FormLabel>Support Item</FormLabel>
 									<FormControl>
-										<SupportItemSelect {...field} />
+										<SupportItemSelect
+											onValueChange={field.onChange}
+											value={field.value}
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>

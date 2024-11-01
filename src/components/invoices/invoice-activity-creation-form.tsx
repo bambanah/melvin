@@ -57,7 +57,7 @@ const InvoiceActivityCreationForm = ({
 	watch,
 }: Props) => {
 	const { data: { supportItems: groupSupportItems } = {} } =
-		trpc.supportItem.list.useQuery({ description: "group" });
+		trpc.supportItem.list.useQuery({ isGroup: true });
 
 	const groupSupportItemIds = useMemo(
 		() => groupSupportItems?.map((item) => item.id),
@@ -133,13 +133,14 @@ const InvoiceActivityCreationForm = ({
 		[groupSupportItemIds]
 	);
 
+	const activitiesToCreate = watch("activitiesToCreate");
 	useEffect(() => {
-		watch("activitiesToCreate")?.forEach((activity, idx) => {
+		activitiesToCreate?.forEach((activity, idx) => {
 			if (isGroupSupportItem(activity.supportItemId)) {
 				setValue(`activitiesToCreate.${idx}.groupClientId`, "");
 			}
 		});
-	}, [isGroupSupportItem, setValue, watch]);
+	}, [isGroupSupportItem, setValue, activitiesToCreate]);
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -155,7 +156,10 @@ const InvoiceActivityCreationForm = ({
 									control={control}
 									render={({ field }) => (
 										<FormItem className="shrink grow basis-1/2">
-											<SupportItemSelect {...field} />
+											<SupportItemSelect
+												onValueChange={field.onChange}
+												value={field.value}
+											/>
 											<FormMessage />
 										</FormItem>
 									)}
@@ -170,7 +174,8 @@ const InvoiceActivityCreationForm = ({
 											<FormItem className="shrink grow basis-1/2">
 												<ClientSelect
 													excludeClientId={watch("clientId")}
-													{...field}
+													onValueChange={field.onChange}
+													value={field.value}
 												/>
 												<FormMessage />
 											</FormItem>

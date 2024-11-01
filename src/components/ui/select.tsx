@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import * as React from "react";
-import { ControllerRenderProps, FieldValues, Path } from "react-hook-form";
 import { FormControl } from "./form";
 
 const Select = SelectPrimitive.Root;
@@ -145,24 +144,23 @@ const SelectSeparator = React.forwardRef<
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
-type FormSelectProps<T extends FieldValues> = {
+type FormSelectProps = {
 	options: {
 		label: string | JSX.Element;
 		value: string;
 	}[];
 	placeholder?: string;
-} & SelectPrimitive.SelectProps &
-	ControllerRenderProps<T, Path<T>>;
+} & SelectPrimitive.SelectProps;
 
-const FormSelect = <T extends FieldValues>({
+const FormSelect = ({
 	options,
 	placeholder,
-	onChange,
+	onValueChange,
 	value,
 	...rest
-}: FormSelectProps<T>) => {
+}: FormSelectProps) => {
 	return (
-		<Select onValueChange={onChange} defaultValue={value} {...rest}>
+		<Select onValueChange={onValueChange} defaultValue={value} {...rest}>
 			<FormControl>
 				<SelectTrigger>
 					<SelectValue placeholder={placeholder} />
