@@ -15,7 +15,7 @@ import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-import "@/fonts/Inter-normal";
+// import "@/fonts/Inter-normal";
 
 const generatePDF = async (invoiceId: string) => {
 	const client = await prisma.invoice
@@ -49,7 +49,7 @@ const generatePDF = async (invoiceId: string) => {
 
 	const document_ = new jspdf();
 
-	document_.setFont("Inter");
+	// document_.setFont("Inter");
 
 	document_.setFontSize(20);
 	document_.text("Tax Invoice", 150, margin);
