@@ -3,18 +3,18 @@ import { trpc } from "@/lib/trpc";
 import { SupportItemListOutput } from "@/server/api/routers/support-item-router";
 import { Users } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { FieldValues } from "react-hook-form";
 
-interface Props {
+interface SupportItemSelectProps
+	extends Omit<FormSelectProps, "placeholder" | "options"> {
 	setSupportItems?: Dispatch<
 		SetStateAction<SupportItemListOutput[] | undefined>
 	>;
 }
 
-const SupportItemSelect = <T extends FieldValues>({
+const SupportItemSelect = ({
 	setSupportItems,
 	...props
-}: Props & Omit<FormSelectProps<T>, "placeholder" | "options">) => {
+}: SupportItemSelectProps) => {
 	const [options, setOptions] = useState<
 		{ label: JSX.Element; value: string }[]
 	>([]);

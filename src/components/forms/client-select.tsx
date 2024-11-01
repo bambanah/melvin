@@ -1,15 +1,13 @@
 import { FormSelect, FormSelectProps } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { useEffect, useState } from "react";
-import { FieldValues } from "react-hook-form";
 
-function ClientSelect<T extends FieldValues>({
-	excludeClientId,
-	...props
-}: { excludeClientId?: string } & Omit<
-	FormSelectProps<T>,
-	"placeholder" | "options"
->) {
+interface ClientSelectProps
+	extends Omit<FormSelectProps, "placeholder" | "options"> {
+	excludeClientId?: string;
+}
+
+function ClientSelect({ excludeClientId, ...props }: ClientSelectProps) {
 	const [options, setOptions] = useState<{ label: string; value: string }[]>(
 		[]
 	);
