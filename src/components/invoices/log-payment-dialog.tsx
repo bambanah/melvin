@@ -149,7 +149,7 @@ const LogPaymentDialog = () => {
 		<Dialog onOpenChange={handleOpenChange}>
 			<DialogTrigger asChild>
 				<Button variant="outline">
-					<Wallet className="mr-2 h-4 w-4" /> Payment
+					<Wallet className="h-4 w-4" /> Payment
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">

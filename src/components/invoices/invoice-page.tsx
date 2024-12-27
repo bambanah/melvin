@@ -100,7 +100,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 								className="absolute right-0 top-0 flex h-full w-full items-center justify-center"
 								onClick={() => setIsPdfPreviewExpanded(true)}
 							>
-								<div className="flex items-center justify-center gap-2 rounded-full bg-zinc-900 bg-opacity-90 px-4 py-3 text-zinc-50 transition-transform group-hover:scale-110 md:px-3 md:py-2 md:text-lg">
+								<div className="flex items-center justify-center gap-2 rounded-md bg-zinc-900/80 px-4 py-3 text-zinc-50 transition-transform group-hover:scale-110 group-hover:bg-zinc-900 md:px-3 md:py-2 md:text-lg">
 									<Search className="h-4 w-4" />
 									Preview
 								</div>
