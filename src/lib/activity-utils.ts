@@ -23,6 +23,7 @@ interface Activity {
 		| "weeknightRate"
 		| "saturdayRate"
 		| "sundayRate"
+		| "isGroup"
 	> & {
 		supportItemRates?: Pick<
 			SupportItemRates,
@@ -123,8 +124,7 @@ export const getTotalCostOfActivities = (activities: Activity[]) => {
 			}
 
 			if (activity.transitDistance) {
-				const isGroup =
-					activity.supportItem.description?.includes("Group Activities");
+				const isGroup = activity.supportItem.isGroup;
 				const ratePerKm = isGroup ? 0.43 : 0.85;
 				subTotal += round(Number(activity.transitDistance) * ratePerKm, 2);
 			}

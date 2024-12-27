@@ -25,7 +25,7 @@ const Header = ({
 				{extraButtons}
 				<Button asChild variant="inverted">
 					<Link href={createNewHref}>
-						<Plus className="mr-2 h-4 w-4" />
+						<Plus className="h-4 w-4" />
 						Add
 					</Link>
 				</Button>

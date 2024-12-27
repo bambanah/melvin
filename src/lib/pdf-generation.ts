@@ -132,8 +132,7 @@ const generatePDF = async (invoiceId: string) => {
 			// Provider Travel - Non Labour Costs
 			if (activity.transitDistance) {
 				// TODO: Handle groups other than 2 clients
-				const isGroup =
-					activity.supportItem.description.includes("Group Activities");
+				const isGroup = activity.supportItem.isGroup;
 				const ratePerKm = isGroup ? 0.43 : 0.85;
 				const travelTotal = ratePerKm * Number(activity.transitDistance);
 
