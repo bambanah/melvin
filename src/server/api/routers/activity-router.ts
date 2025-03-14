@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import dayjs from "dayjs";
 import { DEFAULT_LIST_LIMIT } from "./router.constants";
+import { Activity } from "@prisma/client";
 dayjs.extend(require("dayjs/plugin/utc"));
 dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
@@ -39,7 +40,7 @@ export const activityRouter = router({
 				assigned: z.boolean().optional(),
 				invoiceId: z.string().optional(),
 				clientId: z.string().optional(),
-			})
+			}),
 		)
 		.query(async ({ ctx, input }) => {
 			const limit = input.limit ?? DEFAULT_LIST_LIMIT;
@@ -80,6 +81,33 @@ export const activityRouter = router({
 				nextCursor,
 			};
 		}),
+	pending: authedProcedure.query(async ({ ctx }) => {
+		const activities = await ctx.prisma.activity.findMany({
+			select: defaultActivitySelect,
+			where: {
+				ownerId: ctx.session.user.id,
+				invoiceId: null,
+			},
+		});
+
+		const groupedActivities = activities.reduce<
+			Record<string, Partial<Activity>[]>
+		>((acc, activity) => {
+			const clientName = activity.client?.name;
+			if (!clientName) return acc;
+
+			if (!acc[clientName]) {
+				acc[clientName] = [];
+			}
+
+			// Add the activity to the appropriate group
+			acc[clientName].push(activity);
+
+			return acc;
+		}, {});
+
+		return groupedActivities;
+	}),
 	byId: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
@@ -116,7 +144,7 @@ export const activityRouter = router({
 		.input(
 			z.object({
 				activity: activitySchema,
-			})
+			}),
 		)
 		.mutation(async ({ input, ctx }) => {
 			const { activity: inputActivity } = input;
@@ -147,7 +175,7 @@ export const activityRouter = router({
 			z.object({
 				id: z.string(),
 				activity: activitySchema,
-			})
+			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const activity = await ctx.prisma.activity.update({
