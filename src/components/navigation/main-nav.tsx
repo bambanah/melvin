@@ -12,7 +12,7 @@ const MainNav = () => {
 			<nav className="flex items-center gap-4 lg:gap-6">
 				<Link
 					href="/dashboard"
-					className="-mt-1 font-display text-2xl text-[#ff8484]"
+					className="font-display -mt-1 text-2xl text-[#ff8484]"
 				>
 					melvin
 				</Link>
@@ -23,7 +23,7 @@ const MainNav = () => {
 						className={cn(
 							"transition-colors",
 							pathname?.startsWith(href)
-								? "font-semibold text-foreground hover:text-foreground"
+								? "text-foreground hover:text-foreground font-semibold"
 								: "text-foreground/75 hover:text-foreground"
 						)}
 					>

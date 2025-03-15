@@ -24,7 +24,7 @@ const Logo = ({
 	return (
 		<h1
 			className={cn(
-				"text- text-display m-0 font-display text-[#ff8484]",
+				"text- text-display font-display m-0 text-[#ff8484]",
 				variantStyles[variant],
 				className
 			)}

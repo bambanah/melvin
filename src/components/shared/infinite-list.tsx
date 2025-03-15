@@ -50,7 +50,7 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 							<Fragment key={idx}>{children(page[dataKey])}</Fragment>
 						))
 					) : (
-						<p className="mx-auto mt-8 text-foreground/60">
+						<p className="text-foreground/60 mx-auto mt-8">
 							There&#39;s nothing here
 						</p>
 					)}

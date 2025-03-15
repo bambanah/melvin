@@ -28,7 +28,7 @@ const DashboardPage = () => {
 								<div key={clientName}>
 									<h1 className="text-base">{clientName}</h1>
 
-									<div className="flex flex-col gap-2 pl-2 pt-2">
+									<div className="flex flex-col gap-2 pt-2 pl-2">
 										{activities.map(({ id, date, startTime, endTime }, idx) => (
 											<div
 												key={id}
@@ -36,7 +36,7 @@ const DashboardPage = () => {
 											>
 												<div className="flex flex-col">
 													<p>{dayjs(date).format("ddd MMMM DD, YYYY")}</p>
-													<p className="text-sm text-muted-foreground">
+													<p className="text-muted-foreground text-sm">
 														{dayjs(startTime).format("h:mm A")} -{" "}
 														{dayjs.utc(endTime).format("h:mm A")}
 													</p>
