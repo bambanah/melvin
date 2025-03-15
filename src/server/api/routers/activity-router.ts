@@ -6,7 +6,6 @@ import { z } from "zod";
 
 import dayjs from "dayjs";
 import { DEFAULT_LIST_LIMIT } from "./router.constants";
-import { Activity } from "@prisma/client";
 dayjs.extend(require("dayjs/plugin/utc"));
 dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
@@ -91,7 +90,7 @@ export const activityRouter = router({
 		});
 
 		const groupedActivities = activities.reduce<
-			Record<string, Partial<Activity>[]>
+			Record<string, typeof activities>
 		>((acc, activity) => {
 			const clientName = activity.client?.name;
 			if (!clientName) return acc;

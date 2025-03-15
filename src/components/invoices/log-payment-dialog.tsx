@@ -39,7 +39,7 @@ const LogPaymentDialog = () => {
 		isLoading,
 	} = trpc.invoice.matchByPayment.useQuery(
 		{ paymentAmount: amountPaid ?? 0 },
-		{ enabled: false }
+		{ enabled: false },
 	);
 	const trpcUtils = trpc.useUtils();
 	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
@@ -50,7 +50,7 @@ const LogPaymentDialog = () => {
 
 	const updateAmountPaid = debounce(
 		(value: number) => setAmountPaid(value),
-		750
+		750,
 	);
 
 	const updateMatchingInvoices = () => {
@@ -97,7 +97,7 @@ const LogPaymentDialog = () => {
 							setInvoicesToUpdate([...invoicesToUpdate, invoiceId]);
 						} else {
 							setInvoicesToUpdate(
-								invoicesToUpdate.filter((id) => id !== invoiceId)
+								invoicesToUpdate.filter((id) => id !== invoiceId),
 							);
 						}
 					}}
@@ -110,7 +110,7 @@ const LogPaymentDialog = () => {
 					<p className="font-semibold">
 						{getTotalCostOfActivities(invoice.activities).toLocaleString(
 							undefined,
-							{ style: "currency", currency: "AUD" }
+							{ style: "currency", currency: "AUD" },
 						)}
 					</p>
 					<p className="text-neutral-600">
@@ -149,7 +149,8 @@ const LogPaymentDialog = () => {
 		<Dialog onOpenChange={handleOpenChange}>
 			<DialogTrigger asChild>
 				<Button variant="outline">
-					<Wallet className="h-4 w-4" /> Payment
+					<Wallet className="h-4 w-4" />
+					<span className="hidden sm:inline">Log Payment</span>
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">

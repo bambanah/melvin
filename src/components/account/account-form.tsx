@@ -1,3 +1,4 @@
+import SupportItemSelect from "@/components/forms/support-item-select";
 import { Button } from "@/components/ui/button";
 import {
 	Form,
@@ -27,12 +28,14 @@ const AccountForm = ({ existingUser }: Props) => {
 	const existingUserWithDefaults = useMemo(
 		() => ({
 			name: existingUser?.name ?? "",
+			defaultSupportItemId: existingUser?.defaultSupportItemId ?? "",
+			defaultGroupSupportItemId: existingUser?.defaultGroupSupportItemId ?? "",
 			abn: Number(existingUser?.abn) || undefined,
 			bankName: existingUser?.bankName ?? "",
 			bankNumber: Number(existingUser?.bankNumber) || undefined,
 			bsb: existingUser?.bsb ?? undefined,
 		}),
-		[existingUser]
+		[existingUser],
 	);
 
 	const form = useForm<UserSchema>({
@@ -45,9 +48,16 @@ const AccountForm = ({ existingUser }: Props) => {
 		form.reset(existingUserWithDefaults);
 	}, [existingUser, existingUserWithDefaults, form]);
 
-	const onSubmit = (data: UserSchema) => {
+	const onSubmit = (values: UserSchema) => {
 		updateUserMutation
-			.mutateAsync({ user: data })
+			.mutateAsync({
+				user: {
+					...values,
+					defaultSupportItemId: values.defaultSupportItemId || undefined,
+					defaultGroupSupportItemId:
+						values.defaultGroupSupportItemId || undefined,
+				},
+			})
 			.then(() => trpcUtils.user.fetch.invalidate());
 	};
 
@@ -90,6 +100,44 @@ const AccountForm = ({ existingUser }: Props) => {
 											}}
 											placeholder="12345678901"
 											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
+
+					<div className="flex flex-col gap-4">
+						<Heading className="-mb-2" size="small">
+							Default Support Items
+						</Heading>
+						<FormField
+							name="defaultSupportItemId"
+							control={form.control}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Default Support Item</FormLabel>
+									<FormControl>
+										<SupportItemSelect
+											onValueChange={field.onChange}
+											value={field.value}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							name="defaultGroupSupportItemId"
+							control={form.control}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Default Group Support Item</FormLabel>
+									<FormControl>
+										<SupportItemSelect
+											onValueChange={field.onChange}
+											value={field.value}
 										/>
 									</FormControl>
 									<FormMessage />
@@ -144,11 +192,7 @@ const AccountForm = ({ existingUser }: Props) => {
 					</div>
 
 					<div className="mt-4 flex justify-center gap-4">
-						<Button
-							type="submit"
-							variant="secondary"
-							disabled={form.formState.isSubmitting}
-						>
+						<Button type="submit" disabled={form.formState.isSubmitting}>
 							Save
 						</Button>
 					</div>

@@ -35,7 +35,7 @@ const SupportItemSelect = ({
 						</span>
 					),
 					value: supportItem.id,
-				}))
+				})),
 			);
 		}
 	}, [setSupportItems, supportItems]);
