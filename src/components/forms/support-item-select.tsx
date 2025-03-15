@@ -2,7 +2,7 @@ import { FormSelect, FormSelectProps } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { SupportItemListOutput } from "@/server/api/routers/support-item-router";
 import { Users } from "lucide-react";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState, type JSX } from "react";
 
 interface SupportItemSelectProps
 	extends Omit<FormSelectProps, "placeholder" | "options"> {
@@ -29,7 +29,7 @@ const SupportItemSelect = ({
 					label: (
 						<span className="flex items-center gap-2">
 							{supportItem.isGroup && (
-								<Users className="h-4 w-4 text-foreground/80" />
+								<Users className="text-foreground/80 h-4 w-4" />
 							)}
 							{supportItem.description}
 						</span>

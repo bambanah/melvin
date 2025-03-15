@@ -4,6 +4,8 @@ import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import * as React from "react";
 import { FormControl } from "./form";
 
+import type { JSX } from "react";
+
 const Select = SelectPrimitive.Root;
 
 const SelectGroup = SelectPrimitive.Group;
