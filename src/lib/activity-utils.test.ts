@@ -3,6 +3,7 @@ import {
 	getTotalCostOfActivities
 } from "@/lib/activity-utils";
 import { Prisma } from "@prisma/client";
+import { expect, test } from "vitest";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -62,7 +63,7 @@ const baseActivity = {
 	}
 };
 
-it("Should return correct rates", () => {
+test("Should return correct rates", () => {
 	const activity = { ...baseActivity };
 
 	// Regular weekday - weekday
@@ -97,7 +98,7 @@ it("Should return correct rates", () => {
 	expect(getRateForActivity(activity)).toEqual(["sunday", 4]);
 });
 
-it("Should return correct rates", () => {
+test("Should return correct rates", () => {
 	const activityWithRates = {
 		...baseActivity,
 		supportItem: {
@@ -145,7 +146,7 @@ it("Should return correct rates", () => {
 	expect(getRateForActivity(activityWithRates)).toEqual(["sunday", 8]);
 });
 
-it("Should return correct total", () => {
+test("Should return correct total", () => {
 	expect(
 		getTotalCostOfActivities([getActivity("weekday", "16:00", "17:00", 0, 0)])
 	).toEqual(55.47);
@@ -202,7 +203,7 @@ it("Should return correct total", () => {
 	).toEqual(2315.96);
 });
 
-it("Should return correct total for group activities", () => {
+test("Should return correct total for group activities", () => {
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "16:00", "17:00", 0, 0, true)

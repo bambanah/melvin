@@ -4,11 +4,7 @@
  */
 const config = {
 	"*": "prettier --ignore-unknown --write",
-	"*.{js,jsx,ts,tsx}": [
-		"eslint --fix",
-		"eslint",
-		"bash -c tsc --pretty --noEmit"
-	]
+	"*.{js,jsx,ts,tsx}": ["eslint --fix", "bash -c tsc --pretty --noEmit"]
 };
 
 export default config;
