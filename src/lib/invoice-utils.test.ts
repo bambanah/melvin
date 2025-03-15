@@ -1,6 +1,7 @@
 import { getHighestInvoiceNo, getNextInvoiceNo } from "@/lib/invoice-utils";
+import { expect, test } from "vitest";
 
-it("Should get latest invoice number", () => {
+test("Should get latest invoice number", () => {
 	expect(getHighestInvoiceNo(["Gawne1", "Gawne2", "Gawne3"])).toEqual("Gawne3");
 
 	expect(getHighestInvoiceNo(["Gawne1"])).toEqual("Gawne1");
@@ -8,7 +9,7 @@ it("Should get latest invoice number", () => {
 	expect(getHighestInvoiceNo(["Gawne", "string"])).toEqual(undefined);
 });
 
-it("Should get next invoice number", () => {
+test("Should get next invoice number", () => {
 	expect(
 		getNextInvoiceNo(["Gawne1", "Gawne2", "Gawne3"]).nextInvoiceNo
 	).toEqual("Gawne4");

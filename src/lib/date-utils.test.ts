@@ -2,11 +2,12 @@ import { formatDuration, getDuration } from "@/lib/date-utils";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { expect, test } from "vitest";
 dayjs.extend(utc);
 
 const dateFromTime = (time: string) => dayjs.utc(`1970-01-01T${time}`).toDate();
 
-it("Should get duration", () => {
+test("Should get duration", () => {
 	expect(getDuration(dateFromTime("12:00"), dateFromTime("13:00"))).toEqual(1);
 	expect(getDuration(dateFromTime("12:00"), dateFromTime("13:01"))).toEqual(
 		1.016_666_666_666_666_6
@@ -22,7 +23,7 @@ it("Should get duration", () => {
 	);
 });
 
-it("Should get pretty duration", () => {
+test("Should get pretty duration", () => {
 	expect(
 		formatDuration(getDuration(dateFromTime("12:00"), dateFromTime("13:00")))
 	).toEqual("1 hour");
