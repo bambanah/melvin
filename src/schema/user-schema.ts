@@ -2,6 +2,8 @@ import { z } from "zod";
 
 export const userSchema = z.object({
 	name: z.string().optional(),
+	defaultSupportItemId: z.string().optional(),
+	defaultGroupSupportItemId: z.string().optional(),
 	abn: z.coerce
 		.number()
 		.min(10_000_000_000, "Must be 11 digits")

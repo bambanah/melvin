@@ -1,9 +1,10 @@
 import { userSchema } from "@/schema/user-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
+import { Prisma } from "@prisma/client";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-const defaultUserSelect = {
+const defaultUserSelect: Prisma.UserSelect = {
 	id: true,
 	name: true,
 	email: true,
@@ -11,6 +12,8 @@ const defaultUserSelect = {
 	bankName: true,
 	bankNumber: true,
 	bsb: true,
+	defaultSupportItemId: true,
+	defaultGroupSupportItemId: true,
 };
 
 export const userRouter = router({
@@ -43,7 +46,7 @@ export const userRouter = router({
 		.input(
 			z.object({
 				user: userSchema,
-			})
+			}),
 		)
 		.mutation(async ({ input, ctx }) => {
 			const user = await ctx.prisma.user.update({
