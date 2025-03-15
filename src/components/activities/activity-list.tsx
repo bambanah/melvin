@@ -24,7 +24,7 @@ interface Props {
 }
 
 const groupActivitiesByDate = (
-	activities?: ActivityListOutput["activities"]
+	activities?: ActivityListOutput["activities"],
 ) =>
 	activities
 		? groupBy(activities, (activity) => dayjs(activity.date).toString())
@@ -47,7 +47,9 @@ function ActivityList({
 			<ListPage.Header
 				title="Activities"
 				createNewHref={
-					displayCreateButton ? "/dashboard/activities/create" : undefined
+					displayCreateButton
+						? "/dashboard/activities/create?redirectUrl=/dashboard/activities"
+						: undefined
 				}
 			/>
 
@@ -104,8 +106,8 @@ function ActivityList({
 																formatDuration(
 																	getDuration(
 																		activity.startTime,
-																		activity.endTime
-																	)
+																		activity.endTime,
+																	),
 																)}
 															)
 														</span>
@@ -139,7 +141,7 @@ function ActivityList({
 									))}
 								</div>
 							</div>
-						)
+						),
 					)
 				}
 			</InfiniteList>

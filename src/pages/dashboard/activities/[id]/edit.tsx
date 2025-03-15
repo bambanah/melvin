@@ -5,6 +5,7 @@ import Layout from "@/components/shared/layout";
 import { trpc } from "@/lib/trpc";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import Heading from "@/components/ui/heading";
 
 const EditActivityContent = () => {
 	const router = useRouter();
@@ -32,7 +33,11 @@ const EditActivityContent = () => {
 			<Head>
 				<title>Modifying Activity - Melvin</title>
 			</Head>
-			<ActivityForm existingActivity={activity} />
+
+			<div className="mx-auto flex w-full max-w-md flex-col items-center gap-12">
+				<Heading>Update Activity</Heading>
+				<ActivityForm existingActivity={activity} />
+			</div>
 		</>
 	) : (
 		<Loading />

@@ -10,9 +10,12 @@ const MainNav = () => {
 	return (
 		<div className="mr-4 hidden md:flex">
 			<nav className="flex items-center gap-4 lg:gap-6">
-				<span className="-mt-1 font-display text-2xl text-[#ff8484]">
+				<Link
+					href="/dashboard"
+					className="-mt-1 font-display text-2xl text-[#ff8484]"
+				>
 					melvin
-				</span>
+				</Link>
 				{navConfig.map(({ href, title }) => (
 					<Link
 						key={title}
@@ -21,7 +24,7 @@ const MainNav = () => {
 							"transition-colors",
 							pathname?.startsWith(href)
 								? "font-semibold text-foreground hover:text-foreground"
-								: "text-foreground/75 hover:text-foreground"
+								: "text-foreground/75 hover:text-foreground",
 						)}
 					>
 						{title}

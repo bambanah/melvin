@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 test("Root should redirect to invoices page", async ({ page }) => {
-	await page.goto("/dashboard");
+	await page.goto("/");
 
-	await expect(page).toHaveURL("/dashboard/invoices");
+	await expect(page).toHaveURL("/dashboard");
 });
 
 test("Navbar buttons should work", async ({ page }) => {
