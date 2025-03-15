@@ -170,7 +170,7 @@ const LogPaymentDialog = () => {
 
 				{amountPaid > 0 &&
 					!isLoading &&
-					(!!invoiceIds?.length ? (
+					(invoiceIds?.length ? (
 						<div className="flex flex-col gap-2 divide-y">
 							{invoiceIds.length > 1 && <p>Found multiple candidates.</p>}
 							{invoiceIds.map((candidates, idx) => (
