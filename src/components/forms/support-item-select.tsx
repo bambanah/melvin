@@ -22,7 +22,7 @@ const SupportItemSelect = ({
 
 	useEffect(() => {
 		if (supportItems) {
-			setSupportItems && setSupportItems(supportItems);
+			if (setSupportItems) setSupportItems(supportItems);
 
 			setOptions(
 				supportItems.map((supportItem) => ({

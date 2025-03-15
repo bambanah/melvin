@@ -390,9 +390,11 @@ export const invoiceRouter = router({
 				if (totals.has(total)) {
 					const val = totals.get(total) as string | string[];
 
-					Array.isArray(val)
-						? val.push(invoice.id)
-						: totals.set(total, [val, invoice.id]);
+					if (Array.isArray(val)) {
+						val.push(invoice.id);
+					} else {
+						totals.set(total, [val, invoice.id]);
+					}
 				} else {
 					totals.set(total, invoice.id);
 				}

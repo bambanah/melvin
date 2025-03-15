@@ -144,7 +144,7 @@ const generatePDF = async (invoiceId: string) => {
 					`Provider Travel - Non Labour Costs\n${supportItemCode ?? ""}\n`,
 					`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 					`${activity.transitDistance} km\n`,
-					`\$${ratePerKm}/km\n`,
+					`$${ratePerKm}/km\n`,
 					`$${travelTotal.toFixed(2)}\n`
 				]);
 			}
