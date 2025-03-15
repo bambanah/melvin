@@ -6,7 +6,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger,
+	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import Tooltip from "@/components/ui/tooltip";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
@@ -30,7 +30,7 @@ export default function InvoiceList({ clientId }: Props) {
 	// const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
 
 	const { data: invoices } = trpc.invoice.list.useQuery({
-		clientId,
+		clientId
 	});
 
 	const trpcUtils = trpc.useUtils();
@@ -52,7 +52,7 @@ export default function InvoiceList({ clientId }: Props) {
 			header: ({ column }) => (
 				<SortingHeader column={column}>Date</SortingHeader>
 			),
-			cell: ({ row }) => <>{dayjs.utc(row.original.date).format("DD/MM/YY")}</>,
+			cell: ({ row }) => <>{dayjs.utc(row.original.date).format("DD/MM/YY")}</>
 		},
 		{
 			accessorKey: "invoiceNo",
@@ -63,7 +63,7 @@ export default function InvoiceList({ clientId }: Props) {
 				<Link href={`/dashboard/invoices/${row.original.id}`}>
 					{row.getValue("invoiceNo")}
 				</Link>
-			),
+			)
 		},
 		{
 			id: "client-name",
@@ -75,7 +75,7 @@ export default function InvoiceList({ clientId }: Props) {
 				<Link href={`/dashboard/clients/${row.original.client.id}`}>
 					{row.original.client.name}
 				</Link>
-			),
+			)
 		},
 		{
 			id: "total-cost",
@@ -85,13 +85,13 @@ export default function InvoiceList({ clientId }: Props) {
 				return totalCost > 0
 					? totalCost.toLocaleString(undefined, {
 							style: "currency",
-							currency: "AUD",
+							currency: "AUD"
 						})
 					: "N/A";
 			},
 			header: ({ column }) => (
 				<SortingHeader column={column}>Total</SortingHeader>
-			),
+			)
 		},
 		{
 			accessorKey: "status",
@@ -120,7 +120,7 @@ export default function InvoiceList({ clientId }: Props) {
 							))}
 					</DropdownMenuContent>
 				</DropdownMenu>
-			),
+			)
 		},
 		{
 			id: "actions",
@@ -176,8 +176,8 @@ export default function InvoiceList({ clientId }: Props) {
 						</DropdownMenu>
 					</div>
 				);
-			},
-		},
+			}
+		}
 	];
 
 	return (

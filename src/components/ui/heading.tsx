@@ -7,7 +7,7 @@ const variantStyles: Record<Size, string> = {
 	small: "text-lg md:text-2xl",
 	medium: "text-xl md:text-3xl",
 	large: "text-2xl md:text-4xl",
-	xlarge: "text-4xl md:text-6xl",
+	xlarge: "text-4xl md:text-6xl"
 };
 
 interface Props {

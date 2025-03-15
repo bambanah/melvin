@@ -12,5 +12,5 @@ export default trpcNext.createNextApiHandler({
 						`❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`
 					);
 				}
-			: undefined,
+			: undefined
 });

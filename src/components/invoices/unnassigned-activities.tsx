@@ -30,7 +30,7 @@ const UnassignedActivities = ({ activities, getValues, setValue }: Props) => {
 								"flex cursor-pointer items-center gap-2 rounded-md border px-2 py-3 shadow-md transition-shadow hover:border-orange-500 md:p-4",
 								getValues("activityIds")?.some((c) => c === activity.id)
 									? "border-primary/20 bg-primary/10"
-									: "bg-background",
+									: "bg-background"
 							])}
 							htmlFor={activity.id}
 						>
@@ -44,7 +44,7 @@ const UnassignedActivities = ({ activities, getValues, setValue }: Props) => {
 										const activityIds = getValues("activityIds") ?? [];
 										setValue("activityIds", [...activityIds, activity.id], {
 											shouldTouch: true,
-											shouldValidate: true,
+											shouldValidate: true
 										});
 									} else {
 										setValue(

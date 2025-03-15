@@ -14,7 +14,7 @@ const EditActivityContent = () => {
 		: router.query.id;
 
 	const { data: activity, error } = trpc.activity.byId.useQuery({
-		id: activityId ?? "",
+		id: activityId ?? ""
 	});
 
 	if (error) {

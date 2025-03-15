@@ -16,7 +16,7 @@ import {
 	Plane,
 	Search,
 	Undo,
-	User,
+	User
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -34,7 +34,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 
 	const trpcUtils = trpc.useUtils();
 	const { data: invoice, error } = trpc.invoice.byId.useQuery({
-		id: invoiceId,
+		id: invoiceId
 	});
 	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
 
@@ -88,7 +88,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					className={cn([
 						"group relative h-full max-h-[12rem] min-h-[12rem] basis-1/2 overflow-hidden md:max-h-[15rem]",
 						invoice.activities.length > 0 &&
-							"cursor-pointer bg-foreground/10 shadow-inner",
+							"cursor-pointer bg-foreground/10 shadow-inner"
 					])}
 				>
 					{invoice.activities.length > 0 ? (

@@ -14,7 +14,7 @@ const EditClient = () => {
 
 	const { data: client, error } = trpc.clients.byId.useQuery(
 		{
-			id: clientId ?? "",
+			id: clientId ?? ""
 		},
 		{ enabled: !!clientId }
 	);

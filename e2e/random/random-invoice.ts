@@ -6,7 +6,7 @@ export const randomInvoice = ({
 	billTo,
 	supportItemId,
 	ownerId,
-	clientId,
+	clientId
 }: {
 	invoiceNo?: string;
 	billTo?: string;
@@ -27,7 +27,7 @@ export const randomInvoice = ({
 			startTime: "13:00",
 			endTime: "14:00",
 			transitDistance: faker.number.int({ min: 1, max: 20 }),
-			transitDuration: faker.number.int({ min: 1, max: 20 }),
-		},
-	],
+			transitDuration: faker.number.int({ min: 1, max: 20 })
+		}
+	]
 });

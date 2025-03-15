@@ -6,14 +6,14 @@ import {
 	FormControl,
 	FormField,
 	FormItem,
-	FormMessage,
+	FormMessage
 } from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import {
 	Popover,
 	PopoverContent,
-	PopoverTrigger,
+	PopoverTrigger
 } from "@/components/ui/popover";
 import { stripTimezone } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
@@ -27,7 +27,7 @@ import {
 	ChevronUp,
 	Clock,
 	Plus,
-	X,
+	X
 } from "lucide-react";
 import { useCallback, useEffect, useMemo } from "react";
 import {
@@ -35,7 +35,7 @@ import {
 	UseFormGetValues,
 	UseFormSetValue,
 	UseFormWatch,
-	useFieldArray,
+	useFieldArray
 } from "react-hook-form";
 
 import dayjs from "dayjs";
@@ -54,7 +54,7 @@ const InvoiceActivityCreationForm = ({
 	control,
 	getValues,
 	setValue,
-	watch,
+	watch
 }: Props) => {
 	const { data: { supportItems: groupSupportItems } = {} } =
 		trpc.supportItem.list.useQuery({ isGroup: true });
@@ -68,10 +68,10 @@ const InvoiceActivityCreationForm = ({
 		fields,
 		append: appendActivityGroup,
 		remove,
-		update,
+		update
 	} = useFieldArray({
 		control,
-		name: "activitiesToCreate",
+		name: "activitiesToCreate"
 	});
 
 	const handleMove = (
@@ -92,15 +92,15 @@ const InvoiceActivityCreationForm = ({
 
 		setValue(`activitiesToCreate.${previousFieldIndex}.activities`, [
 			...previousActivities.slice(0, activityFieldIndex),
-			...previousActivities.slice(activityFieldIndex + 1),
+			...previousActivities.slice(activityFieldIndex + 1)
 		]);
 
 		update(newIndex, {
 			...getValues().activitiesToCreate[newIndex],
 			activities: [
 				...getValues().activitiesToCreate[newIndex].activities,
-				activityToMove,
-			],
+				activityToMove
+			]
 		});
 	};
 
@@ -109,8 +109,8 @@ const InvoiceActivityCreationForm = ({
 			...getValues().activitiesToCreate[idx],
 			activities: [
 				...getValues().activitiesToCreate[idx].activities,
-				{ date: stripTimezone(new Date()) },
-			],
+				{ date: stripTimezone(new Date()) }
+			]
 		});
 	};
 
@@ -122,8 +122,8 @@ const InvoiceActivityCreationForm = ({
 			...field,
 			activities: [
 				...field.activities.slice(0, activityFieldIndex),
-				...field.activities.slice(activityFieldIndex),
-			],
+				...field.activities.slice(activityFieldIndex)
+			]
 		});
 	};
 
@@ -334,7 +334,7 @@ const InvoiceActivityCreationForm = ({
 					appendActivityGroup({
 						supportItemId: "",
 						groupClientId: "",
-						activities: [{ date: stripTimezone(new Date()) }],
+						activities: [{ date: stripTimezone(new Date()) }]
 					})
 				}
 				className="mr-auto"

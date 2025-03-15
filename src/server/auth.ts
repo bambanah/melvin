@@ -3,7 +3,7 @@ import type { GetServerSidePropsContext } from "next";
 import {
 	getServerSession,
 	type DefaultSession,
-	type NextAuthOptions,
+	type NextAuthOptions
 } from "next-auth";
 import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
@@ -27,27 +27,27 @@ export const authOptions: NextAuthOptions = {
 			}
 
 			return session;
-		},
+		}
 	},
 	providers: [
 		EmailProvider({
 			server: process.env.EMAIL_SERVER,
-			from: process.env.EMAIL_FROM,
+			from: process.env.EMAIL_FROM
 		}),
 		GoogleProvider({
 			clientId: process.env.GOOGLE_ID || "",
-			clientSecret: process.env.GOOGLE_SECRET || "",
-		}),
+			clientSecret: process.env.GOOGLE_SECRET || ""
+		})
 	],
 	pages: {
-		signIn: "/login",
+		signIn: "/login"
 	},
-	secret: "Yrrn1bc1eCZ864WRDTMsOZuDyoZOJmNEyXQD8z7jm2U=",
+	secret: "Yrrn1bc1eCZ864WRDTMsOZuDyoZOJmNEyXQD8z7jm2U="
 };
 
 export const getServerAuthSession = ({
 	req,
-	res,
+	res
 }: {
 	req: GetServerSidePropsContext["req"];
 	res: GetServerSidePropsContext["res"];

@@ -9,5 +9,5 @@ export const statusFilterMap: Record<
 > = {
 	ALL: undefined,
 	UNPAID: [InvoiceStatus.CREATED, InvoiceStatus.SENT],
-	PAID: [InvoiceStatus.PAID],
+	PAID: [InvoiceStatus.PAID]
 };

@@ -13,7 +13,7 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 	children,
 	queryResult,
 	dataKey,
-	className,
+	className
 }: InfiniteListProps<TData, TError, TKey>) => {
 	const { data, fetchNextPage, isSuccess, isLoading, isFetching, hasNextPage } =
 		queryResult;
@@ -40,7 +40,7 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 		<div
 			className={cn([
 				"mx-auto flex h-full w-full max-w-4xl flex-col",
-				className,
+				className
 			])}
 		>
 			{isSuccess && (

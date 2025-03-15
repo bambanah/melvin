@@ -9,7 +9,7 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-	AlertDialogTrigger,
+	AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import Heading from "@/components/ui/heading";
@@ -68,7 +68,7 @@ const EditAccountPage = () => {
 						<ChevronRight
 							className={cn([
 								"duration-75",
-								isAdvancedExpanded ? "rotate-90" : "",
+								isAdvancedExpanded ? "rotate-90" : ""
 							])}
 						/>
 						<Heading size="small">Advanced Options</Heading>

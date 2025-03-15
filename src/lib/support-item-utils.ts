@@ -9,11 +9,11 @@ export const getSupportItemDefs = (registrationGroupName?: string) => {
 };
 
 export const getRegistrationGroups = () => [
-	...new Set(supportItems.map((item) => item.registrationGroupName)),
+	...new Set(supportItems.map((item) => item.registrationGroupName))
 ];
 
 export const getSupportCategories = () => [
-	...new Set(supportItems.map((item) => item.supportCategoryName)),
+	...new Set(supportItems.map((item) => item.supportCategoryName))
 ];
 
 export const getNonLabourTravelCode = (supportItemCode: string) => {

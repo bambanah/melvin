@@ -24,7 +24,7 @@ const MainNav = () => {
 							"transition-colors",
 							pathname?.startsWith(href)
 								? "font-semibold text-foreground hover:text-foreground"
-								: "text-foreground/75 hover:text-foreground",
+								: "text-foreground/75 hover:text-foreground"
 						)}
 					>
 						{title}

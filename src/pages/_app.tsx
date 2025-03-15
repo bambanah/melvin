@@ -14,20 +14,20 @@ import "react-toastify/dist/ReactToastify.css";
 // Google fonts
 const inter = Inter({
 	subsets: ["latin"],
-	variable: "--font-inter",
+	variable: "--font-inter"
 });
 const notoSerif = Noto_Serif({
 	subsets: ["latin"],
-	variable: "--font-noto-serif",
+	variable: "--font-noto-serif"
 });
 const patuaOne = Patua_One({
 	subsets: ["latin"],
 	variable: "--font-patua-one",
-	weight: "400",
+	weight: "400"
 });
 const robotoMono = Roboto_Mono({
 	subsets: ["latin"],
-	variable: "--font-roboto-mono",
+	variable: "--font-roboto-mono"
 });
 
 function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {

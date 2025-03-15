@@ -33,13 +33,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		return {
 			redirect: {
 				destination: "/dashboard",
-				permanent: false,
-			},
+				permanent: false
+			}
 		};
 	}
 
 	return {
-		props: {},
+		props: {}
 	};
 };
 

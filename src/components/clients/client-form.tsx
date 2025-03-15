@@ -6,7 +6,7 @@ import {
 	FormField,
 	FormItem,
 	FormLabel,
-	FormMessage,
+	FormMessage
 } from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
@@ -43,8 +43,8 @@ const ClientForm = ({ existingClient }: Props) => {
 			defaultTransitDistance:
 				existingClient?.defaultTransitDistance?.toString() ?? "",
 			defaultTransitTime: existingClient?.defaultTransitTime?.toString() ?? "",
-			invoiceEmail: existingClient?.invoiceEmail ?? "",
-		},
+			invoiceEmail: existingClient?.invoiceEmail ?? ""
+		}
 	});
 
 	const submitCallback = (successMessage: string) => {
@@ -59,13 +59,13 @@ const ClientForm = ({ existingClient }: Props) => {
 			updateClientMutation
 				.mutateAsync({
 					id: existingClient.id,
-					client: data,
+					client: data
 				})
 				.then(() => submitCallback("Client updated"));
 		} else {
 			createClientMutation
 				.mutateAsync({
-					client: data,
+					client: data
 				})
 				.then(() => submitCallback("Client created"));
 		}

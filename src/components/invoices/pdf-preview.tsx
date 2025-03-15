@@ -16,7 +16,7 @@ const PdfPreview: FC<PdfProps> = ({ invoiceId, className }) => {
 	const [numPages, setNumPages] = useState<number | null>(null);
 
 	const onDocumentLoadSuccess = ({
-		numPages: nextNumPages,
+		numPages: nextNumPages
 	}: {
 		numPages: number;
 	}) => {

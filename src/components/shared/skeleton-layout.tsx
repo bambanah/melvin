@@ -9,7 +9,7 @@ const SkeletonLayout = () => {
 
 			<ListFilterRow
 				items={Array.from({ length: 2 }).map(() => ({
-					children: <Skeleton />,
+					children: <Skeleton />
 				}))}
 			/>
 			<ul>

@@ -18,15 +18,15 @@ export const invoiceSchema = z.object({
 						endTime: z.string(),
 						itemDistance: z.number(),
 						transitDistance: z.number().optional(),
-						transitDuration: z.number().optional(),
+						transitDuration: z.number().optional()
 					})
 					.partial({ startTime: true, endTime: true, itemDistance: true })
 					.refine(
 						(data) =>
 							(!!data.startTime && !!data.endTime) || !!data.itemDistance
 					)
-			),
+			)
 		})
-	),
+	)
 });
 export type InvoiceSchema = z.infer<typeof invoiceSchema>;

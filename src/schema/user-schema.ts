@@ -15,6 +15,6 @@ export const userSchema = z.object({
 		.number()
 		.min(100_000, "Must be 6 digits")
 		.max(999_999, "Must be 6 digits")
-		.optional(),
+		.optional()
 });
 export type UserSchema = z.infer<typeof userSchema>;

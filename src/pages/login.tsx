@@ -3,7 +3,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getProviders, getSession } from "next-auth/react";
 
 export default function Login({
-	providers,
+	providers
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 	return <LoginPage providers={providers} />;
 }
@@ -15,8 +15,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		return {
 			redirect: {
 				destination: "/dashboard/invoices",
-				permanent: false,
-			},
+				permanent: false
+			}
 		};
 	}
 
@@ -24,7 +24,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 	return {
 		props: {
-			providers,
-		},
+			providers
+		}
 	};
 };

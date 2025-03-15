@@ -2,7 +2,7 @@ import type { Config } from "jest";
 import nextJest from "next/jest";
 
 const createJestConfig = nextJest({
-	dir: "./",
+	dir: "./"
 });
 
 const customJestConfig: Config = {
@@ -11,10 +11,10 @@ const customJestConfig: Config = {
 	testEnvironment: "jest-environment-jsdom",
 	moduleNameMapper: {
 		"^src/(.*)$": "<rootDir>/src/$1",
-		"^@/(.*)$": "<rootDir>/src/$1",
+		"^@/(.*)$": "<rootDir>/src/$1"
 	},
 	testMatch: ["<rootDir>/**/*.test.ts"],
-	testPathIgnorePatterns: ["<rootDir>/e2e/"],
+	testPathIgnorePatterns: ["<rootDir>/e2e/"]
 };
 
 export default createJestConfig(customJestConfig);

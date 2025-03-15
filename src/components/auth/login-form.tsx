@@ -4,7 +4,7 @@ import {
 	FormControl,
 	FormField,
 	FormItem,
-	FormMessage,
+	FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,13 +13,13 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const loginFormSchema = z.object({
-	email: z.string().email(),
+	email: z.string().email()
 });
 type LoginFormSchema = z.infer<typeof loginFormSchema>;
 
 const LoginForm = () => {
 	const form = useForm<LoginFormSchema>({
-		resolver: zodResolver(loginFormSchema),
+		resolver: zodResolver(loginFormSchema)
 	});
 
 	const onSubmit = (data: LoginFormSchema) => {

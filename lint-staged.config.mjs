@@ -7,8 +7,8 @@ const config = {
 	"*.{js,jsx,ts,tsx}": [
 		"eslint --fix",
 		"eslint",
-		"bash -c tsc --pretty --noEmit",
-	],
+		"bash -c tsc --pretty --noEmit"
+	]
 };
 
 export default config;

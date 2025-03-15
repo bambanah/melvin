@@ -14,12 +14,12 @@ const badgeVariants = cva(
 				success: "border-transparent bg-success text-success-foreground",
 				destructive:
 					"border-transparent bg-destructive text-destructive-foreground",
-				outline: "text-foreground",
-			},
+				outline: "text-foreground"
+			}
 		},
 		defaultVariants: {
-			variant: "default",
-		},
+			variant: "default"
+		}
 	}
 );
 

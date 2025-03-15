@@ -6,12 +6,12 @@ module.exports = {
 	parser: "@typescript-eslint/parser",
 	env: {
 		browser: true,
-		es2021: true,
+		es2021: true
 	},
 	extends: [
 		"next/core-web-vitals",
 		"plugin:@typescript-eslint/recommended",
-		"prettier",
+		"prettier"
 	],
 	rules: {
 		"quote-props": ["error", "consistent-as-needed"],
@@ -22,8 +22,8 @@ module.exports = {
 		"no-console": [
 			"error",
 			{
-				allow: ["warn", "error"],
-			},
+				allow: ["warn", "error"]
+			}
 		],
 		"jsx-a11y/anchor-is-valid": "off",
 		"jsx-a11y/no-static-element-interactions": "off",
@@ -40,24 +40,24 @@ module.exports = {
 					"SupportItemSelect",
 					"ClientSelect",
 					"TimeInput",
-					"DatePicker",
+					"DatePicker"
 				],
-				depth: 3,
-			},
-		],
+				depth: 3
+			}
+		]
 	},
 	overrides: [
 		{
 			files: ["**/*.unit.@(test|spec).[jt]s?(x)"],
 			plugins: ["testing-library"],
-			extends: ["plugin:testing-library/react"],
+			extends: ["plugin:testing-library/react"]
 		},
 		{
 			files: ["**/e2e/**/*.@(test|spec).[jt]s?(x)"],
 			extends: ["plugin:playwright/playwright-test"],
 			rules: {
-				"playwright/no-skipped-test": "off",
-			},
-		},
-	],
+				"playwright/no-skipped-test": "off"
+			}
+		}
+	]
 };

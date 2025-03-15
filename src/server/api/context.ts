@@ -8,6 +8,6 @@ export const createContext = async ({ req, res }: CreateNextContextOptions) => {
 
 	return {
 		prisma,
-		session,
+		session
 	};
 };

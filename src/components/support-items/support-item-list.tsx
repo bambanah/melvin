@@ -10,7 +10,7 @@ const ItemCode = ({
 	descriptor,
 	code,
 	rate,
-	rateType,
+	rateType
 }: {
 	descriptor: string;
 	code: string | null;

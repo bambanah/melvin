@@ -10,10 +10,10 @@ export const activitySchema = z
 		endTime: z.string().min(1, "End time is required"),
 		itemDistance: z.number(),
 		transitDistance: z.string().optional(),
-		transitDuration: z.string().optional(),
+		transitDuration: z.string().optional()
 	})
 	.partial({ startTime: true, endTime: true, itemDistance: true })
 	.refine(
-		(data) => (!!data.startTime && !!data.endTime) || !!data.itemDistance,
+		(data) => (!!data.startTime && !!data.endTime) || !!data.itemDistance
 	);
 export type ActivitySchema = z.infer<typeof activitySchema>;

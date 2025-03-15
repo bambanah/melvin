@@ -8,14 +8,14 @@ import {
 	FormField,
 	FormItem,
 	FormLabel,
-	FormMessage,
+	FormMessage
 } from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import {
 	Popover,
 	PopoverContent,
-	PopoverTrigger,
+	PopoverTrigger
 } from "@/components/ui/popover";
 import { stripTimezone } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
@@ -54,8 +54,8 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 				: stripTimezone(new Date()),
 			invoiceNo: existingInvoice?.invoiceNo ?? "",
 			billTo: existingInvoice?.billTo ?? "",
-			activityIds: existingInvoice?.activities.map((a) => a.id) ?? [],
-		},
+			activityIds: existingInvoice?.activities.map((a) => a.id) ?? []
+		}
 	});
 
 	const clientId = form.watch("clientId");
@@ -63,16 +63,16 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 	const { data: billTo, refetch: refetchBillTo } =
 		trpc.clients.getBillTo.useQuery(
 			{
-				id: clientId,
+				id: clientId
 			},
 			{ enabled: false }
 		);
 	const {
 		data: { nextInvoiceNo, latestInvoiceNo } = {},
-		refetch: refetchNextInvoiceNo,
+		refetch: refetchNextInvoiceNo
 	} = trpc.clients.getNextInvoiceNo.useQuery(
 		{
-			id: clientId,
+			id: clientId
 		},
 		{ enabled: false }
 	);
@@ -93,7 +93,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 
 	const { data: { activities } = {} } = trpc.activity.list.useQuery({
 		clientId,
-		assigned: false,
+		assigned: false
 	});
 
 	return (
@@ -182,7 +182,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 									<FormDescription
 										className={cn([
 											"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
-											billTo ? "max-h-5" : "max-h-0",
+											billTo ? "max-h-5" : "max-h-0"
 										])}
 									>
 										{billTo ? "Loaded from client information" : <br />}
@@ -203,7 +203,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 									<FormDescription
 										className={cn([
 											"overflow-y-hidden transition-[max-height] duration-500 ease-in-out",
-											billTo ? "max-h-5" : "max-h-0",
+											billTo ? "max-h-5" : "max-h-0"
 										])}
 									>
 										Previous invoice was {latestInvoiceNo}

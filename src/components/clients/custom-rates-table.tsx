@@ -4,7 +4,7 @@ import {
 	TableBody,
 	TableHead,
 	TableHeader,
-	TableRow,
+	TableRow
 } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 

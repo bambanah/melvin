@@ -6,7 +6,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger,
+	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { trpc } from "@/lib/trpc";
 import { ClientListOutput } from "@/server/api/routers/client-router";
@@ -22,27 +22,27 @@ const columns: ColumnDef<ClientListOutput>[] = [
 			<Link href={`/dashboard/clients/${row.original.id}`}>
 				{row.getValue("name")}
 			</Link>
-		),
+		)
 	},
 	{
 		accessorKey: "number",
 		header: ({ column }) => (
 			<SortingHeader column={column}>Number</SortingHeader>
-		),
+		)
 	},
 	{
 		accessorKey: "invoiceNumberPrefix",
 		header: ({ column }) => (
 			<SortingHeader column={column}>Invoice Prefix</SortingHeader>
 		),
-		cell: ({ row }) => <div>{row.getValue("invoiceNumberPrefix")}##</div>,
+		cell: ({ row }) => <div>{row.getValue("invoiceNumberPrefix")}##</div>
 	},
 	{
 		id: "invoice-no",
 		accessorFn: (client) => client.invoices.length,
 		header: ({ column }) => (
 			<SortingHeader column={column}># Invoices</SortingHeader>
-		),
+		)
 	},
 	{
 		id: "actions",
@@ -68,8 +68,8 @@ const columns: ColumnDef<ClientListOutput>[] = [
 					</DropdownMenuContent>
 				</DropdownMenu>
 			);
-		},
-	},
+		}
+	}
 ];
 
 const ClientList = () => {

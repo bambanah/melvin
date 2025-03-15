@@ -24,7 +24,7 @@ const request = async (request: NextApiRequest, response: NextApiResponse) => {
 		response.writeHead(200, {
 			"Content-Type": "application/pdf",
 			"Content-Length": pdfContent.length,
-			"Content-Disposition": `inline; filename="${fileName}"`,
+			"Content-Disposition": `inline; filename="${fileName}"`
 		});
 
 		response.end(pdfContent);
