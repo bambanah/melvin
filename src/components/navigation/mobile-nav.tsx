@@ -34,7 +34,7 @@ const MobileNav = () => {
 					className="flex items-center"
 					onOpenChange={setOpen}
 				>
-					<span className="-mt-1 font-display text-3xl font-normal text-[#ff8484]">
+					<span className="font-display -mt-1 text-3xl font-normal text-[#ff8484]">
 						melvin
 					</span>
 				</MobileLink>

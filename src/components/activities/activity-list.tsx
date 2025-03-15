@@ -88,12 +88,12 @@ function ActivityList({
 													</p>
 												</Link>
 												{activity.itemDistance ? (
-													<div className="flex items-center gap-2 whitespace-nowrap text-foreground/80">
+													<div className="text-foreground/80 flex items-center gap-2 whitespace-nowrap">
 														<Car className="h-4 w-4" />
 														{activity.itemDistance}km
 													</div>
 												) : (
-													<div className="flex items-center gap-2 whitespace-nowrap text-foreground/80">
+													<div className="text-foreground/80 flex items-center gap-2 whitespace-nowrap">
 														<Clock className="h-4 w-4" />
 														{dayjs
 															.utc(activity.startTime)
@@ -125,7 +125,7 @@ function ActivityList({
 														</div>
 													</Link>
 												)}
-												<div className="flex items-center gap-2 text-foreground/80 md:flex-row-reverse">
+												<div className="text-foreground/80 flex items-center gap-2 md:flex-row-reverse">
 													<CircleDollarSign className="h-4 w-4" />
 													<span>
 														{getTotalCostOfActivities([

@@ -148,7 +148,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 							control={form.control}
 							name="isGroup"
 							render={({ field }) => (
-								<FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border px-4 py-3">
+								<FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-md border px-4 py-3">
 									<FormControl>
 										<Checkbox
 											checked={field.value}
