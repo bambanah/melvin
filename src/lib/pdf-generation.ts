@@ -20,7 +20,7 @@ dayjs.extend(timezone);
 const generatePDF = async (invoiceId: string) => {
 	const client = await prisma.invoice
 		.findUnique({
-			where: { id: invoiceId },
+			where: { id: invoiceId }
 		})
 		.client({ select: { id: true } });
 
@@ -34,12 +34,12 @@ const generatePDF = async (invoiceId: string) => {
 				include: {
 					supportItem: {
 						include: {
-							supportItemRates: { where: { clientId: client.id } },
-						},
-					},
-				},
-			},
-		},
+							supportItemRates: { where: { clientId: client.id } }
+						}
+					}
+				}
+			}
+		}
 	});
 
 	if (!invoice || !invoice.client || !invoice.activities)
@@ -60,7 +60,7 @@ const generatePDF = async (invoiceId: string) => {
 	const invoiceDetails: string[] = [
 		`Invoice Number: ${invoice.invoiceNo}`,
 		`Invoice Date: ${dayjs(invoice.date).format("DD/MM/YY")}`,
-		`Participant Name: ${invoice.client?.name}`,
+		`Participant Name: ${invoice.client?.name}`
 	];
 	if (invoice.client?.number)
 		invoiceDetails.push(`Participant Number: ${invoice.client?.number}`);
@@ -106,7 +106,7 @@ const generatePDF = async (invoiceId: string) => {
 				`$${rate?.toFixed(2)}${`/${
 					activity.supportItem.rateType === RateType.HOUR ? "hr" : "km"
 				}`}\n`,
-				`$${totalCost.toFixed(2)}\n`,
+				`$${totalCost.toFixed(2)}\n`
 			];
 
 			activityStrings.push(currentActivity);
@@ -125,7 +125,7 @@ const generatePDF = async (invoiceId: string) => {
 					`$${rate.toFixed(2)}${`/${
 						activity.supportItem.rateType === RateType.HOUR ? "hr" : "km"
 					}`}\n`,
-					`$${travelTotal.toFixed(2)}\n`,
+					`$${travelTotal.toFixed(2)}\n`
 				]);
 			}
 
@@ -145,7 +145,7 @@ const generatePDF = async (invoiceId: string) => {
 					`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 					`${activity.transitDistance} km\n`,
 					`\$${ratePerKm}/km\n`,
-					`$${travelTotal.toFixed(2)}\n`,
+					`$${travelTotal.toFixed(2)}\n`
 				]);
 			}
 		})
@@ -189,12 +189,12 @@ const generatePDF = async (invoiceId: string) => {
 			{
 				content: "Total",
 				colSpan: 4,
-				styles: { fontStyle: "bold", halign: "right" },
+				styles: { fontStyle: "bold", halign: "right" }
 			},
 			{
 				content: `$${totalCost.toFixed(2)}`,
-				styles: { fontStyle: "bold" },
-			},
+				styles: { fontStyle: "bold" }
+			}
 		],
 		[{ content: "", colSpan: 5, styles: { fillColor: "#fff" } }]
 	);
@@ -215,7 +215,7 @@ const generatePDF = async (invoiceId: string) => {
 				? `Account Number: ${user.bankNumber
 						?.toString()
 						.replaceAll(/\B(?=(\d{3})+(?!\d))/g, " ")}`
-				: "",
+				: ""
 		].filter((val) => val.length > 0);
 
 		if (content.length === 5) {
@@ -230,9 +230,9 @@ const generatePDF = async (invoiceId: string) => {
 						fillColor: "#FFF",
 						fontStyle: "bold",
 						lineWidth: 0.2,
-						lineColor: "#000",
-					},
-				},
+						lineColor: "#000"
+					}
+				}
 			]);
 		}
 	}
@@ -247,8 +247,8 @@ const generatePDF = async (invoiceId: string) => {
 				"Date",
 				"Count",
 				{ content: "Unit Price", styles: { halign: "right" } },
-				"Total",
-			],
+				"Total"
+			]
 		],
 		body: values,
 		startY: startY,
@@ -257,24 +257,24 @@ const generatePDF = async (invoiceId: string) => {
 		headStyles: {
 			lineColor: "#000",
 			fillColor: "#FFF",
-			textColor: "#000",
+			textColor: "#000"
 		},
 		bodyStyles: {
-			textColor: "#000",
+			textColor: "#000"
 		},
 		columnStyles: {
 			0: {
 				cellWidth: 50,
-				fontStyle: "bold",
+				fontStyle: "bold"
 			},
 			1: {
-				cellWidth: 20,
+				cellWidth: 20
 			},
 			3: {
 				cellWidth: 20,
-				halign: "right",
-			},
-		},
+				halign: "right"
+			}
+		}
 	});
 
 	const fileName = getInvoiceFileName(parseInvoice(invoice));
@@ -283,7 +283,7 @@ const generatePDF = async (invoiceId: string) => {
 		pdfString: document_
 			.output("dataurlstring")
 			.replace(/^data:application\/pdf;filename=.+\.pdf;base64,/, ""),
-		fileName,
+		fileName
 	};
 };
 

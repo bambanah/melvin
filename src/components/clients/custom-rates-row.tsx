@@ -67,7 +67,7 @@ export function CustomRatesRow({ clientId, rate }: CustomRatesRowProps) {
 		rate.weekdayRate,
 		rate.weeknightRate,
 		rate.saturdayRate,
-		rate.sundayRate,
+		rate.sundayRate
 	]);
 
 	async function onUpdate() {
@@ -77,12 +77,12 @@ export function CustomRatesRow({ clientId, rate }: CustomRatesRowProps) {
 				weekdayRate: weekdayRate ? Number(weekdayRate) : undefined,
 				weeknightRate: weeknightRate ? Number(weeknightRate) : undefined,
 				saturdayRate: saturdayRate ? Number(saturdayRate) : undefined,
-				sundayRate: sundayRate ? Number(sundayRate) : undefined,
-			},
+				sundayRate: sundayRate ? Number(sundayRate) : undefined
+			}
 		}).then(() => {
 			setIsEditing(false);
 			trpcUtils.supportItem.getCustomRatesForClient.invalidate({
-				id: clientId,
+				id: clientId
 			});
 		});
 	}
@@ -90,7 +90,7 @@ export function CustomRatesRow({ clientId, rate }: CustomRatesRowProps) {
 	function onDelete() {
 		deleteCustomRate({ id: rate.id }).then(() =>
 			trpcUtils.supportItem.getCustomRatesForClient.invalidate({
-				id: clientId,
+				id: clientId
 			})
 		);
 	}

@@ -6,12 +6,12 @@ export default defineConfig({
 		headless: !!process.env.CI,
 		baseURL: "http://localhost:3000/dashboard",
 		storageState: "./e2e/setup/storage-state.json",
-		screenshot: "only-on-failure",
+		screenshot: "only-on-failure"
 	},
 	testDir: "./e2e",
 	webServer: {
 		command: "pnpm dev:next",
 		url: "http://localhost:3000",
-		reuseExistingServer: !process.env.CI,
-	},
+		reuseExistingServer: !process.env.CI
+	}
 });

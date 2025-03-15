@@ -8,7 +8,7 @@ async function globalSetup(config: FullConfig) {
 
 	await prisma.user.deleteMany({ where: { email: testUser.email } });
 	const user = await prisma.user.create({
-		data: testUser,
+		data: testUser
 	});
 
 	const browser = await chromium.launch();
@@ -23,8 +23,8 @@ async function globalSetup(config: FullConfig) {
 			path: "/",
 			httpOnly: true,
 			sameSite: "Lax",
-			expires: dayjs().add(1, "month").unix(),
-		},
+			expires: dayjs().add(1, "month").unix()
+		}
 	]);
 
 	await page.context().storageState({ path: storageState as string });

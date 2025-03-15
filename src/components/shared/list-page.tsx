@@ -16,7 +16,7 @@ const Header = ({
 	title,
 	createNewHref,
 	extraButtons,
-	variant = "default",
+	variant = "default"
 }: HeaderProps) => (
 	<div className="flex items-center justify-between gap-2 py-2 sm:px-4">
 		{title && <h2 className="mr-auto text-2xl font-bold">{title}</h2>}
@@ -55,7 +55,7 @@ const Item = ({
 	<Link
 		className={cn([
 			"flex w-full justify-between gap-2 p-4 text-sm text-neutral-900 transition-colors duration-75 hover:bg-orange-100",
-			className,
+			className
 		])}
 		{...rest}
 	>
@@ -72,7 +72,7 @@ const PageComponent = ({ children, className }: PageComponentProps) => {
 		<div
 			className={cn([
 				"mx-auto flex w-full max-w-4xl flex-col gap-4",
-				className,
+				className
 			])}
 		>
 			{children}

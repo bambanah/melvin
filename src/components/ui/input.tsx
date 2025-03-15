@@ -5,7 +5,7 @@ import {
 	FieldValues,
 	Path,
 	RegisterOptions,
-	UseFormRegister,
+	UseFormRegister
 } from "react-hook-form";
 
 export interface InputProps<T extends FieldValues>

@@ -6,7 +6,7 @@ import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import {
 	formatDuration,
 	getDuration,
-	isHoliday as isDateHoliday,
+	isHoliday as isDateHoliday
 } from "@/lib/date-utils";
 import { groupBy } from "@/lib/generic-utils";
 import { trpc } from "@/lib/trpc";
@@ -24,7 +24,7 @@ interface Props {
 }
 
 const groupActivitiesByDate = (
-	activities?: ActivityListOutput["activities"],
+	activities?: ActivityListOutput["activities"]
 ) =>
 	activities
 		? groupBy(activities, (activity) => dayjs(activity.date).toString())
@@ -33,13 +33,13 @@ const groupActivitiesByDate = (
 function ActivityList({
 	invoiceId,
 	displayCreateButton = true,
-	groupByAssignedStatus = true,
+	groupByAssignedStatus = true
 }: Props) {
 	const [assignedFilter, setAssignedFilter] = useState<boolean | undefined>();
 
 	const queryResult = trpc.activity.list.useInfiniteQuery({
 		assigned: groupByAssignedStatus ? assignedFilter : undefined,
-		invoiceId,
+		invoiceId
 	});
 
 	return (
@@ -58,7 +58,7 @@ function ActivityList({
 					items={assignedFilters.map((assigned) => ({
 						onClick: () => setAssignedFilter(assignedFilterMap[assigned]),
 						active: assignedFilter === assignedFilterMap[assigned],
-						children: assigned,
+						children: assigned
 					}))}
 				/>
 			)}
@@ -106,8 +106,8 @@ function ActivityList({
 																formatDuration(
 																	getDuration(
 																		activity.startTime,
-																		activity.endTime,
-																	),
+																		activity.endTime
+																	)
 																)}
 															)
 														</span>
@@ -129,10 +129,10 @@ function ActivityList({
 													<CircleDollarSign className="h-4 w-4" />
 													<span>
 														{getTotalCostOfActivities([
-															activity,
+															activity
 														]).toLocaleString(undefined, {
 															style: "currency",
-															currency: "AUD",
+															currency: "AUD"
 														})}
 													</span>
 												</div>
@@ -141,7 +141,7 @@ function ActivityList({
 									))}
 								</div>
 							</div>
-						),
+						)
 					)
 				}
 			</InfiniteList>

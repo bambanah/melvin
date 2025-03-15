@@ -3,7 +3,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger,
+	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import Heading from "@/components/ui/heading";
 import { trpc } from "@/lib/trpc";
@@ -15,7 +15,7 @@ import {
 	FileText,
 	Pencil,
 	Trash,
-	User,
+	User
 } from "lucide-react";
 import Head from "next/head";
 import Link from "next/link";
@@ -30,7 +30,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 
 	const trpcUtils = trpc.useUtils();
 	const { data: activity, error } = trpc.activity.byId.useQuery({
-		id: activityId,
+		id: activityId
 	});
 	const deleteActivityMutation = trpc.activity.delete.useMutation();
 
@@ -67,7 +67,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 					<Heading size="small">{activity.supportItem.description}</Heading>
 
 					<DropdownMenu>
-						<DropdownMenuTrigger asChild className="grow-0 ">
+						<DropdownMenuTrigger asChild className="grow-0">
 							<Button variant="ghost" size="icon">
 								<EllipsisVertical />
 							</Button>

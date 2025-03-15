@@ -75,3 +75,6 @@ jobs:
 
       - name: Lint
         run: pnpm lint
+
+      - name: Prettier
+        run: pnpm format:check

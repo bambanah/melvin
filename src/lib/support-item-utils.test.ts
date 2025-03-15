@@ -2,7 +2,7 @@ import {
 	getNonLabourTravelCode,
 	getRegistrationGroups,
 	getSupportCategories,
-	getSupportItemDefs,
+	getSupportItemDefs
 } from "@/lib/support-item-utils";
 
 it("Should return correct provider travel - non-labour costs code", () => {

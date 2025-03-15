@@ -17,7 +17,7 @@ const EditInvoice = () => {
 	const modifyInvoiceMutation = trpc.invoice.modify.useMutation();
 
 	const { data: invoice, error } = trpc.invoice.byId.useQuery({
-		id: invoiceId ?? "",
+		id: invoiceId ?? ""
 	});
 
 	if (error) {

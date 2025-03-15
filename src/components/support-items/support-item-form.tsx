@@ -7,7 +7,7 @@ import {
 	FormField,
 	FormItem,
 	FormLabel,
-	FormMessage,
+	FormMessage
 } from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ import {
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
-	SelectValue,
+	SelectValue
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import type { SupportItemSchema } from "@/schema/support-item-schema";
@@ -54,9 +54,9 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 			saturdayCode: existingSupportItem?.saturdayCode ?? "",
 			saturdayRate: Number(existingSupportItem?.saturdayRate) || undefined,
 			sundayCode: existingSupportItem?.sundayCode ?? "",
-			sundayRate: Number(existingSupportItem?.sundayRate) || undefined,
+			sundayRate: Number(existingSupportItem?.sundayRate) || undefined
 		},
-		mode: "onBlur",
+		mode: "onBlur"
 	});
 
 	const onSubmit = (data: SupportItemSchema) => {
@@ -68,14 +68,14 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 
 					trpcUtils.supportItem.list.invalidate();
 					trpcUtils.supportItem.byId.invalidate({
-						id: existingSupportItem.id,
+						id: existingSupportItem.id
 					});
 					router.push("/dashboard/support-items");
 				});
 		} else {
 			createSupportItemMutation
 				.mutateAsync({
-					supportItem: data,
+					supportItem: data
 				})
 				.then(() => {
 					toast.success("Support Item created");
@@ -204,7 +204,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 															register={form.register}
 															rules={{
 																setValueAs: (v) =>
-																	v === "" ? undefined : Number(v),
+																	v === "" ? undefined : Number(v)
 															}}
 															placeholder="rate"
 															{...field}

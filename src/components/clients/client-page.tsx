@@ -6,7 +6,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger,
+	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
@@ -21,7 +21,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 
 	const trpcUtils = trpc.useUtils();
 	const { data: client, error } = trpc.clients.byId.useQuery({
-		id: clientId ?? "",
+		id: clientId ?? ""
 	});
 
 	const deleteClientMutation = trpc.clients.delete.useMutation();

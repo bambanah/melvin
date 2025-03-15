@@ -12,7 +12,7 @@ export const appRouter = router({
 	activity: activityRouter,
 	supportItem: supportItemRouter,
 	clients: clientRouter,
-	pdf: pdfRouter,
+	pdf: pdfRouter
 });
 
 export type AppRouter = typeof appRouter;

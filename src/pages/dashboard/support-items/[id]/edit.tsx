@@ -12,7 +12,7 @@ const EditSupportItem = () => {
 		: router.query.id;
 
 	const { data: supportItem, error } = trpc.supportItem.byId.useQuery({
-		id: supportItemId ?? "",
+		id: supportItemId ?? ""
 	});
 
 	if (error) {

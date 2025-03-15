@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 export const DeleteEntityButton = ({
 	entityId,
-	entityType = "clients",
+	entityType = "clients"
 }: {
 	entityId: string;
 	entityType: "clients" | "invoice";

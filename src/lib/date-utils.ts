@@ -49,7 +49,7 @@ const HOLIDAYS = new Set([
 	dayjs().date(25).month(3).format("DD/MM/YYYY"),
 	dayjs().date(24).month(11).format("DD/MM/YYYY"),
 	dayjs().date(25).month(11).format("DD/MM/YYYY"),
-	dayjs().date(26).month(11).format("DD/MM/YYYY"),
+	dayjs().date(26).month(11).format("DD/MM/YYYY")
 ]);
 
 export function isHoliday(date: Date | string) {

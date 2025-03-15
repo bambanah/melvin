@@ -6,13 +6,13 @@ import {
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
-	SelectValue,
+	SelectValue
 } from "@/components/ui/select";
 import {
 	ChevronLeftIcon,
 	ChevronRightIcon,
 	ChevronsLeft,
-	ChevronsRight,
+	ChevronsRight
 } from "lucide-react";
 
 interface DataTablePaginationProps<TData> {
@@ -20,7 +20,7 @@ interface DataTablePaginationProps<TData> {
 }
 
 export function DataTablePagination<TData>({
-	table,
+	table
 }: DataTablePaginationProps<TData>) {
 	return (
 		<div className="flex items-center justify-between px-2">

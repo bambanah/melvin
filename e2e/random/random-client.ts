@@ -3,7 +3,7 @@ import { faker } from "@faker-js/faker";
 export const randomClient = ({
 	name,
 	number,
-	billTo,
+	billTo
 }: {
 	name?: string;
 	number?: number;
@@ -17,6 +17,6 @@ export const randomClient = ({
 			number?.toString() ??
 			Math.floor(Math.random() * 999_999_999 + 1).toString(),
 		invoiceNumberPrefix: `${clientName.split(" ").slice(-1)}-`,
-		billTo: billTo ?? faker.company.name(),
+		billTo: billTo ?? faker.company.name()
 	};
 };

@@ -8,6 +8,6 @@ export const clientSchema = z.object({
 	invoiceNumberPrefix: z.string().optional(),
 	defaultTransitDistance: z.string().optional(),
 	defaultTransitTime: z.string().optional(),
-	invoiceEmail: z.string().optional(),
+	invoiceEmail: z.string().optional()
 });
 export type ClientSchema = z.infer<typeof clientSchema>;

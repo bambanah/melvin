@@ -13,8 +13,8 @@ export const testUser = {
 	sessions: {
 		create: {
 			expires: dayjs().add(1, "month").toDate(),
-			sessionToken: randomUUID(),
-		},
+			sessionToken: randomUUID()
+		}
 	},
 	account: {
 		create: {
@@ -24,9 +24,9 @@ export const testUser = {
 			access_token: "ggg_zZl1pWIvKkf3UDynZ09zLvuyZsm1yC0YoRPt",
 			token_type: "Bearer",
 			scope:
-				"https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile",
-		},
-	},
+				"https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile"
+		}
+	}
 };
 
 export async function waitForAlert(page: Page, text: string) {
@@ -43,8 +43,8 @@ export async function createRandomSupportItem() {
 	return await prisma.supportItem.create({
 		data: {
 			...supportItem,
-			ownerId: testUser.id,
-		},
+			ownerId: testUser.id
+		}
 	});
 }
 
@@ -54,8 +54,8 @@ export async function createRandomClient() {
 	const createdClient = await prisma.client.create({
 		data: {
 			...client,
-			ownerId: testUser.id,
-		},
+			ownerId: testUser.id
+		}
 	});
 
 	return createdClient;
@@ -72,7 +72,7 @@ export async function createRandomActivity(
 			date: new Date(),
 			startTime: parse("09:15", "HH:mm", new Date()).toISOString(),
 			endTime: parse("15:23", "HH:mm", new Date()).toISOString(),
-			ownerId: testUser.id,
-		},
+			ownerId: testUser.id
+		}
 	});
 }

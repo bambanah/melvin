@@ -4,7 +4,7 @@ import {
 	createRandomActivity,
 	createRandomClient,
 	createRandomSupportItem,
-	waitForAlert,
+	waitForAlert
 } from "./test-utils";
 
 test("Can create, update, and delete invoices", async ({ page }) => {

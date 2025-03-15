@@ -8,7 +8,7 @@ const createContext = async ({ req, res }: CreateNextContextOptions) => {
 
 	return {
 		prisma,
-		session,
+		session
 	};
 };
 
@@ -29,8 +29,8 @@ export const authMiddleware = t.middleware(({ next, ctx }) => {
 
 	return next({
 		ctx: {
-			session: { ...ctx.session, user: ctx.session.user },
-		},
+			session: { ...ctx.session, user: ctx.session.user }
+		}
 	});
 });
 

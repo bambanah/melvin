@@ -19,7 +19,7 @@ const defaultSupportItemSelect = {
 	saturdayCode: true,
 	saturdayRate: true,
 	sundayCode: true,
-	sundayRate: true,
+	sundayRate: true
 } as const satisfies Prisma.SupportItemSelect;
 
 export const supportItemRouter = router({
@@ -27,7 +27,7 @@ export const supportItemRouter = router({
 		.input(
 			baseListQueryInput.extend({
 				description: z.string().optional(),
-				isGroup: z.boolean().optional(),
+				isGroup: z.boolean().optional()
 			})
 		)
 		.query(async ({ ctx, input }) => {
@@ -42,15 +42,15 @@ export const supportItemRouter = router({
 					description: description
 						? {
 								contains: description,
-								mode: "insensitive",
+								mode: "insensitive"
 							}
 						: undefined,
-					isGroup,
+					isGroup
 				},
 				cursor: cursor ? { id: cursor } : undefined,
 				orderBy: {
-					createdAt: "desc",
-				},
+					createdAt: "desc"
+				}
 			});
 
 			let nextCursor: typeof cursor | undefined;
@@ -61,7 +61,7 @@ export const supportItemRouter = router({
 
 			return {
 				supportItems,
-				nextCursor,
+				nextCursor
 			};
 		}),
 	byId: authedProcedure
@@ -75,12 +75,12 @@ export const supportItemRouter = router({
 					saturdayCode: true,
 					saturdayRate: true,
 					sundayCode: true,
-					sundayRate: true,
+					sundayRate: true
 				},
 				where: {
 					ownerId: ctx.session.user.id,
-					id: input.id,
-				},
+					id: input.id
+				}
 			});
 
 			if (!supportItem) {
@@ -92,21 +92,21 @@ export const supportItemRouter = router({
 	create: authedProcedure
 		.input(
 			z.object({
-				supportItem: supportItemSchema,
+				supportItem: supportItemSchema
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
 			const supportItem = await ctx.prisma.supportItem.create({
 				data: {
 					...input.supportItem,
-					ownerId: ctx.session.user.id,
-				},
+					ownerId: ctx.session.user.id
+				}
 			});
 
 			if (!supportItem) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
-					message: "Couldn't create support item",
+					message: "Couldn't create support item"
 				});
 			}
 
@@ -116,22 +116,22 @@ export const supportItemRouter = router({
 		.input(
 			z.object({
 				supportItemRates: supportItemRatesSchema.extend({
-					clientId: z.string().optional(),
-				}),
+					clientId: z.string().optional()
+				})
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
 			const customRates = await ctx.prisma.supportItemRates.create({
 				data: {
 					...input.supportItemRates,
-					ownerId: ctx.session.user.id,
-				},
+					ownerId: ctx.session.user.id
+				}
 			});
 
 			if (!customRates) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
-					message: "Couldn't create custom support item rates",
+					message: "Couldn't create custom support item rates"
 				});
 			}
 
@@ -143,21 +143,21 @@ export const supportItemRouter = router({
 			const customRates = await ctx.prisma.supportItemRates.findMany({
 				where: {
 					ownerId: ctx.session.user.id,
-					clientId: input.id,
+					clientId: input.id
 				},
 				include: {
 					supportItem: {
 						select: {
-							description: true,
-						},
-					},
-				},
+							description: true
+						}
+					}
+				}
 			});
 
 			if (!customRates) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
-					message: "Couldn't find custom support item rates",
+					message: "Couldn't find custom support item rates"
 				});
 			}
 
@@ -167,23 +167,23 @@ export const supportItemRouter = router({
 		.input(
 			z.object({
 				id: z.string(),
-				supportItemRates: supportItemRatesSchema.partial(),
+				supportItemRates: supportItemRatesSchema.partial()
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
 			const customRate = await ctx.prisma.supportItemRates.update({
 				where: {
-					id: input.id,
+					id: input.id
 				},
 				data: {
-					...input.supportItemRates,
-				},
+					...input.supportItemRates
+				}
 			});
 
 			if (!customRate) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
-					message: "Couldn't update custom support item rate",
+					message: "Couldn't update custom support item rate"
 				});
 			}
 
@@ -194,14 +194,14 @@ export const supportItemRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			const customRate = await ctx.prisma.supportItemRates.delete({
 				where: {
-					id: input.id,
-				},
+					id: input.id
+				}
 			});
 
 			if (!customRate) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
-					message: "Couldn't delete custom support item rate",
+					message: "Couldn't delete custom support item rate"
 				});
 			}
 
@@ -210,21 +210,21 @@ export const supportItemRouter = router({
 	update: authedProcedure
 		.input(
 			z.object({
-				supportItem: supportItemSchema.extend({ id: z.string() }),
+				supportItem: supportItemSchema.extend({ id: z.string() })
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
 			const supportItem = await ctx.prisma.supportItem.update({
 				where: {
-					id: input.supportItem.id,
+					id: input.supportItem.id
 				},
-				data: input.supportItem,
+				data: input.supportItem
 			});
 
 			if (!supportItem) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
-					message: "Couldn't update support item",
+					message: "Couldn't update support item"
 				});
 			}
 
@@ -235,8 +235,8 @@ export const supportItemRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			const supportItem = await ctx.prisma.supportItem.delete({
 				where: {
-					id: input.id,
-				},
+					id: input.id
+				}
 			});
 
 			if (!supportItem) {
@@ -244,7 +244,7 @@ export const supportItemRouter = router({
 			}
 
 			return "Deleted";
-		}),
+		})
 });
 
 export type SupportItemListOutput = inferRouterOutputs<

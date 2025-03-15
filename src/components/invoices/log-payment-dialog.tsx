@@ -7,7 +7,7 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
+	DialogTrigger
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
@@ -36,10 +36,10 @@ const LogPaymentDialog = () => {
 	const {
 		data: { invoiceIds, invoiceDetails } = {},
 		refetch: fetchMatchingInvoiceIds,
-		isLoading,
+		isLoading
 	} = trpc.invoice.matchByPayment.useQuery(
 		{ paymentAmount: amountPaid ?? 0 },
-		{ enabled: false },
+		{ enabled: false }
 	);
 	const trpcUtils = trpc.useUtils();
 	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
@@ -50,7 +50,7 @@ const LogPaymentDialog = () => {
 
 	const updateAmountPaid = debounce(
 		(value: number) => setAmountPaid(value),
-		750,
+		750
 	);
 
 	const updateMatchingInvoices = () => {
@@ -58,7 +58,7 @@ const LogPaymentDialog = () => {
 		markInvoiceAsMutation
 			.mutateAsync({
 				ids: invoicesToUpdate,
-				status: "PAID",
+				status: "PAID"
 			})
 			.then(() => {
 				trpcUtils.invoice.list.invalidate();
@@ -85,7 +85,7 @@ const LogPaymentDialog = () => {
 			<label
 				className={cn([
 					"flex cursor-pointer items-center gap-4 rounded-md border px-4 py-2 hover:border-primary/50",
-					checked ? "border-primary/20 bg-primary/10" : "bg-background",
+					checked ? "border-primary/20 bg-primary/10" : "bg-background"
 				])}
 				htmlFor={invoiceId}
 			>
@@ -97,7 +97,7 @@ const LogPaymentDialog = () => {
 							setInvoicesToUpdate([...invoicesToUpdate, invoiceId]);
 						} else {
 							setInvoicesToUpdate(
-								invoicesToUpdate.filter((id) => id !== invoiceId),
+								invoicesToUpdate.filter((id) => id !== invoiceId)
 							);
 						}
 					}}
@@ -110,7 +110,7 @@ const LogPaymentDialog = () => {
 					<p className="font-semibold">
 						{getTotalCostOfActivities(invoice.activities).toLocaleString(
 							undefined,
-							{ style: "currency", currency: "AUD" },
+							{ style: "currency", currency: "AUD" }
 						)}
 					</p>
 					<p className="text-neutral-600">

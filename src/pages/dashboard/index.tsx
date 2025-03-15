@@ -43,18 +43,18 @@ const DashboardPage = () => {
 												</div>
 												<span>
 													{getTotalCostOfActivities([
-														activities[idx],
+														activities[idx]
 													]).toLocaleString(undefined, {
 														style: "currency",
 														currency: "AUD",
-														minimumFractionDigits: 0,
+														minimumFractionDigits: 0
 													})}
 												</span>
 											</div>
 										))}
 									</div>
 								</div>
-							),
+							)
 						)}
 					</div>
 				)}

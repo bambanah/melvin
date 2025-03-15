@@ -1,6 +1,6 @@
 import {
 	getRateForActivity,
-	getTotalCostOfActivities,
+	getTotalCostOfActivities
 } from "@/lib/activity-utils";
 import { Prisma } from "@prisma/client";
 
@@ -37,8 +37,8 @@ const getActivity = (
 			saturdayRate: new Prisma.Decimal(77.81),
 			sundayCode: "04_106_0125_6_1",
 			sundayRate: new Prisma.Decimal(100.16),
-			isGroup,
-		},
+			isGroup
+		}
 	};
 };
 
@@ -58,8 +58,8 @@ const baseActivity = {
 		saturdayRate: new Prisma.Decimal(3),
 		sundayCode: "sunday",
 		sundayRate: new Prisma.Decimal(4),
-		isGroup: false,
-	},
+		isGroup: false
+	}
 };
 
 it("Should return correct rates", () => {
@@ -107,10 +107,10 @@ it("Should return correct rates", () => {
 					weekdayRate: new Prisma.Decimal(5),
 					weeknightRate: new Prisma.Decimal(6),
 					saturdayRate: new Prisma.Decimal(7),
-					sundayRate: new Prisma.Decimal(8),
-				},
-			],
-		},
+					sundayRate: new Prisma.Decimal(8)
+				}
+			]
+		}
 	};
 
 	// Regular weekday - weekday
@@ -157,7 +157,7 @@ it("Should return correct total", () => {
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "15:00", "17:00", 7, 15),
-			getActivity("weekday", "15:00", "21:00", 7, 15),
+			getActivity("weekday", "15:00", "21:00", 7, 15)
 		])
 	).toEqual(516.33);
 
@@ -185,7 +185,7 @@ it("Should return correct total", () => {
 		getTotalCostOfActivities([
 			getActivity("weekday", "09:30", "15:00", 15, 7),
 			getActivity("weekday", "09:30", "15:10", 15, 7),
-			getActivity("weekday", "09:30", "15:23", 15, 7),
+			getActivity("weekday", "09:30", "15:23", 15, 7)
 		])
 	).toEqual(1005.23);
 
@@ -197,7 +197,7 @@ it("Should return correct total", () => {
 			getActivity("weekday", "09:30", "15:00", 15, 7),
 			getActivity("weekday", "09:30", "15:10", 15, 7),
 			getActivity("weekday", "09:30", "15:10", 15, 7),
-			getActivity("weekday", "09:30", "15:25", 15, 7),
+			getActivity("weekday", "09:30", "15:25", 15, 7)
 		])
 	).toEqual(2315.96);
 });
@@ -205,50 +205,50 @@ it("Should return correct total", () => {
 it("Should return correct total for group activities", () => {
 	expect(
 		getTotalCostOfActivities([
-			getActivity("weekday", "16:00", "17:00", 0, 0, true),
+			getActivity("weekday", "16:00", "17:00", 0, 0, true)
 		])
 	).toEqual(55.47);
 
 	expect(
 		getTotalCostOfActivities([
-			getActivity("weekday", "15:00", "17:00", 7, 15, true),
+			getActivity("weekday", "15:00", "17:00", 7, 15, true)
 		])
 	).toEqual(123.86);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "15:00", "17:00", 7, 15, true),
-			getActivity("weekday", "15:00", "21:00", 7, 15, true),
+			getActivity("weekday", "15:00", "21:00", 7, 15, true)
 		])
 	).toEqual(503.73);
 
 	expect(
 		getTotalCostOfActivities([
-			getActivity("saturday", "15:00", "17:00", 7, 15, true),
+			getActivity("saturday", "15:00", "17:00", 7, 15, true)
 		])
 	).toEqual(171.15);
 
 	expect(
 		getTotalCostOfActivities([
-			getActivity("saturday", "19:00", "21:00", 7, 15, true),
+			getActivity("saturday", "19:00", "21:00", 7, 15, true)
 		])
 	).toEqual(171.15);
 
 	expect(
 		getTotalCostOfActivities([
-			getActivity("weekday", "09:30", "15:00", 0, 0, true),
+			getActivity("weekday", "09:30", "15:00", 0, 0, true)
 		])
 	).toEqual(305.09);
 
 	expect(
 		getTotalCostOfActivities([
-			getActivity("weekday", "09:30", "15:10", 0, 0, true),
+			getActivity("weekday", "09:30", "15:10", 0, 0, true)
 		])
 	).toEqual(314.33);
 
 	expect(
 		getTotalCostOfActivities([
-			getActivity("weekday", "16:10", "20:10", 0, 0, true),
+			getActivity("weekday", "16:10", "20:10", 0, 0, true)
 		])
 	).toEqual(244.2);
 
@@ -256,7 +256,7 @@ it("Should return correct total for group activities", () => {
 		getTotalCostOfActivities([
 			getActivity("weekday", "09:30", "15:00", 15, 7, true),
 			getActivity("weekday", "09:30", "15:10", 15, 7, true),
-			getActivity("weekday", "09:30", "15:23", 15, 7, true),
+			getActivity("weekday", "09:30", "15:23", 15, 7, true)
 		])
 	).toEqual(996.41);
 
@@ -268,7 +268,7 @@ it("Should return correct total for group activities", () => {
 			getActivity("weekday", "09:30", "15:00", 15, 7, true),
 			getActivity("weekday", "09:30", "15:10", 15, 7, true),
 			getActivity("weekday", "09:30", "15:10", 15, 7, true),
-			getActivity("weekday", "09:30", "15:25", 15, 7, true),
+			getActivity("weekday", "09:30", "15:25", 15, 7, true)
 		])
 	).toEqual(2295.38);
 });

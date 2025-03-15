@@ -12,7 +12,7 @@ const serverSchema = z.object({
 	GOOGLE_SECRET: z.string().optional(),
 	EMAIL_SERVER: z.string().optional(),
 	EMAIL_FROM: z.string().optional(),
-	SEED_EMAIL: z.string().email().optional(),
+	SEED_EMAIL: z.string().email().optional()
 });
 
 module.exports = { serverSchema };

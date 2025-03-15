@@ -14,7 +14,7 @@ export default function TimeInput<T extends FieldValues>({
 		<Input
 			type="time"
 			rules={{
-				...rules,
+				...rules
 			}}
 			{...rest}
 		/>

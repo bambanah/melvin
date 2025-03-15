@@ -6,7 +6,7 @@ import {
 	FormField,
 	FormItem,
 	FormLabel,
-	FormMessage,
+	FormMessage
 } from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
@@ -33,15 +33,15 @@ const AccountForm = ({ existingUser }: Props) => {
 			abn: Number(existingUser?.abn) || undefined,
 			bankName: existingUser?.bankName ?? "",
 			bankNumber: Number(existingUser?.bankNumber) || undefined,
-			bsb: existingUser?.bsb ?? undefined,
+			bsb: existingUser?.bsb ?? undefined
 		}),
-		[existingUser],
+		[existingUser]
 	);
 
 	const form = useForm<UserSchema>({
 		mode: "onBlur",
 		resolver: zodResolver(userSchema),
-		defaultValues: existingUserWithDefaults,
+		defaultValues: existingUserWithDefaults
 	});
 
 	useEffect(() => {
@@ -55,8 +55,8 @@ const AccountForm = ({ existingUser }: Props) => {
 					...values,
 					defaultSupportItemId: values.defaultSupportItemId || undefined,
 					defaultGroupSupportItemId:
-						values.defaultGroupSupportItemId || undefined,
-				},
+						values.defaultGroupSupportItemId || undefined
+				}
 			})
 			.then(() => trpcUtils.user.fetch.invalidate());
 	};
@@ -96,7 +96,7 @@ const AccountForm = ({ existingUser }: Props) => {
 											type="number"
 											register={form.register}
 											rules={{
-												setValueAs: (v) => (v === "" ? undefined : Number(v)),
+												setValueAs: (v) => (v === "" ? undefined : Number(v))
 											}}
 											placeholder="12345678901"
 											{...field}

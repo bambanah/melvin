@@ -15,9 +15,9 @@ const defaultClientSelect = {
 	invoices: {
 		select: {
 			invoiceNo: true,
-			billTo: true,
-		},
-	},
+			billTo: true
+		}
+	}
 };
 
 export const clientRouter = router({
@@ -35,15 +35,15 @@ export const clientRouter = router({
 						take: 1,
 						select: { id: true, invoiceNo: true, billTo: true, date: true },
 						orderBy: {
-							createdAt: "desc",
-						},
-					},
+							createdAt: "desc"
+						}
+					}
 				},
 				where: { ownerId: ctx.session.user.id },
 				cursor: cursor ? { id: cursor } : undefined,
 				orderBy: {
-					createdAt: "desc",
-				},
+					createdAt: "desc"
+				}
 			});
 
 			let nextCursor: typeof cursor | undefined;
@@ -54,7 +54,7 @@ export const clientRouter = router({
 
 			return {
 				clients,
-				nextCursor,
+				nextCursor
 			};
 		}),
 	byId: authedProcedure
@@ -66,12 +66,12 @@ export const clientRouter = router({
 					invoiceNumberPrefix: true,
 					defaultTransitDistance: true,
 					defaultTransitTime: true,
-					invoiceEmail: true,
+					invoiceEmail: true
 				},
 				where: {
 					ownerId: ctx.session.user.id,
-					id: input.id,
-				},
+					id: input.id
+				}
 			});
 
 			if (client) return client;
@@ -82,11 +82,11 @@ export const clientRouter = router({
 		.query(async ({ input, ctx }) => {
 			const client = await ctx.prisma.client.findFirst({
 				select: {
-					billTo: true,
+					billTo: true
 				},
 				where: {
-					id: input.id,
-				},
+					id: input.id
+				}
 			});
 
 			if (!client) {
@@ -103,17 +103,17 @@ export const clientRouter = router({
 					invoices: {
 						take: 20,
 						select: {
-							invoiceNo: true,
+							invoiceNo: true
 						},
 						orderBy: {
-							createdAt: "desc",
-						},
+							createdAt: "desc"
+						}
 					},
-					invoiceNumberPrefix: true,
+					invoiceNumberPrefix: true
 				},
 				where: {
-					id: input.id,
-				},
+					id: input.id
+				}
 			});
 
 			if (!client) {
@@ -135,11 +135,11 @@ export const clientRouter = router({
 			const invoice = await ctx.prisma.invoice.findFirst({
 				where: { clientId, ownerId: ctx.session.user.id },
 				select: {
-					id: true,
+					id: true
 				},
 				orderBy: {
-					createdAt: "desc",
-				},
+					createdAt: "desc"
+				}
 			});
 
 			return { id: invoice?.id };
@@ -147,7 +147,7 @@ export const clientRouter = router({
 	create: authedProcedure
 		.input(
 			z.object({
-				client: clientSchema,
+				client: clientSchema
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
@@ -160,13 +160,13 @@ export const clientRouter = router({
 					defaultTransitTime: input.client.defaultTransitTime
 						? parseFloat(input.client.defaultTransitTime)
 						: undefined,
-					ownerId: ctx.session.user.id,
-				},
+					ownerId: ctx.session.user.id
+				}
 			});
 
 			if (!client) {
 				throw new TRPCError({
-					code: "NOT_FOUND",
+					code: "NOT_FOUND"
 				});
 			}
 
@@ -176,13 +176,13 @@ export const clientRouter = router({
 		.input(
 			z.object({
 				id: z.string(),
-				client: clientSchema,
+				client: clientSchema
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
 			const client = await ctx.prisma.client.update({
 				where: {
-					id: input.id,
+					id: input.id
 				},
 				data: {
 					...input.client,
@@ -191,13 +191,13 @@ export const clientRouter = router({
 						: undefined,
 					defaultTransitTime: input.client.defaultTransitTime
 						? parseFloat(input.client.defaultTransitTime)
-						: undefined,
-				},
+						: undefined
+				}
 			});
 
 			if (!client) {
 				throw new TRPCError({
-					code: "NOT_FOUND",
+					code: "NOT_FOUND"
 				});
 			}
 
@@ -208,18 +208,18 @@ export const clientRouter = router({
 		.mutation(async ({ input, ctx }) => {
 			const client = await ctx.prisma.client.delete({
 				where: {
-					id: input.id,
-				},
+					id: input.id
+				}
 			});
 
 			if (!client) {
 				throw new TRPCError({
-					code: "NOT_FOUND",
+					code: "NOT_FOUND"
 				});
 			}
 
 			return {};
-		}),
+		})
 });
 
 export type ClientListOutput = inferRouterOutputs<

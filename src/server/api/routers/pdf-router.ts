@@ -8,7 +8,7 @@ export const pdfRouter = router({
 		.input(
 			z.object({
 				invoiceId: z.string(),
-				returnBase64: z.boolean().nullish(),
+				returnBase64: z.boolean().nullish()
 			})
 		)
 		.query(async ({ input }) => {
@@ -27,5 +27,5 @@ export const pdfRouter = router({
 			const pdfContent = Buffer.from(pdfString, "base64").toString();
 
 			return pdfContent;
-		}),
+		})
 });

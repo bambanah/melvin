@@ -9,13 +9,13 @@ import {
 	FormField,
 	FormItem,
 	FormLabel,
-	FormMessage,
+	FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
 	Popover,
 	PopoverContent,
-	PopoverTrigger,
+	PopoverTrigger
 } from "@/components/ui/popover";
 import { stripTimezone } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
@@ -75,14 +75,14 @@ const ActivityForm = ({ existingActivity }: Props) => {
 				: "",
 			transitDuration: existingActivity?.transitDuration
 				? existingActivity?.transitDuration.toString()
-				: "",
-		},
+				: ""
+		}
 	});
 
 	const { data: client, isFetching: isFetchingClient } =
 		trpc.clients.byId.useQuery(
 			{ id: form.watch("clientId") },
-			{ enabled: !!form.watch("clientId") },
+			{ enabled: !!form.watch("clientId") }
 		);
 
 	useEffect(() => {
@@ -101,7 +101,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 		if (client.defaultTransitDistance) {
 			form.setValue(
 				"transitDistance",
-				client.defaultTransitDistance.toString(),
+				client.defaultTransitDistance.toString()
 			);
 		}
 
@@ -112,14 +112,14 @@ const ActivityForm = ({ existingActivity }: Props) => {
 
 	const onSubmit = (data: ActivitySchema) => {
 		const rateType = supportItems?.find(
-			(i) => i.id === data.supportItemId,
+			(i) => i.id === data.supportItemId
 		)?.rateType;
 
 		const activityData: ActivitySchema = {
 			...data,
 			startTime: rateType === "KM" ? undefined : data.startTime,
 			endTime: rateType === "KM" ? undefined : data.endTime,
-			itemDistance: rateType === "KM" ? data.itemDistance : undefined,
+			itemDistance: rateType === "KM" ? data.itemDistance : undefined
 		};
 
 		if (existingActivity?.id) {
@@ -181,7 +181,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 												variant={"outline"}
 												className={cn(
 													"pl-3 text-left font-normal",
-													!field.value && "text-muted-foreground",
+													!field.value && "text-muted-foreground"
 												)}
 											>
 												{field.value ? (
@@ -272,7 +272,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 					<ChevronDown
 						className={cn(
 							"size-4 transition-transform",
-							advancedOptionsOpen && "rotate-180",
+							advancedOptionsOpen && "rotate-180"
 						)}
 					/>
 					<span>Advanced Options</span>
@@ -281,7 +281,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 				<div
 					className={cn(
 						"flex w-full min-w-0 flex-col items-center gap-4",
-						!advancedOptionsOpen && "hidden",
+						!advancedOptionsOpen && "hidden"
 					)}
 				>
 					<FormField
@@ -309,7 +309,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 									<FormControl>
 										<Input
 											rules={{
-												valueAsNumber: true,
+												valueAsNumber: true
 											}}
 											type="number"
 											step={0.1}
@@ -330,7 +330,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 									<FormControl>
 										<Input
 											rules={{
-												valueAsNumber: true,
+												valueAsNumber: true
 											}}
 											type="number"
 											step={0.1}

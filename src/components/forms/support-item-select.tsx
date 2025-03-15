@@ -34,8 +34,8 @@ const SupportItemSelect = ({
 							{supportItem.description}
 						</span>
 					),
-					value: supportItem.id,
-				})),
+					value: supportItem.id
+				}))
 			);
 		}
 	}, [setSupportItems, supportItems]);

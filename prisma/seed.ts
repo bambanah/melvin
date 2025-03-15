@@ -20,18 +20,18 @@ async function main() {
 	}
 
 	await prisma.user.deleteMany({
-		where: { email: seedEmail },
+		where: { email: seedEmail }
 	});
 	const user = await prisma.user.create({
 		data: {
-			email: seedEmail,
-		},
+			email: seedEmail
+		}
 	});
 
 	const clientsToCreate = 2;
 	for (let i = 0; i < clientsToCreate; i++) {
 		await prisma.client.create({
-			data: { ...randomClient(), ownerId: user.id },
+			data: { ...randomClient(), ownerId: user.id }
 		});
 	}
 
@@ -46,8 +46,8 @@ async function main() {
 			saturdayCode: "04_105_0125_6_1",
 			saturdayRate: 95.07,
 			sundayCode: "04_106_0125_6_1",
-			sundayRate: 122.59,
-		},
+			sundayRate: 122.59
+		}
 	});
 
 	const invoicesToCreate = 10;
@@ -56,14 +56,14 @@ async function main() {
 		const client = await prisma.client.findFirst({
 			take: 1,
 			skip: Math.floor(Math.random() * clientCount),
-			orderBy: { createdAt: "asc" },
+			orderBy: { createdAt: "asc" }
 		});
 		if (!client) continue;
 
 		const invoice = randomInvoice({
 			supportItemId: supportItem.id,
 			ownerId: user.id,
-			clientId: client.id,
+			clientId: client.id
 		});
 		const invoiceStatuses = Object.values(InvoiceStatus);
 
@@ -82,10 +82,10 @@ async function main() {
 						startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
 						endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
 						transitDistance: Number(activity.transitDistance),
-						transitDuration: Number(activity.transitDuration),
-					})),
-				},
-			},
+						transitDuration: Number(activity.transitDuration)
+					}))
+				}
+			}
 		});
 	}
 }

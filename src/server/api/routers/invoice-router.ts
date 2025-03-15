@@ -17,7 +17,7 @@ const defaultInvoiceSelect = {
 	date: true,
 	status: true,
 	client: {
-		select: { name: true, number: true, id: true, invoiceEmail: true },
+		select: { name: true, number: true, id: true, invoiceEmail: true }
 	},
 	activities: {
 		select: {
@@ -27,9 +27,9 @@ const defaultInvoiceSelect = {
 			transitDuration: true,
 			itemDistance: true,
 			date: true,
-			supportItem: true,
-		},
-	},
+			supportItem: true
+		}
+	}
 };
 
 export function parseInvoice<T extends Partial<Invoice>>(
@@ -37,7 +37,7 @@ export function parseInvoice<T extends Partial<Invoice>>(
 ): Omit<T, "date"> & { date?: string } {
 	return {
 		...invoice,
-		date: dayjs(invoice.date).format("YYYY-MM-DD"),
+		date: dayjs(invoice.date).format("YYYY-MM-DD")
 	};
 }
 
@@ -56,9 +56,9 @@ const generateNestedWriteForActivities = (
 			transitDistance: client.defaultTransitDistance ?? undefined,
 			transitDuration: client.defaultTransitTime ?? undefined,
 			supportItemId,
-			ownerId,
+			ownerId
 		}))
-	),
+	)
 });
 
 const generateNestedWriteForGroupActivities = (
@@ -79,10 +79,10 @@ const generateNestedWriteForGroupActivities = (
 				clientId: groupClientId,
 				transitDistance: client?.defaultTransitDistance ?? undefined,
 				transitDuration: client?.defaultTransitTime ?? undefined,
-				ownerId,
+				ownerId
 			}));
 		}
-	),
+	)
 });
 
 export const invoiceRouter = router({
@@ -90,7 +90,7 @@ export const invoiceRouter = router({
 		.input(
 			baseListQueryInput.extend({
 				status: z.nativeEnum(InvoiceStatus).array().optional(),
-				clientId: z.string().optional(),
+				clientId: z.string().optional()
 			})
 		)
 		.query(async ({ ctx, input }) => {
@@ -101,24 +101,24 @@ export const invoiceRouter = router({
 				select: {
 					...defaultInvoiceSelect,
 					_count: {
-						select: { activities: true },
-					},
+						select: { activities: true }
+					}
 				},
 				take: limit + 1,
 				where: {
 					ownerId: ctx.session.user.id,
 					status: { in: status },
-					clientId,
+					clientId
 				},
 				cursor: cursor ? { id: cursor } : undefined,
 				orderBy: [
 					{
-						status: "asc",
+						status: "asc"
 					},
 					{
-						createdAt: "desc",
-					},
-				],
+						createdAt: "desc"
+					}
+				]
 			});
 
 			let nextCursor: typeof cursor | undefined;
@@ -129,7 +129,7 @@ export const invoiceRouter = router({
 
 			return {
 				invoices: invoices.map((invoice) => parseInvoice(invoice)),
-				nextCursor,
+				nextCursor
 			};
 		}),
 	getTotalOwing: authedProcedure.query(async ({ ctx }) => {
@@ -137,13 +137,13 @@ export const invoiceRouter = router({
 			select: {
 				activities: {
 					include: {
-						supportItem: true,
-					},
-				},
+						supportItem: true
+					}
+				}
 			},
 			where: {
-				status: "SENT",
-			},
+				status: "SENT"
+			}
 		});
 
 		const totalOwing = invoices.reduce(
@@ -170,14 +170,14 @@ export const invoiceRouter = router({
 						select: {
 							...defaultInvoiceSelect.activities.select,
 							id: true,
-							supportItemId: true,
-						},
-					},
+							supportItemId: true
+						}
+					}
 				},
 				where: {
 					ownerId: ctx.session.user.id,
-					id: input.id,
-				},
+					id: input.id
+				}
 			});
 
 			if (!invoice) {
@@ -189,20 +189,20 @@ export const invoiceRouter = router({
 	create: authedProcedure
 		.input(
 			z.object({
-				invoice: invoiceSchema,
+				invoice: invoiceSchema
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
 			const { invoice: inputInvoice } = input;
 
 			const client = await ctx.prisma.client.findUnique({
-				where: { id: inputInvoice.clientId },
+				where: { id: inputInvoice.clientId }
 			});
 
 			if (!client) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
-					message: "Can't find that client",
+					message: "Can't find that client"
 				});
 			}
 
@@ -219,9 +219,9 @@ export const invoiceRouter = router({
 							inputInvoice.activitiesToCreate,
 							client,
 							ctx.session.user.id
-						),
-					},
-				},
+						)
+					}
+				}
 			});
 
 			if (!invoice) {
@@ -239,9 +239,9 @@ export const invoiceRouter = router({
 				const clients = await ctx.prisma.client.findMany({
 					where: {
 						id: {
-							in: groupClientIds,
-						},
-					},
+							in: groupClientIds
+						}
+					}
 				});
 
 				await ctx.prisma.activity.createMany(
@@ -260,19 +260,19 @@ export const invoiceRouter = router({
 			z.object({
 				id: z.string(),
 				invoice: invoiceSchema,
-				activities: z.array(activitySchema).optional(),
+				activities: z.array(activitySchema).optional()
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
 			const { id, invoice: inputInvoice } = input;
 
 			const client = await ctx.prisma.client.findUnique({
-				where: { id: inputInvoice.clientId },
+				where: { id: inputInvoice.clientId }
 			});
 
 			const invoice = await ctx.prisma.invoice.update({
 				where: {
-					id,
+					id
 				},
 				data: {
 					invoiceNo: inputInvoice.invoiceNo,
@@ -290,13 +290,13 @@ export const invoiceRouter = router({
 										client,
 										ctx.session.user.id
 									)
-								: undefined,
-					},
+								: undefined
+					}
 				},
 				select: {
 					date: true,
-					invoiceNo: true,
-				},
+					invoiceNo: true
+				}
 			});
 
 			if (!invoice) {
@@ -304,14 +304,14 @@ export const invoiceRouter = router({
 			}
 
 			return {
-				invoice: parseInvoice(invoice),
+				invoice: parseInvoice(invoice)
 			};
 		}),
 	updateStatus: authedProcedure
 		.input(
 			z.object({
 				ids: z.array(z.string()),
-				status: z.nativeEnum(InvoiceStatus),
+				status: z.nativeEnum(InvoiceStatus)
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -332,14 +332,14 @@ export const invoiceRouter = router({
 			const payload = await ctx.prisma.invoice.updateMany({
 				where: {
 					id: {
-						in: ids,
-					},
+						in: ids
+					}
 				},
 				data: {
 					status,
 					sentAt,
-					paidAt,
-				},
+					paidAt
+				}
 			});
 
 			return payload;
@@ -354,9 +354,9 @@ export const invoiceRouter = router({
 					status: "SENT",
 					activities: {
 						some: {
-							id: {},
-						},
-					},
+							id: {}
+						}
+					}
 				},
 				select: {
 					id: true,
@@ -364,21 +364,21 @@ export const invoiceRouter = router({
 					date: true,
 					client: {
 						select: {
-							name: true,
-						},
+							name: true
+						}
 					},
 					activities: {
 						include: {
-							supportItem: true,
-						},
-					},
-				},
+							supportItem: true
+						}
+					}
+				}
 			});
 
 			if (invoices.length === 0) {
 				return {
 					invoiceIds: [],
-					invoiceDetails: [],
+					invoiceDetails: []
 				};
 			}
 
@@ -409,7 +409,7 @@ export const invoiceRouter = router({
 
 			return {
 				invoiceIds,
-				invoiceDetails,
+				invoiceDetails
 			};
 		}),
 	delete: authedProcedure
@@ -417,8 +417,8 @@ export const invoiceRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			const invoice = await ctx.prisma.invoice.delete({
 				where: {
-					id: input.id,
-				},
+					id: input.id
+				}
 			});
 
 			if (!invoice) {
@@ -426,7 +426,7 @@ export const invoiceRouter = router({
 			}
 
 			return {};
-		}),
+		})
 });
 
 export type InvoiceListOutput = inferRouterOutputs<

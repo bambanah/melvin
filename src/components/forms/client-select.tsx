@@ -20,7 +20,7 @@ function ClientSelect({ excludeClientId, ...props }: ClientSelectProps) {
 					.filter((client) => client.id !== excludeClientId)
 					.map((client) => ({
 						label: client.name,
-						value: client.id,
+						value: client.id
 					}))
 			);
 		}

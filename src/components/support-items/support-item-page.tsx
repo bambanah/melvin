@@ -3,7 +3,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger,
+	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import Heading from "@/components/ui/heading";
 import { trpc } from "@/lib/trpc";
@@ -18,7 +18,7 @@ const SupportItemPage = ({ supportItemId }: { supportItemId: string }) => {
 
 	const trpcUtils = trpc.useUtils();
 	const { data: supportItem, error } = trpc.supportItem.byId.useQuery({
-		id: supportItemId ?? "",
+		id: supportItemId ?? ""
 	});
 	const deletesupportItemMutation = trpc.supportItem.delete.useMutation();
 
@@ -97,7 +97,7 @@ const SupportItemPage = ({ supportItemId }: { supportItemId: string }) => {
 												undefined,
 												{
 													style: "currency",
-													currency: "AUD",
+													currency: "AUD"
 												}
 											)}
 											/{supportItem.rateType === "KM" ? "km" : "hr"}

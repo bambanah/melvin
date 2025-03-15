@@ -21,9 +21,9 @@ const defaultActivitySelect = {
 	client: true,
 	invoice: {
 		select: {
-			invoiceNo: true,
-		},
-	},
+			invoiceNo: true
+		}
+	}
 };
 
 function getInvoiceIdWhereCondition(invoiceIdAssigned?: boolean) {
@@ -38,8 +38,8 @@ export const activityRouter = router({
 			baseListQueryInput.extend({
 				assigned: z.boolean().optional(),
 				invoiceId: z.string().optional(),
-				clientId: z.string().optional(),
-			}),
+				clientId: z.string().optional()
+			})
 		)
 		.query(async ({ ctx, input }) => {
 			const limit = input.limit ?? DEFAULT_LIST_LIMIT;
@@ -49,24 +49,24 @@ export const activityRouter = router({
 				select: {
 					...defaultActivitySelect,
 					invoice: {
-						select: { id: true, invoiceNo: true },
-					},
+						select: { id: true, invoiceNo: true }
+					}
 				},
 				take: limit + 1,
 				cursor: cursor ? { id: cursor } : undefined,
 				where: {
 					ownerId: ctx.session.user.id,
 					invoiceId: invoiceId ?? getInvoiceIdWhereCondition(assigned),
-					clientId,
+					clientId
 				},
 				orderBy: [
 					{
-						date: "desc",
+						date: "desc"
 					},
 					{
-						startTime: "desc",
-					},
-				],
+						startTime: "desc"
+					}
+				]
 			});
 
 			let nextCursor: typeof cursor | undefined;
@@ -77,7 +77,7 @@ export const activityRouter = router({
 
 			return {
 				activities,
-				nextCursor,
+				nextCursor
 			};
 		}),
 	pending: authedProcedure.query(async ({ ctx }) => {
@@ -85,8 +85,8 @@ export const activityRouter = router({
 			select: defaultActivitySelect,
 			where: {
 				ownerId: ctx.session.user.id,
-				invoiceId: null,
-			},
+				invoiceId: null
+			}
 		});
 
 		const groupedActivities = activities.reduce<
@@ -114,8 +114,8 @@ export const activityRouter = router({
 				select: defaultActivitySelect,
 				where: {
 					id: input.id,
-					ownerId: ctx.session.user.id,
-				},
+					ownerId: ctx.session.user.id
+				}
 			});
 
 			if (!activity) {
@@ -131,8 +131,8 @@ export const activityRouter = router({
 				select: defaultActivitySelect,
 				where: {
 					ownerId: ctx.session.user.id,
-					invoiceId: input.invoiceId,
-				},
+					invoiceId: input.invoiceId
+				}
 			});
 
 			return activities.length > 0
@@ -142,8 +142,8 @@ export const activityRouter = router({
 	add: authedProcedure
 		.input(
 			z.object({
-				activity: activitySchema,
-			}),
+				activity: activitySchema
+			})
 		)
 		.mutation(async ({ input, ctx }) => {
 			const { activity: inputActivity } = input;
@@ -159,8 +159,8 @@ export const activityRouter = router({
 						: undefined,
 					transitDistance: inputActivity.transitDistance || undefined,
 					transitDuration: inputActivity.transitDuration || undefined,
-					ownerId: ctx.session.user.id,
-				},
+					ownerId: ctx.session.user.id
+				}
 			});
 
 			if (!activity) {
@@ -173,13 +173,13 @@ export const activityRouter = router({
 		.input(
 			z.object({
 				id: z.string(),
-				activity: activitySchema,
-			}),
+				activity: activitySchema
+			})
 		)
 		.mutation(async ({ ctx, input }) => {
 			const activity = await ctx.prisma.activity.update({
 				where: {
-					id: input.id,
+					id: input.id
 				},
 				data: {
 					...input.activity,
@@ -190,8 +190,8 @@ export const activityRouter = router({
 						? dayjs.utc(input.activity.endTime, "HH:mm").toDate()
 						: undefined,
 					transitDistance: input.activity.transitDistance || undefined,
-					transitDuration: input.activity.transitDuration || undefined,
-				},
+					transitDuration: input.activity.transitDuration || undefined
+				}
 			});
 
 			if (!activity) {
@@ -205,8 +205,8 @@ export const activityRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			const activity = await ctx.prisma.activity.delete({
 				where: {
-					id: input.id,
-				},
+					id: input.id
+				}
 			});
 
 			if (!activity) {
@@ -214,7 +214,7 @@ export const activityRouter = router({
 			}
 
 			return true;
-		}),
+		})
 });
 
 export type ActivityListOutput = inferRouterOutputs<

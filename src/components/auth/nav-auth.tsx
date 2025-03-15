@@ -6,7 +6,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
-	DropdownMenuTrigger,
+	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { ExternalLink, File, LogOut, Settings, User } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";

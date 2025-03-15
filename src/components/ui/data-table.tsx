@@ -7,7 +7,7 @@ import {
 	getSortedRowModel,
 	SortDirection,
 	SortingState,
-	useReactTable,
+	useReactTable
 } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import React, { useState } from "react";
@@ -19,7 +19,7 @@ import {
 	TableCell,
 	TableHead,
 	TableHeader,
-	TableRow,
+	TableRow
 } from "./table";
 
 const SortingIcon = ({ sorted }: { sorted: false | SortDirection }) => {
@@ -74,7 +74,7 @@ interface DataTableProps<TData, TValue> {
 
 const DataTable = <TData, TValue>({
 	columns,
-	data,
+	data
 }: DataTableProps<TData, TValue>) => {
 	const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -86,13 +86,13 @@ const DataTable = <TData, TValue>({
 		onSortingChange: setSorting,
 		getSortedRowModel: getSortedRowModel(),
 		state: {
-			sorting,
+			sorting
 		},
 		initialState: {
 			pagination: {
-				pageSize: 20,
-			},
-		},
+				pageSize: 20
+			}
+		}
 	});
 
 	return (

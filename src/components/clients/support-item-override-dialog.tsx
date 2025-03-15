@@ -6,7 +6,7 @@ import {
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
+	DialogTrigger
 } from "@/components/ui/dialog";
 import {
 	Form,
@@ -14,7 +14,7 @@ import {
 	FormField,
 	FormItem,
 	FormLabel,
-	FormMessage,
+	FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -22,7 +22,7 @@ import { trpc } from "@/lib/trpc";
 import { decimalToCurrencyString } from "@/lib/utils";
 import {
 	SupportItemRatesSchema,
-	supportItemRatesSchema,
+	supportItemRatesSchema
 } from "@/schema/support-item-rates-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusIcon } from "lucide-react";
@@ -40,15 +40,15 @@ const SupportItemOverrideDialog = ({ clientId }: Props) => {
 	const form = useForm<SupportItemRatesSchema>({
 		resolver: zodResolver(supportItemRatesSchema),
 		defaultValues: {
-			supportItemId: "",
-		},
+			supportItemId: ""
+		}
 	});
 
 	const trpcUtils = trpc.useUtils();
 
 	const { data: supportItem } = trpc.supportItem.byId.useQuery(
 		{
-			id: form.watch("supportItemId"),
+			id: form.watch("supportItemId")
 		},
 		{ enabled: !!form.watch("supportItemId") }
 	);
@@ -64,7 +64,7 @@ const SupportItemOverrideDialog = ({ clientId }: Props) => {
 				},
 				onError: (e) => {
 					toast.error(e.message);
-				},
+				}
 			}
 		);
 
@@ -126,7 +126,7 @@ const SupportItemOverrideDialog = ({ clientId }: Props) => {
 								["Weekday Daytime", "weekdayRate"],
 								["Weekday Evening", "weeknightRate"],
 								["Saturday", "saturdayRate"],
-								["Sunday", "sundayRate"],
+								["Sunday", "sundayRate"]
 							] as const
 						).map(([label, accessor]) => (
 							<FormField

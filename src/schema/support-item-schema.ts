@@ -33,6 +33,6 @@ export const supportItemSchema = z.object({
 	sundayRate: z.coerce
 		.number({ invalid_type_error: "Must be a number" })
 		.step(0.01, "Can't be more than 2 decimal places (x.xx)")
-		.optional(),
+		.optional()
 });
 export type SupportItemSchema = z.infer<typeof supportItemSchema>;
