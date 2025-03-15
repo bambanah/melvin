@@ -29,5 +29,5 @@
 		"tsBuildInfoFile": ".next/cache/.tsbuildinfo"
 	},
 	"exclude": ["node_modules"],
-	"include": ["**/*.ts", "**/*.tsx", "**/*.js", "lint-staged.config.mjs"]
+	"include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.mjs", "**/*.cjs"]
 }

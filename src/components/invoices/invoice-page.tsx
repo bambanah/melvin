@@ -88,7 +88,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					className={cn([
 						"group relative h-full max-h-[12rem] min-h-[12rem] basis-1/2 overflow-hidden md:max-h-[15rem]",
 						invoice.activities.length > 0 &&
-							"cursor-pointer bg-foreground/10 shadow-inner"
+							"bg-foreground/10 cursor-pointer shadow-inner"
 					])}
 				>
 					{invoice.activities.length > 0 ? (
@@ -97,7 +97,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 								<PdfPreview invoiceId={invoice.id} />
 							</div>
 							<div
-								className="absolute right-0 top-0 flex h-full w-full items-center justify-center"
+								className="absolute top-0 right-0 flex h-full w-full items-center justify-center"
 								onClick={() => setIsPdfPreviewExpanded(true)}
 							>
 								<div className="flex items-center justify-center gap-2 rounded-md bg-zinc-900/80 px-4 py-3 text-zinc-50 transition-transform group-hover:scale-110 group-hover:bg-zinc-900 md:px-3 md:py-2 md:text-lg">
@@ -107,8 +107,8 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 							</div>
 						</>
 					) : (
-						<div className="flex h-full w-full items-center justify-center bg-foreground/10 md:h-[15rem]">
-							<p className="text-4xl text-foreground/50">DRAFT</p>
+						<div className="bg-foreground/10 flex h-full w-full items-center justify-center md:h-[15rem]">
+							<p className="text-foreground/50 text-4xl">DRAFT</p>
 						</div>
 					)}
 				</div>
@@ -122,7 +122,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 							EDIT
 						</Link>
 					</div>
-					<p className="text-sm text-foreground/80">Total</p>
+					<p className="text-foreground/80 text-sm">Total</p>
 					<div className="flex items-center justify-between">
 						<p className="text-xl">
 							{getTotalCostOfActivities(invoice.activities).toLocaleString(
@@ -133,7 +133,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 						<InvoiceStatusBadge invoiceStatus={invoice.status} />
 					</div>
 
-					<div className="flex flex-grow flex-col justify-start gap-4">
+					<div className="flex grow flex-col justify-start gap-4">
 						<div className="mt-5 flex justify-center gap-2">
 							{invoice.status === InvoiceStatus.CREATED &&
 								invoice.activities.length > 0 && (
@@ -183,7 +183,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 							</Button>
 						</div>
 						{invoice.sentAt && (
-							<div className="flex flex-col gap-1 text-foreground/80">
+							<div className="text-foreground/80 flex flex-col gap-1">
 								<p>Sent on: {dayjs.utc(invoice.sentAt).format("DD/MM/YYYY")}</p>
 							</div>
 						)}
@@ -198,7 +198,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 						<p>{dayjs.utc(invoice.date).format("DD/MM/YYYY")}</p>
 					</div>
 					<Link
-						className="text-fg flex w-full items-center gap-4 rounded-md p-2 text-left hover:bg-foreground/15"
+						className="text-fg hover:bg-foreground/15 flex w-full items-center gap-4 rounded-md p-2 text-left"
 						href={`/dashboard/clients/${invoice.client.id}`}
 					>
 						<User className="h-4 w-4" />
