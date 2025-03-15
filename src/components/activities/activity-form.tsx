@@ -25,9 +25,9 @@ import { ActivityByIdOutput } from "@/server/api/routers/activity-router";
 import { SupportItemListOutput } from "@/server/api/routers/support-item-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, ChevronDown } from "lucide-react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -44,12 +44,15 @@ interface Props {
 const ActivityForm = ({ existingActivity }: Props) => {
 	const router = useRouter();
 
+	const [advancedOptionsOpen, setAdvancedOptionsOpen] = useState(false);
+
 	const [supportItems, setSupportItems] = useState<SupportItemListOutput[]>();
 	const searchParams = useSearchParams();
 
 	const trpcUtils = trpc.useUtils();
 	const createActivityMutation = trpc.activity.add.useMutation();
 	const modifyActivityMutation = trpc.activity.modify.useMutation();
+	const { data: { defaultSupportItemId } = {} } = trpc.user.fetch.useQuery();
 
 	const form = useForm<ActivitySchema>({
 		resolver: zodResolver(activitySchema),
@@ -75,6 +78,37 @@ const ActivityForm = ({ existingActivity }: Props) => {
 				: "",
 		},
 	});
+
+	const { data: client, isFetching: isFetchingClient } =
+		trpc.clients.byId.useQuery(
+			{ id: form.watch("clientId") },
+			{ enabled: !!form.watch("clientId") },
+		);
+
+	useEffect(() => {
+		if (defaultSupportItemId && supportItems) {
+			form.setValue("supportItemId", defaultSupportItemId);
+		}
+	}, [defaultSupportItemId, form, supportItems]);
+
+	useEffect(() => {
+		if (!client || isFetchingClient) {
+			form.setValue("transitDistance", "");
+			form.setValue("transitDuration", "");
+			return;
+		}
+
+		if (client.defaultTransitDistance) {
+			form.setValue(
+				"transitDistance",
+				client.defaultTransitDistance.toString(),
+			);
+		}
+
+		if (client.defaultTransitTime) {
+			form.setValue("transitDuration", client.defaultTransitTime.toString());
+		}
+	}, [client, form, isFetchingClient]);
 
 	const onSubmit = (data: ActivitySchema) => {
 		const rateType = supportItems?.find(
@@ -210,6 +244,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 									<FormControl>
 										<Input type="time" {...field} />
 									</FormControl>
+									<FormMessage />
 								</FormItem>
 							)}
 						/>
@@ -222,14 +257,33 @@ const ActivityForm = ({ existingActivity }: Props) => {
 									<FormControl>
 										<Input type="time" {...field} />
 									</FormControl>
+									<FormMessage />
 								</FormItem>
 							)}
 						/>
 					</div>
 				)}
-				<hr className="w-full" />
 
-				<div className="flex w-full flex-col items-center gap-4">
+				<button
+					className="flex items-center gap-2 text-sm text-muted-foreground"
+					onClick={() => setAdvancedOptionsOpen(!advancedOptionsOpen)}
+					type="button"
+				>
+					<ChevronDown
+						className={cn(
+							"size-4 transition-transform",
+							advancedOptionsOpen && "rotate-180",
+						)}
+					/>
+					<span>Advanced Options</span>
+				</button>
+
+				<div
+					className={cn(
+						"flex w-full min-w-0 flex-col items-center gap-4",
+						!advancedOptionsOpen && "hidden",
+					)}
+				>
 					<FormField
 						name="supportItemId"
 						control={form.control}
@@ -238,6 +292,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 								<FormLabel required>Support Item</FormLabel>
 								<SupportItemSelect
 									setSupportItems={setSupportItems}
+									value={field.value}
 									onValueChange={field.onChange}
 								/>
 								<FormMessage />
@@ -262,6 +317,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 										/>
 									</FormControl>
 									<FormDescription>Distance to client (in km)</FormDescription>
+									<FormMessage />
 								</FormItem>
 							)}
 						/>
@@ -284,6 +340,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 									<FormDescription>
 										Duration of drive (in minutes)
 									</FormDescription>
+									<FormMessage />
 								</FormItem>
 							)}
 						/>

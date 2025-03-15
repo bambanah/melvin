@@ -6,14 +6,14 @@ export const activitySchema = z
 		supportItemId: z.string(),
 		clientId: z.string().min(1, "Client is required"),
 		date: z.date({ required_error: "Date is required" }),
-		startTime: z.string(),
-		endTime: z.string(),
+		startTime: z.string().min(1, "Start time is required"),
+		endTime: z.string().min(1, "End time is required"),
 		itemDistance: z.number(),
 		transitDistance: z.string().optional(),
 		transitDuration: z.string().optional(),
 	})
 	.partial({ startTime: true, endTime: true, itemDistance: true })
 	.refine(
-		(data) => (!!data.startTime && !!data.endTime) || !!data.itemDistance
+		(data) => (!!data.startTime && !!data.endTime) || !!data.itemDistance,
 	);
 export type ActivitySchema = z.infer<typeof activitySchema>;

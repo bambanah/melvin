@@ -16,6 +16,8 @@ test("Can create activity", async ({ page }) => {
 	await expect(page).toHaveURL("/dashboard/activities");
 	await page.getByRole("link", { name: "Add" }).click();
 
+	await page.getByText("Advanced Options").click();
+
 	await page.getByText("Select a support item...").click();
 	await page.getByLabel(supportItem.description).click();
 	await page.getByText("Select a client...").click();
