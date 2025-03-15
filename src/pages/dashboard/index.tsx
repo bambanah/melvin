@@ -1,5 +1,6 @@
 import ActivityForm from "@/components/activities/activity-form";
 import Layout from "@/components/shared/layout";
+import { Separator } from "@/components/ui/separator";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { trpc } from "@/lib/trpc";
 import dayjs from "dayjs";
@@ -8,13 +9,16 @@ const DashboardPage = () => {
 	const { data: pendingActivities } = trpc.activity.pending.useQuery();
 
 	return (
-		<Layout className="mx-auto w-full max-w-4xl gap-4 divide-x sm:flex-row sm:justify-center">
-			<div className="grow sm:pr-4">
+		<Layout className="mx-auto w-full max-w-4xl gap-4 px-4 sm:flex-row sm:justify-evenly">
+			<div className="flex-auto basis-1/2 sm:pr-4">
 				<h1 className="mb-4 text-2xl">Hello, Phoebe</h1>
 
 				<ActivityForm />
 			</div>
-			<div className="flex grow flex-col gap-4 sm:pl-4">
+
+			<Separator className="sm:hidden" />
+
+			<div className="flex flex-auto flex-col gap-4 sm:pl-4">
 				<h1 className="text-2xl">Pending Work</h1>
 
 				{pendingActivities && (
