@@ -5,8 +5,8 @@ import MobileNav from "./mobile-nav";
 
 export function Navbar() {
 	return (
-		<header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/60">
-			<div className="container flex h-14 max-w-screen-lg items-center">
+		<header className="border-border/40 bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b shadow-xs backdrop-blur-sm">
+			<div className="container flex h-14 max-w-(--breakpoint-lg) items-center">
 				<MainNav />
 				<MobileNav />
 
