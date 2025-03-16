@@ -3,7 +3,7 @@ import LoginForm from "@/components/auth/login-form";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/ui/logo";
-import { BuiltInProviderType } from "next-auth/providers";
+import { BuiltInProviderType } from "next-auth/providers/index";
 import { ClientSafeProvider, LiteralUnion, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 

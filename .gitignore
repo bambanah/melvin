@@ -13,6 +13,7 @@ e2e/setup/storage-state.json
 .swc
 analyze/
 .idea/
+tsconfig.tsbuildinfo
 
 next-env.d.ts
 .vercel

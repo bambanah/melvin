@@ -1,7 +1,7 @@
 import prisma from "@/server/prisma";
 import { FullConfig, chromium } from "@playwright/test";
 import dayjs from "dayjs";
-import { testUser } from "e2e/test-utils";
+import { testUser } from "../test-utils";
 
 async function globalSetup(config: FullConfig) {
 	const { baseURL, storageState } = config.projects[0].use;
