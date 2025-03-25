@@ -141,7 +141,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 
 					toast.success("Activity created");
 
-					const redirectUrl = searchParams.get("redirectUrl");
+					const redirectUrl = searchParams?.get("redirectUrl");
 					if (redirectUrl) router.push(redirectUrl);
 				});
 		}

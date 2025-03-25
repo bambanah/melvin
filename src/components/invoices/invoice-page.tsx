@@ -94,7 +94,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					{invoice.activities.length > 0 ? (
 						<>
 							<div className="mx-auto w-8/12 basis-1/2">
-								<PdfPreview invoiceId={invoice.id} />
+								{/* <PdfPreview invoiceId={invoice.id} /> */}
 							</div>
 							<div
 								className="absolute top-0 right-0 flex h-full w-full items-center justify-center"
