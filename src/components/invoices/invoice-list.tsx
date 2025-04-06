@@ -1,7 +1,9 @@
 import { DeleteEntityButton } from "@/components/shared/delete-entity-button";
+import ListFilterRow from "@/components/shared/list-filter-row";
 import ListPage from "@/components/shared/list-page";
 import { Button } from "@/components/ui/button";
 import DataTable, { SortingHeader } from "@/components/ui/data-table";
+import DatePicker from "@/components/ui/date-picker";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -17,7 +19,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import { Copy, Download, MoreHorizontal, Pencil } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { InvoiceStatusBadge } from "../ui/badge";
+import {
+	StatusFilter,
+	statusFilterMap,
+	statusFilters
+} from "./invoice-list.constants";
 import LogPaymentDialog from "./log-payment-dialog";
 dayjs.extend(require("dayjs/plugin/utc"));
 
@@ -27,10 +35,15 @@ interface Props {
 }
 
 export default function InvoiceList({ clientId }: Props) {
-	// const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+	const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+	const [from, setFrom] = useState<Date | undefined>(undefined);
+	const [to, setTo] = useState<Date | undefined>(undefined);
 
 	const { data: invoices } = trpc.invoice.list.useQuery({
-		clientId
+		clientId,
+		status: statusFilterMap[statusFilter],
+		from,
+		to
 	});
 
 	const trpcUtils = trpc.useUtils();
@@ -187,6 +200,38 @@ export default function InvoiceList({ clientId }: Props) {
 				createNewHref="/dashboard/invoices/create"
 				extraButtons={<LogPaymentDialog />}
 			/>
+
+			<div className="mb-4">
+				<h3 className="mb-2 font-medium">Status</h3>
+				<ListFilterRow
+					items={statusFilters.map((filter) => ({
+						children: filter,
+						active: statusFilter === filter,
+						onClick: () => setStatusFilter(filter)
+					}))}
+				/>
+			</div>
+
+			<div className="mb-4">
+				<h3 className="mb-2 font-medium">Financial Year</h3>
+				<div className="flex items-center gap-4">
+					<DatePicker date={from} setDate={setFrom} />
+
+					<DatePicker date={to} setDate={setTo} />
+				</div>
+			</div>
+
+			{invoices?.totalAmount !== undefined && (
+				<div className="mb-4 rounded-md bg-slate-100 p-4 dark:bg-slate-800">
+					<h3 className="font-medium">Total Amount</h3>
+					<p className="text-2xl font-bold text-orange-700">
+						{invoices.totalAmount.toLocaleString(undefined, {
+							style: "currency",
+							currency: "AUD"
+						})}
+					</p>
+				</div>
+			)}
 
 			{invoices && <DataTable columns={columns} data={invoices.invoices} />}
 		</ListPage>
