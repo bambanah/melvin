@@ -5,9 +5,7 @@ import autoTable, { CellDef } from "jspdf-autotable";
 import { getRateForActivity, getTotalCostOfActivities } from "./activity-utils";
 import { formatDuration, getDuration } from "./date-utils";
 import { round } from "./generic-utils";
-import { getInvoiceFileName } from "./invoice-utils";
 import { getNonLabourTravelCode } from "./support-item-utils";
-import { parseInvoice } from "@/server/api/routers/invoice-router";
 
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
@@ -277,7 +275,7 @@ const generatePDF = async (invoiceId: string) => {
 		}
 	});
 
-	const fileName = getInvoiceFileName(parseInvoice(invoice));
+	const fileName = `${invoice.invoiceNo}.pdf`;
 
 	return {
 		pdfString: document_
