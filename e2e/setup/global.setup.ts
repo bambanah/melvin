@@ -1,6 +1,6 @@
 import prisma from "@/server/prisma";
 import { FullConfig, chromium } from "@playwright/test";
-import dayjs from "dayjs";
+import { addMonths, getUnixTime } from "date-fns";
 import { testUser } from "../test-utils";
 
 async function globalSetup(config: FullConfig) {
@@ -23,7 +23,7 @@ async function globalSetup(config: FullConfig) {
 			path: "/",
 			httpOnly: true,
 			sameSite: "Lax",
-			expires: dayjs().add(1, "month").unix()
+			expires: getUnixTime(addMonths(new Date(), 1))
 		}
 	]);
 
