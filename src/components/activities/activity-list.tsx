@@ -37,10 +37,15 @@ function ActivityList({
 }: Props) {
 	const [assignedFilter, setAssignedFilter] = useState<boolean | undefined>();
 
-	const queryResult = trpc.activity.list.useInfiniteQuery({
-		assigned: groupByAssignedStatus ? assignedFilter : undefined,
-		invoiceId
-	});
+	const queryResult = trpc.activity.list.useInfiniteQuery(
+		{
+			assigned: groupByAssignedStatus ? assignedFilter : undefined,
+			invoiceId
+		},
+		{
+			getNextPageParam: (lastPage) => lastPage.nextCursor
+		}
+	);
 
 	return (
 		<ListPage>

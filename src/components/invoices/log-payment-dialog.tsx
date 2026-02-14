@@ -36,7 +36,7 @@ const LogPaymentDialog = () => {
 	const {
 		data: { invoiceIds, invoiceDetails } = {},
 		refetch: fetchMatchingInvoiceIds,
-		isLoading
+		isPending
 	} = trpc.invoice.matchByPayment.useQuery(
 		{ paymentAmount: amountPaid ?? 0 },
 		{ enabled: false }
@@ -165,7 +165,7 @@ const LogPaymentDialog = () => {
 				/>
 
 				{amountPaid > 0 &&
-					!isLoading &&
+					!isPending &&
 					(invoiceIds?.length ? (
 						<div className="flex flex-col gap-2 divide-y">
 							{invoiceIds.length > 1 && <p>Found multiple candidates.</p>}
