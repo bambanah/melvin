@@ -1,6 +1,6 @@
 import { userSchema } from "@/schema/user-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/client";
 import { inferRouterOutputs, TRPCError } from "@trpc/server";
 import { z } from "zod";
 

@@ -23,7 +23,7 @@ import type { SupportItemSchema } from "@/schema/support-item-schema";
 import { supportItemSchema } from "@/schema/support-item-schema";
 import { SupportItemByIdOutput } from "@/server/api/routers/support-item-router";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RateType } from "@prisma/client";
+import { RateType } from "@/generated/browser";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";

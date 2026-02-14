@@ -14,7 +14,7 @@ import Tooltip from "@/components/ui/tooltip";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { trpc } from "@/lib/trpc";
 import { InvoiceListOutput } from "@/server/api/routers/invoice-router";
-import { InvoiceStatus } from "@prisma/client";
+import { InvoiceStatus } from "@/generated/browser";
 import { ColumnDef } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import { Copy, Download, MoreHorizontal, Pencil } from "lucide-react";
