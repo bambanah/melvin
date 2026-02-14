@@ -1,5 +1,5 @@
 import prisma from "@/server/prisma";
-import { RateType } from "@prisma/client";
+import { RateType } from "@/generated/client";
 import jspdf from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
 import { getRateForActivity, getTotalCostOfActivities } from "./activity-utils";

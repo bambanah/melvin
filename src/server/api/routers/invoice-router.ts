@@ -4,7 +4,7 @@ import { baseListQueryInput } from "@/lib/trpc";
 import { activitySchema } from "@/schema/activity-schema";
 import { InvoiceSchema, invoiceSchema } from "@/schema/invoice-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
-import { Client, Invoice, InvoiceStatus } from "@prisma/client";
+import { Client, Invoice, InvoiceStatus } from "@/generated/client";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
 import { z } from "zod";

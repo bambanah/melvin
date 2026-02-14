@@ -2,7 +2,7 @@ import { baseListQueryInput } from "@/lib/trpc";
 import { supportItemRatesSchema } from "@/schema/support-item-rates-schema";
 import { supportItemSchema } from "@/schema/support-item-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/client";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { z } from "zod";
 import { DEFAULT_LIST_LIMIT } from "./router.constants";

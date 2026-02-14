@@ -1,8 +1,9 @@
 import InfiniteList from "@/components/shared/infinite-list";
 import ListPage from "@/components/shared/list-page";
+import type { Prisma } from "@/generated/client";
+import { RateType } from "@/generated/browser";
 import { trpc } from "@/lib/trpc";
 import { decimalToCurrencyString } from "@/lib/utils";
-import { Prisma, RateType } from "@prisma/client";
 import { Users } from "lucide-react";
 import Link from "next/link";
 
