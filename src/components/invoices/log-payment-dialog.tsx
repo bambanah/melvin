@@ -149,7 +149,7 @@ const LogPaymentDialog = () => {
 					<span className="hidden sm:inline">Log Payment</span>
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[425px]">
+			<DialogContent className="sm:max-w-106.25">
 				<DialogHeader>
 					<DialogTitle>How much were you paid?</DialogTitle>
 				</DialogHeader>

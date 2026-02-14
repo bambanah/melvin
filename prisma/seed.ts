@@ -1,13 +1,19 @@
-import { InvoiceStatus, PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { randomClient } from "../e2e/random/random-client";
 import { randomInvoice } from "../e2e/random/random-invoice";
+import { PrismaClient, InvoiceStatus } from "@/generated/client";
 
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 dayjs.extend(customParseFormat);
-const prisma = new PrismaClient();
+
+const adapter = new PrismaPg({
+	connectionString: process.env.DATABASE_URL
+});
+
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
 	const seedEmail = process.env.SEED_EMAIL;

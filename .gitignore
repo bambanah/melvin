@@ -2,7 +2,6 @@ node_modules
 .env*
 !.env.template
 .eslintcache
-.vscode/
 .next
 coverage/
 yarn-error.log
@@ -10,10 +9,11 @@ yarn-error.log
 /playwright-report/
 /playwright/.cache/
 e2e/setup/storage-state.json
-.swc
+
 analyze/
 .idea/
 tsconfig.tsbuildinfo
 
 next-env.d.ts
 .vercel
+generated/

@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { decimalToCurrencyString } from "@/lib/utils";
-import { SupportItem, SupportItemRates } from "@prisma/client";
+import { SupportItem, SupportItemRates } from "@/generated/browser";
 import { Check, Pencil, Trash, X } from "lucide-react";
 import { useMemo, useState } from "react";
 

@@ -1,4 +1,4 @@
-import { InvoiceStatus } from "@prisma/client";
+import { InvoiceStatus } from "@/generated/browser";
 
 export const statusFilters = ["ALL", "UNPAID", "PAID"] as const;
 export type StatusFilter = (typeof statusFilters)[number];
