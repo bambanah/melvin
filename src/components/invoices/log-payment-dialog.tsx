@@ -44,10 +44,6 @@ const LogPaymentDialog = () => {
 	const trpcUtils = trpc.useUtils();
 	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
 
-	useEffect(() => {
-		setInvoicesToUpdate([]);
-	}, [invoiceIds]);
-
 	const updateAmountPaid = debounce(
 		(value: number) => setAmountPaid(value),
 		750
