@@ -1,0 +1,7 @@
+onlyBuiltDependencies:
+  - "@prisma/engines"
+  - canvas
+  - core-js
+  - esbuild
+  - prisma
+  - sharp
