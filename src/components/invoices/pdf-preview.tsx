@@ -1,8 +1,7 @@
 import Loading from "@/components/ui/loading";
 import { trpc } from "@/lib/trpc";
-import { FC, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Document, Page } from "react-pdf";
-import { SizeMe } from "react-sizeme";
 
 import { pdfjs } from "react-pdf";
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
@@ -14,6 +13,25 @@ interface PdfProps {
 
 const PdfPreview: FC<PdfProps> = ({ invoiceId, className }) => {
 	const [numPages, setNumPages] = useState<number | null>(null);
+	const [containerWidth, setContainerWidth] = useState(800);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const element = containerRef.current;
+		if (!element || typeof ResizeObserver === "undefined") return;
+
+		const observer = new ResizeObserver((entries) => {
+			const nextWidth = entries[0]?.contentRect.width;
+			if (nextWidth) setContainerWidth(Math.max(1, Math.floor(nextWidth)));
+		});
+
+		observer.observe(element);
+		setContainerWidth(
+			Math.max(1, Math.floor(element.getBoundingClientRect().width))
+		);
+
+		return () => observer.disconnect();
+	}, []);
 
 	const onDocumentLoadSuccess = ({
 		numPages: nextNumPages
@@ -32,23 +50,19 @@ const PdfPreview: FC<PdfProps> = ({ invoiceId, className }) => {
 	if (!pdf.data) return <Loading />;
 
 	return (
-		<div className={className}>
-			<SizeMe>
-				{({ size }) => (
-					<Document file={pdf.data} onLoadSuccess={onDocumentLoadSuccess}>
-						{numPages &&
-							Array.from({ length: numPages }, (_, index) => (
-								<Page
-									key={index}
-									pageNumber={index + 1}
-									width={size.width ?? 800}
-									renderTextLayer={false}
-									renderAnnotationLayer={false}
-								/>
-							))}
-					</Document>
-				)}
-			</SizeMe>
+		<div ref={containerRef} className={className}>
+			<Document file={pdf.data} onLoadSuccess={onDocumentLoadSuccess}>
+				{numPages &&
+					Array.from({ length: numPages }, (_, index) => (
+						<Page
+							key={index}
+							pageNumber={index + 1}
+							width={containerWidth}
+							renderTextLayer={false}
+							renderAnnotationLayer={false}
+						/>
+					))}
+			</Document>
 		</div>
 	);
 };

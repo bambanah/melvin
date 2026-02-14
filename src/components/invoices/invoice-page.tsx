@@ -24,7 +24,9 @@ import { Fragment, useState } from "react";
 
 dayjs.extend(require("dayjs/plugin/utc"));
 
-const PdfPreview = dynamic(() => import("@/components/invoices/pdf-preview"));
+const PdfPreview = dynamic(() => import("@/components/invoices/pdf-preview"), {
+	ssr: false
+});
 const ActivityList = dynamic(
 	() => import("@/components/activities/activity-list")
 );
