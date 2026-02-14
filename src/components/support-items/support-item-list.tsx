@@ -32,7 +32,12 @@ const ItemCode = ({
 };
 
 function SupportItemList() {
-	const queryResult = trpc.supportItem.list.useInfiniteQuery({});
+	const queryResult = trpc.supportItem.list.useInfiniteQuery(
+		{},
+		{
+			getNextPageParam: (lastPage) => lastPage.nextCursor
+		}
+	);
 
 	return (
 		<ListPage>

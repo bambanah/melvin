@@ -1,10 +1,10 @@
 import Loading from "@/components/ui/loading";
 import { cn } from "@/lib/utils";
-import { UseTRPCInfiniteQueryResult } from "@trpc/react-query/shared";
+import { InfiniteData, UseInfiniteQueryResult } from "@tanstack/react-query";
 import React, { Fragment, useEffect, useRef } from "react";
 
 interface InfiniteListProps<TData, TError, TKey extends keyof TData> {
-	queryResult: UseTRPCInfiniteQueryResult<TData, TError>;
+	queryResult: UseInfiniteQueryResult<InfiniteData<TData>, TError>;
 	children: (data: TData[TKey]) => React.ReactNode;
 	dataKey: TKey;
 	className?: string;
@@ -15,7 +15,7 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 	dataKey,
 	className
 }: InfiniteListProps<TData, TError, TKey>) => {
-	const { data, fetchNextPage, isSuccess, isLoading, isFetching, hasNextPage } =
+	const { data, fetchNextPage, isSuccess, isPending, isFetching, hasNextPage } =
 		queryResult;
 	const dataReturned =
 		isSuccess && data.pages.flatMap((page) => page[dataKey])?.length > 0;
@@ -57,7 +57,7 @@ const InfiniteList = <TData, TError, TKey extends keyof TData>({
 				</div>
 			)}
 
-			{(isLoading || isFetching) && !data && <Loading />}
+			{(isPending || isFetching) && !data && <Loading />}
 
 			<div ref={loadMoreRef} className=""></div>
 		</div>
