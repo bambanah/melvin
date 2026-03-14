@@ -1,4 +1,4 @@
-import { RateType } from "@prisma/client";
+import { RateType } from "@/generated/browser";
 import { z } from "zod";
 
 export const itemCodeRegex = /^\d{2}_(?:\d{3}|\d{9})_\d{4}_\d_\d(?:_T)?$/;

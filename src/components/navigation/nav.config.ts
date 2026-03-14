@@ -8,10 +8,6 @@ export const navConfig: { title: string; href: string }[] = [
 		href: "/dashboard/clients"
 	},
 	{
-		title: "Activities",
-		href: "/dashboard/activities"
-	},
-	{
 		title: "Items",
 		href: "/dashboard/support-items"
 	}

@@ -1,11 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
 
 model Account {
@@ -138,6 +137,7 @@ model Activity {
   invoice         Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
 
   @@index([ownerId])
+  @@index([ownerId, date, startTime])
   @@index([clientId])
   @@index([supportItemId])
   @@index([invoiceId])

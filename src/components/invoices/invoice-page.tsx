@@ -6,7 +6,7 @@ import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogPanel, Transition } from "@headlessui/react";
-import { InvoiceStatus } from "@prisma/client";
+import { InvoiceStatus } from "@/generated/browser";
 import dayjs from "dayjs";
 import {
 	Clock,
@@ -24,7 +24,9 @@ import { Fragment, useState } from "react";
 
 dayjs.extend(require("dayjs/plugin/utc"));
 
-const PdfPreview = dynamic(() => import("@/components/invoices/pdf-preview"));
+const PdfPreview = dynamic(() => import("@/components/invoices/pdf-preview"), {
+	ssr: false
+});
 const ActivityList = dynamic(
 	() => import("@/components/activities/activity-list")
 );

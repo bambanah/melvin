@@ -2,7 +2,7 @@ import {
 	getRateForActivity,
 	getTotalCostOfActivities
 } from "@/lib/activity-utils";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/client";
 import { expect, test } from "vitest";
 
 import dayjs from "dayjs";

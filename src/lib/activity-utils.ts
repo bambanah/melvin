@@ -1,4 +1,4 @@
-import { Prisma, SupportItem, SupportItemRates } from "@prisma/client";
+import type { Prisma, SupportItem, SupportItemRates } from "@/generated/client";
 import { getDuration } from "./date-utils";
 import { round } from "./generic-utils";
 

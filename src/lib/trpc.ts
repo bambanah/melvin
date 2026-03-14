@@ -21,17 +21,16 @@ export const trpc = createTRPCNext<AppRouter>({
 		if (typeof window !== "undefined") {
 			// Client requests
 			return {
-				transformer: superjson,
 				links: [
 					httpBatchLink({
-						url: `${getBaseUrl()}/api/trpc`
+						url: `${getBaseUrl()}/api/trpc`,
+						transformer: superjson
 					})
 				]
 			};
 		}
 
 		return {
-			transformer: superjson,
 			links: [
 				httpBatchLink({
 					url: `${getBaseUrl()}/api/trpc`,
@@ -42,11 +41,13 @@ export const trpc = createTRPCNext<AppRouter>({
 							return { ...headers, "x-ssr": "1" };
 						}
 						return {};
-					}
+					},
+					transformer: superjson
 				})
 			]
 		};
-	}
+	},
+	transformer: superjson
 });
 
 export const baseListQueryInput = z.object({

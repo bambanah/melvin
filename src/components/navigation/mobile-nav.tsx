@@ -30,7 +30,7 @@ const MobileNav = () => {
 			</SheetTrigger>
 			<SheetContent side="left" className="pr-0">
 				<MobileLink
-					href="/dashboard/invoices"
+					href="/dashboard"
 					className="flex items-center"
 					onOpenChange={setOpen}
 				>

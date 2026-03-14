@@ -8,8 +8,9 @@ import {
 	UseFormRegister
 } from "react-hook-form";
 
-export interface InputProps<T extends FieldValues>
-	extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps<
+	T extends FieldValues
+> extends React.InputHTMLAttributes<HTMLInputElement> {
 	register?: UseFormRegister<T>;
 	rules?: RegisterOptions<T>;
 	name?: Path<T>;

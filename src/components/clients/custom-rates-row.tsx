@@ -3,9 +3,9 @@ import { Input } from "@/components/ui/input";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { decimalToCurrencyString } from "@/lib/utils";
-import { SupportItem, SupportItemRates } from "@prisma/client";
+import { SupportItem, SupportItemRates } from "@/generated/browser";
 import { Check, Pencil, Trash, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 interface CustomRatesCellProps {
 	value?: string;
@@ -70,6 +70,17 @@ export function CustomRatesRow({ clientId, rate }: CustomRatesRowProps) {
 		rate.sundayRate
 	]);
 
+	const handleEditChange = (editing: boolean) => {
+		setIsEditing(editing);
+
+		if (editing) {
+			setWeekdayRate(rate.weekdayRate?.toString() ?? "");
+			setWeeknightRate(rate.weeknightRate?.toString() ?? "");
+			setSaturdayRate(rate.saturdayRate?.toString() ?? "");
+			setSundayRate(rate.sundayRate?.toString() ?? "");
+		}
+	};
+
 	async function onUpdate() {
 		updateCustomRate({
 			id: rate.id,
@@ -80,7 +91,7 @@ export function CustomRatesRow({ clientId, rate }: CustomRatesRowProps) {
 				sundayRate: sundayRate ? Number(sundayRate) : undefined
 			}
 		}).then(() => {
-			setIsEditing(false);
+			handleEditChange(false);
 			trpcUtils.supportItem.getCustomRatesForClient.invalidate({
 				id: clientId
 			});
@@ -94,15 +105,6 @@ export function CustomRatesRow({ clientId, rate }: CustomRatesRowProps) {
 			})
 		);
 	}
-
-	useEffect(() => {
-		if (isEditing) {
-			setWeekdayRate(rate.weekdayRate?.toString() ?? "");
-			setWeeknightRate(rate.weeknightRate?.toString() ?? "");
-			setSaturdayRate(rate.saturdayRate?.toString() ?? "");
-			setSundayRate(rate.sundayRate?.toString() ?? "");
-		}
-	}, [isEditing, rate]);
 
 	if (isEditing) {
 		return (
@@ -125,7 +127,7 @@ export function CustomRatesRow({ clientId, rate }: CustomRatesRowProps) {
 					<Button
 						variant="ghost"
 						size="icon"
-						onClick={() => setIsEditing(false)}
+						onClick={() => handleEditChange(false)}
 					>
 						<X className="h-4 w-4" />
 					</Button>
@@ -150,7 +152,11 @@ export function CustomRatesRow({ clientId, rate }: CustomRatesRowProps) {
 				{rate.sundayRate && decimalToCurrencyString(rate.sundayRate)}
 			</TableCell>
 			<TableCell className="gap-2">
-				<Button variant="ghost" size="icon" onClick={() => setIsEditing(true)}>
+				<Button
+					variant="ghost"
+					size="icon"
+					onClick={() => handleEditChange(true)}
+				>
 					<Pencil className="h-4 w-4" />
 				</Button>
 				<Button

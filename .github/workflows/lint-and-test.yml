@@ -29,13 +29,13 @@ jobs:
           - 5432:5432
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22.x
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
+          node-version: 24.x
+          cache: pnpm
+      - run: pnpm install
 
       - name: Install playwright browsers
         run: npx playwright install
@@ -50,13 +50,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22.x
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
+          node-version: 24.x
+          cache: pnpm
+      - run: pnpm install
 
       - name: Run tests
         run: pnpm test:unit
@@ -65,13 +65,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22.x
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
+          node-version: 24.x
+          cache: pnpm
+      - run: pnpm install
 
       - name: ESlint
         run: pnpm lint

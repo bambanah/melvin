@@ -36,17 +36,13 @@ const LogPaymentDialog = () => {
 	const {
 		data: { invoiceIds, invoiceDetails } = {},
 		refetch: fetchMatchingInvoiceIds,
-		isLoading
+		isPending
 	} = trpc.invoice.matchByPayment.useQuery(
 		{ paymentAmount: amountPaid ?? 0 },
 		{ enabled: false }
 	);
 	const trpcUtils = trpc.useUtils();
 	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
-
-	useEffect(() => {
-		setInvoicesToUpdate([]);
-	}, [invoiceIds]);
 
 	const updateAmountPaid = debounce(
 		(value: number) => setAmountPaid(value),
@@ -153,7 +149,7 @@ const LogPaymentDialog = () => {
 					<span className="hidden sm:inline">Log Payment</span>
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[425px]">
+			<DialogContent className="sm:max-w-106.25">
 				<DialogHeader>
 					<DialogTitle>How much were you paid?</DialogTitle>
 				</DialogHeader>
@@ -169,7 +165,7 @@ const LogPaymentDialog = () => {
 				/>
 
 				{amountPaid > 0 &&
-					!isLoading &&
+					!isPending &&
 					(invoiceIds?.length ? (
 						<div className="flex flex-col gap-2 divide-y">
 							{invoiceIds.length > 1 && <p>Found multiple candidates.</p>}
