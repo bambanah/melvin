@@ -107,6 +107,31 @@ export const activityRouter = router({
 
 		return groupedActivities;
 	}),
+	byDateRange: authedProcedure
+		.input(
+			z.object({
+				startDate: z.date(),
+				endDate: z.date()
+			})
+		)
+		.query(async ({ ctx, input }) => {
+			const activities = await ctx.prisma.activity.findMany({
+				select: {
+					...defaultActivitySelect,
+					invoiceId: true
+				},
+				where: {
+					ownerId: ctx.session.user.id,
+					date: {
+						gte: input.startDate,
+						lt: input.endDate
+					}
+				},
+				orderBy: [{ date: "asc" }, { startTime: "asc" }]
+			});
+
+			return activities;
+		}),
 	byId: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
@@ -224,3 +249,7 @@ export type ActivityListOutput = inferRouterOutputs<
 export type ActivityByIdOutput = inferRouterOutputs<
 	typeof activityRouter
 >["byId"];
+
+export type ActivityByDateRangeOutput = inferRouterOutputs<
+	typeof activityRouter
+>["byDateRange"];
