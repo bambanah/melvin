@@ -137,6 +137,7 @@ model Activity {
   invoice         Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
 
   @@index([ownerId])
+  @@index([ownerId, date, startTime])
   @@index([clientId])
   @@index([supportItemId])
   @@index([invoiceId])
