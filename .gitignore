@@ -17,3 +17,5 @@ tsconfig.tsbuildinfo
 next-env.d.ts
 .vercel
 generated/
+
+.DS_Store
