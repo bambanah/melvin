@@ -87,7 +87,9 @@ export function calculateTripTransit(
 
 		if (isLast && sorted.length > 1) {
 			transitDistance += Number(activity.client?.distanceToClient ?? 0);
-			const rawReturnDuration = Number(activity.client?.travelTimeToClient ?? 0);
+			const rawReturnDuration = Number(
+				activity.client?.travelTimeToClient ?? 0
+			);
 			if (rawReturnDuration > MAX_TRANSIT_DURATION_MINUTES) {
 				durationCapped = true;
 				transitDuration += MAX_TRANSIT_DURATION_MINUTES;

@@ -25,7 +25,13 @@ import { ActivityByIdOutput } from "@/server/api/routers/activity-router";
 import { SupportItemListOutput } from "@/server/api/routers/support-item-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { AlertTriangle, CalendarIcon, ChevronDown, Link2, Unlink } from "lucide-react";
+import {
+	AlertTriangle,
+	CalendarIcon,
+	ChevronDown,
+	Link2,
+	Unlink
+} from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -78,7 +84,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 			}
 
 			router.reload();
-		} catch (error) {
+		} catch {
 			toast.error("Failed to remove from trip");
 		}
 	};

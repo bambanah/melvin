@@ -5,30 +5,36 @@
 ## Key Files
 
 ### Database
+
 - `prisma/schema.prisma` — Activity model (lines 120-144), Client model (lines 77-98), User model (lines 47-75)
   - Activity has `transitDistance`, `transitDuration` (Decimal)
   - Client has `defaultTransitDistance`, `defaultTransitTime` (Decimal) — **to be renamed**
   - User has no transit rate fields — **to be added**
 
 ### Transit Logic
+
 - `src/lib/activity-utils.ts` — `getTotalCostOfActivities()` calculates cost including transit
   - Current distance rate: $0.85/km (non-group), $0.43/km (group) — **to be customizable**
   - Duration rate: hourly rate / 60 per minute
   - 30-min cap not currently enforced — **to be added**
 
 ### Activity Forms
+
 - `src/components/activities/activity-form.tsx` — Full activity form, auto-populates transit from client defaults
 - `src/components/calendar/quick-add-form.tsx` — Quick add modal from calendar
 
 ### Calendar
+
 - `src/components/calendar/calendar-day-modal.tsx` — Day detail modal (add trip grouping here)
 - `src/components/calendar/calendar-view.tsx` — Main calendar
 
 ### API
+
 - `src/server/api/routers/activity-router.ts` — Activity CRUD (add overlap validation here)
 - `src/server/api/routers/client-router.ts` — Client CRUD
 
 ### Invoices
+
 - `src/components/invoices/invoice-activity-creation-form.tsx` — Group activity handling (separate concern)
 - Invoice currently reads live from activities, no snapshots
 

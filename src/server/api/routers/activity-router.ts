@@ -1,7 +1,4 @@
-import {
-	checkActivityOverlap,
-	formatOverlapError
-} from "@/lib/overlap-utils";
+import { checkActivityOverlap, formatOverlapError } from "@/lib/overlap-utils";
 import { baseListQueryInput } from "@/lib/trpc";
 import { activitySchema } from "@/schema/activity-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
@@ -33,6 +30,14 @@ const defaultActivitySelect = {
 		select: {
 			id: true,
 			date: true
+		}
+	},
+	transportItems: {
+		select: {
+			id: true,
+			type: true,
+			amount: true,
+			note: true
 		}
 	}
 };
@@ -183,16 +188,17 @@ export const activityRouter = router({
 		)
 		.mutation(async ({ input, ctx }) => {
 			const { activity: inputActivity } = input;
+			const { transportItems, ...activityData } = inputActivity;
 
-			const startTime = inputActivity.startTime
-				? dayjs.utc(inputActivity.startTime, "HH:mm").toDate()
+			const startTime = activityData.startTime
+				? dayjs.utc(activityData.startTime, "HH:mm").toDate()
 				: undefined;
-			const endTime = inputActivity.endTime
-				? dayjs.utc(inputActivity.endTime, "HH:mm").toDate()
+			const endTime = activityData.endTime
+				? dayjs.utc(activityData.endTime, "HH:mm").toDate()
 				: undefined;
 
 			const conflicting = await checkActivityOverlap(ctx.prisma, {
-				date: inputActivity.date,
+				date: activityData.date,
 				startTime,
 				endTime,
 				ownerId: ctx.session.user.id
@@ -207,12 +213,25 @@ export const activityRouter = router({
 
 			const activity = await ctx.prisma.activity.create({
 				data: {
-					...inputActivity,
+					...activityData,
 					startTime,
 					endTime,
-					transitDistance: inputActivity.transitDistance || undefined,
-					transitDuration: inputActivity.transitDuration || undefined,
-					ownerId: ctx.session.user.id
+					transitDistance: activityData.transitDistance || undefined,
+					transitDuration: activityData.transitDuration || undefined,
+					ownerId: ctx.session.user.id,
+					transportItems:
+						transportItems && transportItems.length > 0
+							? {
+									create: transportItems.map((item) => ({
+										type: item.type,
+										amount: item.amount,
+										note: item.note
+									}))
+								}
+							: undefined
+				},
+				include: {
+					transportItems: true
 				}
 			});
 
@@ -230,15 +249,17 @@ export const activityRouter = router({
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
-			const startTime = input.activity.startTime
-				? dayjs.utc(input.activity.startTime, "HH:mm").toDate()
+			const { transportItems, ...activityData } = input.activity;
+
+			const startTime = activityData.startTime
+				? dayjs.utc(activityData.startTime, "HH:mm").toDate()
 				: undefined;
-			const endTime = input.activity.endTime
-				? dayjs.utc(input.activity.endTime, "HH:mm").toDate()
+			const endTime = activityData.endTime
+				? dayjs.utc(activityData.endTime, "HH:mm").toDate()
 				: undefined;
 
 			const conflicting = await checkActivityOverlap(ctx.prisma, {
-				date: input.activity.date,
+				date: activityData.date,
 				startTime,
 				endTime,
 				ownerId: ctx.session.user.id,
@@ -252,16 +273,36 @@ export const activityRouter = router({
 				});
 			}
 
+			// Delete existing transport items and recreate
+			if (transportItems !== undefined) {
+				await ctx.prisma.activityTransportItem.deleteMany({
+					where: { activityId: input.id }
+				});
+			}
+
 			const activity = await ctx.prisma.activity.update({
 				where: {
 					id: input.id
 				},
 				data: {
-					...input.activity,
+					...activityData,
 					startTime,
 					endTime,
-					transitDistance: input.activity.transitDistance || undefined,
-					transitDuration: input.activity.transitDuration || undefined
+					transitDistance: activityData.transitDistance || undefined,
+					transitDuration: activityData.transitDuration || undefined,
+					transportItems:
+						transportItems && transportItems.length > 0
+							? {
+									create: transportItems.map((item) => ({
+										type: item.type,
+										amount: item.amount,
+										note: item.note
+									}))
+								}
+							: undefined
+				},
+				include: {
+					transportItems: true
 				}
 			});
 
@@ -285,6 +326,132 @@ export const activityRouter = router({
 			}
 
 			return true;
+		}),
+	bulkAdd: authedProcedure
+		.input(
+			z.object({
+				activities: z.array(activitySchema),
+				autoCreateTrip: z.boolean().default(true)
+			})
+		)
+		.mutation(async ({ input, ctx }) => {
+			const { activities: inputActivities, autoCreateTrip } = input;
+
+			if (inputActivities.length === 0) {
+				return { activities: [], tripId: null };
+			}
+
+			// Parse and validate all activities
+			const parsedActivities = inputActivities.map((activity) => {
+				const { transportItems, ...activityData } = activity;
+				return {
+					...activityData,
+					startTime: activityData.startTime
+						? dayjs.utc(activityData.startTime, "HH:mm").toDate()
+						: undefined,
+					endTime: activityData.endTime
+						? dayjs.utc(activityData.endTime, "HH:mm").toDate()
+						: undefined,
+					transportItems
+				};
+			});
+
+			// Sort by start time for contiguity check
+			const sorted = [...parsedActivities].sort((a, b) => {
+				if (!a.startTime || !b.startTime) return 0;
+				return a.startTime.getTime() - b.startTime.getTime();
+			});
+
+			// Create all activities in a transaction
+			const createdActivities = await ctx.prisma.$transaction(
+				sorted.map((activity) =>
+					ctx.prisma.activity.create({
+						data: {
+							clientId: activity.clientId,
+							date: activity.date,
+							startTime: activity.startTime,
+							endTime: activity.endTime,
+							supportItemId: activity.supportItemId,
+							transitDistance: activity.transitDistance || undefined,
+							transitDuration: activity.transitDuration || undefined,
+							ownerId: ctx.session.user.id,
+							transportItems:
+								activity.transportItems && activity.transportItems.length > 0
+									? {
+											create: activity.transportItems.map((item) => ({
+												type: item.type,
+												amount: item.amount,
+												note: item.note
+											}))
+										}
+									: undefined
+						},
+						include: {
+							transportItems: true,
+							client: {
+								select: {
+									distanceToClient: true,
+									travelTimeToClient: true
+								}
+							}
+						}
+					})
+				)
+			);
+
+			// Check if activities are contiguous (end time equals next start time)
+			let tripId: string | null = null;
+			if (
+				autoCreateTrip &&
+				createdActivities.length >= 2 &&
+				createdActivities.every((a) => a.startTime && a.endTime)
+			) {
+				const isContiguous = createdActivities.every((activity, index) => {
+					if (index === 0) return true;
+					const prevActivity = createdActivities[index - 1];
+					if (!prevActivity.endTime || !activity.startTime) return false;
+					// Check if end time of previous equals start time of current
+					return (
+						dayjs.utc(prevActivity.endTime).format("HH:mm") ===
+						dayjs.utc(activity.startTime).format("HH:mm")
+					);
+				});
+
+				if (isContiguous) {
+					// Create trip with inter-client legs
+					const interClientLegs = [];
+					for (let i = 0; i < createdActivities.length - 1; i++) {
+						const fromActivity = createdActivities[i];
+						const toActivity = createdActivities[i + 1];
+						interClientLegs.push({
+							fromActivityId: fromActivity.id,
+							toActivityId: toActivity.id,
+							distance: Number(toActivity.client?.distanceToClient ?? 0),
+							duration: Number(toActivity.client?.travelTimeToClient ?? 0)
+						});
+					}
+
+					const trip = await ctx.prisma.trip.create({
+						data: {
+							date: createdActivities[0].date,
+							ownerId: ctx.session.user.id,
+							activities: {
+								connect: createdActivities.map((a) => ({ id: a.id }))
+							},
+							interClientLegs: {
+								create: interClientLegs
+							}
+						}
+					});
+
+					tripId = trip.id;
+				}
+			}
+
+			return {
+				activities: createdActivities,
+				tripId
+			};
 		})
 });
 

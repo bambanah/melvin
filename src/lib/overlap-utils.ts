@@ -51,9 +51,7 @@ export async function checkActivityOverlap(
 
 export function formatOverlapError(conflicting: ConflictingActivity): string {
 	const clientName = conflicting.client?.name ?? "Unknown Client";
-	const start = conflicting.startTime
-		? formatTime(conflicting.startTime)
-		: "?";
+	const start = conflicting.startTime ? formatTime(conflicting.startTime) : "?";
 	const end = conflicting.endTime ? formatTime(conflicting.endTime) : "?";
 
 	return `This time overlaps with an activity for ${clientName} (${start} - ${end})`;

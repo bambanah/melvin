@@ -1,10 +1,21 @@
-import type { Prisma, SupportItem, SupportItemRates } from "@/generated/client";
+import type {
+	ActivityTransportType,
+	Prisma,
+	SupportItem,
+	SupportItemRates
+} from "@/generated/client";
 import { getDuration } from "./date-utils";
 import { round } from "./generic-utils";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
+
+interface TransportItem {
+	type: ActivityTransportType;
+	amount: Prisma.Decimal | number;
+	note?: string | null;
+}
 
 interface Activity {
 	date: Date;
@@ -13,6 +24,7 @@ interface Activity {
 	itemDistance?: number | null;
 	transitDistance?: Prisma.Decimal | null;
 	transitDuration?: Prisma.Decimal | null;
+	transportItems?: TransportItem[];
 	supportItem: Pick<
 		SupportItem,
 		| "weekdayCode"
@@ -120,6 +132,8 @@ export const getRateForActivity = (
 	return [activity.supportItem.weekdayCode, Number(rate)];
 };
 
+const DEFAULT_ACTIVITY_TRANSPORT_RATE = 0.99;
+
 export const getTotalCostOfActivities = (
 	activities: Activity[],
 	rateContext?: TransitRateContext
@@ -149,6 +163,19 @@ export const getTotalCostOfActivities = (
 					Number(activity.transitDuration) * (Number(rate) / 60),
 					2
 				);
+			}
+
+			if (activity.transportItems) {
+				for (const item of activity.transportItems) {
+					if (item.type === "DISTANCE") {
+						subTotal += round(
+							Number(item.amount) * DEFAULT_ACTIVITY_TRANSPORT_RATE,
+							2
+						);
+					} else {
+						subTotal += round(Number(item.amount), 2);
+					}
+				}
 			}
 
 			return subTotal;

@@ -9,7 +9,7 @@ import { useCallback, useMemo, useState } from "react";
 import CalendarAgenda from "./calendar-agenda";
 import CalendarDayModal from "./calendar-day-modal";
 import CalendarMonth from "./calendar-month";
-import QuickAddForm from "./quick-add-form";
+import { MultiActivityForm } from "@/components/activities/multi-activity-form";
 
 type ViewMode = "calendar" | "list";
 
@@ -131,17 +131,15 @@ const CalendarView = () => {
 				onRefresh={() => refetch()}
 			/>
 
-			<QuickAddForm
-				day={quickAddDay}
+			<MultiActivityForm
+				date={quickAddDay?.toDate() ?? null}
 				open={quickAddDay !== null}
 				onOpenChange={(open) => {
 					if (!open) setQuickAddDay(null);
 				}}
-				onSuggestTrip={() => {
-					refetch().then(() => {
-						setSelectedDay(quickAddDay);
-						setQuickAddDay(null);
-					});
+				onSuccess={() => {
+					refetch();
+					setQuickAddDay(null);
 				}}
 			/>
 		</Layout>

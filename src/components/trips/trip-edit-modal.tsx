@@ -78,8 +78,7 @@ const TripEditModal = ({ trip, open, onOpenChange, onSuccess }: Props) => {
 				const to = sortedActivities[i + 1];
 
 				const existingLeg = trip.interClientLegs.find(
-					(leg) =>
-						leg.fromActivityId === from.id && leg.toActivityId === to.id
+					(leg) => leg.fromActivityId === from.id && leg.toActivityId === to.id
 				);
 
 				newValues.push({

@@ -1,7 +1,6 @@
-import { calculateTripTransit, sortActivitiesByTime } from "@/lib/trip-utils";
+import { calculateTripTransit } from "@/lib/trip-utils";
 import { authedProcedure, router } from "@/server/api/trpc";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
-import { Prisma } from "@/generated/client";
 import { z } from "zod";
 
 const interClientLegSchema = z.object({
