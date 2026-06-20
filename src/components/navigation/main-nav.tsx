@@ -1,11 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { navConfig } from "./nav.config";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { MultiActivityForm } from "@/components/activities/multi-activity-form";
 
 const MainNav = () => {
 	const pathname = usePathname();
+	const [quickAddOpen, setQuickAddOpen] = useState(false);
 
 	return (
 		<div className="mr-4 hidden md:flex">
@@ -30,7 +34,22 @@ const MainNav = () => {
 						{title}
 					</Link>
 				))}
+				<Button
+					variant="ghost"
+					size="sm"
+					onClick={() => setQuickAddOpen(true)}
+					className="ml-2"
+				>
+					<Plus className="mr-1 h-4 w-4" />
+					Add Activity
+				</Button>
 			</nav>
+
+			<MultiActivityForm
+				date={new Date()}
+				open={quickAddOpen}
+				onOpenChange={setQuickAddOpen}
+			/>
 		</div>
 	);
 };

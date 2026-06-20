@@ -145,6 +145,8 @@ model Activity {
   invoice         Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
   trip            Trip?       @relation(fields: [tripId], references: [id], onDelete: SetNull)
 
+  transportItems  ActivityTransportItem[]
+
   @@index([ownerId])
   @@index([ownerId, date, startTime])
   @@index([clientId])
@@ -238,4 +240,22 @@ enum InvoiceStatus {
 enum RateType {
   KM
   HOUR
+}
+
+enum ActivityTransportType {
+  DISTANCE
+  PARKING
+  TOLL
+  OTHER
+}
+
+model ActivityTransportItem {
+  id         String                @id @default(cuid())
+  activityId String
+  activity   Activity              @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  type       ActivityTransportType
+  amount     Decimal
+  note       String?
+
+  @@index([activityId])
 }

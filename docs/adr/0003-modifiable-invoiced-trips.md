@@ -26,16 +26,19 @@ Trip versioning is deferred as a future feature if audit requirements emerge.
 ## Consequences
 
 **Positive**:
+
 - Simple mental model: the Trip always reflects current reality
 - No workflow friction (no need to void invoices for corrections)
 - Providers can fix mistakes without administrative overhead
 
 **Negative**:
+
 - Activity transit values can diverge from what was invoiced
 - No built-in audit trail of what transit was at invoice time (invoice itself is the record)
 - Could cause confusion if provider expects invoice to update automatically
 
 **Mitigations**:
+
 - Clear warning before modifying trips with invoiced activities
 - Invoice stores the transit value at time of generation (immutable)
 - Future: add Trip versioning if compliance or audit needs arise

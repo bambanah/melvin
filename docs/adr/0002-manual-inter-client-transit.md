@@ -22,6 +22,7 @@ When creating or editing a Trip, the provider enters inter-client values for eac
 ## Consequences
 
 **Positive**:
+
 - No API costs or rate limits
 - No dependency on external services
 - Provider enters what they actually drove, not what a routing algorithm predicted
@@ -29,10 +30,12 @@ When creating or editing a Trip, the provider enters inter-client values for eac
 - Works offline
 
 **Negative**:
+
 - Adds friction to trip creation (provider must know/look up distances)
 - Potential for inaccurate entry (typos, guessing)
 - No automatic updates if a client moves
 
 **Mitigations**:
+
 - Symmetric pre-fill reduces entry burden for round trips
 - UI shows warnings for implausible values (e.g., 100km in 10 minutes)

@@ -1,4 +1,5 @@
 import Navbar from "@/components/navigation/navbar";
+import { QuickAddFab } from "@/components/activities/quick-add-fab";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -35,6 +36,8 @@ const Layout = ({ children, isLoading, className }: Props) => {
 			>
 				{content}
 			</div>
+
+			{session.status === "authenticated" && <QuickAddFab />}
 		</div>
 	);
 };

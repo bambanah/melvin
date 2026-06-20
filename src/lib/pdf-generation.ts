@@ -34,7 +34,8 @@ const generatePDF = async (invoiceId: string) => {
 						include: {
 							supportItemRates: { where: { clientId: client.id } }
 						}
-					}
+					},
+					transportItems: true
 				}
 			}
 		}
@@ -145,6 +146,43 @@ const generatePDF = async (invoiceId: string) => {
 					`$${ratePerKm}/km\n`,
 					`$${travelTotal.toFixed(2)}\n`
 				]);
+			}
+
+			// Activity Based Transport items
+			if (activity.transportItems && activity.transportItems.length > 0) {
+				const ACTIVITY_TRANSPORT_RATE = 0.99;
+
+				for (const transportItem of activity.transportItems) {
+					if (transportItem.type === "DISTANCE") {
+						const transportTotal = round(
+							Number(transportItem.amount) * ACTIVITY_TRANSPORT_RATE,
+							2
+						);
+						activityStrings.push([
+							`Activity Based Transport\n04_799_0104_6_1\n`,
+							`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
+							`${transportItem.amount} km\n`,
+							`$${ACTIVITY_TRANSPORT_RATE.toFixed(2)}/km\n`,
+							`$${transportTotal.toFixed(2)}\n`
+						]);
+					} else {
+						const typeLabels: Record<string, string> = {
+							PARKING: "Parking",
+							TOLL: "Toll",
+							OTHER: "Other Transport Expense"
+						};
+						const label = typeLabels[transportItem.type] || transportItem.type;
+						const amount = Number(transportItem.amount);
+
+						activityStrings.push([
+							`${label}\n04_799_0104_6_1\n`,
+							`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
+							transportItem.note || "-\n",
+							`-\n`,
+							`$${amount.toFixed(2)}\n`
+						]);
+					}
+				}
 			}
 		})
 	);

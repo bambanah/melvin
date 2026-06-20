@@ -23,21 +23,24 @@ Change transit fields to **one-way semantics**:
 - Rename `defaultTransitTime` → `travelTimeToClient` (minutes, one-way)
 - Migrate existing data by dividing values by 2
 
-The field names now reflect what they store: the distance/time *to* the client, not round-trip.
+The field names now reflect what they store: the distance/time _to_ the client, not round-trip.
 
 ## Consequences
 
 **Positive**:
+
 - Mental model matches reality: "Sarah is 10km away" → store 10
 - Trip calculation is straightforward: first leg = `distanceToClient`, return leg = `distanceToClient`
 - Field names are self-documenting
 
 **Negative**:
+
 - Requires data migration (divide existing values by 2)
 - Existing activities store per-activity transit (already calculated), not affected
 - Any external integrations or reports assuming round-trip values need updating
 
 **Migration**:
+
 ```sql
 UPDATE "Client" SET "distanceToClient" = "distanceToClient" / 2 WHERE "distanceToClient" IS NOT NULL;
 UPDATE "Client" SET "travelTimeToClient" = "travelTimeToClient" / 2 WHERE "travelTimeToClient" IS NOT NULL;

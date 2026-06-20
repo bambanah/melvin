@@ -184,14 +184,14 @@ const TripBuilderModal = ({
 			interClientTime +
 			Math.min(lastToHomeTime, MAX_DURATION);
 
-		const standaloneDistance =
-			sortedSelected.reduce(
-				(sum, a) => sum + Number(a.client?.distanceToClient ?? 0) * 2,
-				0
-			);
+		const standaloneDistance = sortedSelected.reduce(
+			(sum, a) => sum + Number(a.client?.distanceToClient ?? 0) * 2,
+			0
+		);
 		const standaloneTime = sortedSelected.reduce(
 			(sum, a) =>
-				sum + Math.min(Number(a.client?.travelTimeToClient ?? 0), MAX_DURATION) * 2,
+				sum +
+				Math.min(Number(a.client?.travelTimeToClient ?? 0), MAX_DURATION) * 2,
 			0
 		);
 
@@ -335,7 +335,10 @@ const TripBuilderModal = ({
 
 											<div className="grid grid-cols-2 gap-3">
 												<div>
-													<Label htmlFor={`distance-${index}`} className="text-xs">
+													<Label
+														htmlFor={`distance-${index}`}
+														className="text-xs"
+													>
 														Distance (km)
 													</Label>
 													<Input
@@ -365,7 +368,10 @@ const TripBuilderModal = ({
 													)}
 												</div>
 												<div>
-													<Label htmlFor={`duration-${index}`} className="text-xs">
+													<Label
+														htmlFor={`duration-${index}`}
+														className="text-xs"
+													>
 														Time (min)
 													</Label>
 													<Input
@@ -408,7 +414,9 @@ const TripBuilderModal = ({
 							<div className="mt-2 grid grid-cols-2 gap-4 text-sm">
 								<div className="flex items-center gap-2">
 									<Car className="text-muted-foreground h-4 w-4" />
-									<span>{transitSummary.totalDistance.toFixed(1)} km total</span>
+									<span>
+										{transitSummary.totalDistance.toFixed(1)} km total
+									</span>
 								</div>
 								<div className="flex items-center gap-2">
 									<Clock className="text-muted-foreground h-4 w-4" />
