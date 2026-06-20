@@ -64,8 +64,10 @@ export const clientRouter = router({
 				select: {
 					...defaultClientSelect,
 					invoiceNumberPrefix: true,
-					defaultTransitDistance: true,
-					defaultTransitTime: true,
+					distanceToClient: true,
+					travelTimeToClient: true,
+					transitRatePerKm: true,
+					groupTransitRatePerKm: true,
 					invoiceEmail: true
 				},
 				where: {
@@ -154,11 +156,17 @@ export const clientRouter = router({
 			const client = await ctx.prisma.client.create({
 				data: {
 					...input.client,
-					defaultTransitDistance: input.client.defaultTransitDistance
-						? parseFloat(input.client.defaultTransitDistance)
+					distanceToClient: input.client.distanceToClient
+						? parseFloat(input.client.distanceToClient)
 						: undefined,
-					defaultTransitTime: input.client.defaultTransitTime
-						? parseFloat(input.client.defaultTransitTime)
+					travelTimeToClient: input.client.travelTimeToClient
+						? parseFloat(input.client.travelTimeToClient)
+						: undefined,
+					transitRatePerKm: input.client.transitRatePerKm
+						? parseFloat(input.client.transitRatePerKm)
+						: undefined,
+					groupTransitRatePerKm: input.client.groupTransitRatePerKm
+						? parseFloat(input.client.groupTransitRatePerKm)
 						: undefined,
 					ownerId: ctx.session.user.id
 				}
@@ -186,11 +194,17 @@ export const clientRouter = router({
 				},
 				data: {
 					...input.client,
-					defaultTransitDistance: input.client.defaultTransitDistance
-						? parseFloat(input.client.defaultTransitDistance)
+					distanceToClient: input.client.distanceToClient
+						? parseFloat(input.client.distanceToClient)
 						: undefined,
-					defaultTransitTime: input.client.defaultTransitTime
-						? parseFloat(input.client.defaultTransitTime)
+					travelTimeToClient: input.client.travelTimeToClient
+						? parseFloat(input.client.travelTimeToClient)
+						: undefined,
+					transitRatePerKm: input.client.transitRatePerKm
+						? parseFloat(input.client.transitRatePerKm)
+						: undefined,
+					groupTransitRatePerKm: input.client.groupTransitRatePerKm
+						? parseFloat(input.client.groupTransitRatePerKm)
 						: undefined
 				}
 			});

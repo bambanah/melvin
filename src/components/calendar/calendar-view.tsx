@@ -24,7 +24,11 @@ const CalendarView = () => {
 	const startDate = currentMonth.toDate();
 	const endDate = currentMonth.add(1, "month").toDate();
 
-	const { data: activities, isLoading } = trpc.activity.byDateRange.useQuery({
+	const {
+		data: activities,
+		isLoading,
+		refetch
+	} = trpc.activity.byDateRange.useQuery({
 		startDate,
 		endDate
 	});
@@ -124,6 +128,7 @@ const CalendarView = () => {
 					if (!open) setSelectedDay(null);
 				}}
 				onAddActivity={handleAddActivity}
+				onRefresh={() => refetch()}
 			/>
 
 			<QuickAddForm
@@ -131,6 +136,12 @@ const CalendarView = () => {
 				open={quickAddDay !== null}
 				onOpenChange={(open) => {
 					if (!open) setQuickAddDay(null);
+				}}
+				onSuggestTrip={() => {
+					refetch().then(() => {
+						setSelectedDay(quickAddDay);
+						setQuickAddDay(null);
+					});
 				}}
 			/>
 		</Layout>

@@ -58,6 +58,9 @@ model User {
   bankNumber    BigInt?
   bsb           Int?
 
+  transitRatePerKm      Decimal @default(0.85)
+  groupTransitRatePerKm Decimal @default(0.43)
+
   defaultSupportItemId      String?
   defaultSupportItem        SupportItem? @relation("defaultSupportItem", fields: [defaultSupportItemId], references: [id], onDelete: SetNull)
   defaultGroupSupportItemId String?
@@ -70,6 +73,7 @@ model User {
   supportItems     SupportItem[]
   activities       Activity[]
   supportItemRates SupportItemRates[]
+  trips            Trip[]
 
   @@index([defaultSupportItemId])
   @@index([defaultGroupSupportItemId])
@@ -84,8 +88,10 @@ model Client {
   number       String?
   invoiceEmail String?
 
-  defaultTransitDistance Decimal?
-  defaultTransitTime     Decimal?
+  distanceToClient      Decimal? @map("defaultTransitDistance")
+  travelTimeToClient    Decimal? @map("defaultTransitTime")
+  transitRatePerKm      Decimal?
+  groupTransitRatePerKm Decimal?
 
   billTo              String?
   invoiceNumberPrefix String?
@@ -132,16 +138,46 @@ model Activity {
   clientId        String?
   supportItemId   String
   invoiceId       String?
+  tripId          String?
   owner           User?       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   client          Client?     @relation(fields: [clientId], references: [id], onDelete: Cascade)
   supportItem     SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
   invoice         Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  trip            Trip?       @relation(fields: [tripId], references: [id], onDelete: SetNull)
 
   @@index([ownerId])
   @@index([ownerId, date, startTime])
   @@index([clientId])
   @@index([supportItemId])
   @@index([invoiceId])
+  @@index([tripId])
+}
+
+model Trip {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created")
+  updatedAt DateTime @default(now()) @updatedAt
+  date      DateTime @db.Date
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  activities      Activity[]
+  interClientLegs InterClientLeg[]
+
+  @@index([ownerId])
+  @@index([ownerId, date])
+}
+
+model InterClientLeg {
+  id             String  @id @default(cuid())
+  tripId         String
+  trip           Trip    @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  fromActivityId String
+  toActivityId   String
+  distance       Decimal
+  duration       Decimal
+
+  @@index([tripId])
 }
 
 model SupportItem {

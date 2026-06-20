@@ -108,20 +108,38 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 				</div>
 
 				<div className="flex flex-col">
-					<h3 className="font-semibold">Default Transit Distance</h3>
-					{client.defaultTransitDistance ? (
-						<p>{client.defaultTransitDistance.toString()}</p>
+					<h3 className="font-semibold">Distance to Client (one-way)</h3>
+					{client.distanceToClient ? (
+						<p>{client.distanceToClient.toString()} km</p>
 					) : (
 						<p className="text-foreground/50">Not set</p>
 					)}
 				</div>
 
 				<div className="flex flex-col">
-					<h3 className="font-semibold">Default Transit Time</h3>
-					{client.defaultTransitTime ? (
-						<p>{client.defaultTransitTime.toString()}</p>
+					<h3 className="font-semibold">Travel Time to Client (one-way)</h3>
+					{client.travelTimeToClient ? (
+						<p>{client.travelTimeToClient.toString()} min</p>
 					) : (
 						<p className="text-foreground/50">Not set</p>
+					)}
+				</div>
+
+				<div className="flex flex-col">
+					<h3 className="font-semibold">Transit Rate</h3>
+					{client.transitRatePerKm ? (
+						<p>${client.transitRatePerKm.toString()}/km</p>
+					) : (
+						<p className="text-foreground/50">Using default</p>
+					)}
+				</div>
+
+				<div className="flex flex-col">
+					<h3 className="font-semibold">Group Transit Rate</h3>
+					{client.groupTransitRatePerKm ? (
+						<p>${client.groupTransitRatePerKm.toString()}/km</p>
+					) : (
+						<p className="text-foreground/50">Using default</p>
 					)}
 				</div>
 

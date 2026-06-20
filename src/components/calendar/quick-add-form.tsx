@@ -31,9 +31,10 @@ interface Props {
 	day: Dayjs | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	onSuggestTrip?: () => void;
 }
 
-const QuickAddForm = ({ day, open, onOpenChange }: Props) => {
+const QuickAddForm = ({ day, open, onOpenChange, onSuggestTrip }: Props) => {
 	const [supportItems, setSupportItems] = useState<SupportItemListOutput[]>();
 
 	const trpcUtils = trpc.useUtils();
@@ -84,15 +85,12 @@ const QuickAddForm = ({ day, open, onOpenChange }: Props) => {
 			return;
 		}
 
-		if (client.defaultTransitDistance) {
-			form.setValue(
-				"transitDistance",
-				client.defaultTransitDistance.toString()
-			);
+		if (client.distanceToClient) {
+			form.setValue("transitDistance", client.distanceToClient.toString());
 		}
 
-		if (client.defaultTransitTime) {
-			form.setValue("transitDuration", client.defaultTransitTime.toString());
+		if (client.travelTimeToClient) {
+			form.setValue("transitDuration", client.travelTimeToClient.toString());
 		}
 	}, [client, form, isFetchingClient]);
 
@@ -100,7 +98,7 @@ const QuickAddForm = ({ day, open, onOpenChange }: Props) => {
 		(i) => i.id === form.watch("supportItemId")
 	)?.rateType;
 
-	const onSubmit = (data: ActivitySchema) => {
+	const onSubmit = async (data: ActivitySchema) => {
 		const activityData: ActivitySchema = {
 			...data,
 			startTime: selectedRateType === "KM" ? undefined : data.startTime,
@@ -108,14 +106,33 @@ const QuickAddForm = ({ day, open, onOpenChange }: Props) => {
 			itemDistance: selectedRateType === "KM" ? data.itemDistance : undefined
 		};
 
-		createActivityMutation.mutateAsync({ activity: activityData }).then(() => {
-			trpcUtils.activity.byDateRange.invalidate();
-			trpcUtils.activity.list.invalidate();
-			trpcUtils.activity.pending.invalidate();
+		await createActivityMutation.mutateAsync({ activity: activityData });
 
-			toast.success("Activity created");
-			onOpenChange(false);
-		});
+		await trpcUtils.activity.byDateRange.invalidate();
+		trpcUtils.activity.list.invalidate();
+		trpcUtils.activity.pending.invalidate();
+
+		const hasTimes = data.startTime && data.endTime;
+		if (hasTimes && onSuggestTrip && day) {
+			const activities = await trpcUtils.activity.byDateRange.fetch({
+				startDate: day.startOf("day").toDate(),
+				endDate: day.endOf("day").toDate()
+			});
+			const eligibleCount = activities.filter(
+				(a) => a.startTime && a.endTime && !a.tripId
+			).length;
+			if (eligibleCount >= 2) {
+				toast.success(
+					"Activity created — you can now link it as a back-to-back trip",
+					{ autoClose: 5000 }
+				);
+				onSuggestTrip();
+				return;
+			}
+		}
+
+		toast.success("Activity created");
+		onOpenChange(false);
 	};
 
 	if (!day) return null;
