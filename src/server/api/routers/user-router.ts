@@ -13,7 +13,9 @@ const defaultUserSelect: Prisma.UserSelect = {
 	bankNumber: true,
 	bsb: true,
 	defaultSupportItemId: true,
-	defaultGroupSupportItemId: true
+	defaultGroupSupportItemId: true,
+	transitRatePerKm: true,
+	groupTransitRatePerKm: true
 };
 
 export const userRouter = router({

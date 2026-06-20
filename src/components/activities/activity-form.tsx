@@ -25,7 +25,7 @@ import { ActivityByIdOutput } from "@/server/api/routers/activity-router";
 import { SupportItemListOutput } from "@/server/api/routers/support-item-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { CalendarIcon, ChevronDown } from "lucide-react";
+import { AlertTriangle, CalendarIcon, ChevronDown, Link2, Unlink } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -38,7 +38,10 @@ dayjs.extend(require("dayjs/plugin/localizedFormat"));
 dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
 interface Props {
-	existingActivity?: Partial<ActivityByIdOutput>;
+	existingActivity?: Partial<ActivityByIdOutput> & {
+		tripId?: string | null;
+		trip?: { id: string } | null;
+	};
 }
 
 const ActivityForm = ({ existingActivity }: Props) => {
@@ -52,7 +55,33 @@ const ActivityForm = ({ existingActivity }: Props) => {
 	const trpcUtils = trpc.useUtils();
 	const createActivityMutation = trpc.activity.add.useMutation();
 	const modifyActivityMutation = trpc.activity.modify.useMutation();
+	const removeFromTripMutation = trpc.trip.removeActivity.useMutation();
 	const { data: { defaultSupportItemId } = {} } = trpc.user.fetch.useQuery();
+
+	const handleRemoveFromTrip = async () => {
+		if (!existingActivity?.tripId || !existingActivity?.id) return;
+
+		try {
+			const result = await removeFromTripMutation.mutateAsync({
+				tripId: existingActivity.tripId,
+				activityId: existingActivity.id
+			});
+
+			trpcUtils.activity.byId.invalidate({ id: existingActivity.id });
+			trpcUtils.activity.list.invalidate();
+			trpcUtils.activity.byDateRange.invalidate();
+
+			if (result.dissolved) {
+				toast.success("Activity removed and trip dissolved");
+			} else {
+				toast.success("Activity removed from back-to-back trip");
+			}
+
+			router.reload();
+		} catch (error) {
+			toast.error("Failed to remove from trip");
+		}
+	};
 
 	const form = useForm<ActivitySchema>({
 		resolver: zodResolver(activitySchema),
@@ -98,15 +127,12 @@ const ActivityForm = ({ existingActivity }: Props) => {
 			return;
 		}
 
-		if (client.defaultTransitDistance) {
-			form.setValue(
-				"transitDistance",
-				client.defaultTransitDistance.toString()
-			);
+		if (client.distanceToClient) {
+			form.setValue("transitDistance", client.distanceToClient.toString());
 		}
 
-		if (client.defaultTransitTime) {
-			form.setValue("transitDuration", client.defaultTransitTime.toString());
+		if (client.travelTimeToClient) {
+			form.setValue("transitDuration", client.travelTimeToClient.toString());
 		}
 	}, [client, form, isFetchingClient]);
 
@@ -147,8 +173,38 @@ const ActivityForm = ({ existingActivity }: Props) => {
 		}
 	};
 
+	const isInTrip = existingActivity?.tripId != null;
+	const isInvoiced = existingActivity && "invoice" in existingActivity;
+
 	return (
 		<Form {...form}>
+			{isInTrip && (
+				<div className="mb-4 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
+					<Link2 className="h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
+					<div className="flex-1">
+						<p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+							Part of a back-to-back trip
+						</p>
+						<p className="text-xs text-blue-700 dark:text-blue-300">
+							Transit values are calculated based on trip position.
+						</p>
+					</div>
+					{isInvoiced && (
+						<AlertTriangle className="h-5 w-5 shrink-0 text-amber-500" />
+					)}
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={handleRemoveFromTrip}
+						disabled={removeFromTripMutation.isPending}
+						className="shrink-0"
+					>
+						<Unlink className="mr-1 h-3 w-3" />
+						{removeFromTripMutation.isPending ? "Removing..." : "Remove"}
+					</Button>
+				</div>
+			)}
 			<form
 				onSubmit={form.handleSubmit(onSubmit)}
 				className="flex w-full flex-col items-center gap-5"

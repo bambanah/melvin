@@ -40,9 +40,11 @@ const ClientForm = ({ existingClient }: Props) => {
 			number: existingClient?.number ?? "",
 			billTo: existingClient?.billTo ?? "",
 			invoiceNumberPrefix: existingClient?.invoiceNumberPrefix ?? "",
-			defaultTransitDistance:
-				existingClient?.defaultTransitDistance?.toString() ?? "",
-			defaultTransitTime: existingClient?.defaultTransitTime?.toString() ?? "",
+			distanceToClient: existingClient?.distanceToClient?.toString() ?? "",
+			travelTimeToClient: existingClient?.travelTimeToClient?.toString() ?? "",
+			transitRatePerKm: existingClient?.transitRatePerKm?.toString() ?? "",
+			groupTransitRatePerKm:
+				existingClient?.groupTransitRatePerKm?.toString() ?? "",
 			invoiceEmail: existingClient?.invoiceEmail ?? ""
 		}
 	});
@@ -138,27 +140,72 @@ const ClientForm = ({ existingClient }: Props) => {
 						)}
 					/>
 					<FormField
-						name="defaultTransitDistance"
+						name="distanceToClient"
 						control={form.control}
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Default Transit Distance</FormLabel>
+								<FormLabel>Distance to Client (km, one-way)</FormLabel>
 								<FormControl>
-									<Input placeholder="123456789" {...field} />
+									<Input placeholder="15" type="number" step="0.1" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
 					<FormField
-						name="defaultTransitTime"
+						name="travelTimeToClient"
 						control={form.control}
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Default Transit Time</FormLabel>
+								<FormLabel>Travel Time to Client (min, one-way)</FormLabel>
 								<FormControl>
-									<Input placeholder="123456789" {...field} />
+									<Input placeholder="20" type="number" {...field} />
 								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						name="transitRatePerKm"
+						control={form.control}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Transit Rate ($/km)</FormLabel>
+								<FormControl>
+									<Input
+										placeholder="0.85"
+										type="number"
+										step="0.01"
+										max="0.99"
+										{...field}
+									/>
+								</FormControl>
+								<FormDescription>
+									Override default rate (max $0.99). Leave blank to use your
+									default.
+								</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						name="groupTransitRatePerKm"
+						control={form.control}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Group Transit Rate ($/km)</FormLabel>
+								<FormControl>
+									<Input
+										placeholder="0.43"
+										type="number"
+										step="0.01"
+										max="0.99"
+										{...field}
+									/>
+								</FormControl>
+								<FormDescription>
+									Override default group rate. Leave blank to use your default.
+								</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}

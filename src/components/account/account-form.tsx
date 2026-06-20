@@ -33,7 +33,13 @@ const AccountForm = ({ existingUser }: Props) => {
 			abn: Number(existingUser?.abn) || undefined,
 			bankName: existingUser?.bankName ?? "",
 			bankNumber: Number(existingUser?.bankNumber) || undefined,
-			bsb: existingUser?.bsb ?? undefined
+			bsb: existingUser?.bsb ?? undefined,
+			transitRatePerKm: existingUser?.transitRatePerKm
+				? Number(existingUser.transitRatePerKm)
+				: 0.85,
+			groupTransitRatePerKm: existingUser?.groupTransitRatePerKm
+				? Number(existingUser.groupTransitRatePerKm)
+				: 0.43
 		}),
 		[existingUser]
 	);
@@ -138,6 +144,52 @@ const AccountForm = ({ existingUser }: Props) => {
 										<SupportItemSelect
 											onValueChange={field.onChange}
 											value={field.value}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
+
+					<div className="flex flex-col gap-4">
+						<Heading className="-mb-2" size="small">
+							Transit Rates
+						</Heading>
+						<FormField
+							name="transitRatePerKm"
+							control={form.control}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Transit Rate ($/km)</FormLabel>
+									<FormControl>
+										<Input
+											type="number"
+											step="0.01"
+											min="0"
+											max="0.99"
+											placeholder="0.85"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							name="groupTransitRatePerKm"
+							control={form.control}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Group Transit Rate ($/km)</FormLabel>
+									<FormControl>
+										<Input
+											type="number"
+											step="0.01"
+											min="0"
+											max="0.99"
+											placeholder="0.43"
+											{...field}
 										/>
 									</FormControl>
 									<FormMessage />

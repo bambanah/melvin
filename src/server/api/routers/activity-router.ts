@@ -1,3 +1,7 @@
+import {
+	checkActivityOverlap,
+	formatOverlapError
+} from "@/lib/overlap-utils";
 import { baseListQueryInput } from "@/lib/trpc";
 import { activitySchema } from "@/schema/activity-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
@@ -22,6 +26,13 @@ const defaultActivitySelect = {
 	invoice: {
 		select: {
 			invoiceNo: true
+		}
+	},
+	tripId: true,
+	trip: {
+		select: {
+			id: true,
+			date: true
 		}
 	}
 };
@@ -173,15 +184,32 @@ export const activityRouter = router({
 		.mutation(async ({ input, ctx }) => {
 			const { activity: inputActivity } = input;
 
+			const startTime = inputActivity.startTime
+				? dayjs.utc(inputActivity.startTime, "HH:mm").toDate()
+				: undefined;
+			const endTime = inputActivity.endTime
+				? dayjs.utc(inputActivity.endTime, "HH:mm").toDate()
+				: undefined;
+
+			const conflicting = await checkActivityOverlap(ctx.prisma, {
+				date: inputActivity.date,
+				startTime,
+				endTime,
+				ownerId: ctx.session.user.id
+			});
+
+			if (conflicting) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: formatOverlapError(conflicting)
+				});
+			}
+
 			const activity = await ctx.prisma.activity.create({
 				data: {
 					...inputActivity,
-					startTime: inputActivity.startTime
-						? dayjs.utc(inputActivity.startTime, "HH:mm").toDate()
-						: undefined,
-					endTime: inputActivity.endTime
-						? dayjs.utc(inputActivity.endTime, "HH:mm").toDate()
-						: undefined,
+					startTime,
+					endTime,
 					transitDistance: inputActivity.transitDistance || undefined,
 					transitDuration: inputActivity.transitDuration || undefined,
 					ownerId: ctx.session.user.id
@@ -202,18 +230,36 @@ export const activityRouter = router({
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
+			const startTime = input.activity.startTime
+				? dayjs.utc(input.activity.startTime, "HH:mm").toDate()
+				: undefined;
+			const endTime = input.activity.endTime
+				? dayjs.utc(input.activity.endTime, "HH:mm").toDate()
+				: undefined;
+
+			const conflicting = await checkActivityOverlap(ctx.prisma, {
+				date: input.activity.date,
+				startTime,
+				endTime,
+				ownerId: ctx.session.user.id,
+				excludeActivityId: input.id
+			});
+
+			if (conflicting) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: formatOverlapError(conflicting)
+				});
+			}
+
 			const activity = await ctx.prisma.activity.update({
 				where: {
 					id: input.id
 				},
 				data: {
 					...input.activity,
-					startTime: input.activity.startTime
-						? dayjs.utc(input.activity.startTime, "HH:mm").toDate()
-						: undefined,
-					endTime: input.activity.endTime
-						? dayjs.utc(input.activity.endTime, "HH:mm").toDate()
-						: undefined,
+					startTime,
+					endTime,
 					transitDistance: input.activity.transitDistance || undefined,
 					transitDuration: input.activity.transitDuration || undefined
 				}

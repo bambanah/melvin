@@ -53,8 +53,8 @@ const generateNestedWriteForActivities = (
 			startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
 			endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
 			clientId: client.id,
-			transitDistance: client.defaultTransitDistance ?? undefined,
-			transitDuration: client.defaultTransitTime ?? undefined,
+			transitDistance: client.distanceToClient ?? undefined,
+			transitDuration: client.travelTimeToClient ?? undefined,
 			supportItemId,
 			ownerId
 		}))
@@ -77,8 +77,8 @@ const generateNestedWriteForGroupActivities = (
 				startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
 				endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
 				clientId: groupClientId,
-				transitDistance: client?.defaultTransitDistance ?? undefined,
-				transitDuration: client?.defaultTransitTime ?? undefined,
+				transitDistance: client?.distanceToClient ?? undefined,
+				transitDuration: client?.travelTimeToClient ?? undefined,
 				ownerId
 			}));
 		}
