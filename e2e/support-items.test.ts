@@ -5,7 +5,7 @@ import { waitForAlert } from "./test-utils";
 test("Can create, update, and delete support items", async ({ page }) => {
 	await page.goto("/dashboard/support-items");
 
-	await page.getByRole("link", { name: "Add" }).click();
+	await page.getByRole("link", { name: "Add", exact: true }).click();
 	await expect(page).toHaveURL("/dashboard/support-items/create");
 
 	const supportItem = randomSupportItem();
@@ -34,7 +34,7 @@ test("Can create, update, and delete support items", async ({ page }) => {
 		.filter({ hasText: new RegExp(`^${supportItem.description}$`) })
 		.getByRole("button")
 		.click();
-	await page.getByRole("menuitem", { name: "Edit" }).click();
+	await page.getByRole("menuitem", { name: "Edit", exact: true }).click();
 
 	await page.getByLabel("Description").fill(newSupportItem.description);
 	await page.getByRole("button", { name: "Update" }).click();
@@ -42,7 +42,9 @@ test("Can create, update, and delete support items", async ({ page }) => {
 
 	await expect(page).toHaveURL("/dashboard/support-items");
 
-	await page.getByRole("link", { name: newSupportItem.description }).click();
+	await page
+		.getByRole("link", { name: newSupportItem.description, exact: true })
+		.click();
 	await page
 		.locator("div")
 		.filter({ hasText: new RegExp(`^${newSupportItem.description}$`) })
@@ -51,7 +53,7 @@ test("Can create, update, and delete support items", async ({ page }) => {
 	page.once("dialog", (dialog) => {
 		dialog.accept().catch(() => {});
 	});
-	await page.getByRole("menuitem", { name: "Delete" }).click();
+	await page.getByRole("menuitem", { name: "Delete", exact: true }).click();
 
 	await waitForAlert(page, "Support Item Deleted");
 });

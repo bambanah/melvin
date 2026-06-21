@@ -1,3 +1,4 @@
+import "dotenv/config";
 import prisma from "@/server/prisma";
 import { FullConfig, chromium } from "@playwright/test";
 import { addMonths, getUnixTime } from "date-fns";
