@@ -10,6 +10,10 @@ env:
   DIRECT_URL: postgres://postgres:pass@localhost:5432/melvin
   NEXTAUTH_URL: "http://localhost:3000"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest
@@ -36,7 +40,7 @@ jobs:
         with:
           node-version-file: package.json
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
 
       - name: Install playwright browsers
         run: pnpm exec playwright install --with-deps
@@ -58,7 +62,7 @@ jobs:
         with:
           node-version-file: package.json
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
 
       - name: Run tests
         run: pnpm test:unit
@@ -74,7 +78,7 @@ jobs:
         with:
           node-version-file: package.json
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
 
       - name: ESlint
         run: pnpm lint
