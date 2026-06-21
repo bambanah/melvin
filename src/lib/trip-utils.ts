@@ -12,7 +12,6 @@ export interface TripActivity {
 		distanceToClient: Prisma.Decimal | null;
 		travelTimeToClient: Prisma.Decimal | null;
 		transitRatePerKm: Prisma.Decimal | null;
-		groupTransitRatePerKm: Prisma.Decimal | null;
 	} | null;
 }
 
@@ -110,21 +109,15 @@ export function calculateTripTransit(
 
 interface ClientWithRates {
 	transitRatePerKm: Prisma.Decimal | null;
-	groupTransitRatePerKm: Prisma.Decimal | null;
 }
 
 interface UserWithRates {
 	transitRatePerKm: Prisma.Decimal;
-	groupTransitRatePerKm: Prisma.Decimal;
 }
 
 export function getEffectiveTransitRate(
 	client: ClientWithRates | null,
-	user: UserWithRates,
-	isGroup: boolean
+	user: UserWithRates
 ): number {
-	if (isGroup) {
-		return Number(client?.groupTransitRatePerKm ?? user.groupTransitRatePerKm);
-	}
 	return Number(client?.transitRatePerKm ?? user.transitRatePerKm);
 }

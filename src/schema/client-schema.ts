@@ -9,7 +9,6 @@ export const clientSchema = z.object({
 	distanceToClient: z.string().optional(),
 	travelTimeToClient: z.string().optional(),
 	transitRatePerKm: z.string().optional(),
-	groupTransitRatePerKm: z.string().optional(),
 	invoiceEmail: z.string().optional()
 });
 export type ClientSchema = z.infer<typeof clientSchema>;

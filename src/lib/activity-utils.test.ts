@@ -204,6 +204,7 @@ test("Should return correct total", () => {
 });
 
 test("Should return correct total for group activities", () => {
+	// Group activities now use the same transit rate as non-group activities
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "16:00", "17:00", 0, 0, true)
@@ -214,26 +215,26 @@ test("Should return correct total for group activities", () => {
 		getTotalCostOfActivities([
 			getActivity("weekday", "15:00", "17:00", 7, 15, true)
 		])
-	).toEqual(123.86);
+	).toEqual(130.16);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "15:00", "17:00", 7, 15, true),
 			getActivity("weekday", "15:00", "21:00", 7, 15, true)
 		])
-	).toEqual(503.73);
+	).toEqual(516.33);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("saturday", "15:00", "17:00", 7, 15, true)
 		])
-	).toEqual(171.15);
+	).toEqual(177.45);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("saturday", "19:00", "21:00", 7, 15, true)
 		])
-	).toEqual(171.15);
+	).toEqual(177.45);
 
 	expect(
 		getTotalCostOfActivities([
@@ -259,7 +260,7 @@ test("Should return correct total for group activities", () => {
 			getActivity("weekday", "09:30", "15:10", 15, 7, true),
 			getActivity("weekday", "09:30", "15:23", 15, 7, true)
 		])
-	).toEqual(996.41);
+	).toEqual(1005.23);
 
 	expect(
 		getTotalCostOfActivities([
@@ -271,5 +272,5 @@ test("Should return correct total for group activities", () => {
 			getActivity("weekday", "09:30", "15:10", 15, 7, true),
 			getActivity("weekday", "09:30", "15:25", 15, 7, true)
 		])
-	).toEqual(2295.38);
+	).toEqual(2315.96);
 });

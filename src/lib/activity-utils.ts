@@ -45,17 +45,14 @@ interface Activity {
 	};
 	client?: {
 		transitRatePerKm?: Prisma.Decimal | null;
-		groupTransitRatePerKm?: Prisma.Decimal | null;
 	} | null;
 }
 
 interface TransitRateContext {
 	userTransitRatePerKm?: number;
-	userGroupTransitRatePerKm?: number;
 }
 
-const DEFAULT_TRANSIT_RATE = 0.85;
-const DEFAULT_GROUP_TRANSIT_RATE = 0.43;
+const DEFAULT_TRANSIT_RATE = 0.99;
 
 const getRateForDay = (
 	day: "weekday" | "weeknight" | "saturday" | "sunday",
@@ -153,8 +150,7 @@ export const getTotalCostOfActivities = (
 			}
 
 			if (activity.transitDistance) {
-				const isGroup = activity.supportItem.isGroup;
-				const ratePerKm = getTransitRate(activity, isGroup, rateContext);
+				const ratePerKm = getTransitRate(activity, rateContext);
 				subTotal += round(Number(activity.transitDistance) * ratePerKm, 2);
 			}
 
@@ -187,16 +183,8 @@ export const getTotalCostOfActivities = (
 
 function getTransitRate(
 	activity: Activity,
-	isGroup: boolean | null | undefined,
 	rateContext?: TransitRateContext
 ): number {
-	if (isGroup) {
-		return (
-			Number(activity.client?.groupTransitRatePerKm) ||
-			rateContext?.userGroupTransitRatePerKm ||
-			DEFAULT_GROUP_TRANSIT_RATE
-		);
-	}
 	return (
 		Number(activity.client?.transitRatePerKm) ||
 		rateContext?.userTransitRatePerKm ||

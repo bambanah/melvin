@@ -23,8 +23,7 @@ const tripActivitySelect = {
 			name: true,
 			distanceToClient: true,
 			travelTimeToClient: true,
-			transitRatePerKm: true,
-			groupTransitRatePerKm: true
+			transitRatePerKm: true
 		}
 	},
 	supportItem: {

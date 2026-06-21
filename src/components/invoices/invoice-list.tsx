@@ -3,7 +3,6 @@ import ListFilterRow from "@/components/shared/list-filter-row";
 import ListPage from "@/components/shared/list-page";
 import { Button } from "@/components/ui/button";
 import DataTable, { SortingHeader } from "@/components/ui/data-table";
-import DatePicker from "@/components/ui/date-picker";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -36,14 +35,10 @@ interface Props {
 
 export default function InvoiceList({ clientId }: Props) {
 	const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
-	const [from, setFrom] = useState<Date | undefined>(undefined);
-	const [to, setTo] = useState<Date | undefined>(undefined);
 
 	const { data: invoices } = trpc.invoice.list.useQuery({
 		clientId,
-		status: statusFilterMap[statusFilter],
-		from,
-		to
+		status: statusFilterMap[statusFilter]
 	});
 
 	const trpcUtils = trpc.useUtils();
@@ -211,27 +206,6 @@ export default function InvoiceList({ clientId }: Props) {
 					}))}
 				/>
 			</div>
-
-			<div className="mb-4">
-				<h3 className="mb-2 font-medium">Financial Year</h3>
-				<div className="flex items-center gap-4">
-					<DatePicker date={from} setDate={setFrom} />
-
-					<DatePicker date={to} setDate={setTo} />
-				</div>
-			</div>
-
-			{invoices?.totalAmount !== undefined && (
-				<div className="mb-4 rounded-md bg-slate-100 p-4 dark:bg-slate-800">
-					<h3 className="font-medium">Total Amount</h3>
-					<p className="text-2xl font-bold text-orange-700">
-						{invoices.totalAmount.toLocaleString(undefined, {
-							style: "currency",
-							currency: "AUD"
-						})}
-					</p>
-				</div>
-			)}
 
 			{invoices && <DataTable columns={columns} data={invoices.invoices} />}
 		</ListPage>

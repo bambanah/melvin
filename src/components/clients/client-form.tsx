@@ -43,8 +43,6 @@ const ClientForm = ({ existingClient }: Props) => {
 			distanceToClient: existingClient?.distanceToClient?.toString() ?? "",
 			travelTimeToClient: existingClient?.travelTimeToClient?.toString() ?? "",
 			transitRatePerKm: existingClient?.transitRatePerKm?.toString() ?? "",
-			groupTransitRatePerKm:
-				existingClient?.groupTransitRatePerKm?.toString() ?? "",
 			invoiceEmail: existingClient?.invoiceEmail ?? ""
 		}
 	});
@@ -173,7 +171,7 @@ const ClientForm = ({ existingClient }: Props) => {
 								<FormLabel>Transit Rate ($/km)</FormLabel>
 								<FormControl>
 									<Input
-										placeholder="0.85"
+										placeholder="0.99"
 										type="number"
 										step="0.01"
 										max="0.99"
@@ -183,28 +181,6 @@ const ClientForm = ({ existingClient }: Props) => {
 								<FormDescription>
 									Override default rate (max $0.99). Leave blank to use your
 									default.
-								</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						name="groupTransitRatePerKm"
-						control={form.control}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Group Transit Rate ($/km)</FormLabel>
-								<FormControl>
-									<Input
-										placeholder="0.43"
-										type="number"
-										step="0.01"
-										max="0.99"
-										{...field}
-									/>
-								</FormControl>
-								<FormDescription>
-									Override default group rate. Leave blank to use your default.
 								</FormDescription>
 								<FormMessage />
 							</FormItem>

@@ -20,11 +20,6 @@ export const userSchema = z.object({
 		.number()
 		.min(0, "Must be positive")
 		.max(0.99, "Maximum $0.99/km")
-		.optional(),
-	groupTransitRatePerKm: z.coerce
-		.number()
-		.min(0, "Must be positive")
-		.max(0.99, "Maximum $0.99/km")
 		.optional()
 });
 export type UserSchema = z.infer<typeof userSchema>;
