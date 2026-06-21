@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main
 
 env:
   DATABASE_URL: postgres://postgres:pass@localhost:5432/melvin

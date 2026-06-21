@@ -153,22 +153,22 @@ test("Should return correct total", () => {
 
 	expect(
 		getTotalCostOfActivities([getActivity("weekday", "15:00", "17:00", 7, 15)])
-	).toEqual(130.16);
+	).toEqual(132.26);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "15:00", "17:00", 7, 15),
 			getActivity("weekday", "15:00", "21:00", 7, 15)
 		])
-	).toEqual(516.33);
+	).toEqual(520.53);
 
 	expect(
 		getTotalCostOfActivities([getActivity("saturday", "15:00", "17:00", 7, 15)])
-	).toEqual(177.45);
+	).toEqual(179.55);
 
 	expect(
 		getTotalCostOfActivities([getActivity("saturday", "19:00", "21:00", 7, 15)])
-	).toEqual(177.45);
+	).toEqual(179.55);
 
 	expect(
 		getTotalCostOfActivities([getActivity("weekday", "09:30", "15:00", 0, 0)])
@@ -188,7 +188,7 @@ test("Should return correct total", () => {
 			getActivity("weekday", "09:30", "15:10", 15, 7),
 			getActivity("weekday", "09:30", "15:23", 15, 7)
 		])
-	).toEqual(1005.23);
+	).toEqual(1008.17);
 
 	expect(
 		getTotalCostOfActivities([
@@ -200,7 +200,7 @@ test("Should return correct total", () => {
 			getActivity("weekday", "09:30", "15:10", 15, 7),
 			getActivity("weekday", "09:30", "15:25", 15, 7)
 		])
-	).toEqual(2315.96);
+	).toEqual(2322.82);
 });
 
 test("Should return correct total for group activities", () => {
@@ -215,26 +215,26 @@ test("Should return correct total for group activities", () => {
 		getTotalCostOfActivities([
 			getActivity("weekday", "15:00", "17:00", 7, 15, true)
 		])
-	).toEqual(130.16);
+	).toEqual(132.26);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "15:00", "17:00", 7, 15, true),
 			getActivity("weekday", "15:00", "21:00", 7, 15, true)
 		])
-	).toEqual(516.33);
+	).toEqual(520.53);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("saturday", "15:00", "17:00", 7, 15, true)
 		])
-	).toEqual(177.45);
+	).toEqual(179.55);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("saturday", "19:00", "21:00", 7, 15, true)
 		])
-	).toEqual(177.45);
+	).toEqual(179.55);
 
 	expect(
 		getTotalCostOfActivities([
@@ -260,7 +260,7 @@ test("Should return correct total for group activities", () => {
 			getActivity("weekday", "09:30", "15:10", 15, 7, true),
 			getActivity("weekday", "09:30", "15:23", 15, 7, true)
 		])
-	).toEqual(1005.23);
+	).toEqual(1008.17);
 
 	expect(
 		getTotalCostOfActivities([
@@ -272,5 +272,5 @@ test("Should return correct total for group activities", () => {
 			getActivity("weekday", "09:30", "15:10", 15, 7, true),
 			getActivity("weekday", "09:30", "15:25", 15, 7, true)
 		])
-	).toEqual(2315.96);
+	).toEqual(2322.82);
 });
