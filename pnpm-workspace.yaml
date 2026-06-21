@@ -1,7 +1,9 @@
-onlyBuiltDependencies:
-  - "@prisma/engines"
-  - canvas
-  - core-js
-  - esbuild
-  - prisma
-  - sharp
+saveExact: true
+
+allowBuilds:
+  "@prisma/engines": true
+  canvas: true
+  core-js: true
+  esbuild: true
+  prisma: true
+  sharp: true
