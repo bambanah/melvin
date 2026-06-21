@@ -6,12 +6,10 @@ UPDATE "Client" SET "defaultTransitTime" = "defaultTransitTime" / 2 WHERE "defau
 ALTER TABLE "Activity" ADD COLUMN     "tripId" TEXT;
 
 -- AlterTable
-ALTER TABLE "Client" ADD COLUMN     "groupTransitRatePerKm" DECIMAL(65,30),
-ADD COLUMN     "transitRatePerKm" DECIMAL(65,30);
+ALTER TABLE "Client" ADD COLUMN     "transitRatePerKm" DECIMAL(65,30);
 
 -- AlterTable
-ALTER TABLE "User" ADD COLUMN     "groupTransitRatePerKm" DECIMAL(65,30) NOT NULL DEFAULT 0.43,
-ADD COLUMN     "transitRatePerKm" DECIMAL(65,30) NOT NULL DEFAULT 0.85;
+ALTER TABLE "User" ADD COLUMN     "transitRatePerKm" DECIMAL(65,30) NOT NULL DEFAULT 0.85;
 
 -- CreateTable
 CREATE TABLE "Trip" (

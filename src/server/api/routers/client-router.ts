@@ -67,7 +67,6 @@ export const clientRouter = router({
 					distanceToClient: true,
 					travelTimeToClient: true,
 					transitRatePerKm: true,
-					groupTransitRatePerKm: true,
 					invoiceEmail: true
 				},
 				where: {
@@ -165,9 +164,6 @@ export const clientRouter = router({
 					transitRatePerKm: input.client.transitRatePerKm
 						? parseFloat(input.client.transitRatePerKm)
 						: undefined,
-					groupTransitRatePerKm: input.client.groupTransitRatePerKm
-						? parseFloat(input.client.groupTransitRatePerKm)
-						: undefined,
 					ownerId: ctx.session.user.id
 				}
 			});
@@ -202,9 +198,6 @@ export const clientRouter = router({
 						: undefined,
 					transitRatePerKm: input.client.transitRatePerKm
 						? parseFloat(input.client.transitRatePerKm)
-						: undefined,
-					groupTransitRatePerKm: input.client.groupTransitRatePerKm
-						? parseFloat(input.client.groupTransitRatePerKm)
 						: undefined
 				}
 			});

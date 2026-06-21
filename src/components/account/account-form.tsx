@@ -36,10 +36,7 @@ const AccountForm = ({ existingUser }: Props) => {
 			bsb: existingUser?.bsb ?? undefined,
 			transitRatePerKm: existingUser?.transitRatePerKm
 				? Number(existingUser.transitRatePerKm)
-				: 0.85,
-			groupTransitRatePerKm: existingUser?.groupTransitRatePerKm
-				? Number(existingUser.groupTransitRatePerKm)
-				: 0.43
+				: 0.99
 		}),
 		[existingUser]
 	);
@@ -168,27 +165,7 @@ const AccountForm = ({ existingUser }: Props) => {
 											step="0.01"
 											min="0"
 											max="0.99"
-											placeholder="0.85"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							name="groupTransitRatePerKm"
-							control={form.control}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Group Transit Rate ($/km)</FormLabel>
-									<FormControl>
-										<Input
-											type="number"
-											step="0.01"
-											min="0"
-											max="0.99"
-											placeholder="0.43"
+											placeholder="0.99"
 											{...field}
 										/>
 									</FormControl>

@@ -135,15 +135,6 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 				</div>
 
 				<div className="flex flex-col">
-					<h3 className="font-semibold">Group Transit Rate</h3>
-					{client.groupTransitRatePerKm ? (
-						<p>${client.groupTransitRatePerKm.toString()}/km</p>
-					) : (
-						<p className="text-foreground/50">Using default</p>
-					)}
-				</div>
-
-				<div className="flex flex-col">
 					<h3 className="font-semibold">Invoice Email</h3>
 					{client.invoiceEmail ? (
 						<a

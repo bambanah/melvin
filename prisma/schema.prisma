@@ -58,8 +58,7 @@ model User {
   bankNumber    BigInt?
   bsb           Int?
 
-  transitRatePerKm      Decimal @default(0.85)
-  groupTransitRatePerKm Decimal @default(0.43)
+  transitRatePerKm Decimal @default(0.85)
 
   defaultSupportItemId      String?
   defaultSupportItem        SupportItem? @relation("defaultSupportItem", fields: [defaultSupportItemId], references: [id], onDelete: SetNull)
@@ -90,8 +89,7 @@ model Client {
 
   distanceToClient      Decimal? @map("defaultTransitDistance")
   travelTimeToClient    Decimal? @map("defaultTransitTime")
-  transitRatePerKm      Decimal?
-  groupTransitRatePerKm Decimal?
+  transitRatePerKm Decimal?
 
   billTo              String?
   invoiceNumberPrefix String?

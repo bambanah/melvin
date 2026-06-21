@@ -14,8 +14,7 @@ const defaultUserSelect: Prisma.UserSelect = {
 	bsb: true,
 	defaultSupportItemId: true,
 	defaultGroupSupportItemId: true,
-	transitRatePerKm: true,
-	groupTransitRatePerKm: true
+	transitRatePerKm: true
 };
 
 export const userRouter = router({
