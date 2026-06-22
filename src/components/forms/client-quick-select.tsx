@@ -127,6 +127,7 @@ export function ClientQuickSelect({
 					onChange={(e) => setSearch(e.target.value)}
 					placeholder="Search clients..."
 					className="w-full"
+					data-testid="client-search-input"
 				/>
 
 				{filteredClients.length > 0 && (
