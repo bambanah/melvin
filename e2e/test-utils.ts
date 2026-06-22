@@ -48,6 +48,17 @@ export async function createRandomSupportItem() {
 	});
 }
 
+export async function createDefaultSupportItem() {
+	const supportItem = await createRandomSupportItem();
+
+	await prisma.user.update({
+		where: { id: testUser.id },
+		data: { defaultSupportItemId: supportItem.id }
+	});
+
+	return supportItem;
+}
+
 export async function createRandomClient() {
 	const client = randomClient();
 
@@ -63,15 +74,19 @@ export async function createRandomClient() {
 
 export async function createRandomActivity(
 	clientId: string,
-	supportItemId: string
+	supportItemId: string,
+	times?: { startTime: string; endTime: string }
 ) {
+	const startTime = times?.startTime ?? "09:15";
+	const endTime = times?.endTime ?? "10:00";
+
 	return await prisma.activity.create({
 		data: {
 			clientId,
 			supportItemId,
 			date: new Date(),
-			startTime: parse("09:15", "HH:mm", new Date()).toISOString(),
-			endTime: parse("15:23", "HH:mm", new Date()).toISOString(),
+			startTime: parse(startTime, "HH:mm", new Date()).toISOString(),
+			endTime: parse(endTime, "HH:mm", new Date()).toISOString(),
 			ownerId: testUser.id
 		}
 	});

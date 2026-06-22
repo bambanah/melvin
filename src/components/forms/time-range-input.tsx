@@ -115,6 +115,7 @@ export function TimeRangeInput({
 			onFocus={handleFocus}
 			placeholder="9:30-13:50"
 			className={cn(error && "border-destructive", className)}
+			data-testid="time-range-input"
 		/>
 	);
 }

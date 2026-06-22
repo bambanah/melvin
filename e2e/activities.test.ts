@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import {
+	createDefaultSupportItem,
 	createRandomActivity,
 	createRandomClient,
 	createRandomSupportItem,
@@ -10,32 +11,24 @@ test("Can create activity", async ({ page }) => {
 	await page.goto("/dashboard");
 
 	const client = await createRandomClient();
-	const supportItem = await createRandomSupportItem();
+	await createDefaultSupportItem();
 
-	await page.getByRole("link", { name: "Activities" }).nth(0).click();
-	await expect(page).toHaveURL("/dashboard/activities");
-	await page.getByRole("link", { name: "Add" }).click();
+	await page.getByRole("button", { name: "Add Activity" }).click();
+	await page.getByTestId("client-search-input").fill(client.name);
+	await page.getByRole("button", { name: client.name }).click();
+	await page.getByTestId("time-range-input").fill("08:00-09:00");
+	await page.getByRole("button", { name: "Save all" }).click();
 
-	await page.getByText("Advanced Options").click();
-
-	await page.getByText("Select a support item...").click();
-	await page.getByLabel(supportItem.description).click();
-	await page.getByText("Select a client...").click();
-	await page.getByLabel(client.name).first().click();
-
-	await page.getByLabel("Start Time").fill("09:15");
-	await page.getByLabel("End Time").fill("15:23");
-	await page.getByRole("button", { name: "Create" }).click();
-
-	await waitForAlert(page, "activity created");
-
-	await expect(page).toHaveURL("/dashboard/activities");
+	await waitForAlert(page, "saved");
 });
 
 test("Can edit activity", async ({ page }) => {
 	const client = await createRandomClient();
 	const supportItem = await createRandomSupportItem();
-	const activity = await createRandomActivity(client.id, supportItem.id);
+	const activity = await createRandomActivity(client.id, supportItem.id, {
+		startTime: "11:00",
+		endTime: "12:00"
+	});
 
 	await page.goto("/dashboard/activities");
 
@@ -51,22 +44,22 @@ test("Can edit activity", async ({ page }) => {
 		.click();
 	await page.getByRole("menuitem", { name: "Edit" }).click();
 
-	await page.getByLabel("Start Time").fill("13:25");
-	await page.getByLabel("End Time").fill("16:56");
+	await page.getByLabel("Start Time").fill("11:30");
+	await page.getByLabel("End Time").fill("12:30");
 	await page.getByRole("button", { name: "Update" }).click();
 	await waitForAlert(page, "activity updated");
 	await expect(page).toHaveURL(`/dashboard/activities/${activity.id}`);
 });
 
 test("Can delete activity", async ({ page }) => {
-	await page.goto("/dashboard");
-
 	const client = await createRandomClient();
 	const supportItem = await createRandomSupportItem();
-	await createRandomActivity(client.id, supportItem.id);
+	await createRandomActivity(client.id, supportItem.id, {
+		startTime: "14:00",
+		endTime: "15:00"
+	});
 
-	await page.getByRole("link", { name: "Activities" }).click();
-	await expect(page).toHaveURL("/dashboard/activities");
+	await page.goto("/dashboard/activities");
 
 	await page
 		.getByRole("link")
