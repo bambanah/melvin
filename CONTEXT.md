@@ -2,6 +2,9 @@
 
 ## Core Entities
 
+**Invoice**
+A grouping of Activities for a single Client, representing a bill for NDIS-funded services. Can be exported as a PDF for submission to the billing handler.
+
 **Activity**
 A single service delivery to a Client. Has a date, start/end time, and is billed under a Support Item. May include Activity Based Transport and Provider Travel costs.
 
@@ -30,6 +33,17 @@ NDIS MMM1-3 regions limit claimable travel time to 30 minutes per leg. Applied a
 
 **Activity Based Transport**
 Driving done during an activity as part of delivering support (e.g., driving the client to an appointment). Billed as NDIS "Activity Based Transport" at $0.99/km. Stored as `ActivityTransportItem` records. Entered manually by the provider.
+
+## NDIS Pricing
+
+**Price Guide**
+The official NDIA document (published annually) that defines all valid Support Item codes, their maximum prices, and billing rules. Used to validate that invoiced rates don't exceed NDIS limits.
+
+**Price Limited Support**
+A Support Item with a maximum price set by NDIA. Providers can charge up to but not exceed this rate.
+
+**Quotable Support**
+A Support Item with no fixed price — the rate is negotiated between provider and participant. Not subject to price validation.
 
 ## Key Distinctions
 
