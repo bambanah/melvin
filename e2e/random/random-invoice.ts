@@ -16,7 +16,7 @@ export const randomInvoice = ({
 } = {}) => ({
 	invoiceNo:
 		invoiceNo?.toString() ??
-		faker.number.int({ min: 10000, max: 99999 }).toString(),
+		"INV-" + faker.number.int({ min: 10000, max: 99999 }).toString(),
 	billTo: billTo ?? faker.company.name(),
 	activities: [
 		{
