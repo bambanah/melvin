@@ -8,10 +8,10 @@ import {
 } from "./test-utils";
 
 test("Can create activity", async ({ page }) => {
-	await page.goto("/dashboard");
-
 	const client = await createRandomClient();
 	await createDefaultSupportItem();
+
+	await page.goto("/dashboard");
 
 	await page.getByRole("button", { name: "Add Activity" }).click();
 	await page.getByTestId("client-search-input").fill(client.name);

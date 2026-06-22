@@ -18,7 +18,7 @@ const Header = ({
 	extraButtons,
 	variant = "default"
 }: HeaderProps) => (
-	<div className="flex items-center justify-between gap-2 py-2 sm:px-4">
+	<div className="flex items-center justify-between gap-2 py-2">
 		{title && <h2 className="mr-auto text-2xl font-bold">{title}</h2>}
 		{createNewHref && (
 			<>
