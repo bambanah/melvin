@@ -5,7 +5,10 @@ import autoTable, { CellDef } from "jspdf-autotable";
 import { getRateForActivity, getTotalCostOfActivities } from "./activity-utils";
 import { formatDuration, getDuration } from "./date-utils";
 import { round } from "./generic-utils";
-import { getNonLabourTravelCode } from "./support-item-utils";
+import {
+	getActivityBasedTransportCode,
+	getNonLabourTravelCode
+} from "./support-item-utils";
 
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
@@ -152,6 +155,10 @@ const generatePDF = async (invoiceId: string) => {
 			if (activity.transportItems && activity.transportItems.length > 0) {
 				const ACTIVITY_TRANSPORT_RATE = 0.99;
 
+				const transportCode = getActivityBasedTransportCode(
+					activity.supportItem.weekdayCode
+				);
+
 				for (const transportItem of activity.transportItems) {
 					if (transportItem.type === "DISTANCE") {
 						const transportTotal = round(
@@ -159,7 +166,7 @@ const generatePDF = async (invoiceId: string) => {
 							2
 						);
 						activityStrings.push([
-							`Activity Based Transport\n04_799_0104_6_1\n`,
+							`Activity Based Transport\n${transportCode}\n`,
 							`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 							`${transportItem.amount} km\n`,
 							`$${ACTIVITY_TRANSPORT_RATE.toFixed(2)}/km\n`,
@@ -175,7 +182,7 @@ const generatePDF = async (invoiceId: string) => {
 						const amount = Number(transportItem.amount);
 
 						activityStrings.push([
-							`${label}\n04_799_0104_6_1\n`,
+							`${label}\n${transportCode}\n`,
 							`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 							transportItem.note || "-\n",
 							`-\n`,
