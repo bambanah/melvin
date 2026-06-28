@@ -123,7 +123,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 				{activity.invoice && (
 					<div className="flex items-center gap-2">
 						<FileText className="h-4 w-4" />
-						<Link href={`/dashboard/clients/${activity.client?.id}`}>
+						<Link href={`/dashboard/invoices/${activity.invoice.id}`}>
 							{activity.invoice.invoiceNo}
 						</Link>
 					</div>

@@ -32,7 +32,11 @@ export async function checkActivityOverlap(
 			ownerId,
 			date,
 			id: excludeActivityId ? { not: excludeActivityId } : undefined,
-			AND: [{ startTime: { lt: endTime } }, { endTime: { gt: startTime } }]
+			AND: [
+				{ startTime: { lt: endTime } },
+				{ endTime: { gt: startTime } },
+				{ supportItem: { isGroup: { not: true } } }
+			]
 		},
 		select: {
 			id: true,

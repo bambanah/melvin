@@ -110,7 +110,8 @@ const ActivityForm = ({ existingActivity }: Props) => {
 				: "",
 			transitDuration: existingActivity?.transitDuration
 				? existingActivity?.transitDuration.toString()
-				: ""
+				: "",
+			transportItems: [{ type: "DISTANCE", amount: 0 }]
 		}
 	});
 
@@ -407,6 +408,30 @@ const ActivityForm = ({ existingActivity }: Props) => {
 							)}
 						/>
 					</div>
+
+					<FormField
+						name="transportItems.0.amount"
+						control={form.control}
+						render={({ field }) => (
+							<FormItem className="w-full grow">
+								<FormLabel>Activity Based Transport</FormLabel>
+								<FormControl>
+									<Input
+										type="number"
+										step={0.1}
+										{...field}
+										onChange={(e) =>
+											field.onChange(parseFloat(e.target.value) || 0)
+										}
+									/>
+								</FormControl>
+								<FormDescription>
+									Distance driven during activity (in km)
+								</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 				</div>
 
 				<div className="mt-4 flex justify-center gap-4">

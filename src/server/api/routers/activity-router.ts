@@ -22,7 +22,8 @@ const defaultActivitySelect = {
 	client: true,
 	invoice: {
 		select: {
-			invoiceNo: true
+			invoiceNo: true,
+			id: true
 		}
 	},
 	tripId: true,
