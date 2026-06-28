@@ -162,12 +162,13 @@ export const getTotalCostOfActivities = (
 			}
 
 			if (activity.transportItems) {
+				const isGroup = activity.supportItem.isGroup;
+				const activityTransportRate = isGroup
+					? 0.49
+					: DEFAULT_ACTIVITY_TRANSPORT_RATE;
 				for (const item of activity.transportItems) {
 					if (item.type === "DISTANCE") {
-						subTotal += round(
-							Number(item.amount) * DEFAULT_ACTIVITY_TRANSPORT_RATE,
-							2
-						);
+						subTotal += round(Number(item.amount) * activityTransportRate, 2);
 					} else {
 						subTotal += round(Number(item.amount), 2);
 					}

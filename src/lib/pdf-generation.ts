@@ -153,7 +153,8 @@ const generatePDF = async (invoiceId: string) => {
 
 			// Activity Based Transport items
 			if (activity.transportItems && activity.transportItems.length > 0) {
-				const ACTIVITY_TRANSPORT_RATE = 0.99;
+				const isGroupActivity = activity.supportItem.isGroup;
+				const activityTransportRate = isGroupActivity ? 0.49 : 0.99;
 
 				const transportCode = getActivityBasedTransportCode(
 					activity.supportItem.weekdayCode
@@ -162,14 +163,14 @@ const generatePDF = async (invoiceId: string) => {
 				for (const transportItem of activity.transportItems) {
 					if (transportItem.type === "DISTANCE") {
 						const transportTotal = round(
-							Number(transportItem.amount) * ACTIVITY_TRANSPORT_RATE,
+							Number(transportItem.amount) * activityTransportRate,
 							2
 						);
 						activityStrings.push([
 							`Activity Based Transport\n${transportCode}\n`,
 							`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 							`${transportItem.amount} km\n`,
-							`$${ACTIVITY_TRANSPORT_RATE.toFixed(2)}/km\n`,
+							`$${activityTransportRate.toFixed(2)}/km\n`,
 							`$${transportTotal.toFixed(2)}\n`
 						]);
 					} else {
