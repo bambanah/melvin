@@ -31,7 +31,8 @@ import {
 	Loader2,
 	Plus,
 	Trash2,
-	Link2
+	Link2,
+	Users
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -39,6 +40,8 @@ import { toast } from "react-toastify";
 interface ActivityRowData {
 	id: string;
 	clientId: string;
+	isGroup: boolean;
+	groupClientId: string;
 	timeRange: TimeRangeValue;
 	transportKm: number | undefined;
 	transportItems: ActivityTransportItemSchema[];
@@ -46,6 +49,7 @@ interface ActivityRowData {
 	showAdvanced: boolean;
 	errors: {
 		client?: string;
+		groupClient?: string;
 		timeRange?: string;
 	};
 }
@@ -54,6 +58,8 @@ function createEmptyRow(): ActivityRowData {
 	return {
 		id: crypto.randomUUID(),
 		clientId: "",
+		isGroup: false,
+		groupClientId: "",
 		timeRange: { startTime: "", endTime: "" },
 		transportKm: undefined,
 		transportItems: [],
@@ -80,7 +86,8 @@ export function MultiActivityForm({
 	const [rows, setRows] = useState<ActivityRowData[]>([createEmptyRow()]);
 
 	const trpcUtils = trpc.useUtils();
-	const { data: { defaultSupportItemId } = {} } = trpc.user.fetch.useQuery();
+	const { data: { defaultSupportItemId, defaultGroupSupportItemId } = {} } =
+		trpc.user.fetch.useQuery();
 	const bulkAddMutation = trpc.activity.bulkAdd.useMutation();
 
 	const updateRow = (id: string, updates: Partial<ActivityRowData>) => {
@@ -147,6 +154,11 @@ export function MultiActivityForm({
 				isValid = false;
 			}
 
+			if (row.isGroup && !row.groupClientId) {
+				errors.groupClient = "Second participant is required";
+				isValid = false;
+			}
+
 			const timeError = validateTimeRange(row.timeRange);
 			if (timeError) {
 				errors.timeRange = timeError;
@@ -179,7 +191,10 @@ export function MultiActivityForm({
 			return;
 		}
 
-		const activities: ActivitySchema[] = nonEmptyRows.map((row) => {
+		const activities: ActivitySchema[] = [];
+		let hasGroupActivities = false;
+
+		nonEmptyRows.forEach((row) => {
 			const transportItems: ActivityTransportItemSchema[] = [];
 
 			// Add distance transport item if specified
@@ -195,20 +210,39 @@ export function MultiActivityForm({
 				...row.transportItems.filter((item) => item.amount > 0)
 			);
 
-			return {
+			// Use group support item for group activities, otherwise use default
+			const supportItemId = row.isGroup
+				? row.supportItemId || defaultGroupSupportItemId || ""
+				: row.supportItemId || defaultSupportItemId || "";
+
+			// Primary client activity (always created)
+			activities.push({
 				clientId: row.clientId,
 				date: stripTimezone(date),
 				startTime: row.timeRange.startTime,
 				endTime: row.timeRange.endTime,
-				supportItemId: row.supportItemId || defaultSupportItemId || "",
+				supportItemId,
 				transportItems: transportItems.length > 0 ? transportItems : undefined
-			};
+			});
+
+			// Second participant activity (only for group activities)
+			if (row.isGroup && row.groupClientId) {
+				hasGroupActivities = true;
+				activities.push({
+					clientId: row.groupClientId,
+					date: stripTimezone(date),
+					startTime: row.timeRange.startTime,
+					endTime: row.timeRange.endTime,
+					supportItemId
+					// No transport items for second participant
+				});
+			}
 		});
 
 		try {
 			const result = await bulkAddMutation.mutateAsync({
 				activities,
-				autoCreateTrip: true
+				autoCreateTrip: !hasGroupActivities
 			});
 
 			await trpcUtils.activity.byDateRange.invalidate();
@@ -252,6 +286,9 @@ export function MultiActivityForm({
 								row={row}
 								index={index}
 								defaultSupportItemId={defaultSupportItemId ?? undefined}
+								defaultGroupSupportItemId={
+									defaultGroupSupportItemId ?? undefined
+								}
 								onUpdate={(updates) => updateRow(row.id, updates)}
 								onRemove={() => removeRow(row.id)}
 								onAddTransportItem={() => addTransportItem(row.id)}
@@ -305,6 +342,7 @@ interface ActivityRowProps {
 	row: ActivityRowData;
 	index: number;
 	defaultSupportItemId?: string;
+	defaultGroupSupportItemId?: string;
 	onUpdate: (updates: Partial<ActivityRowData>) => void;
 	onRemove: () => void;
 	onAddTransportItem: () => void;
@@ -320,6 +358,7 @@ function ActivityRow({
 	row,
 	index,
 	defaultSupportItemId,
+	defaultGroupSupportItemId,
 	onUpdate,
 	onRemove,
 	onAddTransportItem,
@@ -330,14 +369,37 @@ function ActivityRow({
 	// Check if this activity is contiguous with a potential previous one
 	const isContiguous = row.timeRange.startTime !== "";
 
+	const handleGroupToggle = () => {
+		onUpdate({
+			isGroup: !row.isGroup,
+			groupClientId: !row.isGroup ? "" : row.groupClientId,
+			errors: { ...row.errors, groupClient: undefined }
+		});
+	};
+
 	return (
 		<div className="bg-muted/30 relative rounded-lg border p-4">
 			<div className="mb-3 flex items-center justify-between">
-				<span className="text-muted-foreground text-sm font-medium">
-					Activity {index + 1}
-				</span>
 				<div className="flex items-center gap-2">
-					{isContiguous && index > 0 && (
+					<span className="text-muted-foreground text-sm font-medium">
+						Activity {index + 1}
+					</span>
+					<button
+						type="button"
+						onClick={handleGroupToggle}
+						className={cn(
+							"flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors",
+							row.isGroup
+								? "bg-primary text-primary-foreground"
+								: "bg-muted text-muted-foreground hover:bg-muted/80"
+						)}
+					>
+						<Users className="h-3 w-3" />
+						Group
+					</button>
+				</div>
+				<div className="flex items-center gap-2">
+					{isContiguous && index > 0 && !row.isGroup && (
 						<Badge variant="outline" className="text-xs">
 							<Link2 className="mr-1 h-3 w-3" />
 							Back-to-back
@@ -360,7 +422,7 @@ function ActivityRow({
 			<div className="flex flex-col gap-4">
 				<div>
 					<Label className={cn(row.errors.client && "text-destructive")}>
-						Client
+						{row.isGroup ? "First participant" : "Client"}
 					</Label>
 					<ClientQuickSelect
 						value={row.clientId}
@@ -375,6 +437,29 @@ function ActivityRow({
 						<p className="text-destructive mt-1 text-sm">{row.errors.client}</p>
 					)}
 				</div>
+
+				{row.isGroup && (
+					<div>
+						<Label className={cn(row.errors.groupClient && "text-destructive")}>
+							Second participant
+						</Label>
+						<ClientQuickSelect
+							value={row.groupClientId}
+							onChange={(groupClientId) =>
+								onUpdate({
+									groupClientId,
+									errors: { ...row.errors, groupClient: undefined }
+								})
+							}
+							excludeClientId={row.clientId}
+						/>
+						{row.errors.groupClient && (
+							<p className="text-destructive mt-1 text-sm">
+								{row.errors.groupClient}
+							</p>
+						)}
+					</div>
+				)}
 
 				<div className="grid grid-cols-2 gap-4">
 					<div>

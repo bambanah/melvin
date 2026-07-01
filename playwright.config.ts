@@ -3,7 +3,7 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
 	globalSetup: require.resolve("./e2e/setup/global.setup.ts"),
 	use: {
-		headless: !!process.env.CI,
+		headless: true,
 		baseURL: "http://localhost:3000/dashboard",
 		storageState: "./e2e/setup/storage-state.json",
 		screenshot: "only-on-failure"

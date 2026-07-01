@@ -14,7 +14,8 @@ test("Can create activity", async ({ page }) => {
 	await page.goto("/dashboard");
 
 	await page.getByRole("button", { name: "Add Activity" }).click();
-	await page.getByTestId("client-search-input").fill(client.name);
+	await page.getByTestId("client-search-input").click();
+	await page.getByPlaceholder("Search clients...").fill(client.name);
 	await page.getByRole("button", { name: client.name }).click();
 	await page.getByTestId("time-range-input").fill("08:00-09:00");
 	await page.getByRole("button", { name: "Save all" }).click();
