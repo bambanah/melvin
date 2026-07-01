@@ -1,9 +1,13 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
-import { Check, X } from "lucide-react";
+import { Check, ChevronsUpDown, X } from "lucide-react";
 import * as React from "react";
 
 const RECENT_CLIENTS_KEY = "melvin:recent-clients";
@@ -13,6 +17,7 @@ interface ClientQuickSelectProps {
 	value?: string;
 	onChange?: (clientId: string) => void;
 	className?: string;
+	excludeClientId?: string;
 }
 
 function getRecentClientIds(): string[] {
@@ -42,8 +47,10 @@ function addRecentClient(clientId: string): void {
 export function ClientQuickSelect({
 	value,
 	onChange,
-	className
+	className,
+	excludeClientId
 }: ClientQuickSelectProps) {
+	const [open, setOpen] = React.useState(false);
 	const [search, setSearch] = React.useState("");
 	const [recentIds, setRecentIds] = React.useState<string[]>([]);
 
@@ -54,100 +61,144 @@ export function ClientQuickSelect({
 	const { data: { clients } = {} } = trpc.clients.list.useQuery({});
 
 	const selectedClient = clients?.find((c) => c.id === value);
-	const recentClients = React.useMemo(() => {
-		if (!clients) return [];
-		return recentIds
-			.map((id) => clients.find((c) => c.id === id))
-			.filter((c): c is (typeof clients)[number] => c !== undefined)
-			.slice(0, 4);
-	}, [recentIds, clients]);
+
+	const availableClients = React.useMemo(() => {
+		return clients?.filter((c) => c.id !== excludeClientId) ?? [];
+	}, [clients, excludeClientId]);
 
 	const filteredClients = React.useMemo(() => {
-		if (!search.trim()) return [];
+		if (!search.trim()) return availableClients;
 		const lower = search.toLowerCase();
-		return (
-			clients
-				?.filter((c) => c.name.toLowerCase().includes(lower))
-				.slice(0, 5) ?? []
-		);
-	}, [clients, search]);
+		return availableClients.filter((c) => c.name.toLowerCase().includes(lower));
+	}, [availableClients, search]);
+
+	const recentClients = React.useMemo(() => {
+		const recentFromIds = recentIds
+			.map((id) => filteredClients.find((c) => c.id === id))
+			.filter((c): c is (typeof filteredClients)[number] => c !== undefined)
+			.slice(0, 4);
+		return recentFromIds;
+	}, [recentIds, filteredClients]);
+
+	const otherClients = React.useMemo(() => {
+		const recentIdSet = new Set(recentClients.map((c) => c.id));
+		return filteredClients.filter((c) => !recentIdSet.has(c.id));
+	}, [filteredClients, recentClients]);
 
 	const handleSelect = (clientId: string) => {
 		onChange?.(clientId);
 		addRecentClient(clientId);
 		setRecentIds(getRecentClientIds());
+		setOpen(false);
 		setSearch("");
 	};
 
-	const handleClear = () => {
+	const handleClear = (e: React.MouseEvent) => {
+		e.stopPropagation();
 		onChange?.("");
 		setSearch("");
 	};
 
-	if (selectedClient) {
-		return (
-			<div className={cn("flex items-center gap-2", className)}>
-				<Badge variant="secondary" className="py-1.5 pr-1 pl-3 text-sm">
-					{selectedClient.name}
-					<Button
-						type="button"
-						variant="ghost"
-						size="sm"
-						className="ml-1 h-5 w-5 p-0"
-						onClick={handleClear}
-					>
-						<X className="h-3 w-3" />
-					</Button>
-				</Badge>
-			</div>
-		);
-	}
-
 	return (
-		<div className={cn("flex flex-col gap-2", className)}>
-			{recentClients.length > 0 && (
-				<div className="flex flex-wrap gap-1.5">
-					{recentClients.map((client) => (
-						<Badge
-							key={client.id}
-							variant="outline"
-							className="hover:bg-accent cursor-pointer transition-colors"
-							onClick={() => handleSelect(client.id)}
-						>
-							{client.name}
-						</Badge>
-					))}
-				</div>
-			)}
-
-			<div className="relative">
-				<Input
-					type="text"
-					value={search}
-					onChange={(e) => setSearch(e.target.value)}
-					placeholder="Search clients..."
-					className="w-full"
+		<Popover open={open} onOpenChange={setOpen}>
+			<PopoverTrigger asChild>
+				<Button
+					variant="outline"
+					role="combobox"
+					aria-expanded={open}
+					className={cn(
+						"w-full justify-between font-normal",
+						!value && "text-muted-foreground",
+						className
+					)}
 					data-testid="client-search-input"
-				/>
-
-				{filteredClients.length > 0 && (
-					<div className="bg-popover absolute top-full right-0 left-0 z-10 mt-1 rounded-md border shadow-md">
-						{filteredClients.map((client) => (
-							<button
-								key={client.id}
-								type="button"
-								className="hover:bg-accent flex w-full items-center gap-2 px-3 py-2 text-left text-sm"
-								onClick={() => handleSelect(client.id)}
-							>
-								{client.name}
-								{client.id === value && (
-									<Check className="text-primary ml-auto h-4 w-4" />
-								)}
-							</button>
-						))}
+				>
+					{selectedClient?.name ?? "Select client..."}
+					<div className="flex items-center gap-1">
+						{value && (
+							<X
+								className="h-4 w-4 shrink-0 opacity-50 hover:opacity-100"
+								onClick={handleClear}
+							/>
+						)}
+						<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
 					</div>
-				)}
-			</div>
-		</div>
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent
+				className="w-[var(--radix-popover-trigger-width)] p-0"
+				align="start"
+			>
+				<div className="p-2">
+					<Input
+						placeholder="Search clients..."
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+						className="h-8"
+					/>
+				</div>
+				<div className="max-h-60 overflow-y-auto">
+					{filteredClients.length === 0 ? (
+						<div className="text-muted-foreground py-6 text-center text-sm">
+							No clients found
+						</div>
+					) : (
+						<>
+							{recentClients.length > 0 && (
+								<div>
+									<div className="text-muted-foreground px-2 py-1.5 text-xs font-medium">
+										Recent
+									</div>
+									{recentClients.map((client) => (
+										<button
+											key={client.id}
+											type="button"
+											className={cn(
+												"hover:bg-accent relative flex w-full cursor-pointer items-center rounded-sm py-1.5 pr-2 pl-8 text-sm outline-none select-none",
+												value === client.id && "bg-accent"
+											)}
+											onClick={() => handleSelect(client.id)}
+										>
+											{value === client.id && (
+												<Check className="absolute left-2 h-4 w-4" />
+											)}
+											{client.name}
+										</button>
+									))}
+								</div>
+							)}
+							{recentClients.length > 0 && otherClients.length > 0 && (
+								<div className="bg-border mx-2 my-1 h-px" />
+							)}
+							{otherClients.length > 0 && (
+								<div>
+									{recentClients.length > 0 && (
+										<div className="text-muted-foreground px-2 py-1.5 text-xs font-medium">
+											All Clients
+										</div>
+									)}
+									{otherClients.map((client) => (
+										<button
+											key={client.id}
+											type="button"
+											className={cn(
+												"hover:bg-accent relative flex w-full cursor-pointer items-center rounded-sm py-1.5 pr-2 pl-8 text-sm outline-none select-none",
+												value === client.id && "bg-accent"
+											)}
+											onClick={() => handleSelect(client.id)}
+										>
+											{value === client.id && (
+												<Check className="absolute left-2 h-4 w-4" />
+											)}
+											{client.name}
+										</button>
+									))}
+								</div>
+							)}
+						</>
+					)}
+				</div>
+			</PopoverContent>
+		</Popover>
 	);
 }
