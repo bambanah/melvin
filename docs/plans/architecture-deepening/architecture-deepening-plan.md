@@ -1,8 +1,8 @@
 # Architecture Deepening Plan
 
 **Created**: 2026-06-20  
-**Last Updated**: 2026-06-20  
-**Status**: Candidates identified, awaiting selection
+**Last Updated**: 2026-07-02  
+**Status**: Superseded — opportunities now tracked as executable plans in `plans/`: #6 → plan 005, #4 → plans 006/007, #1/#5 → plan 008, #2 → plan 008 Step 3. #3 (multi-activity form state) remains open here; it overlaps TRD-001's quick-form rebuild (`docs/trd/trd-001`). Rate figures below (`0.43`/`0.85`) are stale; see plan 006.
 
 ## Overview
 
