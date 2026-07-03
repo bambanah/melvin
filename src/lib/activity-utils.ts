@@ -54,6 +54,9 @@ interface TransitRateContext {
 
 const DEFAULT_TRANSIT_RATE = 0.99;
 
+// TODO: Handle groups other than 2 clients
+const GROUP_TRANSIT_RATE = 0.43;
+
 const getRateForDay = (
 	day: "weekday" | "weeknight" | "saturday" | "sunday",
 	supportItem: Activity["supportItem"],
@@ -182,10 +185,14 @@ export const getTotalCostOfActivities = (
 	return round(grandTotal, 2);
 };
 
-function getTransitRate(
+export function getTransitRate(
 	activity: Activity,
 	rateContext?: TransitRateContext
 ): number {
+	if (activity.supportItem.isGroup) {
+		return GROUP_TRANSIT_RATE;
+	}
+
 	return (
 		Number(activity.client?.transitRatePerKm) ||
 		rateContext?.userTransitRatePerKm ||

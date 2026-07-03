@@ -126,9 +126,11 @@ export default function InvoiceList({ clientId: propClientId }: Props) {
 	const [searchInput, setSearchInput] = useState(urlSearch);
 	const debouncedSearch = useDebounce(searchInput, 300);
 	const isClearing = useRef(false);
+	const isSyncingFromUrl = useRef(false);
 
-	// Sync URL → input (external navigation)
+	// Sync URL → input (external navigation / hydration)
 	useEffect(() => {
+		isSyncingFromUrl.current = true;
 		const timeoutId = setTimeout(() => {
 			setSearchInput(urlSearch);
 			if (urlSearch === "") {
@@ -141,6 +143,11 @@ export default function InvoiceList({ clientId: propClientId }: Props) {
 	// Sync input → URL (user typing, after debounce)
 	useEffect(() => {
 		if (isClearing.current) return;
+		// Skip if we're syncing from URL (hydration or external navigation)
+		if (isSyncingFromUrl.current) {
+			isSyncingFromUrl.current = false;
+			return;
+		}
 		if (debouncedSearch !== urlSearch) {
 			updateUrl({ search: debouncedSearch });
 		}
