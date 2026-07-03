@@ -1,0 +1,14 @@
+=== Page 1 ===
+Invoice Number: SAT-1 | Tax Invoice
+Invoice Date: 01/02/23
+Participant Name: Jane Citizen
+Description | Date | Details | Unit Price | Total
+Access Community Social | 14/01/23 | 09:00-11:00 (2 hours) | $87.51/hr | $175.02
+and Rec Activ - Standard
+04_105_0125_6_1
+Total | $175.02
+Marlee Provider
+ABN: 12 345 678 901
+Bank: Sample Bank
+BSB: 123-456
+Account Number: 987 654 321

@@ -1,0 +1,40 @@
+=== Page 1 ===
+Invoice Number: PLAN-1 | Tax Invoice
+Invoice Date: 25/06/23
+Participant Name: Casey Citizen
+Participant Number: 430123456
+Bill To: Banksia Plan Management
+Description | Date | Details | Unit Price | Total
+Access Community Social | 20/06/23 | 13:20-14:25 (1 hour, 5 mins) | $70.23/hr | $76.08
+and Rec Activ - Standard | 22/06/23 | 09:00-14:30 (5 hours, 30 mins) | $70.23/hr | $386.27
+04_104_0125_6_1
+Access Community Social | 24/06/23 | 06:15-10:20 (4 hours, 5 mins) | $98.83/hr | $403.56
+and Rec Activ - Standard
+04_105_0125_6_1
+Activity Based Transport | 22/06/23 | 46 km | $0.99/km | $45.54
+04_590_0125_6_1 | 24/06/23 | 32 km | $0.99/km | $31.68
+Activity Based Transport | 20/06/23 | 30 km | $0.49/km | $14.70
+04_591_0136_6_1
+Group Activities - Standard | 20/06/23 | 12:00-13:20 (1 hour, 20 mins) | $35.10/hr | $46.80
+04_102_0136_6_1
+Provider travel - labour | 20/06/23 | 25 minutes | $35.10/hr | $14.63
+costs
+04_102_0136_6_1
+Provider travel - labour | 22/06/23 | 30 minutes | $70.23/hr | $35.12
+costs
+04_104_0125_6_1
+Provider travel - labour | 24/06/23 | 30 minutes | $98.83/hr | $49.42
+costs
+04_105_0125_6_1
+Provider travel - non-labour | 22/06/23 | 26 km | $0.99/km | $25.74
+costs | 24/06/23 | 26 km | $0.99/km | $25.74
+04_799_0125_6_1
+Provider travel - non-labour | 20/06/23 | 13 km | $0.43/km | $5.59
+costs
+04_799_0136_6_1
+Total | $1160.87
+Marlee Provider
+ABN: 12 345 678 901
+Bank: Sample Bank
+BSB: 123-456
+Account Number: 987 654 321

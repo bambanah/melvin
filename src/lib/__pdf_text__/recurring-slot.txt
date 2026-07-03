@@ -1,0 +1,14 @@
+=== Page 1 ===
+Invoice Number: REC-1 | Tax Invoice
+Invoice Date: 25/06/23
+Participant Name: Riley Example
+Description | Date | Details | Unit Price | Total
+Access Community Social | 19/06/23 | 14:35-16:35 (2 hours) | $70.23/hr | $140.46
+and Rec Activ - Standard | 20/06/23 | 14:35-16:35 (2 hours) | $70.23/hr | $140.46
+04_104_0125_6_1 | 22/06/23 | 14:35-16:35 (2 hours) | $70.23/hr | $140.46
+Total | $421.38
+Marlee Provider
+ABN: 12 345 678 901
+Bank: Sample Bank
+BSB: 123-456
+Account Number: 987 654 321

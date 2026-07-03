@@ -203,8 +203,132 @@ test("Should return correct total", () => {
 	).toEqual(2322.82);
 });
 
+test("Should include activity based transport items in total", () => {
+	// DISTANCE solo: km * 0.99
+	expect(
+		getTotalCostOfActivities([
+			{
+				...getActivity("weekday", "16:00", "17:00", 0, 0),
+				transportItems: [{ type: "DISTANCE" as const, amount: 22 }]
+			}
+		])
+	).toEqual(77.25); // 55.47 + 22 * 0.99
+
+	// DISTANCE group: km * 0.49
+	expect(
+		getTotalCostOfActivities([
+			{
+				...getActivity("weekday", "16:00", "17:00", 0, 0, true),
+				transportItems: [{ type: "DISTANCE" as const, amount: 22 }]
+			}
+		])
+	).toEqual(66.25); // 55.47 + 22 * 0.49
+
+	// PARKING / TOLL / OTHER are flat amounts
+	expect(
+		getTotalCostOfActivities([
+			{
+				...getActivity("weekday", "16:00", "17:00", 0, 0),
+				transportItems: [
+					{ type: "PARKING" as const, amount: 8.5, note: "Airport parking" },
+					{ type: "TOLL" as const, amount: 5.7 },
+					{ type: "OTHER" as const, amount: 12, note: null }
+				]
+			}
+		])
+	).toEqual(81.67); // 55.47 + 8.50 + 5.70 + 12.00
+
+	// Mixed list of DISTANCE and flat items
+	expect(
+		getTotalCostOfActivities([
+			{
+				...getActivity("weekday", "16:00", "17:00", 0, 0),
+				transportItems: [
+					{ type: "DISTANCE" as const, amount: 10 },
+					{ type: "PARKING" as const, amount: 8.5 }
+				]
+			}
+		])
+	).toEqual(73.87); // 55.47 + 9.90 + 8.50
+
+	// Prisma.Decimal amounts are converted with Number()
+	expect(
+		getTotalCostOfActivities([
+			{
+				...getActivity("weekday", "16:00", "17:00", 0, 0),
+				transportItems: [
+					{ type: "DISTANCE" as const, amount: new Prisma.Decimal(22) }
+				]
+			}
+		])
+	).toEqual(77.25);
+});
+
+test("Should use itemDistance when activity has no start/end times", () => {
+	// KM rate type: no startTime/endTime, itemDistance * rate
+	expect(
+		getTotalCostOfActivities([
+			{
+				date: new Date("2022-01-14"),
+				startTime: null,
+				endTime: null,
+				itemDistance: 34,
+				supportItem: {
+					...baseActivity.supportItem,
+					weekdayRate: new Prisma.Decimal(0.85)
+				}
+			}
+		])
+	).toEqual(28.9); // 34 * 0.85
+});
+
+test("Should resolve transit rate with correct precedence", () => {
+	const activityWithTransit = {
+		...getActivity("weekday", "16:00", "17:00", 0, 0),
+		transitDistance: new Prisma.Decimal(10)
+	};
+
+	// 1. Client transitRatePerKm wins, even when a rateContext is supplied
+	expect(
+		getTotalCostOfActivities(
+			[
+				{
+					...activityWithTransit,
+					client: { transitRatePerKm: new Prisma.Decimal(0.5) }
+				}
+			],
+			{ userTransitRatePerKm: 0.85 }
+		)
+	).toEqual(60.47); // 55.47 + 10 * 0.50
+
+	// 2. Falls back to rateContext.userTransitRatePerKm
+	expect(
+		getTotalCostOfActivities([{ ...activityWithTransit, client: null }], {
+			userTransitRatePerKm: 0.85
+		})
+	).toEqual(63.97); // 55.47 + 10 * 0.85
+
+	// 3. Falls back to the 0.99 default
+	expect(getTotalCostOfActivities([activityWithTransit])).toEqual(65.37); // 55.47 + 10 * 0.99
+
+	// Quirk (documented, not fixed): a Decimal(0) client rate falls through to
+	// the next fallback because of `Number(x) || y`
+	expect(
+		getTotalCostOfActivities(
+			[
+				{
+					...activityWithTransit,
+					client: { transitRatePerKm: new Prisma.Decimal(0) }
+				}
+			],
+			{ userTransitRatePerKm: 0.85 }
+		)
+	).toEqual(63.97); // falls through to userTransitRatePerKm
+});
+
 test("Should return correct total for group activities", () => {
-	// Group activities now use the same transit rate as non-group activities
+	// Group activities price transit distance at the group rate ($0.43/km),
+	// matching the PDF's non-labour travel line items
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "16:00", "17:00", 0, 0, true)
@@ -215,26 +339,26 @@ test("Should return correct total for group activities", () => {
 		getTotalCostOfActivities([
 			getActivity("weekday", "15:00", "17:00", 7, 15, true)
 		])
-	).toEqual(132.26);
+	).toEqual(123.86);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "15:00", "17:00", 7, 15, true),
 			getActivity("weekday", "15:00", "21:00", 7, 15, true)
 		])
-	).toEqual(520.53);
+	).toEqual(503.73);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("saturday", "15:00", "17:00", 7, 15, true)
 		])
-	).toEqual(179.55);
+	).toEqual(171.15);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("saturday", "19:00", "21:00", 7, 15, true)
 		])
-	).toEqual(179.55);
+	).toEqual(171.15);
 
 	expect(
 		getTotalCostOfActivities([
@@ -260,7 +384,7 @@ test("Should return correct total for group activities", () => {
 			getActivity("weekday", "09:30", "15:10", 15, 7, true),
 			getActivity("weekday", "09:30", "15:23", 15, 7, true)
 		])
-	).toEqual(1008.17);
+	).toEqual(996.41);
 
 	expect(
 		getTotalCostOfActivities([
@@ -272,5 +396,5 @@ test("Should return correct total for group activities", () => {
 			getActivity("weekday", "09:30", "15:10", 15, 7, true),
 			getActivity("weekday", "09:30", "15:25", 15, 7, true)
 		])
-	).toEqual(2322.82);
+	).toEqual(2295.38);
 });

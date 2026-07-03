@@ -2,7 +2,11 @@ import prisma from "@/server/prisma";
 import { RateType } from "@/generated/client";
 import jspdf from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
-import { getRateForActivity, getTotalCostOfActivities } from "./activity-utils";
+import {
+	getRateForActivity,
+	getTotalCostOfActivities,
+	getTransitRate
+} from "./activity-utils";
 import { formatDuration, getDuration } from "./date-utils";
 import { round } from "./generic-utils";
 import {
@@ -121,7 +125,7 @@ const generatePDF = async (invoiceId: string) => {
 				);
 
 				activityStrings.push([
-					`Provider Travel - Labour Costs\n${itemCode}\n`,
+					`Provider travel - labour costs\n${itemCode}\n`,
 					`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 					`${activity.transitDuration} minutes\n`,
 					`$${rate.toFixed(2)}${`/${
@@ -133,9 +137,7 @@ const generatePDF = async (invoiceId: string) => {
 
 			// Provider Travel - Non Labour Costs
 			if (activity.transitDistance) {
-				// TODO: Handle groups other than 2 clients
-				const isGroup = activity.supportItem.isGroup;
-				const ratePerKm = isGroup ? 0.43 : 0.99;
+				const ratePerKm = getTransitRate(activity);
 				const travelTotal = ratePerKm * Number(activity.transitDistance);
 
 				const supportItemCode = getNonLabourTravelCode(
@@ -143,7 +145,7 @@ const generatePDF = async (invoiceId: string) => {
 				);
 
 				activityStrings.push([
-					`Provider Travel - Non Labour Costs\n${supportItemCode ?? ""}\n`,
+					`Provider travel - non-labour costs\n${supportItemCode ?? ""}\n`,
 					`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 					`${activity.transitDistance} km\n`,
 					`$${ratePerKm}/km\n`,
@@ -159,6 +161,9 @@ const generatePDF = async (invoiceId: string) => {
 				const transportCode = getActivityBasedTransportCode(
 					activity.supportItem.weekdayCode
 				);
+				// "Activity Based Transport" is the price guide's name for this code;
+				// the expense type (parking, toll, …) prints in the Details column
+				const transportDescription = `Activity Based Transport\n${transportCode}\n`;
 
 				for (const transportItem of activity.transportItems) {
 					if (transportItem.type === "DISTANCE") {
@@ -167,7 +172,7 @@ const generatePDF = async (invoiceId: string) => {
 							2
 						);
 						activityStrings.push([
-							`Activity Based Transport\n${transportCode}\n`,
+							transportDescription,
 							`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 							`${transportItem.amount} km\n`,
 							`$${activityTransportRate.toFixed(2)}/km\n`,
@@ -183,9 +188,9 @@ const generatePDF = async (invoiceId: string) => {
 						const amount = Number(transportItem.amount);
 
 						activityStrings.push([
-							`${label}\n${transportCode}\n`,
+							transportDescription,
 							`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
-							transportItem.note || "-\n",
+							`${label}${transportItem.note ? ` - ${transportItem.note}` : ""}\n`,
 							`-\n`,
 							`$${amount.toFixed(2)}\n`
 						]);
@@ -289,7 +294,7 @@ const generatePDF = async (invoiceId: string) => {
 			[
 				"Description",
 				"Date",
-				"Count",
+				"Details",
 				{ content: "Unit Price", styles: { halign: "right" } },
 				"Total"
 			]

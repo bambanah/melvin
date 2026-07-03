@@ -1,0 +1,14 @@
+=== Page 1 ===
+Invoice Number: NIGHT-1 | Tax Invoice
+Invoice Date: 01/02/23
+Participant Name: Jane Citizen
+Description | Date | Details | Unit Price | Total
+Access Community Social | 11/01/23 | 17:30-19:30 (2 hours) | $68.50/hr | $137.00
+and Rec Activ - Standard
+04_103_0125_6_1
+Total | $137.00
+Marlee Provider
+ABN: 12 345 678 901
+Bank: Sample Bank
+BSB: 123-456
+Account Number: 987 654 321

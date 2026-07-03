@@ -1,27 +1,110 @@
-import { getHighestInvoiceNo, getNextInvoiceNo } from "@/lib/invoice-utils";
+import {
+	getHighestInvoiceNo,
+	getNextInvoiceNo,
+	invoiceCandidatesFromPaymentAmount
+} from "@/lib/invoice-utils";
 import { expect, test } from "vitest";
 
 test("Should get latest invoice number", () => {
-	expect(getHighestInvoiceNo(["Gawne1", "Gawne2", "Gawne3"])).toEqual("Gawne3");
+	expect(getHighestInvoiceNo(["Sample1", "Sample2", "Sample3"])).toEqual(
+		"Sample3"
+	);
 
-	expect(getHighestInvoiceNo(["Gawne1"])).toEqual("Gawne1");
+	expect(getHighestInvoiceNo(["Sample1"])).toEqual("Sample1");
 	expect(getHighestInvoiceNo([])).toEqual(undefined);
-	expect(getHighestInvoiceNo(["Gawne", "string"])).toEqual(undefined);
+	expect(getHighestInvoiceNo(["Sample", "string"])).toEqual(undefined);
 });
 
 test("Should get next invoice number", () => {
 	expect(
-		getNextInvoiceNo(["Gawne1", "Gawne2", "Gawne3"]).nextInvoiceNo
-	).toEqual("Gawne4");
+		getNextInvoiceNo(["Sample1", "Sample2", "Sample3"]).nextInvoiceNo
+	).toEqual("Sample4");
 	expect(
 		getNextInvoiceNo(["Client-1", "Client-2", "Client-3"]).nextInvoiceNo
 	).toEqual("Client-4");
 	expect(
-		getNextInvoiceNo(["Gawne1", "Gawne2", "Gawne-3"]).nextInvoiceNo
-	).toEqual("Gawne-4");
+		getNextInvoiceNo(["Sample1", "Sample2", "Sample-3"]).nextInvoiceNo
+	).toEqual("Sample-4");
 	expect(getNextInvoiceNo([]).nextInvoiceNo).toEqual("");
-	expect(getNextInvoiceNo(["Gawne1"]).nextInvoiceNo).toEqual("Gawne2");
-	expect(getNextInvoiceNo(["Gawne01", "Gawne02"]).nextInvoiceNo).toEqual(
-		"Gawne03"
+	expect(getNextInvoiceNo(["Sample1"]).nextInvoiceNo).toEqual("Sample2");
+	expect(getNextInvoiceNo(["Sample01", "Sample02"]).nextInvoiceNo).toEqual(
+		"Sample03"
 	);
+});
+
+test("Should find single invoice matching payment amount", () => {
+	expect(
+		invoiceCandidatesFromPaymentAmount(10.1, new Map([[10.1, "INV-1"]]))
+	).toEqual([["INV-1"]]);
+});
+
+test("Should find multi-invoice combination matching payment amount", () => {
+	expect(
+		invoiceCandidatesFromPaymentAmount(
+			10.1,
+			new Map<number, string | string[]>([
+				[3.3, "INV-1"],
+				[6.8, "INV-2"]
+			])
+		)
+	).toEqual([["INV-1", "INV-2"]]);
+});
+
+test("Should find all valid combinations matching payment amount", () => {
+	expect(
+		invoiceCandidatesFromPaymentAmount(
+			15,
+			new Map<number, string | string[]>([
+				[5, "INV-1"],
+				[10, "INV-2"],
+				[15, "INV-3"]
+			])
+		)
+	).toEqual([["INV-3"], ["INV-1", "INV-2"]]);
+});
+
+test("Should handle float rounding in payment combinations", () => {
+	// Naive summation gives 3.3 + 6.8 = 10.100000000000001; the backtracker
+	// rounds partial sums to 2dp so this still matches
+	expect(
+		invoiceCandidatesFromPaymentAmount(
+			10.1,
+			new Map<number, string | string[]>([
+				[3.3, "INV-1"],
+				[6.8, "INV-2"],
+				[20, "INV-3"]
+			])
+		)
+	).toEqual([["INV-1", "INV-2"]]);
+});
+
+test("Should return no candidates when nothing matches", () => {
+	expect(
+		invoiceCandidatesFromPaymentAmount(
+			7,
+			new Map<number, string | string[]>([
+				[5, "INV-1"],
+				[10, "INV-2"]
+			])
+		)
+	).toEqual([]);
+
+	expect(invoiceCandidatesFromPaymentAmount(7, new Map())).toEqual([]);
+});
+
+test("Should return grouped invoice ids for duplicate totals", () => {
+	expect(
+		invoiceCandidatesFromPaymentAmount(
+			10.1,
+			new Map<number, string | string[]>([[10.1, ["INV-1", "INV-2"]]])
+		)
+	).toEqual([[["INV-1", "INV-2"]]]);
+});
+
+test("Should return a single empty combination for payment amount of 0", () => {
+	// Current behavior: an amount of 0 is "matched" by selecting no invoices
+	expect(invoiceCandidatesFromPaymentAmount(0, new Map())).toEqual([[]]);
+	expect(
+		invoiceCandidatesFromPaymentAmount(0, new Map([[5, "INV-1"]]))
+	).toEqual([[]]);
 });
