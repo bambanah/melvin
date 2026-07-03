@@ -95,12 +95,15 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 				>
 					{invoice.activities.length > 0 ? (
 						<>
-							<div className="mx-auto w-8/12 basis-1/2">
-								{/* <PdfPreview invoiceId={invoice.id} /> */}
+							<div className="pointer-events-none absolute inset-0 flex justify-center overflow-hidden">
+								<div className="w-full">
+									<PdfPreview invoiceId={invoice.id} />
+								</div>
 							</div>
 							<div
 								className="absolute top-0 right-0 flex h-full w-full items-center justify-center"
 								onClick={() => setIsPdfPreviewExpanded(true)}
+								data-testid="pdf-preview-trigger"
 							>
 								<div className="flex items-center justify-center gap-2 rounded-md bg-zinc-900/80 px-4 py-3 text-zinc-50 transition-transform group-hover:scale-110 group-hover:bg-zinc-900 md:px-3 md:py-2 md:text-lg">
 									<Search className="h-4 w-4" />
@@ -126,7 +129,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					</div>
 					<p className="text-foreground/80 text-sm">Total</p>
 					<div className="flex items-center justify-between">
-						<p className="text-xl">
+						<p className="text-xl" data-testid="invoice-total">
 							{getTotalCostOfActivities(invoice.activities).toLocaleString(
 								undefined,
 								{ style: "currency", currency: "AUD" }
