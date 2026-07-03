@@ -4,7 +4,7 @@ import { FC, useEffect, useRef, useState } from "react";
 import { Document, Page } from "react-pdf";
 
 import { pdfjs } from "react-pdf";
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
 interface PdfProps {
 	invoiceId: string;
@@ -50,7 +50,7 @@ const PdfPreview: FC<PdfProps> = ({ invoiceId, className }) => {
 	if (!pdf.data) return <Loading />;
 
 	return (
-		<div ref={containerRef} className={className}>
+		<div ref={containerRef} className={className} data-testid="pdf-preview">
 			<Document file={pdf.data} onLoadSuccess={onDocumentLoadSuccess}>
 				{numPages &&
 					Array.from({ length: numPages }, (_, index) => (
