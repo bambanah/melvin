@@ -74,7 +74,7 @@ status          InvoiceStatus  // + AMENDED terminal state for the original
 - Byte-stability: seal an invoice, change every upstream input (rates, client transit rate, support item codes, activity times via direct DB write), re-render → identical PDF. This is the headline regression test.
 - Amendment E2E: send → amend → edit activity → send amendment → original AMENDED + excluded from owing totals; PDF header references original; payment on original migrates to head.
 - Chain: amend twice; assert only head payable; invoice list shows the chain sensibly (one logical row, expandable).
-- Guard: editing sealed activity blocked in both UI and router (router-level test — ownership-scoping harness from plans/003 is the right home).
+- Guard: editing sealed activity blocked in both UI and router (router-level test — ownership-scoping harness from docs/plans/003 is the right home).
 
 ## Open questions
 

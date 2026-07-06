@@ -41,7 +41,7 @@ cadenceAnchor   DateTime?      // start of the current period (for fortnightly a
 
 ### D3. One-action send
 
-- `Invoice → Send`: generates the PDF server-side, emails it to `client.invoiceEmail` (which exists but is currently only a bare `mailto:`), CCs the user, sets `SENT` + `sentAt` on success. Provider email via Resend/Nodemailer + a `User.fromEmail` (or the login email) — pick per deploy environment; secret handling per plans/002 conventions.
+- `Invoice → Send`: generates the PDF server-side, emails it to `client.invoiceEmail` (which exists but is currently only a bare `mailto:`), CCs the user, sets `SENT` + `sentAt` on success. Provider email via Resend/Nodemailer + a `User.fromEmail` (or the login email) — pick per deploy environment; secret handling per docs/plans/002 conventions.
 - Failure leaves status untouched with a visible error; "Download PDF" remains for manual sending (some plan managers want portal uploads).
 - Send is the seal point for TRD-006 (immutability begins at `SENT`).
 

@@ -4,7 +4,7 @@
 > verification command and confirm the expected result before moving to the
 > next step. If anything in the "STOP conditions" section occurs, stop and
 > report — do not improvise. When done, update the status row for this plan
-> in `plans/README.md` — unless a reviewer dispatched you and told you they
+> in `docs/plans/README.md` — unless a reviewer dispatched you and told you they
 > maintain the index.
 >
 > **Drift check (run first)**: `git diff --stat c48e1dd..HEAD -- src/lib/pdf-generation.ts src/lib/activity-utils.ts src/server/api/routers/invoice-router.ts`
@@ -18,7 +18,7 @@
 - **Priority**: P1
 - **Effort**: M
 - **Risk**: MED (changes visible invoice figures — that is the point, but review carefully)
-- **Depends on**: plans/001-secure-pdf-endpoint.md, plans/005-money-math-characterization-tests.md
+- **Depends on**: docs/plans/001-secure-pdf-endpoint.md, docs/plans/005-money-math-characterization-tests.md
 - **Category**: bug
 - **Planned at**: commit `c48e1dd`, 2026-07-02
 
@@ -231,7 +231,7 @@ Machine-checkable. ALL must hold:
 - [ ] `pnpm exec vitest run` exits 0 (including all plan-005 characterization tests, unmodified except where this plan's Step 4 explicitly adds cases)
 - [ ] `pnpm type-check`, `pnpm lint` exit 0
 - [ ] No files outside the in-scope list are modified (`git status`)
-- [ ] `plans/README.md` status row updated
+- [ ] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 

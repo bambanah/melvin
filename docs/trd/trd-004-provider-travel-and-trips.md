@@ -1,6 +1,6 @@
 # TRD-004 — Provider Travel & Trips UX
 
-**Status**: Proposed · **Priority**: P2 · **Depends on**: plans/006 (travel-rate single source), plans/005 (characterization tests); coordinates with finding #8 (trip mutation robustness) and #12 (duplicate trip modals)
+**Status**: Proposed · **Priority**: P2 · **Depends on**: docs/plans/006 (travel-rate single source), docs/plans/005 (characterization tests); coordinates with finding #8 (trip mutation robustness) and #12 (duplicate trip modals)
 
 ## Problem
 

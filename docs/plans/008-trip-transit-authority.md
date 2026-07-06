@@ -4,7 +4,7 @@
 > verification command and confirm the expected result before moving to the
 > next step. If anything in the "STOP conditions" section occurs, stop and
 > report — do not improvise. When done, update the status row for this plan
-> in `plans/README.md` — unless a reviewer dispatched you and told you they
+> in `docs/plans/README.md` — unless a reviewer dispatched you and told you they
 > maintain the index.
 >
 > **Drift check (run first)**: `git diff --stat 0ae76ab..HEAD -- src/lib/trip-utils.ts src/server/api/routers/trip-router.ts src/components/trips/`
@@ -18,8 +18,8 @@
 - **Priority**: P2
 - **Effort**: M–L
 - **Risk**: MED (touches transit persistence; plan 005's tests plus one new behavior decision below)
-- **Depends on**: plans/005
-- **Absorbs**: plans/README findings #8 (trip mutation robustness) and #12 (duplicate trip modals); `docs/plans/architecture-deepening/` opportunities #1, #2, #5, #6
+- **Depends on**: docs/plans/005
+- **Absorbs**: docs/plans/README findings #8 (trip mutation robustness) and #12 (duplicate trip modals); plan 013 (`docs/plans/013-architecture-deepening.md`) opportunities #1, #2, #5, #6
 - **Category**: architecture
 - **Planned at**: commit `0ae76ab`, 2026-07-02 (architecture review, revision 2)
 
@@ -227,7 +227,7 @@ Machine-checkable. ALL must hold:
 - [ ] `pnpm exec vitest run`, `pnpm type-check`, `pnpm lint`, `pnpm format:check` exit 0
 - [ ] E2E passes (or explicitly reported as not run — no Docker)
 - [ ] No files outside the in-scope list are modified (`git status`)
-- [ ] `plans/README.md` status row updated
+- [ ] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 

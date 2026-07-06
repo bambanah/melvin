@@ -4,7 +4,7 @@
 > verification command and confirm the expected result before moving to the
 > next step. If anything in the "STOP conditions" section occurs, stop and
 > report — do not improvise. When done, update the status row for this plan
-> in `plans/README.md` — unless a reviewer dispatched you and told you they
+> in `docs/plans/README.md` — unless a reviewer dispatched you and told you they
 > maintain the index.
 >
 > **Drift check (run first)**: `git diff --stat 0ae76ab..HEAD -- src/server/api/ vitest.config.mts package.json docker-compose.yml`
@@ -18,8 +18,8 @@
 - **Priority**: P2
 - **Effort**: M
 - **Risk**: LOW (additive — new test infrastructure; no production code changes)
-- **Depends on**: plans/003
-- **Absorbs**: the "Router-level integration test harness" follow-up in plans/README
+- **Depends on**: docs/plans/003
+- **Absorbs**: the "Router-level integration test harness" follow-up in docs/plans/README
 - **Category**: tests
 - **Planned at**: commit `0ae76ab`, 2026-07-02 (architecture review, revision 2)
 
@@ -31,7 +31,7 @@ ownership rules are verified only by a manual grep sweep, the trip
 write-back mutations have never been executed by a test, finding #9's
 payment matching is untestable, and TRD-006 explicitly parks its
 sealed-invoice guard tests "in the ownership-scoping harness" — which
-doesn't exist. plans/README names this the biggest remaining test gap.
+doesn't exist. docs/plans/README names this the biggest remaining test gap.
 
 The routers ARE the application's interface — the UI crosses exactly this
 seam. A harness that calls procedures as real users against a real database
@@ -194,7 +194,7 @@ Machine-checkable. ALL must hold:
 - [ ] `pnpm exec vitest run` (unit) exits 0 and touches no database (passes with Docker down)
 - [ ] `pnpm type-check`, `pnpm lint` exit 0
 - [ ] No production source file modified except the optional caller-factory export (`git status`)
-- [ ] `plans/README.md` status row updated
+- [ ] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 

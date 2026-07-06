@@ -1,6 +1,6 @@
 # TRD-002 — Support Item Catalogue & Rate Engine
 
-**Status**: Proposed · **Priority**: P1 · **Depends on**: plans/004 (8pm boundary), plans/005 (characterization tests), plans/006 (travel-rate single source) · **Blocks**: TRD-003 (group limits), TRD-007 (cancellation rates), TRD-001 D6 (billing receipt)
+**Status**: Proposed · **Priority**: P1 · **Depends on**: docs/plans/004 (8pm boundary), docs/plans/005 (characterization tests), docs/plans/006 (travel-rate single source) · **Blocks**: TRD-003 (group limits), TRD-007 (cancellation rates), TRD-001 D6 (billing receipt)
 
 ## Problem
 
@@ -57,7 +57,7 @@ The catalogue is flat; Melvin's `SupportItem` concept ("the thing I bill this ki
 
 ### D4. Rate resolution engine
 
-Single pure module (deepen per `docs/plans/architecture-deepening` #1's philosophy):
+Single pure module (deepen per `docs/plans/013-architecture-deepening.md` #1's philosophy):
 
 ```
 resolveRate(input: {

@@ -4,7 +4,7 @@
 > verification command and confirm the expected result before moving to the
 > next step. If anything in the "STOP conditions" section occurs, stop and
 > report — do not improvise. When done, update the status row for this plan
-> in `plans/README.md` — unless a reviewer dispatched you and told you they
+> in `docs/plans/README.md` — unless a reviewer dispatched you and told you they
 > maintain the index.
 >
 > **Drift check (run first)**: `git diff --stat c48e1dd..HEAD -- src/server/auth.ts src/env/schema.js .env.template .github/workflows/lint-and-test.yml`
@@ -64,7 +64,7 @@ The NextAuth signing secret is a hardcoded string literal committed at `src/serv
 
 **Out of scope** (do NOT touch, even though they look related):
 
-- Migrating next-auth v4 → v5 (deliberately deferred; see plans/README.md).
+- Migrating next-auth v4 → v5 (deliberately deferred; see docs/plans/README.md).
 - Any other provider config in `authOptions` (Google/Email envs are already optional and env-driven).
 
 ## Git workflow
@@ -135,7 +135,7 @@ Machine-checkable. ALL must hold:
 - [ ] CI workflow contains a dummy `NEXTAUTH_SECRET`
 - [ ] No secret value appears in any tracked file (`git diff` review)
 - [ ] Rotation handoff message delivered to the operator
-- [ ] `plans/README.md` status row updated
+- [ ] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 

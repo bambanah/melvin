@@ -4,7 +4,7 @@
 > verification command and confirm the expected result before moving to the
 > next step. If anything in the "STOP conditions" section occurs, stop and
 > report — do not improvise. When done, update the status row for this plan
-> in `plans/README.md` — unless a reviewer dispatched you and told you they
+> in `docs/plans/README.md` — unless a reviewer dispatched you and told you they
 > maintain the index.
 >
 > **Drift check (run first)**: `git diff --stat c48e1dd..HEAD -- src/server/api/routers/`
@@ -119,7 +119,7 @@ Repo conventions: tabs, double quotes, `TRPCError({ code: "NOT_FOUND" })` on mis
 - `src/server/api/routers/pdf-router.ts` and `src/lib/pdf-generation.ts` — plan 001.
 - `src/server/api/routers/user-router.ts` — operates on the session user only.
 - Refactoring to a shared ownership-assert helper or Prisma client extension — tempting, but keep this change mechanical and reviewable; a consolidation can follow later.
-- `activity-router.ts:180-182` (`forInvoice` returns a `TRPCError` instead of throwing) — known separate bug, tracked in plans/README.md; don't fix it here.
+- `activity-router.ts:180-182` (`forInvoice` returns a `TRPCError` instead of throwing) — known separate bug, tracked in docs/plans/README.md; don't fix it here.
 
 ## Git workflow
 
@@ -185,7 +185,7 @@ For every hit in the four in-scope files, confirm the surrounding `where` (or a 
 
 ## Test plan
 
-Router-level tests need a DB harness that doesn't exist yet (tracked in plans/README.md as a follow-up; plan 005 covers pure-function tests only). The gates here are the e2e regression suite plus the Step 6 sweep. When a router test harness lands later, the first tests to write are: user B cannot `invoice.updateStatus`, `client.delete`, or `activity.modify` records owned by user A (expect `NOT_FOUND`), and `invoice.getTotalOwing` for user B excludes user A's invoices.
+Router-level tests need a DB harness that doesn't exist yet (tracked in docs/plans/README.md as a follow-up; plan 005 covers pure-function tests only). The gates here are the e2e regression suite plus the Step 6 sweep. When a router test harness lands later, the first tests to write are: user B cannot `invoice.updateStatus`, `client.delete`, or `activity.modify` records owned by user A (expect `NOT_FOUND`), and `invoice.getTotalOwing` for user B excludes user A's invoices.
 
 ## Done criteria
 
@@ -197,7 +197,7 @@ Machine-checkable. ALL must hold:
 - [ ] `pnpm exec vitest run` exits 0
 - [ ] E2E suite passes (or is explicitly reported as not run because Docker was unavailable)
 - [ ] No files outside the in-scope list are modified (`git status`)
-- [ ] `plans/README.md` status row updated
+- [ ] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 
@@ -212,4 +212,4 @@ Stop and report back (do not improvise) if:
 
 - Every future procedure must scope by `ownerId`; the trip-router pattern is the exemplar. A Prisma client extension that injects tenant scoping automatically would prevent regression — deliberately deferred to keep this diff mechanical.
 - Reviewer: check each Shape-B pre-check throws BEFORE any write (especially site 10, where the `deleteMany` precedes the `update`).
-- `invoice.create`'s group-activity path double-writes activities (separate known bug — see plans/README.md finding #7); this plan only adds ownership checks around it, it does not fix the duplication.
+- `invoice.create`'s group-activity path double-writes activities (separate known bug — see docs/plans/README.md finding #7); this plan only adds ownership checks around it, it does not fix the duplication.
