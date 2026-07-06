@@ -1,6 +1,6 @@
 # TRD-001 — Capture-First Activity Entry
 
-**Status**: Proposed · **Priority**: P1 · **Depends on**: plans/001-006 baseline · **Blocks**: TRD-005 (needs activities in-system), informs TRD-003/004/007 capture hooks
+**Status**: Proposed · **Priority**: P1 · **Depends on**: docs/plans/001-006 baseline · **Blocks**: TRD-005 (needs activities in-system), informs TRD-003/004/007 capture hooks
 
 ## Problem
 

@@ -4,7 +4,7 @@
 > verification command and confirm the expected result before moving to the
 > next step. If anything in the "STOP conditions" section occurs, stop and
 > report — do not improvise. When done, update the status row for this plan
-> in `plans/README.md` — unless a reviewer dispatched you and told you they
+> in `docs/plans/README.md` — unless a reviewer dispatched you and told you they
 > maintain the index.
 >
 > **Drift check (run first)**: `git diff --stat 0ae76ab..HEAD -- src/server/api/`
@@ -18,7 +18,7 @@
 - **Priority**: P3
 - **Effort**: M
 - **Risk**: LOW–MED (pure refactor of security-relevant code — mechanical, but only safe because plan 009's suite exists)
-- **Depends on**: plans/003, plans/009
+- **Depends on**: docs/plans/003, docs/plans/009
 - **Implements**: plan 003's deferred maintenance note ("a Prisma client extension that injects tenant scoping automatically would prevent regression — deliberately deferred")
 - **Category**: architecture
 - **Planned at**: commit `0ae76ab`, 2026-07-02 (architecture review, revision 2)
@@ -182,7 +182,7 @@ Machine-checkable. ALL must hold:
 - [ ] `pnpm test:integration` exits 0 with the ownership suite unmodified (except additions)
 - [ ] `pnpm exec vitest run`, `pnpm type-check`, `pnpm lint` exit 0
 - [ ] No files outside the in-scope list are modified (`git status`)
-- [ ] `plans/README.md` status row updated
+- [ ] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 

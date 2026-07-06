@@ -1,28 +1,8 @@
-## Dev Docs
-
-When you've just finished creating a plan, create dev docs so that we can have a record of the plan and next steps:
-
-1. **Create Task Directory**
-
-- `mkdir -p ./docs/plans/[task-name]/`
-
-2. **Create Documents**
-
-- `[task-name]-plan.md` - The accepted plan
-- `[task-name]-context.md` - Key files, decisions
-- `[task-name]-tasks.md` - Checklist of work
-
-3. **Update Regularly**
-
-- Mark tasks complete immediately
-
-### Continuing a Task
-
-- Check `/docs/plans/` for existing tasks
-- Read all three files before proceeding
-- Update "Last Updated" timestamps
-
 ## Agent skills
+
+### Plan management
+
+Numbered, referenceable plans live in `docs/plans/`, indexed in `docs/plans/README.md`. See the `manage-plans` skill.
 
 ### Issue tracker
 

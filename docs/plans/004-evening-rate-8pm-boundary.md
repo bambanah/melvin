@@ -4,7 +4,7 @@
 > verification command and confirm the expected result before moving to the
 > next step. If anything in the "STOP conditions" section occurs, stop and
 > report — do not improvise. When done, update the status row for this plan
-> in `plans/README.md` — unless a reviewer dispatched you and told you they
+> in `docs/plans/README.md` — unless a reviewer dispatched you and told you they
 > maintain the index.
 >
 > **Drift check (run first)**: `git diff --stat c48e1dd..HEAD -- src/lib/activity-utils.ts src/lib/activity-utils.test.ts`
@@ -128,7 +128,7 @@ Machine-checkable. ALL must hold:
 - [ ] `pnpm exec vitest run` exits 0 with the two new boundary assertions present
 - [ ] `pnpm type-check` and `pnpm lint` exit 0
 - [ ] No files outside the in-scope list are modified (`git status`)
-- [ ] `plans/README.md` status row updated
+- [ ] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 

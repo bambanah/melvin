@@ -4,7 +4,7 @@
 > verification command and confirm the expected result before moving to the
 > next step. If anything in the "STOP conditions" section occurs, stop and
 > report — do not improvise. When done, update the status row for this plan
-> in `plans/README.md` — unless a reviewer dispatched you and told you they
+> in `docs/plans/README.md` — unless a reviewer dispatched you and told you they
 > maintain the index.
 >
 > **Drift check (run first)**: `git diff --stat c48e1dd..HEAD -- src/lib/trip-utils.ts src/lib/activity-utils.ts src/lib/activity-utils.test.ts`
@@ -18,7 +18,7 @@
 - **Priority**: P1
 - **Effort**: S–M
 - **Risk**: LOW (test-only change; no production code may be modified)
-- **Depends on**: plans/004-evening-rate-8pm-boundary.md (so tests lock in the corrected 8pm boundary, not the bug)
+- **Depends on**: docs/plans/004-evening-rate-8pm-boundary.md (so tests lock in the corrected 8pm boundary, not the bug)
 - **Category**: tests
 - **Planned at**: commit `c48e1dd`, 2026-07-02
 
@@ -66,9 +66,9 @@
 
 **Out of scope** (do NOT touch):
 
-- ANY production source file. If a characterized behavior looks wrong, add a `// NOTE: characterizes current behavior — see plans/README.md` comment on the test and report it.
+- ANY production source file. If a characterized behavior looks wrong, add a `// NOTE: characterizes current behavior — see docs/plans/README.md` comment on the test and report it.
 - `src/lib/pdf-generation.ts` — its math is exercised indirectly via `getTotalCostOfActivities`; direct PDF testing needs an extraction refactor that plan 006 handles.
-- `src/lib/overlap-utils.ts` — needs a Prisma mock/DB harness; deferred (see plans/README.md).
+- `src/lib/overlap-utils.ts` — needs a Prisma mock/DB harness; deferred (see docs/plans/README.md).
 
 ## Git workflow
 
@@ -124,7 +124,7 @@ Machine-checkable. ALL must hold:
 - [ ] `git diff --stat` shows ONLY the two test files changed
 - [ ] `pnpm type-check`, `pnpm lint`, `pnpm format:check` exit 0
 - [ ] Behaviors 5 and 7 (Step 1) and quirk 5 (Step 2) carry a NOTE comment marking them as characterization of current behavior
-- [ ] `plans/README.md` status row updated
+- [ ] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 
@@ -137,5 +137,5 @@ Stop and report back (do not improvise) if:
 ## Maintenance notes
 
 - Plan 006 will change `getTransitRate`'s group behavior and thread `rateContext` through real callers — tests 1-4 in Step 2 are exactly the net it needs; expect 006 to UPDATE some expectations deliberately (with justification), not delete them.
-- The characterized quirks (silent-zero missing legs, stacked 30-min caps, time-over-distance precedence) are candidate bugs recorded in plans/README.md — when any is fixed, flip its characterization test into a specification test.
-- Router-level integration tests (a real test DB) remain the biggest gap; see plans/README.md follow-ups.
+- The characterized quirks (silent-zero missing legs, stacked 30-min caps, time-over-distance precedence) are candidate bugs recorded in docs/plans/README.md — when any is fixed, flip its characterization test into a specification test.
+- Router-level integration tests (a real test DB) remain the biggest gap; see docs/plans/README.md follow-ups.
