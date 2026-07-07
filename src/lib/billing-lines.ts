@@ -1,0 +1,324 @@
+import type {
+	ActivityTransportType,
+	Prisma,
+	SupportItem,
+	SupportItemRates
+} from "@/generated/client";
+import { RateType } from "@/generated/client";
+import { getDuration } from "./date-utils";
+import { round } from "./generic-utils";
+import {
+	getActivityBasedTransportCode,
+	getNonLabourTravelCode
+} from "./support-item-utils";
+
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+
+interface TransportItem {
+	type: ActivityTransportType;
+	amount: Prisma.Decimal | number;
+	note?: string | null;
+}
+
+export interface BillableActivity {
+	id?: string;
+	date: Date;
+	startTime?: Date | null;
+	endTime?: Date | null;
+	itemDistance?: number | null;
+	transitDistance?: Prisma.Decimal | null;
+	transitDuration?: Prisma.Decimal | null;
+	transportItems?: TransportItem[];
+	supportItem: Pick<
+		SupportItem,
+		| "weekdayCode"
+		| "weeknightCode"
+		| "saturdayCode"
+		| "sundayCode"
+		| "weekdayRate"
+		| "weeknightRate"
+		| "saturdayRate"
+		| "sundayRate"
+		| "isGroup"
+	> & {
+		rateType?: RateType;
+		supportItemRates?: Pick<
+			SupportItemRates,
+			"weekdayRate" | "weeknightRate" | "saturdayRate" | "sundayRate"
+		>[];
+		description?: string;
+	};
+	client?: {
+		transitRatePerKm?: Prisma.Decimal | null;
+	} | null;
+}
+
+export interface TransitRateContext {
+	userTransitRatePerKm?: number;
+}
+
+const DEFAULT_TRANSIT_RATE = 0.99;
+
+// TODO: Handle groups other than 2 clients
+const GROUP_TRANSIT_RATE = 0.43;
+
+const DEFAULT_ACTIVITY_TRANSPORT_RATE = 0.99;
+
+// TODO: Handle groups other than 2 clients
+const GROUP_ACTIVITY_TRANSPORT_RATE = 0.49;
+
+const getRateForDay = (
+	day: "weekday" | "weeknight" | "saturday" | "sunday",
+	supportItem: BillableActivity["supportItem"],
+	supportItemRates?: BillableActivity["supportItem"]["supportItemRates"]
+) => {
+	const customRate = supportItemRates?.find((r) => r[`${day}Rate`])?.[
+		`${day}Rate`
+	];
+
+	return customRate || supportItem[`${day}Rate`];
+};
+
+/** The support item code + rate for an activity's own SUPPORT line. */
+export const getRateForActivity = (
+	activity: BillableActivity
+): [code: string, rate: number] => {
+	// Saturday
+	if (
+		dayjs.utc(activity.date).day() === 6 &&
+		activity.supportItem.saturdayCode?.length
+	) {
+		const rate = getRateForDay(
+			"saturday",
+			activity.supportItem,
+			activity.supportItem.supportItemRates
+		);
+
+		if (rate) {
+			return [activity.supportItem.saturdayCode, Number(rate)];
+		}
+	}
+
+	// Sunday
+	if (
+		dayjs.utc(activity.date).day() === 0 &&
+		activity.supportItem.sundayCode?.length
+	) {
+		const rate = getRateForDay(
+			"sunday",
+			activity.supportItem,
+			activity.supportItem.supportItemRates
+		);
+
+		if (rate) {
+			return [activity.supportItem.sundayCode, Number(rate)];
+		}
+	}
+
+	if (
+		activity.endTime &&
+		dayjs.utc(activity.endTime).hour() >= 20 &&
+		activity.supportItem.weeknightCode?.length &&
+		activity.supportItem.weeknightRate
+	) {
+		// Day is a weekday and it's 8pm or later
+		const rate = getRateForDay(
+			"weeknight",
+			activity.supportItem,
+			activity.supportItem.supportItemRates
+		);
+
+		if (rate) {
+			return [activity.supportItem.weeknightCode, Number(rate)];
+		}
+	}
+
+	// Weekday before 8pm
+	const rate = getRateForDay(
+		"weekday",
+		activity.supportItem,
+		activity.supportItem.supportItemRates
+	);
+
+	return [activity.supportItem.weekdayCode, Number(rate)];
+};
+
+/** The effective non-labour travel rate per km: group → client → user → default. */
+export function getTransitRate(
+	activity: BillableActivity,
+	rateContext?: TransitRateContext
+): number {
+	if (activity.supportItem.isGroup) {
+		return GROUP_TRANSIT_RATE;
+	}
+
+	return (
+		Number(activity.client?.transitRatePerKm) ||
+		rateContext?.userTransitRatePerKm ||
+		DEFAULT_TRANSIT_RATE
+	);
+}
+
+export type LineKind =
+	| "SUPPORT"
+	| "TRAVEL_TIME"
+	| "TRAVEL_KM"
+	| "ABT"
+	| "EXPENSE";
+
+export interface BillableLine {
+	kind: LineKind;
+	description: string;
+	supportItemCode: string;
+	serviceDate: Date;
+	quantity: number; // hours, km, minutes (TRAVEL_TIME), or 1 for EXPENSE — see `unit`
+	unit: "HOUR" | "KM" | "MINUTE" | "EACH";
+	unitPrice: number; // 0-decimal-safe number; EXPENSE lines: unitPrice = amount
+	total: number; // round(quantity * unitPrice, 2), or face value for EXPENSE
+	activityId?: string;
+	// Rendering-only metadata for the one case display can't reconstruct from
+	// the fields above: the flat transport expense's type/note. Not part of
+	// the persisted shape TRD-006 will store.
+	transportType?: ActivityTransportType;
+	note?: string | null;
+}
+
+/**
+ * The single implementation of "what a line on an invoice costs". Everything
+ * that needs to know an activity's cost — the printed PDF rows, the printed
+ * Total, and any UI total — computes it by summing these lines.
+ */
+export function billableLines(
+	activity: BillableActivity,
+	rateContext?: TransitRateContext
+): BillableLine[] {
+	const lines: BillableLine[] = [];
+	const [itemCode, rate] = getRateForActivity(activity);
+
+	// SUPPORT: gated on rateType like the PDF (the printed truth), not on
+	// which fields happen to be populated. A KM-rate item always bills by
+	// itemDistance, even if it also has a time span (docs/plans/007).
+	if (activity.supportItem.rateType === RateType.KM) {
+		if (activity.itemDistance) {
+			lines.push({
+				kind: "SUPPORT",
+				description: activity.supportItem.description ?? "",
+				supportItemCode: itemCode,
+				serviceDate: activity.date,
+				quantity: activity.itemDistance,
+				unit: "KM",
+				unitPrice: Number(rate),
+				total: round(Number(rate) * activity.itemDistance, 2),
+				activityId: activity.id
+			});
+		}
+	} else if (activity.startTime && activity.endTime) {
+		const duration = getDuration(activity.startTime, activity.endTime);
+
+		lines.push({
+			kind: "SUPPORT",
+			description: activity.supportItem.description ?? "",
+			supportItemCode: itemCode,
+			serviceDate: activity.date,
+			quantity: duration,
+			unit: "HOUR",
+			unitPrice: Number(rate),
+			total: round(Number(rate) * duration, 2),
+			activityId: activity.id
+		});
+	} else if (activity.itemDistance) {
+		lines.push({
+			kind: "SUPPORT",
+			description: activity.supportItem.description ?? "",
+			supportItemCode: itemCode,
+			serviceDate: activity.date,
+			quantity: activity.itemDistance,
+			unit: "KM",
+			unitPrice: Number(rate),
+			total: round(Number(rate) * activity.itemDistance, 2),
+			activityId: activity.id
+		});
+	}
+
+	// Provider Travel - Labour Costs
+	if (activity.transitDuration) {
+		const minutes = Number(activity.transitDuration);
+
+		lines.push({
+			kind: "TRAVEL_TIME",
+			description: "Provider travel - labour costs",
+			supportItemCode: itemCode,
+			serviceDate: activity.date,
+			quantity: minutes,
+			unit: "MINUTE",
+			unitPrice: Number(rate),
+			total: round((Number(rate) / 60) * minutes, 2),
+			activityId: activity.id
+		});
+	}
+
+	// Provider Travel - Non Labour Costs
+	if (activity.transitDistance) {
+		const km = Number(activity.transitDistance);
+		const ratePerKm = getTransitRate(activity, rateContext);
+
+		lines.push({
+			kind: "TRAVEL_KM",
+			description: "Provider travel - non-labour costs",
+			supportItemCode:
+				getNonLabourTravelCode(activity.supportItem.weekdayCode) ?? "",
+			serviceDate: activity.date,
+			quantity: km,
+			unit: "KM",
+			unitPrice: ratePerKm,
+			total: round(km * ratePerKm, 2),
+			activityId: activity.id
+		});
+	}
+
+	// Activity Based Transport items
+	if (activity.transportItems) {
+		const isGroup = activity.supportItem.isGroup;
+		const activityTransportRate = isGroup
+			? GROUP_ACTIVITY_TRANSPORT_RATE
+			: DEFAULT_ACTIVITY_TRANSPORT_RATE;
+		const transportCode =
+			getActivityBasedTransportCode(activity.supportItem.weekdayCode) ?? "";
+
+		for (const item of activity.transportItems) {
+			const amount = Number(item.amount);
+
+			if (item.type === "DISTANCE") {
+				lines.push({
+					kind: "ABT",
+					description: "Activity Based Transport",
+					supportItemCode: transportCode,
+					serviceDate: activity.date,
+					quantity: amount,
+					unit: "KM",
+					unitPrice: activityTransportRate,
+					total: round(amount * activityTransportRate, 2),
+					activityId: activity.id
+				});
+			} else {
+				lines.push({
+					kind: "EXPENSE",
+					description: "Activity Based Transport",
+					supportItemCode: transportCode,
+					serviceDate: activity.date,
+					quantity: 1,
+					unit: "EACH",
+					unitPrice: amount,
+					total: round(amount, 2),
+					activityId: activity.id,
+					transportType: item.type,
+					note: item.note
+				});
+			}
+		}
+	}
+
+	return lines;
+}

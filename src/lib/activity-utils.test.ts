@@ -2,7 +2,7 @@ import {
 	getRateForActivity,
 	getTotalCostOfActivities
 } from "@/lib/activity-utils";
-import { Prisma } from "@/generated/client";
+import { Prisma, RateType } from "@/generated/client";
 import { expect, test } from "vitest";
 
 import dayjs from "dayjs";
@@ -290,16 +290,23 @@ test("Should use itemDistance when activity has no start/end times", () => {
 	).toEqual(28.9); // 34 * 0.85
 });
 
-// NOTE: characterizes current behavior — see docs/plans/README.md
-test("Should bill by time rather than itemDistance when an activity has both", () => {
+// Plan 007: support-line math now gates on rateType (matching the PDF)
+// instead of "does a time span exist". A KM-rate item bills by itemDistance
+// even when it also has a time span — the inverse of the old default-gating
+// rule, which is exactly why that default doesn't apply to real data (every
+// SupportItem.rateType is HOUR or KM, never absent).
+test("Should bill by itemDistance rather than time for a KM-rate item with both", () => {
+	const activity = getActivity("weekday", "16:00", "17:00", 0, 0);
+
 	expect(
 		getTotalCostOfActivities([
 			{
-				...getActivity("weekday", "16:00", "17:00", 0, 0),
-				itemDistance: 34
+				...activity,
+				itemDistance: 34,
+				supportItem: { ...activity.supportItem, rateType: RateType.KM }
 			}
 		])
-	).toEqual(55.47); // duration (16:00-17:00) * weekdayRate, itemDistance ignored
+	).toEqual(1885.98); // itemDistance(34) * weekdayRate(55.47), time span ignored
 });
 
 test("Should resolve transit rate with correct precedence", () => {

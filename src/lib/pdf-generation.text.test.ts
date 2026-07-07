@@ -1,6 +1,10 @@
 // @vitest-environment node
-import generatePDF from "@/lib/pdf-generation";
-import { invoiceFixtures } from "@/lib/testing/invoice-fixtures";
+import generatePDF, { renderInvoicePdf } from "@/lib/pdf-generation";
+import {
+	getFixture,
+	invoiceFixtures,
+	toRenderInput
+} from "@/lib/testing/invoice-fixtures";
 import { extractPdfText } from "@/lib/testing/pdf-test-utils";
 import { describe, expect, test, vi } from "vitest";
 
@@ -144,10 +148,7 @@ describe("invoice PDF text golden masters", () => {
 	test.each(invoiceFixtures.map((fixture) => [fixture.name, fixture] as const))(
 		"%s",
 		async (name, fixture) => {
-			const { pdfString, fileName } = await generatePDF(
-				fixture.invoice.id,
-				fixture.invoice.ownerId
-			);
+			const { pdfString, fileName } = renderInvoicePdf(toRenderInput(fixture));
 
 			expect(fileName).toEqual(`${fixture.invoice.invoiceNo}.pdf`);
 			expect(pdfString.length).toBeGreaterThan(0);
@@ -171,4 +172,30 @@ describe("invoice PDF text golden masters", () => {
 			await expect(text).toMatchFileSnapshot(`__pdf_text__/${name}.txt`);
 		}
 	);
+});
+
+describe("generatePDF loader", () => {
+	test("loads an invoice by id + ownerId and renders it", async () => {
+		const fixture = getFixture("basic-weekday");
+
+		const { pdfString, fileName } = await generatePDF(
+			fixture.invoice.id,
+			fixture.invoice.ownerId
+		);
+
+		expect(fileName).toEqual(`${fixture.invoice.invoiceNo}.pdf`);
+		expect(pdfString.length).toBeGreaterThan(0);
+	});
+
+	test("returns an empty result when ownerId doesn't match the invoice", async () => {
+		const fixture = getFixture("basic-weekday");
+
+		const { pdfString, fileName } = await generatePDF(
+			fixture.invoice.id,
+			"someone-elses-user-id"
+		);
+
+		expect(pdfString).toEqual("");
+		expect(fileName).toBeNull();
+	});
 });

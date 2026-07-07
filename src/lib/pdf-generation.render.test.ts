@@ -1,16 +1,9 @@
 // @vitest-environment node
-import generatePDF from "@/lib/pdf-generation";
-import { getFixture } from "@/lib/testing/invoice-fixtures";
+import { renderInvoicePdf } from "@/lib/pdf-generation";
+import { getFixture, toRenderInput } from "@/lib/testing/invoice-fixtures";
 import { comparePng, renderPdfPageToPng } from "@/lib/testing/pdf-test-utils";
 import path from "node:path";
-import { describe, expect, test, vi } from "vitest";
-
-vi.mock("@/server/prisma", async () => {
-	const { invoiceFixtures, mockPrismaForFixtures } =
-		await import("@/lib/testing/invoice-fixtures");
-
-	return mockPrismaForFixtures(invoiceFixtures);
-});
+import { describe, expect, test } from "vitest";
 
 /**
  * Committed PNG renders of sample invoices. GitHub shows changed PNGs with
@@ -39,10 +32,7 @@ describe("invoice PDF visual snapshots", () => {
 	test.each(RENDER_FIXTURES)("%s", async (name) => {
 		const fixture = getFixture(name);
 
-		const { pdfString } = await generatePDF(
-			fixture.invoice.id,
-			fixture.invoice.ownerId
-		);
+		const { pdfString } = renderInvoicePdf(toRenderInput(fixture));
 		expect(pdfString.length).toBeGreaterThan(0);
 
 		const png = await renderPdfPageToPng(pdfString, 1, 2);

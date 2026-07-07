@@ -5,6 +5,7 @@ import {
 	RateType,
 	type User
 } from "@/generated/client";
+import type { InvoicePdfData } from "@/lib/pdf-generation";
 
 /**
  * Hand-authored invoice fixtures for the PDF golden-master tests.
@@ -753,3 +754,12 @@ export const mockPrismaForFixtures = (fixtures: InvoiceFixture[]) => {
 
 export const mockPrismaForFixture = (fixture: InvoiceFixture) =>
 	mockPrismaForFixtures([fixture]);
+
+/** Builds `renderInvoicePdf`'s input shape directly from a fixture. */
+export const toRenderInput = (fixture: InvoiceFixture): InvoicePdfData => ({
+	invoice: fixture.invoice,
+	user: fixture.user,
+	rateContext: {
+		userTransitRatePerKm: Number(fixture.user.transitRatePerKm ?? 0.99)
+	}
+});

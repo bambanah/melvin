@@ -1,3 +1,4 @@
+import { useRateContext } from "@/components/shared/use-rate-context";
 import { InvoiceStatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Heading from "@/components/ui/heading";
@@ -33,6 +34,7 @@ const ActivityList = dynamic(
 
 const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 	const [isPdfPreviewExpanded, setIsPdfPreviewExpanded] = useState(false);
+	const rateContext = useRateContext();
 
 	const trpcUtils = trpc.useUtils();
 	const { data: invoice, error } = trpc.invoice.byId.useQuery({
@@ -130,10 +132,13 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					<p className="text-foreground/80 text-sm">Total</p>
 					<div className="flex items-center justify-between">
 						<p className="text-xl" data-testid="invoice-total">
-							{getTotalCostOfActivities(invoice.activities).toLocaleString(
-								undefined,
-								{ style: "currency", currency: "AUD" }
-							)}
+							{getTotalCostOfActivities(
+								invoice.activities,
+								rateContext
+							).toLocaleString(undefined, {
+								style: "currency",
+								currency: "AUD"
+							})}
 						</p>
 						<InvoiceStatusBadge invoiceStatus={invoice.status} />
 					</div>

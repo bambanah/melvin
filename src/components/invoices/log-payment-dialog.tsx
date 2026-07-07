@@ -1,3 +1,4 @@
+import { useRateContext } from "@/components/shared/use-rate-context";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -22,6 +23,7 @@ import { toast } from "react-toastify";
 const LogPaymentDialog = () => {
 	const [amountPaid, setAmountPaid] = useState(0);
 	const [invoicesToUpdate, setInvoicesToUpdate] = useState<string[]>([]);
+	const rateContext = useRateContext();
 
 	const handleOpenChange = (open: boolean) => {
 		if (!open) {
@@ -104,10 +106,13 @@ const LogPaymentDialog = () => {
 				</div>
 				<div className="ml-auto text-right">
 					<p className="font-semibold">
-						{getTotalCostOfActivities(invoice.activities).toLocaleString(
-							undefined,
-							{ style: "currency", currency: "AUD" }
-						)}
+						{getTotalCostOfActivities(
+							invoice.activities,
+							rateContext
+						).toLocaleString(undefined, {
+							style: "currency",
+							currency: "AUD"
+						})}
 					</p>
 					<p className="text-neutral-600">
 						{dayjs.utc(invoice.date).format("DD/MM/YY")}
