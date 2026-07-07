@@ -98,8 +98,8 @@ const makeClient = (
 /**
  * The default fixture item is the solo community-access item — one of the two
  * support items our users actually bill (the other is the group item below).
- * Codes, name, and rates come verbatim from the bundled 22-23 support
- * catalogue (src/lib/ndis-support-catalogue-22-23.json).
+ * Codes, name, and rates come verbatim from the bundled support
+ * catalogue (src/lib/ndis-support-catalogue.json).
  */
 const makeSupportItem = (
 	fixtureName: string,
