@@ -42,7 +42,7 @@ export const authOptions: NextAuthOptions = {
 	pages: {
 		signIn: "/login"
 	},
-	secret: "Yrrn1bc1eCZ864WRDTMsOZuDyoZOJmNEyXQD8z7jm2U="
+	secret: process.env.NEXTAUTH_SECRET
 };
 
 export const getServerAuthSession = ({

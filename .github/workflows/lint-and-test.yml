@@ -12,6 +12,7 @@ env:
   DATABASE_URL: postgres://postgres:pass@localhost:5432/melvin
   DIRECT_URL: postgres://postgres:pass@localhost:5432/melvin
   NEXTAUTH_URL: "http://localhost:3000"
+  NEXTAUTH_SECRET: "ci-only-dummy-secret-not-used-in-production"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
