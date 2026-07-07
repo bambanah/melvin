@@ -62,9 +62,10 @@ const invariants: Record<string, { contains: string[]; excludes?: string[] }> =
 		},
 		"transit-group": {
 			// The 0136 (group) registration group derives the group non-labour
-			// travel code, billed at $0.43/km on the line item AND in the Total
-			// (Q1 fixed: both now go through getTransitRate)
-			contains: ["04_799_0136_6_1", "$0.43/km", "$6.45", "$161.88"]
+			// travel code, billed at the apportioned rate (docs/plans/016:
+			// floorToCent(the fixture user's 0.85/km ÷ 2) = $0.42/km) on the line
+			// item AND in the Total (Q1 fixed: both now go through getTransitRate)
+			contains: ["04_799_0136_6_1", "$0.42/km", "$6.30", "$161.73"]
 		},
 		"transport-all-types": {
 			contains: [
@@ -83,6 +84,21 @@ const invariants: Record<string, { contains: string[]; excludes?: string[] }> =
 		},
 		"transport-group-distance": {
 			contains: ["04_591_0136_6_1", "$0.49/km", "$10.78", "$135.12"]
+		},
+		"transport-group-three-participants": {
+			// N=3 apportioning (docs/plans/016): floorToCent(70.2/3) = $23.40/hr,
+			// floorToCent(0.85/3) = $0.28/km transit, floorToCent(0.99/3) = $0.33/km ABT
+			contains: [
+				"04_591_0136_6_1",
+				"04_799_0136_6_1",
+				"$0.33/km",
+				"$7.26",
+				"$23.40/hr",
+				"$46.80",
+				"$0.28/km",
+				"$4.20",
+				"$69.96"
+			]
 		},
 		"duplicate-merge": { contains: ["$186.51"] },
 		"kitchen-sink": {
@@ -134,12 +150,15 @@ const invariants: Record<string, { contains: string[]; excludes?: string[] }> =
 				"04_799_0136_6_1",
 				"13:20-14:25 (1 hour, 5 mins)",
 				"$0.49/km",
-				"$0.43/km",
+				// docs/plans/016: the group's non-labour travel apportions the
+				// fixture user's 0.85/km rate by group size — floorToCent(0.85/2)
+				"$0.42/km",
 				// The source invoice printed $1168.15 ($7.28 above its line-item
-				// sum — quirk Q1); with Q1 fixed the Total equals the line items.
-				// Once the user's 0.85 rate is threaded through (this plan), the
-				// two solo travel legs drop from $0.99/km to $0.85/km.
-				"$1153.59"
+				// sum — quirk Q1); with Q1 fixed and the user's 0.85 rate threaded
+				// through, the Total was $1153.59. docs/plans/016's deliberate
+				// -1c/km transit apportioning change (13km × $0.01) brings it to
+				// $1153.46.
+				"$1153.46"
 			]
 		}
 	};

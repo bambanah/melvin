@@ -29,7 +29,8 @@ export const activitySchema = z
 		itemDistance: z.number(),
 		transitDistance: z.string().optional(),
 		transitDuration: z.string().optional(),
-		transportItems: z.array(activityTransportItemSchema).optional()
+		transportItems: z.array(activityTransportItemSchema).optional(),
+		groupSize: z.number().int().min(2).max(10).optional()
 	})
 	.partial({ startTime: true, endTime: true, itemDistance: true })
 	.refine(

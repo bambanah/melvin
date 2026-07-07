@@ -9,7 +9,7 @@ import type {
 	SupportItemRates
 } from "@/generated/client";
 import { getDuration } from "./date-utils";
-import { round } from "./generic-utils";
+import { floorToCent, round } from "./generic-utils";
 import {
 	getActivityBasedTransportCode,
 	getNonLabourTravelCode
@@ -33,6 +33,7 @@ export interface BillableActivity {
 	itemDistance?: number | null;
 	transitDistance?: Prisma.Decimal | null;
 	transitDuration?: Prisma.Decimal | null;
+	groupSize?: number | null;
 	transportItems?: TransportItem[];
 	supportItem: Pick<
 		SupportItem,
@@ -64,13 +65,16 @@ export interface TransitRateContext {
 
 const DEFAULT_TRANSIT_RATE = 0.99;
 
-// TODO: Handle groups other than 2 clients
-const GROUP_TRANSIT_RATE = 0.43;
-
 const DEFAULT_ACTIVITY_TRANSPORT_RATE = 0.99;
 
-// TODO: Handle groups other than 2 clients
-const GROUP_ACTIVITY_TRANSPORT_RATE = 0.49;
+/**
+ * The number of participants a group activity's rate is divided across.
+ * Defaults to 2 for group activities created before `groupSize` existed
+ * (docs/plans/016). Non-group activities always have a single participant.
+ */
+export function groupSizeOf(activity: BillableActivity): number {
+	return activity.supportItem.isGroup ? (activity.groupSize ?? 2) : 1;
+}
 
 const getRateForDay = (
 	day: "weekday" | "weeknight" | "saturday" | "sunday",
@@ -148,20 +152,21 @@ export const getRateForActivity = (
 	return [activity.supportItem.weekdayCode, Number(rate)];
 };
 
-/** The effective non-labour travel rate per km: group → client → user → default. */
+/** The effective non-labour travel rate per km: client → user → default, apportioned by group size. */
 export function getTransitRate(
 	activity: BillableActivity,
 	rateContext?: TransitRateContext
 ): number {
-	if (activity.supportItem.isGroup) {
-		return GROUP_TRANSIT_RATE;
-	}
-
-	return (
+	const effectiveRate =
 		Number(activity.client?.transitRatePerKm) ||
 		rateContext?.userTransitRatePerKm ||
-		DEFAULT_TRANSIT_RATE
-	);
+		DEFAULT_TRANSIT_RATE;
+
+	if (activity.supportItem.isGroup) {
+		return floorToCent(effectiveRate / groupSizeOf(activity));
+	}
+
+	return effectiveRate;
 }
 
 export type LineKind =
@@ -198,7 +203,12 @@ export function billableLines(
 	rateContext?: TransitRateContext
 ): BillableLine[] {
 	const lines: BillableLine[] = [];
-	const [itemCode, rate] = getRateForActivity(activity);
+	const [itemCode, resolvedRate] = getRateForActivity(activity);
+	// Apportioned once so the support line, its printed unit price, and the
+	// labour-travel rate/60 all use the same per-participant figure.
+	const rate = activity.supportItem.isGroup
+		? floorToCent(resolvedRate / groupSizeOf(activity))
+		: resolvedRate;
 
 	// SUPPORT: gated on rateType like the PDF (the printed truth), not on
 	// which fields happen to be populated. A KM-rate item always bills by
@@ -283,9 +293,8 @@ export function billableLines(
 
 	// Activity Based Transport items
 	if (activity.transportItems) {
-		const isGroup = activity.supportItem.isGroup;
-		const activityTransportRate = isGroup
-			? GROUP_ACTIVITY_TRANSPORT_RATE
+		const activityTransportRate = activity.supportItem.isGroup
+			? floorToCent(DEFAULT_ACTIVITY_TRANSPORT_RATE / groupSizeOf(activity))
 			: DEFAULT_ACTIVITY_TRANSPORT_RATE;
 		const transportCode =
 			getActivityBasedTransportCode(activity.supportItem.weekdayCode) ?? "";

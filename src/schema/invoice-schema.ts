@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+/** A group activity's primary client plus up to this many other participants (10 total). */
+export const MAX_GROUP_PARTICIPANTS = 9;
+
 export const invoiceSchema = z.object({
 	date: z.date().optional(),
 	clientId: z.string().min(1, "Client is required"),
@@ -9,7 +12,10 @@ export const invoiceSchema = z.object({
 	activitiesToCreate: z.array(
 		z.object({
 			supportItemId: z.string().min(1, "Support item is required"),
-			groupClientId: z.string(),
+			groupClientIds: z
+				.array(z.string())
+				.max(MAX_GROUP_PARTICIPANTS)
+				.default([]),
 			activities: z.array(
 				z
 					.object({

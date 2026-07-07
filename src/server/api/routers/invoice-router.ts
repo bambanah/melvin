@@ -47,18 +47,24 @@ const generateNestedWriteForActivities = (
 	client: Client,
 	ownerId: string
 ) => ({
-	data: activitiesToCreate.flatMap(({ supportItemId, activities }) =>
-		activities.map((activity) => ({
-			...activity,
-			date: activity.date,
-			startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
-			endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
-			clientId: client.id,
-			transitDistance: client.distanceToClient ?? undefined,
-			transitDuration: client.travelTimeToClient ?? undefined,
-			supportItemId,
-			ownerId
-		}))
+	data: activitiesToCreate.flatMap(
+		({ supportItemId, groupClientIds, activities }) => {
+			const groupSize =
+				groupClientIds.length > 0 ? groupClientIds.length + 1 : undefined;
+
+			return activities.map((activity) => ({
+				...activity,
+				date: activity.date,
+				startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
+				endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
+				clientId: client.id,
+				transitDistance: client.distanceToClient ?? undefined,
+				transitDuration: client.travelTimeToClient ?? undefined,
+				supportItemId,
+				groupSize,
+				ownerId
+			}));
+		}
 	)
 });
 
@@ -68,20 +74,25 @@ const generateNestedWriteForGroupActivities = (
 	clients: Client[]
 ) => ({
 	data: activitiesToCreate.flatMap(
-		({ supportItemId, groupClientId, activities }) => {
-			const client = clients.find((c) => c.id === groupClientId);
+		({ supportItemId, groupClientIds, activities }) => {
+			const groupSize = groupClientIds.length + 1;
 
-			return activities.map((activity) => ({
-				...activity,
-				supportItemId,
-				date: activity.date,
-				startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
-				endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
-				clientId: groupClientId,
-				transitDistance: client?.distanceToClient ?? undefined,
-				transitDuration: client?.travelTimeToClient ?? undefined,
-				ownerId
-			}));
+			return groupClientIds.flatMap((groupClientId) => {
+				const client = clients.find((c) => c.id === groupClientId);
+
+				return activities.map((activity) => ({
+					...activity,
+					supportItemId,
+					date: activity.date,
+					startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
+					endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
+					clientId: groupClientId,
+					transitDistance: client?.distanceToClient ?? undefined,
+					transitDuration: client?.travelTimeToClient ?? undefined,
+					groupSize,
+					ownerId
+				}));
+			});
 		}
 	)
 });
@@ -229,6 +240,29 @@ export const invoiceRouter = router({
 				);
 			}
 
+			const soloRowSupportItemIds = [
+				...new Set(
+					inputInvoice.activitiesToCreate
+						.filter((activity) => activity.groupClientIds.length === 0)
+						.map((activity) => activity.supportItemId)
+				)
+			];
+
+			if (soloRowSupportItemIds.length > 0) {
+				const groupSupportItemsAmongSoloRows =
+					await ctx.owned.supportItem.findMany({
+						where: { id: { in: soloRowSupportItemIds }, isGroup: true },
+						select: { id: true }
+					});
+
+				if (groupSupportItemsAmongSoloRows.length > 0) {
+					throw new TRPCError({
+						code: "BAD_REQUEST",
+						message: "Group activities require at least one other participant"
+					});
+				}
+			}
+
 			const invoice = await ctx.prisma.invoice.create({
 				data: {
 					invoiceNo: inputInvoice.invoiceNo,
@@ -252,22 +286,42 @@ export const invoiceRouter = router({
 			}
 
 			const groupActivitiesToCreate = inputInvoice.activitiesToCreate.filter(
-				(activity) => activity.groupClientId
+				(activity) => activity.groupClientIds.length > 0
 			);
-			if (groupActivitiesToCreate) {
-				const groupClientIds = groupActivitiesToCreate.map(
-					(activity) => activity.groupClientId
+
+			if (groupActivitiesToCreate.length > 0) {
+				for (const activity of groupActivitiesToCreate) {
+					if (
+						new Set(activity.groupClientIds).size !==
+						activity.groupClientIds.length
+					) {
+						throw new TRPCError({
+							code: "BAD_REQUEST",
+							message: "Group participants must be distinct"
+						});
+					}
+
+					if (activity.groupClientIds.includes(inputInvoice.clientId)) {
+						throw new TRPCError({
+							code: "BAD_REQUEST",
+							message: "The primary client cannot also be a group participant"
+						});
+					}
+				}
+
+				const allGroupClientIds = groupActivitiesToCreate.flatMap(
+					(activity) => activity.groupClientIds
 				);
 
 				const clients = await ctx.owned.client.findMany({
 					where: {
 						id: {
-							in: groupClientIds
+							in: allGroupClientIds
 						}
 					}
 				});
 
-				if (clients.length !== new Set(groupClientIds).size) {
+				if (clients.length !== new Set(allGroupClientIds).size) {
 					throw new TRPCError({
 						code: "NOT_FOUND",
 						message: "One or more group clients not found"

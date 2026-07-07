@@ -8,10 +8,10 @@ Group Activities - Standard | 11/01/23 | 09:00-11:00 (2 hours) | $62.17/hr | $12
 Provider travel - labour | 11/01/23 | 30 minutes | $62.17/hr | $31.09
 costs
 04_102_0136_6_1
-Provider travel - non-labour | 11/01/23 | 15 km | $0.43/km | $6.45
+Provider travel - non-labour | 11/01/23 | 15 km | $0.42/km | $6.30
 costs
 04_799_0136_6_1
-Total | $161.88
+Total | $161.73
 Marlee Provider
 ABN: 12 345 678 901
 Bank: Sample Bank

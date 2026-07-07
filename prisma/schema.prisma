@@ -132,6 +132,7 @@ model Activity {
   transitDuration Decimal?
   transitDistance Decimal?
   itemDistance    Int?
+  groupSize       Int?
   ownerId         String?
   clientId        String?
   supportItemId   String

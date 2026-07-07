@@ -18,6 +18,7 @@ interface ClientQuickSelectProps {
 	onChange?: (clientId: string) => void;
 	className?: string;
 	excludeClientId?: string;
+	excludeClientIds?: string[];
 }
 
 function getRecentClientIds(): string[] {
@@ -48,7 +49,8 @@ export function ClientQuickSelect({
 	value,
 	onChange,
 	className,
-	excludeClientId
+	excludeClientId,
+	excludeClientIds
 }: ClientQuickSelectProps) {
 	const [open, setOpen] = React.useState(false);
 	const [search, setSearch] = React.useState("");
@@ -63,8 +65,9 @@ export function ClientQuickSelect({
 	const selectedClient = clients?.find((c) => c.id === value);
 
 	const availableClients = React.useMemo(() => {
-		return clients?.filter((c) => c.id !== excludeClientId) ?? [];
-	}, [clients, excludeClientId]);
+		const excluded = new Set([excludeClientId, ...(excludeClientIds ?? [])]);
+		return clients?.filter((c) => !excluded.has(c.id)) ?? [];
+	}, [clients, excludeClientId, excludeClientIds]);
 
 	const filteredClients = React.useMemo(() => {
 		if (!search.trim()) return availableClients;

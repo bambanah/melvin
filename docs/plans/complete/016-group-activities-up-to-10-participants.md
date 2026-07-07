@@ -17,6 +17,7 @@
 
 ## Status
 
+- **State**: DONE (2026-07-07)
 - **Priority**: P2
 - **Effort**: L
 - **Risk**: MED–HIGH (schema + data migration; redefines what a group support item's stored rate MEANS; billing-visible cent changes documented below)
@@ -288,15 +289,15 @@ documented lines plus the one new fixture's files.
 
 Machine-checkable. ALL must hold:
 
-- [ ] `grep -rn "GROUP_TRANSIT_RATE\|Handle groups other than 2" src/lib` → no matches
-- [ ] `grep -rn "0.49" src/lib --include="*.ts" | grep -v test | grep -v testing` → no matches (ABT group rate is computed, not hardcoded)
-- [ ] `grep -n "groupSize" prisma/schema.prisma` → one match on `Activity`; migration file includes both backfill UPDATEs
-- [ ] `grep -n "groupClientIds" src/schema/invoice-schema.ts` → array with `.max(9)`
-- [ ] New N=3 fixture + goldens exist; `pnpm exec vitest run` exits 0
-- [ ] Golden diffs for pre-existing fixtures touch only `transit-group` and `plan-managed-week` (the $0.43→$0.42 lines and totals)
-- [ ] `pnpm type-check`, `pnpm lint`, `pnpm format:check` exit 0
-- [ ] CONTEXT.md no longer mentions `groupTransitRatePerKm`
-- [ ] `docs/plans/README.md` status row updated
+- [x] `grep -rn "GROUP_TRANSIT_RATE\|Handle groups other than 2" src/lib` → no matches
+- [x] `grep -rn "0.49" src/lib --include="*.ts" | grep -v test | grep -v testing` → no matches (ABT group rate is computed, not hardcoded)
+- [x] `grep -n "groupSize" prisma/schema.prisma` → one match on `Activity`; migration file includes both backfill UPDATEs
+- [x] `grep -n "groupClientIds" src/schema/invoice-schema.ts` → array with `.max(9)`
+- [x] New N=3 fixture + goldens exist; `pnpm exec vitest run` exits 0
+- [x] Golden diffs for pre-existing fixtures touch only `transit-group` and `plan-managed-week` (the $0.43→$0.42 lines and totals)
+- [x] `pnpm type-check`, `pnpm lint`, `pnpm format:check` exit 0
+- [x] CONTEXT.md no longer mentions `groupTransitRatePerKm`
+- [x] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 
