@@ -229,7 +229,7 @@ byte-for-byte unaffected.
    optional `groupSize` (int, 2–10) so the quick-entry path can stamp it;
    reject `groupSize` on activities whose support item is not a group item.
 4. `src/components/activities/multi-activity-form.tsx`: `groupClientId:
-   string` → `groupClientIds: string[]` with add/remove participant rows
+string` → `groupClientIds: string[]` with add/remove participant rows
    (each a `ClientSelect` excluding the primary and already-chosen clients,
    capped at 9); validation copy "Second participant is required" → "At
    least one other participant is required"; on save push one mirrored
