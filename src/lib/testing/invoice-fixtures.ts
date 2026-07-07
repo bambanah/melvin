@@ -234,13 +234,13 @@ const basicWeekday = makeFixture(
 	makeInvoice("basic-weekday", "WKDY-1", [makeActivity("basic-weekday", 1)])
 );
 
-/** 2. endTime >= 19:00 on a weekday selects the weeknight code/rate. */
+/** 2. endTime >= 20:00 (8pm) on a weekday selects the weeknight code/rate. */
 const weeknight = makeFixture(
 	"weeknight",
 	makeInvoice("weeknight", "NIGHT-1", [
 		makeActivity("weeknight", 1, {
-			startTime: time("17:30"),
-			endTime: time("19:30")
+			startTime: time("18:00"),
+			endTime: time("20:00")
 		})
 	])
 );
@@ -283,8 +283,8 @@ const clientCustomRates = (() => {
 			makeActivity(name, 1, { supportItem }),
 			makeActivity(name, 2, {
 				date: day("2023-01-12"),
-				startTime: time("17:30"),
-				endTime: time("19:30"),
+				startTime: time("18:00"),
+				endTime: time("20:00"),
 				supportItem
 			}),
 			makeActivity(name, 3, { date: day("2023-01-14"), supportItem })
@@ -458,8 +458,8 @@ const kitchenSink = (() => {
 				}),
 				makeActivity(name, 2, {
 					date: day("2023-01-12"),
-					startTime: time("17:30"),
-					endTime: time("19:30"),
+					startTime: time("18:00"),
+					endTime: time("20:00"),
 					supportItem
 				}),
 				makeActivity(name, 3, { date: day("2023-01-14"), supportItem }),
