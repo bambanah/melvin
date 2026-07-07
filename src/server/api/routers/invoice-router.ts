@@ -149,6 +149,7 @@ export const invoiceRouter = router({
 				}
 			},
 			where: {
+				ownerId: ctx.session.user.id,
 				status: "SENT"
 			}
 		});
@@ -202,8 +203,8 @@ export const invoiceRouter = router({
 		.mutation(async ({ input, ctx }) => {
 			const { invoice: inputInvoice } = input;
 
-			const client = await ctx.prisma.client.findUnique({
-				where: { id: inputInvoice.clientId }
+			const client = await ctx.prisma.client.findFirst({
+				where: { id: inputInvoice.clientId, ownerId: ctx.session.user.id }
 			});
 
 			if (!client) {
@@ -211,6 +212,22 @@ export const invoiceRouter = router({
 					code: "NOT_FOUND",
 					message: "Can't find that client"
 				});
+			}
+
+			if (inputInvoice.activityIds && inputInvoice.activityIds.length > 0) {
+				const ownedActivities = await ctx.prisma.activity.findMany({
+					where: {
+						id: { in: inputInvoice.activityIds },
+						ownerId: ctx.session.user.id
+					},
+					select: { id: true }
+				});
+				if (ownedActivities.length !== inputInvoice.activityIds.length) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "One or more activities not found"
+					});
+				}
 			}
 
 			const invoice = await ctx.prisma.invoice.create({
@@ -245,11 +262,19 @@ export const invoiceRouter = router({
 
 				const clients = await ctx.prisma.client.findMany({
 					where: {
+						ownerId: ctx.session.user.id,
 						id: {
 							in: groupClientIds
 						}
 					}
 				});
+
+				if (clients.length !== new Set(groupClientIds).size) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "One or more group clients not found"
+					});
+				}
 
 				await ctx.prisma.activity.createMany(
 					generateNestedWriteForGroupActivities(
@@ -273,9 +298,33 @@ export const invoiceRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			const { id, invoice: inputInvoice } = input;
 
-			const client = await ctx.prisma.client.findUnique({
-				where: { id: inputInvoice.clientId }
+			const existing = await ctx.prisma.invoice.findFirst({
+				where: { id, ownerId: ctx.session.user.id },
+				select: { id: true }
 			});
+			if (!existing) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			const client = await ctx.prisma.client.findFirst({
+				where: { id: inputInvoice.clientId, ownerId: ctx.session.user.id }
+			});
+
+			if (inputInvoice.activityIds && inputInvoice.activityIds.length > 0) {
+				const ownedActivities = await ctx.prisma.activity.findMany({
+					where: {
+						id: { in: inputInvoice.activityIds },
+						ownerId: ctx.session.user.id
+					},
+					select: { id: true }
+				});
+				if (ownedActivities.length !== inputInvoice.activityIds.length) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "One or more activities not found"
+					});
+				}
+			}
 
 			const invoice = await ctx.prisma.invoice.update({
 				where: {
@@ -338,6 +387,7 @@ export const invoiceRouter = router({
 
 			const payload = await ctx.prisma.invoice.updateMany({
 				where: {
+					ownerId: ctx.session.user.id,
 					id: {
 						in: ids
 					}
@@ -358,6 +408,7 @@ export const invoiceRouter = router({
 
 			const invoices = await ctx.prisma.invoice.findMany({
 				where: {
+					ownerId: ctx.session.user.id,
 					status: "SENT",
 					activities: {
 						some: {
@@ -424,6 +475,14 @@ export const invoiceRouter = router({
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
+			const existing = await ctx.prisma.invoice.findFirst({
+				where: { id: input.id, ownerId: ctx.session.user.id },
+				select: { id: true }
+			});
+			if (!existing) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
 			const invoice = await ctx.prisma.invoice.delete({
 				where: {
 					id: input.id
