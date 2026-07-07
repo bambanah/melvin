@@ -201,6 +201,39 @@ describe("invoice.create with group activities", () => {
 			})
 		).rejects.toThrow(/at least one other participant/i);
 	});
+
+	// docs/plans/020: a nonexistent group client is only discovered inside
+	// createGroupMirrorActivities, which runs *after* the invoice write. Before
+	// the transaction wrap, this left a committed invoice + primary activity
+	// with a groupSize but zero participant rows.
+	test("rolls back the invoice write when a group client doesn't exist", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const supportItem = await createGroupSupportItem(owner);
+		const [primary, other] = await createClients(owner, 2);
+
+		await expect(
+			caller.invoice.create({
+				invoice: {
+					clientId: primary.id,
+					invoiceNo: "INV-1",
+					activitiesToCreate: [
+						activityToCreate({
+							supportItemId: supportItem.id,
+							groupClientIds: [other.id, "nonexistent-client-id"]
+						})
+					]
+				}
+			})
+		).rejects.toThrow(/not found/i);
+
+		expect(await prisma.invoice.count({ where: { ownerId: owner.id } })).toBe(
+			0
+		);
+		expect(await prisma.activity.count({ where: { ownerId: owner.id } })).toBe(
+			0
+		);
+	});
 });
 
 describe("invoice.modify with group activities", () => {
@@ -247,6 +280,60 @@ describe("invoice.modify with group activities", () => {
 			new Set(others.map((c) => c.id))
 		);
 		expect(pending.every((a) => a.groupSize === 3)).toBe(true);
+	});
+
+	// docs/plans/020 characterization: `invoice-form.tsx` seeds `activityIds`
+	// from `existingInvoice.activities` (the persisted primary row) and leaves
+	// `activitiesToCreate` empty on edit — mirror participant rows have
+	// `invoiceId: null` so they never appear in `existingInvoice.activities`
+	// and are never re-sent inside `activitiesToCreate`. Resubmitting that
+	// real payload shape, unchanged, must not re-fan the mirrors.
+	test("resubmitting the edit-form payload for an unchanged group row does not duplicate mirror activities", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const supportItem = await createGroupSupportItem(owner);
+		const [primary, ...others] = await createClients(owner, 3);
+
+		const invoice = await caller.invoice.create({
+			invoice: {
+				clientId: primary.id,
+				invoiceNo: "INV-1",
+				activitiesToCreate: [
+					activityToCreate({
+						supportItemId: supportItem.id,
+						groupClientIds: others.map((c) => c.id)
+					})
+				]
+			}
+		});
+
+		const totalBefore = await prisma.activity.count({
+			where: { ownerId: owner.id }
+		});
+		expect(totalBefore).toBe(3); // 1 primary + 2 mirrors
+
+		const primaryActivity = await prisma.activity.findFirstOrThrow({
+			where: { invoiceId: invoice.id },
+			select: { id: true }
+		});
+
+		// Mirrors this shape's actual construction in invoice-form.tsx:
+		// `activityIds: existingInvoice.activities.map((a) => a.id)`, with
+		// `activitiesToCreate` left at its unseeded (empty) default.
+		await caller.invoice.modify({
+			id: invoice.id,
+			invoice: {
+				clientId: primary.id,
+				invoiceNo: "INV-1",
+				activityIds: [primaryActivity.id],
+				activitiesToCreate: []
+			}
+		});
+
+		const totalAfter = await prisma.activity.count({
+			where: { ownerId: owner.id }
+		});
+		expect(totalAfter).toBe(totalBefore);
 	});
 
 	test("rejects the primary client appearing among the group clients on edit", async () => {
