@@ -1,6 +1,7 @@
 import { getNextInvoiceNo } from "@/lib/invoice-utils";
 import { baseListQueryInput } from "@/lib/trpc";
 import { clientSchema } from "@/schema/client-schema";
+import { paginate } from "@/server/api/owned";
 import { authedProcedure, router } from "@/server/api/trpc";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { z } from "zod";
@@ -27,30 +28,33 @@ export const clientRouter = router({
 			const limit = input.limit ?? DEFAULT_LIST_LIMIT;
 			const { cursor } = input;
 
-			const clients = await ctx.prisma.client.findMany({
-				take: limit + 1,
-				select: {
-					...defaultClientSelect,
-					invoices: {
-						take: 1,
-						select: { id: true, invoiceNo: true, billTo: true, date: true },
+			const { items: clients, nextCursor } = await paginate({
+				limit,
+				cursor,
+				query: ({ take, cursor }) =>
+					ctx.owned.client.findMany({
+						take,
+						select: {
+							...defaultClientSelect,
+							invoices: {
+								take: 1,
+								select: {
+									id: true,
+									invoiceNo: true,
+									billTo: true,
+									date: true
+								},
+								orderBy: {
+									createdAt: "desc"
+								}
+							}
+						},
+						cursor,
 						orderBy: {
 							createdAt: "desc"
 						}
-					}
-				},
-				where: { ownerId: ctx.session.user.id },
-				cursor: cursor ? { id: cursor } : undefined,
-				orderBy: {
-					createdAt: "desc"
-				}
+					})
 			});
-
-			let nextCursor: typeof cursor | undefined;
-			if (clients.length > limit) {
-				const nextClient = clients.pop();
-				nextCursor = nextClient?.id;
-			}
 
 			return {
 				clients,
@@ -60,7 +64,7 @@ export const clientRouter = router({
 	byId: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
-			const client = await ctx.prisma.client.findFirst({
+			const client = await ctx.owned.client.findFirst({
 				select: {
 					...defaultClientSelect,
 					invoiceNumberPrefix: true,
@@ -70,7 +74,6 @@ export const clientRouter = router({
 					invoiceEmail: true
 				},
 				where: {
-					ownerId: ctx.session.user.id,
 					id: input.id
 				}
 			});
@@ -81,13 +84,12 @@ export const clientRouter = router({
 	getBillTo: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
-			const client = await ctx.prisma.client.findFirst({
+			const client = await ctx.owned.client.findFirst({
 				select: {
 					billTo: true
 				},
 				where: {
-					id: input.id,
-					ownerId: ctx.session.user.id
+					id: input.id
 				}
 			});
 
@@ -100,7 +102,7 @@ export const clientRouter = router({
 	getNextInvoiceNo: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
-			const client = await ctx.prisma.client.findFirst({
+			const client = await ctx.owned.client.findFirst({
 				select: {
 					invoices: {
 						take: 20,
@@ -114,8 +116,7 @@ export const clientRouter = router({
 					invoiceNumberPrefix: true
 				},
 				where: {
-					id: input.id,
-					ownerId: ctx.session.user.id
+					id: input.id
 				}
 			});
 
@@ -135,8 +136,8 @@ export const clientRouter = router({
 		.query(async ({ input, ctx }) => {
 			const { clientId } = input;
 
-			const invoice = await ctx.prisma.invoice.findFirst({
-				where: { clientId, ownerId: ctx.session.user.id },
+			const invoice = await ctx.owned.invoice.findFirst({
+				where: { clientId },
 				select: {
 					id: true
 				},
@@ -186,13 +187,7 @@ export const clientRouter = router({
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
-			const existing = await ctx.prisma.client.findFirst({
-				where: { id: input.id, ownerId: ctx.session.user.id },
-				select: { id: true }
-			});
-			if (!existing) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
+			await ctx.owned.client.assert(input.id);
 
 			const client = await ctx.prisma.client.update({
 				where: {
@@ -223,13 +218,7 @@ export const clientRouter = router({
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ input, ctx }) => {
-			const existing = await ctx.prisma.client.findFirst({
-				where: { id: input.id, ownerId: ctx.session.user.id },
-				select: { id: true }
-			});
-			if (!existing) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
+			await ctx.owned.client.assert(input.id);
 
 			const client = await ctx.prisma.client.delete({
 				where: {
