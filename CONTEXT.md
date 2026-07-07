@@ -35,7 +35,10 @@ Driving to and from clients (home → client → home). Billed as NDIS "Provider
 The distance and travel time between two clients in a Trip. Entered manually by the provider for each leg. Used to calculate Provider Travel for middle and last activities in a Trip.
 
 **Transit Rate**
-The per-kilometre rate charged for Provider Travel. Defaults to the User's configured rate (max $0.99/km per NDIS rules). Can be overridden per Client. Separate rates exist for individual activities (`transitRatePerKm`) and group activities (`groupTransitRatePerKm`).
+The per-kilometre rate charged for Provider Travel. Defaults to the User's configured rate (max $0.99/km per NDIS rules). Can be overridden per Client. For group activities, the resolved rate is apportioned by participant count — see **Group Activity**.
+
+**Group Activity**
+An Activity delivered to 2–10 Melvin Clients at once, recorded as one mirrored Activity per participant sharing a `groupSize` (the participant count at creation; membership is immutable afterwards). A group Support Item's stored rate holds the full per-session amount; each participant is billed `floorToCent(rate ÷ groupSize)` for the hourly support rate, Provider Travel per-km, and Activity Based Transport per-km alike.
 
 **Travel Time Cap**
 NDIS MMM1-3 regions limit claimable travel time to 30 minutes per leg. Applied as a hard cap during transit calculation, with a warning shown when exceeded.

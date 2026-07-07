@@ -1,3 +1,4 @@
+import { floorToCent } from "@/lib/generic-utils";
 import { extractPdfText } from "@/lib/testing/pdf-test-utils";
 import prisma from "@/server/prisma";
 import { expect, test } from "@playwright/test";
@@ -67,7 +68,10 @@ test("Realistic plan-managed invoice: group and solo travel codes in the PDF", a
 	expect(text).toContain("04_591_0136_6_1"); // group activity transport
 	expect(text).toContain("$0.49/km");
 	expect(text).toContain("04_799_0136_6_1"); // group non-labour travel
-	expect(text).toContain("$0.43/km");
+	// docs/plans/016: group provider travel apportions the effective rate by
+	// group size (defaults to 2) — testUser's transitRatePerKm is 0.99 (schema
+	// default), which coincides with the ABT group rate above.
+	expect(text).toContain(`$${floorToCent(0.99 / 2).toFixed(2)}/km`);
 	expect(text).toContain("04_799_0125_6_1"); // solo non-labour travel
 	expect(text).toContain("$0.99/km"); // testUser's transitRatePerKm (schema default)
 
@@ -75,7 +79,8 @@ test("Realistic plan-managed invoice: group and solo travel codes in the PDF", a
 	expect(text).toContain("13:20-14:25 (1 hour, 5 mins)");
 
 	// The printed Total equals getTotalCostOfActivities over the same
-	// activities — group travel priced at $0.43/km on both sides (Q1 fixed)
+	// activities — group travel priced at the apportioned rate on both sides
+	// (Q1 fixed; docs/plans/016)
 	expect(text).toContain(`$${expectedPdfTotal.toFixed(2)}`);
 });
 

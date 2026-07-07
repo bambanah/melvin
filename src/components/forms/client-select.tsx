@@ -7,21 +7,28 @@ interface ClientSelectProps extends Omit<
 	"placeholder" | "options"
 > {
 	excludeClientId?: string;
+	excludeClientIds?: string[];
 }
 
-function ClientSelect({ excludeClientId, ...props }: ClientSelectProps) {
+function ClientSelect({
+	excludeClientId,
+	excludeClientIds,
+	...props
+}: ClientSelectProps) {
 	const { data: { clients } = {} } = trpc.clients.list.useQuery({});
 
-	const options = useMemo(
-		() =>
+	const options = useMemo(() => {
+		const excluded = new Set([excludeClientId, ...(excludeClientIds ?? [])]);
+
+		return (
 			clients
-				?.filter((client) => client.id !== excludeClientId)
+				?.filter((client) => !excluded.has(client.id))
 				.map((client) => ({
 					label: client.name,
 					value: client.id
-				})) ?? [],
-		[clients, excludeClientId]
-	);
+				})) ?? []
+		);
+	}, [clients, excludeClientId, excludeClientIds]);
 
 	return (
 		<FormSelect options={options} placeholder="Select a client..." {...props} />

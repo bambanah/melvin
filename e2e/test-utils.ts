@@ -258,7 +258,10 @@ export async function createRealisticInvoice() {
 			rateType: "HOUR",
 			isGroup: true,
 			weekdayCode: "04_102_0136_6_1",
-			weekdayRate: 35.1,
+			// Full-session rate (docs/plans/016): billing apportions this by the
+			// activity's groupSize (defaults to 2), reproducing the original
+			// per-participant rate of 35.10.
+			weekdayRate: 70.2,
 			ownerId: testUser.id
 		}
 	});

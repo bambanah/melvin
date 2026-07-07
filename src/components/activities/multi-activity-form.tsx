@@ -24,6 +24,7 @@ import type {
 	ActivitySchema,
 	ActivityTransportItemSchema
 } from "@/schema/activity-schema";
+import { MAX_GROUP_PARTICIPANTS } from "@/schema/invoice-schema";
 import dayjs from "dayjs";
 import {
 	ChevronDown,
@@ -41,7 +42,7 @@ interface ActivityRowData {
 	id: string;
 	clientId: string;
 	isGroup: boolean;
-	groupClientId: string;
+	groupClientIds: string[];
 	timeRange: TimeRangeValue;
 	transportKm: number | undefined;
 	transportItems: ActivityTransportItemSchema[];
@@ -59,7 +60,7 @@ function createEmptyRow(): ActivityRowData {
 		id: crypto.randomUUID(),
 		clientId: "",
 		isGroup: false,
-		groupClientId: "",
+		groupClientIds: [],
 		timeRange: { startTime: "", endTime: "" },
 		transportKm: undefined,
 		transportItems: [],
@@ -154,8 +155,8 @@ export function MultiActivityForm({
 				isValid = false;
 			}
 
-			if (row.isGroup && !row.groupClientId) {
-				errors.groupClient = "Second participant is required";
+			if (row.isGroup && row.groupClientIds.length === 0) {
+				errors.groupClient = "At least one other participant is required";
 				isValid = false;
 			}
 
@@ -215,6 +216,11 @@ export function MultiActivityForm({
 				? row.supportItemId || defaultGroupSupportItemId || ""
 				: row.supportItemId || defaultSupportItemId || "";
 
+			const groupSize =
+				row.isGroup && row.groupClientIds.length > 0
+					? row.groupClientIds.length + 1
+					: undefined;
+
 			// Primary client activity (always created)
 			activities.push({
 				clientId: row.clientId,
@@ -222,20 +228,24 @@ export function MultiActivityForm({
 				startTime: row.timeRange.startTime,
 				endTime: row.timeRange.endTime,
 				supportItemId,
+				groupSize,
 				transportItems: transportItems.length > 0 ? transportItems : undefined
 			});
 
-			// Second participant activity (only for group activities)
-			if (row.isGroup && row.groupClientId) {
+			// Other participants' activities (only for group activities)
+			if (row.isGroup && row.groupClientIds.length > 0) {
 				hasGroupActivities = true;
-				activities.push({
-					clientId: row.groupClientId,
-					date: stripTimezone(date),
-					startTime: row.timeRange.startTime,
-					endTime: row.timeRange.endTime,
-					supportItemId
-					// No transport items for second participant
-				});
+				for (const groupClientId of row.groupClientIds) {
+					activities.push({
+						clientId: groupClientId,
+						date: stripTimezone(date),
+						startTime: row.timeRange.startTime,
+						endTime: row.timeRange.endTime,
+						supportItemId,
+						groupSize
+						// No transport items for other participants
+					});
+				}
 			}
 		});
 
@@ -372,8 +382,28 @@ function ActivityRow({
 	const handleGroupToggle = () => {
 		onUpdate({
 			isGroup: !row.isGroup,
-			groupClientId: !row.isGroup ? "" : row.groupClientId,
+			groupClientIds: !row.isGroup ? [] : row.groupClientIds,
 			errors: { ...row.errors, groupClient: undefined }
+		});
+	};
+
+	const updateGroupClientId = (index: number, clientId: string) => {
+		const groupClientIds = [...row.groupClientIds];
+		groupClientIds[index] = clientId;
+		onUpdate({
+			groupClientIds,
+			errors: { ...row.errors, groupClient: undefined }
+		});
+	};
+
+	const addGroupParticipant = () => {
+		if (row.groupClientIds.length >= MAX_GROUP_PARTICIPANTS) return;
+		onUpdate({ groupClientIds: [...row.groupClientIds, ""] });
+	};
+
+	const removeGroupParticipant = (index: number) => {
+		onUpdate({
+			groupClientIds: row.groupClientIds.filter((_, i) => i !== index)
 		});
 	};
 
@@ -441,18 +471,44 @@ function ActivityRow({
 				{row.isGroup && (
 					<div>
 						<Label className={cn(row.errors.groupClient && "text-destructive")}>
-							Second participant
+							Other participants
 						</Label>
-						<ClientQuickSelect
-							value={row.groupClientId}
-							onChange={(groupClientId) =>
-								onUpdate({
-									groupClientId,
-									errors: { ...row.errors, groupClient: undefined }
-								})
-							}
-							excludeClientId={row.clientId}
-						/>
+						<div className="flex flex-col gap-2">
+							{row.groupClientIds.map((groupClientId, participantIndex) => (
+								<div key={participantIndex} className="flex items-center gap-2">
+									<div className="flex-1">
+										<ClientQuickSelect
+											value={groupClientId}
+											onChange={(clientId) =>
+												updateGroupClientId(participantIndex, clientId)
+											}
+											excludeClientId={row.clientId}
+											excludeClientIds={row.groupClientIds.filter(
+												(_, i) => i !== participantIndex
+											)}
+										/>
+									</div>
+									<Button
+										type="button"
+										variant="ghost"
+										size="sm"
+										onClick={() => removeGroupParticipant(participantIndex)}
+										className="text-destructive hover:text-destructive h-8 w-8 p-0"
+									>
+										<Trash2 className="h-4 w-4" />
+									</Button>
+								</div>
+							))}
+						</div>
+						{row.groupClientIds.length < MAX_GROUP_PARTICIPANTS && (
+							<button
+								type="button"
+								onClick={addGroupParticipant}
+								className="text-muted-foreground hover:text-foreground mt-2 text-left text-sm underline-offset-4 hover:underline"
+							>
+								+ add participant
+							</button>
+						)}
 						{row.errors.groupClient && (
 							<p className="text-destructive mt-1 text-sm">
 								{row.errors.groupClient}

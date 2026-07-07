@@ -1,0 +1,21 @@
+=== Page 1 ===
+Invoice Number: GROUP3-1 | Tax Invoice
+Invoice Date: 01/02/23
+Participant Name: Jane Citizen
+Description | Date | Details | Unit Price | Total
+Activity Based Transport | 11/01/23 | 22 km | $0.33/km | $7.26
+04_591_0136_6_1
+Group Activities - Standard | 11/01/23 | 09:00-11:00 (2 hours) | $23.40/hr | $46.80
+04_102_0136_6_1
+Provider travel - labour | 11/01/23 | 30 minutes | $23.40/hr | $11.70
+costs
+04_102_0136_6_1
+Provider travel - non-labour | 11/01/23 | 15 km | $0.28/km | $4.20
+costs
+04_799_0136_6_1
+Total | $69.96
+Marlee Provider
+ABN: 12 345 678 901
+Bank: Sample Bank
+BSB: 123-456
+Account Number: 987 654 321

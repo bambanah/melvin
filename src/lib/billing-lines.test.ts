@@ -62,7 +62,22 @@ test("group activity's ABT DISTANCE lines at 0.49/km", () => {
 	expect(abtLine?.total).toEqual(round(10 * 0.49, 2));
 });
 
-test("group activity's TRAVEL_KM line bills at the group rate (0.43/km), via getTransitRate", () => {
+test("group activity's TRAVEL_KM line apportions the effective rate by group size (docs/plans/016)", () => {
+	const lines = billableLines(
+		{
+			...fullyLoadedActivity,
+			transportItems: [],
+			supportItem: { ...baseSupportItem, isGroup: true }
+		},
+		{ userTransitRatePerKm: 0.85 }
+	);
+
+	const travelKmLine = lines.find((line) => line.kind === "TRAVEL_KM");
+	expect(travelKmLine?.unitPrice).toEqual(0.42); // floorToCent(0.85 / 2)
+	expect(travelKmLine?.total).toEqual(round(15 * 0.42, 2));
+});
+
+test("group activity with no groupSize defaults to N=2", () => {
 	const lines = billableLines({
 		...fullyLoadedActivity,
 		transportItems: [],
@@ -70,8 +85,50 @@ test("group activity's TRAVEL_KM line bills at the group rate (0.43/km), via get
 	});
 
 	const travelKmLine = lines.find((line) => line.kind === "TRAVEL_KM");
-	expect(travelKmLine?.unitPrice).toEqual(0.43);
-	expect(travelKmLine?.total).toEqual(round(15 * 0.43, 2));
+	expect(travelKmLine?.unitPrice).toEqual(0.49); // floorToCent(0.99 / 2)
+});
+
+test("group activity rates apportion by an explicit groupSize (N=3, N=10)", () => {
+	const supportItem = { ...baseSupportItem, isGroup: true };
+
+	const n3 = billableLines({
+		...fullyLoadedActivity,
+		groupSize: 3,
+		supportItem
+	});
+	expect(n3.find((line) => line.kind === "SUPPORT")?.unitPrice).toEqual(
+		18.49 // floorToCent(55.47 / 3)
+	);
+	expect(n3.find((line) => line.kind === "TRAVEL_KM")?.unitPrice).toEqual(
+		0.33 // floorToCent(0.99 / 3)
+	);
+	expect(n3.find((line) => line.kind === "ABT")?.unitPrice).toEqual(
+		0.33 // floorToCent(0.99 / 3)
+	);
+
+	const n10 = billableLines({
+		...fullyLoadedActivity,
+		groupSize: 10,
+		supportItem
+	});
+	expect(n10.find((line) => line.kind === "TRAVEL_KM")?.unitPrice).toEqual(
+		0.09 // floorToCent(0.99 / 10)
+	);
+	expect(n10.find((line) => line.kind === "ABT")?.unitPrice).toEqual(
+		0.09 // floorToCent(0.99 / 10)
+	);
+});
+
+test("non-group activity is unaffected by groupSize apportioning", () => {
+	const lines = billableLines({ ...fullyLoadedActivity, groupSize: 5 });
+
+	expect(lines.find((line) => line.kind === "SUPPORT")?.unitPrice).toEqual(
+		55.47
+	);
+	expect(lines.find((line) => line.kind === "TRAVEL_KM")?.unitPrice).toEqual(
+		0.99
+	);
+	expect(lines.find((line) => line.kind === "ABT")?.unitPrice).toEqual(0.99);
 });
 
 test("solo activity's TRAVEL_KM line resolves the plan-006 effective rate (client → user → 0.99)", () => {

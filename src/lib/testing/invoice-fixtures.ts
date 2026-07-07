@@ -128,6 +128,11 @@ const makeSupportItem = (
  * registration group, which derives the group travel/transport codes
  * (04_591_0136_6_1, 04_799_0136_6_1). Price limits in the 22-23 catalogue
  * are identical to the solo 0125 item's.
+ *
+ * Rates are the FULL-SESSION amount (docs/plans/016 operator decision 3):
+ * double the solo item's per-participant rate, so that billing's ÷2
+ * apportioning (the fixtures' default `groupSize`) reproduces the exact
+ * solo-equivalent per-participant cents.
  */
 const makeGroupSupportItem = (
 	fixtureName: string,
@@ -140,6 +145,10 @@ const makeGroupSupportItem = (
 		weeknightCode: "04_103_0136_6_1",
 		saturdayCode: "04_104_0136_6_1",
 		sundayCode: "04_105_0136_6_1",
+		weekdayRate: new Prisma.Decimal(124.34),
+		weeknightRate: new Prisma.Decimal(137),
+		saturdayRate: new Prisma.Decimal(175.02),
+		sundayRate: new Prisma.Decimal(225.7),
 		...overrides
 	});
 
@@ -187,6 +196,7 @@ const makeActivity = (
 	transitDuration: null,
 	transitDistance: null,
 	itemDistance: null,
+	groupSize: null,
 	ownerId: `user_${fixtureName}`,
 	clientId: `client_${fixtureName}`,
 	supportItemId: `supportitem_${fixtureName}`,
@@ -333,9 +343,10 @@ const transitSolo = makeFixture(
 
 /**
  * 8. Group provider travel: the non-labour line item and the printed Total
- * both price transit at the group rate ($0.43/km) via getTransitRate, so the
+ * both price transit at the apportioned group rate ($0.42/km = floorToCent(the
+ * fixture user's 0.85/km ÷ 2), docs/plans/016) via getTransitRate, so the
  * Total equals the sum of the line items. (Formerly quirk Q1: the Total
- * charged $0.99/km while the line item showed $0.43/km.)
+ * charged $0.99/km while the line item showed a hardcoded $0.43/km.)
  */
 const transitGroup = makeFixture(
 	"transit-group",
@@ -343,6 +354,7 @@ const transitGroup = makeFixture(
 		makeActivity("transit-group", 1, {
 			transitDuration: new Prisma.Decimal(30),
 			transitDistance: new Prisma.Decimal(15),
+			groupSize: 2,
 			supportItem: makeGroupSupportItem("transit-group")
 		})
 	])
@@ -392,8 +404,35 @@ const transportGroupDistance = makeFixture(
 	makeInvoice("transport-group-distance", "TRANSPORT-2", [
 		makeActivity("transport-group-distance", 1, {
 			supportItem: makeGroupSupportItem("transport-group-distance"),
+			groupSize: 2,
 			transportItems: [
 				makeTransportItem("transport-group-distance", 1, {
+					type: ActivityTransportType.DISTANCE,
+					amount: new Prisma.Decimal(22)
+				})
+			]
+		})
+	])
+);
+
+/**
+ * 10a. A 3-participant group activity (docs/plans/016) — every category
+ * apportions by 3 instead of the N=2 default: hourly floorToCent(70.2/3) =
+ * 23.40/hr, transit floorToCent(0.85/3) = 0.28/km, ABT floorToCent(0.99/3) =
+ * 0.33/km.
+ */
+const transportGroupThreeParticipants = makeFixture(
+	"transport-group-three-participants",
+	makeInvoice("transport-group-three-participants", "GROUP3-1", [
+		makeActivity("transport-group-three-participants", 1, {
+			supportItem: makeGroupSupportItem("transport-group-three-participants", {
+				weekdayRate: new Prisma.Decimal(70.2)
+			}),
+			groupSize: 3,
+			transitDuration: new Prisma.Decimal(30),
+			transitDistance: new Prisma.Decimal(15),
+			transportItems: [
+				makeTransportItem("transport-group-three-participants", 1, {
 					type: ActivityTransportType.DISTANCE,
 					amount: new Prisma.Decimal(22)
 				})
@@ -591,13 +630,15 @@ const recurringSlot = (() => {
 /**
  * 16. The richest real-world shape, plan-managed: a group session whose 0136
  * registration group derives 04_591_0136_6_1 transport ($0.49/km) and
- * 04_799_0136_6_1 non-labour travel ($0.43/km), alongside solo sessions on
+ * 04_799_0136_6_1 non-labour travel (apportioned to $0.42/km, docs/plans/016 —
+ * floorToCent(the fixture user's 0.85/km ÷ 2)), alongside solo sessions on
  * 0125 codes ($0.99/km); odd durations (1h 5m, 5h 30m, 4h 5m); provider
  * travel labour billed per minute at each parent item's rate; and both
  * Participant Number and Bill To in the header. The source invoice printed a
  * Total of $1168.15 — $7.28 above its own line-item sum — because it exhibited
- * quirk Q1 (the Total charged the group's 13 km at $0.99/km instead of
- * $0.43/km). With Q1 fixed, the Total is $1160.87, equal to the line items.
+ * quirk Q1 (the Total charged the group's 13 km at $0.99/km instead of the
+ * group rate). With Q1 fixed, the Total was $1160.87; docs/plans/016's
+ * deliberate -1c/km transit apportioning change brings it to $1160.74.
  * (The original paginated onto page 2; with the price guide's shorter item
  * names the table now fits on one page.)
  */
@@ -606,12 +647,13 @@ const planManagedWeek = (() => {
 	const communityAccess = makeCommunityAccessItem(name);
 	const groupActivities = makeGroupSupportItem(name, {
 		id: `supportitem_${name}_group`,
-		// The real user's group item is weekday-only, at their apportioned
-		// (per-participant) rate rather than the full published price limit
+		// The real user's group item is weekday-only, at the full-session rate
+		// (docs/plans/016) rather than the full published price limit — 70.20
+		// apportions to the pre-plan per-participant rate of 35.10 at N=2.
 		weeknightCode: null,
 		saturdayCode: null,
 		sundayCode: null,
-		weekdayRate: new Prisma.Decimal(35.1),
+		weekdayRate: new Prisma.Decimal(70.2),
 		weeknightRate: null,
 		saturdayRate: null,
 		sundayRate: null
@@ -631,6 +673,7 @@ const planManagedWeek = (() => {
 					endTime: time("13:20"),
 					supportItemId: `supportitem_${name}_group`,
 					supportItem: groupActivities,
+					groupSize: 2,
 					transitDuration: new Prisma.Decimal(25),
 					transitDistance: new Prisma.Decimal(13),
 					transportItems: [
@@ -701,6 +744,7 @@ export const invoiceFixtures: InvoiceFixture[] = [
 	transitGroup,
 	transportAllTypes,
 	transportGroupDistance,
+	transportGroupThreeParticipants,
 	duplicateMerge,
 	kitchenSink,
 	noPaymentFooter,

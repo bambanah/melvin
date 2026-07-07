@@ -222,7 +222,8 @@ test("Should include activity based transport items in total", () => {
 		])
 	).toEqual(77.25); // 55.47 + 22 * 0.99
 
-	// DISTANCE group: km * 0.49
+	// DISTANCE group (N=2, docs/plans/016): support and ABT both apportioned
+	// by group size — floorToCent(55.47/2) + 22 * floorToCent(0.99/2)
 	expect(
 		getTotalCostOfActivities([
 			{
@@ -230,7 +231,7 @@ test("Should include activity based transport items in total", () => {
 				transportItems: [{ type: "DISTANCE" as const, amount: 22 }]
 			}
 		])
-	).toEqual(66.25); // 55.47 + 22 * 0.49
+	).toEqual(38.51); // 27.73 + 22 * 0.49
 
 	// PARKING / TOLL / OTHER are flat amounts
 	expect(
@@ -354,9 +355,9 @@ test("Should resolve transit rate with correct precedence", () => {
 });
 
 test("Group branch beats a client transit rate override", () => {
-	// Group activities always bill transit at GROUP_TRANSIT_RATE, even when
-	// the client has a custom transitRatePerKm — until plan 016 replaces the
-	// constant with effective-rate ÷ group-size
+	// Group transit still resolves client → user → default first (docs/plans/016);
+	// the client override wins over both the rateContext and the 0.99 default,
+	// then the effective rate is apportioned by group size (N=2 default).
 	const groupActivityWithClientOverride = {
 		...getActivity("weekday", "16:00", "17:00", 0, 10, true),
 		client: { transitRatePerKm: new Prisma.Decimal(0.5) }
@@ -366,60 +367,61 @@ test("Group branch beats a client transit rate override", () => {
 		getTotalCostOfActivities([groupActivityWithClientOverride], {
 			userTransitRatePerKm: 0.85
 		})
-	).toEqual(59.77); // 55.47 + 10 * 0.43 (GROUP_TRANSIT_RATE, not 0.5 or 0.85)
+	).toEqual(30.23); // floorToCent(55.47/2) + 10 * floorToCent(0.5/2)
 });
 
 test("Should return correct total for group activities", () => {
-	// Group activities price transit distance at the group rate ($0.43/km),
-	// matching the PDF's non-labour travel line items
+	// Group activities apportion every rate category by group size (N=2
+	// default when unset) — hourly support/labour-travel and transit per-km
+	// (docs/plans/016). Support rate: floorToCent(55.47/2) = 27.73.
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "16:00", "17:00", 0, 0, true)
 		])
-	).toEqual(55.47);
+	).toEqual(27.73);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "15:00", "17:00", 7, 15, true)
 		])
-	).toEqual(123.86);
+	).toEqual(66.05);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "15:00", "17:00", 7, 15, true),
 			getActivity("weekday", "15:00", "21:00", 7, 15, true)
 		])
-	).toEqual(503.73);
+	).toEqual(260.08);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("saturday", "15:00", "17:00", 7, 15, true)
 		])
-	).toEqual(171.15);
+	).toEqual(89.69);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("saturday", "19:00", "21:00", 7, 15, true)
 		])
-	).toEqual(171.15);
+	).toEqual(89.69);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "09:30", "15:00", 0, 0, true)
 		])
-	).toEqual(305.09);
+	).toEqual(152.52);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "09:30", "15:10", 0, 0, true)
 		])
-	).toEqual(314.33);
+	).toEqual(157.14);
 
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "16:10", "20:10", 0, 0, true)
 		])
-	).toEqual(244.2);
+	).toEqual(122.08);
 
 	expect(
 		getTotalCostOfActivities([
@@ -427,7 +429,7 @@ test("Should return correct total for group activities", () => {
 			getActivity("weekday", "09:30", "15:10", 15, 7, true),
 			getActivity("weekday", "09:30", "15:23", 15, 7, true)
 		])
-	).toEqual(996.41);
+	).toEqual(503.88);
 
 	expect(
 		getTotalCostOfActivities([
@@ -439,5 +441,5 @@ test("Should return correct total for group activities", () => {
 			getActivity("weekday", "09:30", "15:10", 15, 7, true),
 			getActivity("weekday", "09:30", "15:25", 15, 7, true)
 		])
-	).toEqual(2295.38);
+	).toEqual(1160.95);
 });

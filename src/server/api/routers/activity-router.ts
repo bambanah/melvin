@@ -341,6 +341,27 @@ export const activityRouter = router({
 				return { activities: [], tripId: null };
 			}
 
+			const groupSizeSupportItemIds = [
+				...new Set(
+					inputActivities
+						.filter((activity) => activity.groupSize !== undefined)
+						.map((activity) => activity.supportItemId)
+				)
+			];
+
+			if (groupSizeSupportItemIds.length > 0) {
+				const groupSupportItems = await ctx.owned.supportItem.findMany({
+					where: { id: { in: groupSizeSupportItemIds }, isGroup: true }
+				});
+
+				if (groupSupportItems.length !== groupSizeSupportItemIds.length) {
+					throw new TRPCError({
+						code: "BAD_REQUEST",
+						message: "groupSize can only be set for group support items"
+					});
+				}
+			}
+
 			// Parse and validate all activities
 			const parsedActivities = inputActivities.map((activity) => {
 				const { transportItems, ...activityData } = activity;
@@ -374,6 +395,7 @@ export const activityRouter = router({
 							supportItemId: activity.supportItemId,
 							transitDistance: activity.transitDistance || undefined,
 							transitDuration: activity.transitDuration || undefined,
+							groupSize: activity.groupSize,
 							ownerId: ctx.session.user.id,
 							transportItems:
 								activity.transportItems && activity.transportItems.length > 0

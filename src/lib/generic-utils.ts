@@ -15,6 +15,15 @@ export function round(value: number, exp: number) {
 	return +`${valueArray[0]}e${valueArray[1] ? +valueArray[1] - exp : -exp}`;
 }
 
+/**
+ * Floors a dollar value to the nearest cent, neutralising float noise first
+ * (e.g. 70.2 / 2 === 35.099999999999994 in IEEE 754) so a genuine exact
+ * division isn't floored down a cent by representation error.
+ */
+export function floorToCent(value: number): number {
+	return Math.floor(round(value * 100, 6)) / 100;
+}
+
 export function groupBy<T>(arr: T[], keyGetter: (item: T) => string) {
 	const groupedObj: { [key: string]: T[] } = {};
 

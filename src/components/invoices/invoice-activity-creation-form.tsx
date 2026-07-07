@@ -18,7 +18,7 @@ import {
 import { stripTimezone } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
-import { InvoiceSchema } from "@/schema/invoice-schema";
+import { InvoiceSchema, MAX_GROUP_PARTICIPANTS } from "@/schema/invoice-schema";
 import { format } from "date-fns";
 import {
 	ArrowRight,
@@ -137,10 +137,47 @@ const InvoiceActivityCreationForm = ({
 	useEffect(() => {
 		activitiesToCreate?.forEach((activity, idx) => {
 			if (isGroupSupportItem(activity.supportItemId)) {
-				setValue(`activitiesToCreate.${idx}.groupClientId`, "");
+				setValue(`activitiesToCreate.${idx}.groupClientIds`, []);
 			}
 		});
 	}, [isGroupSupportItem, setValue, activitiesToCreate]);
+
+	const updateGroupClientId = (
+		activityIndex: number,
+		participantIndex: number,
+		clientId: string
+	) => {
+		const groupClientIds = [
+			...(getValues().activitiesToCreate[activityIndex].groupClientIds ?? [])
+		];
+		groupClientIds[participantIndex] = clientId;
+		setValue(
+			`activitiesToCreate.${activityIndex}.groupClientIds`,
+			groupClientIds
+		);
+	};
+
+	const addGroupParticipant = (activityIndex: number) => {
+		const groupClientIds =
+			getValues().activitiesToCreate[activityIndex].groupClientIds ?? [];
+		if (groupClientIds.length >= MAX_GROUP_PARTICIPANTS) return;
+		setValue(`activitiesToCreate.${activityIndex}.groupClientIds`, [
+			...groupClientIds,
+			""
+		]);
+	};
+
+	const removeGroupParticipant = (
+		activityIndex: number,
+		participantIndex: number
+	) => {
+		const groupClientIds =
+			getValues().activitiesToCreate[activityIndex].groupClientIds ?? [];
+		setValue(
+			`activitiesToCreate.${activityIndex}.groupClientIds`,
+			groupClientIds.filter((_, i) => i !== participantIndex)
+		);
+	};
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -164,24 +201,6 @@ const InvoiceActivityCreationForm = ({
 										</FormItem>
 									)}
 								/>
-								{isGroupSupportItem(
-									watch("activitiesToCreate")[index].supportItemId
-								) && (
-									<FormField
-										name={`activitiesToCreate.${index}.groupClientId`}
-										control={control}
-										render={({ field }) => (
-											<FormItem className="shrink grow basis-1/2">
-												<ClientSelect
-													excludeClientId={watch("clientId")}
-													onValueChange={field.onChange}
-													value={field.value}
-												/>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								)}
 								<Button
 									variant="ghost"
 									size="icon"
@@ -191,6 +210,68 @@ const InvoiceActivityCreationForm = ({
 									<X className="h-6 w-6" />
 								</Button>
 							</div>
+
+							{isGroupSupportItem(
+								watch("activitiesToCreate")[index].supportItemId
+							) && (
+								<div className="mb-2 flex flex-col gap-2">
+									{(
+										watch(`activitiesToCreate.${index}.groupClientIds`) ?? []
+									).map((groupClientId, participantIndex) => (
+										<div
+											key={participantIndex}
+											className="flex items-center gap-2"
+										>
+											<div className="shrink grow basis-1/2">
+												<ClientSelect
+													excludeClientId={watch("clientId")}
+													excludeClientIds={(
+														watch(
+															`activitiesToCreate.${index}.groupClientIds`
+														) ?? []
+													).filter((_, i) => i !== participantIndex)}
+													onValueChange={(clientId) =>
+														updateGroupClientId(
+															index,
+															participantIndex,
+															clientId
+														)
+													}
+													value={groupClientId}
+												/>
+											</div>
+											<Button
+												variant="ghost"
+												size="icon"
+												onClick={() =>
+													removeGroupParticipant(index, participantIndex)
+												}
+												type="button"
+											>
+												<X className="h-6 w-6" />
+											</Button>
+										</div>
+									))}
+									{(watch(`activitiesToCreate.${index}.groupClientIds`) ?? [])
+										.length < MAX_GROUP_PARTICIPANTS && (
+										<Button
+											onClick={() => addGroupParticipant(index)}
+											className="mr-auto"
+											variant="outline"
+											size="sm"
+											type="button"
+										>
+											+ Add Participant
+										</Button>
+									)}
+									{(watch(`activitiesToCreate.${index}.groupClientIds`) ?? [])
+										.length === 0 && (
+										<p className="text-destructive text-sm">
+											At least one other participant is required
+										</p>
+									)}
+								</div>
+							)}
 
 							<ul className="tree">
 								{fields[index].activities.map((_, activityFieldIndex) => (
@@ -333,7 +414,7 @@ const InvoiceActivityCreationForm = ({
 				onClick={() =>
 					appendActivityGroup({
 						supportItemId: "",
-						groupClientId: "",
+						groupClientIds: [],
 						activities: [{ date: stripTimezone(new Date()) }]
 					})
 				}
