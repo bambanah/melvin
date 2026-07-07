@@ -58,7 +58,7 @@ model User {
   bankNumber    BigInt?
   bsb           Int?
 
-  transitRatePerKm Decimal @default(0.85)
+  transitRatePerKm Decimal @default(0.99)
 
   defaultSupportItemId      String?
   defaultSupportItem        SupportItem? @relation("defaultSupportItem", fields: [defaultSupportItemId], references: [id], onDelete: SetNull)
