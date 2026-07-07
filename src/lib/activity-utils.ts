@@ -3,6 +3,7 @@ import {
 	getRateForActivity,
 	getTransitRate,
 	type BillableActivity,
+	type BillableLinesOptions,
 	type TransitRateContext
 } from "./billing-lines";
 import { round } from "./generic-utils";
@@ -13,10 +14,11 @@ export { getRateForActivity, getTransitRate };
 
 export const getTotalCostOfActivities = (
 	activities: BillableActivity[],
-	rateContext?: TransitRateContext
+	rateContext?: TransitRateContext,
+	options?: BillableLinesOptions
 ) => {
 	const grandTotal = activities
-		.flatMap((activity) => billableLines(activity, rateContext))
+		.flatMap((activity) => billableLines(activity, rateContext, options))
 		.reduce((total, line) => total + line.total, 0);
 
 	return round(grandTotal, 2);

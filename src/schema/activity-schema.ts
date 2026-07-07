@@ -33,7 +33,13 @@ export const activitySchema = z
 		groupSize: z.number().int().min(2).max(10).optional()
 	})
 	.partial({ startTime: true, endTime: true, itemDistance: true })
+	.refine((data) => (!!data.startTime && !!data.endTime) || !!data.itemDistance)
 	.refine(
-		(data) => (!!data.startTime && !!data.endTime) || !!data.itemDistance
+		(data) => !data.startTime || !data.endTime || data.startTime < data.endTime,
+		{
+			message:
+				"End time must be after start time — activities can't cross midnight",
+			path: ["endTime"]
+		}
 	);
 export type ActivitySchema = z.infer<typeof activitySchema>;

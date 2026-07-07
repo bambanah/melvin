@@ -176,6 +176,51 @@ test("EXPENSE lines (PARKING/TOLL/OTHER) bill at face value", () => {
 	expect(expenseLine?.note).toEqual("CityLink");
 });
 
+test("billableLines throws on a reversed time range by default (invoicing must hard-stop)", () => {
+	const reversed = {
+		...fullyLoadedActivity,
+		startTime: new Date("1970-01-01T23:00:00.000Z"),
+		endTime: new Date("1970-01-01T01:00:00.000Z")
+	};
+
+	expect(() => billableLines(reversed)).toThrow(/precedes startTime/);
+});
+
+test("billableLines drops the SUPPORT line for a reversed time range when forDisplay is set", () => {
+	const reversed = {
+		...fullyLoadedActivity,
+		startTime: new Date("1970-01-01T23:00:00.000Z"),
+		endTime: new Date("1970-01-01T01:00:00.000Z")
+	};
+
+	const lines = billableLines(reversed, undefined, { forDisplay: true });
+
+	expect(lines.map((line) => line.kind)).toEqual([
+		"TRAVEL_TIME",
+		"TRAVEL_KM",
+		"ABT",
+		"EXPENSE"
+	]);
+});
+
+test("getTotalCostOfActivities degrades a reversed time range to 0 for that activity's SUPPORT line when forDisplay is set", () => {
+	const reversed = {
+		...fullyLoadedActivity,
+		transitDuration: null,
+		transitDistance: null,
+		transportItems: [],
+		startTime: new Date("1970-01-01T23:00:00.000Z"),
+		endTime: new Date("1970-01-01T01:00:00.000Z")
+	};
+
+	expect(() => getTotalCostOfActivities([reversed])).toThrow(
+		/precedes startTime/
+	);
+	expect(
+		getTotalCostOfActivities([reversed], undefined, { forDisplay: true })
+	).toEqual(0);
+});
+
 test("sum of every activity's line totals equals getTotalCostOfActivities, for every invoice fixture", () => {
 	for (const fixture of invoiceFixtures) {
 		const rateContext = {

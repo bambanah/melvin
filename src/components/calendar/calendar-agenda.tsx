@@ -2,7 +2,7 @@ import { useRateContext } from "@/components/shared/use-rate-context";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
-import { formatDuration, getDuration, isHoliday } from "@/lib/date-utils";
+import { formatActivityDuration, isHoliday } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import type { ActivityByDateRangeOutput } from "@/server/api/routers/activity-router";
 import dayjs, { type Dayjs } from "dayjs";
@@ -59,7 +59,9 @@ const CalendarAgenda = ({ currentMonth, activities, isLoading }: Props) => {
 			{groups.map(({ date, activities: dayActivities }) => {
 				const day = dayjs(date);
 				const holiday = isHoliday(day.toDate());
-				const dayCost = getTotalCostOfActivities(dayActivities, rateContext);
+				const dayCost = getTotalCostOfActivities(dayActivities, rateContext, {
+					forDisplay: true
+				});
 
 				return (
 					<div key={date} className="py-3">
@@ -102,7 +104,9 @@ interface AgendaRowProps {
 
 const AgendaRow = ({ activity, rateContext }: AgendaRowProps) => {
 	const isInvoiced = activity.invoiceId !== null;
-	const cost = getTotalCostOfActivities([activity], rateContext);
+	const cost = getTotalCostOfActivities([activity], rateContext, {
+		forDisplay: true
+	});
 
 	return (
 		<Link
@@ -130,10 +134,7 @@ const AgendaRow = ({ activity, rateContext }: AgendaRowProps) => {
 							<Clock className="h-3 w-3" />
 							{dayjs.utc(activity.startTime).format("H:mm")} -{" "}
 							{dayjs.utc(activity.endTime).format("H:mm")} (
-							{formatDuration(
-								getDuration(activity.startTime, activity.endTime)
-							)}
-							)
+							{formatActivityDuration(activity.startTime, activity.endTime)})
 						</span>
 					) : null}
 

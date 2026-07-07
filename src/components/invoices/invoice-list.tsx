@@ -246,7 +246,9 @@ export default function InvoiceList({ clientId: propClientId }: Props) {
 				// live recompute (docs/plans/017 Step 7/8).
 				const totalCost =
 					invoice.status === InvoiceStatus.CREATED
-						? getTotalCostOfActivities(invoice.activities, rateContext)
+						? getTotalCostOfActivities(invoice.activities, rateContext, {
+								forDisplay: true
+							})
 						: (invoice.versions?.[0]?.total ?? 0);
 
 				return totalCost > 0
