@@ -77,6 +77,15 @@ test("Should return correct rates", () => {
 	activity.endTime = dayjs.utc("1970-01-01T20:00").toDate();
 	expect(getRateForActivity(activity)).toEqual(["weeknight", 2]);
 
+	// 7:30pm weekday - still weekday rate (weeknight starts at 8pm)
+	activity.date = new Date("2022-01-14");
+	activity.endTime = dayjs.utc("1970-01-01T19:30").toDate();
+	expect(getRateForActivity(activity)).toEqual(["weekday", 1]);
+
+	// 7:59pm weekday - still weekday rate
+	activity.endTime = dayjs.utc("1970-01-01T19:59").toDate();
+	expect(getRateForActivity(activity)).toEqual(["weekday", 1]);
+
 	// Saturday - saturday
 	activity.date = new Date("2022-01-15");
 	activity.endTime = dayjs.utc("1970-01-01T15:10").toDate();

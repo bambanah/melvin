@@ -5,7 +5,7 @@ Participant Name: Jane Citizen
 Participant Number: 431234567
 Bill To: HELP Plan Managers
 Description | Date | Details | Unit Price | Total
-Access Community Social | 12/01/23 | 17:30-19:30 (2 hours) | $68.50/hr | $137.00
+Access Community Social | 12/01/23 | 18:30-20:30 (2 hours) | $68.50/hr | $137.00
 and Rec Activ - Standard
 04_103_0125_6_1
 Access Community Social | 11/01/23 | 09:00-11:00 (2 hours) | $62.17/hr | $124.34
