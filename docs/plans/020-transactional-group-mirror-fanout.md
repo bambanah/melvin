@@ -119,12 +119,12 @@ In `src/server/api/test/invoice-group-creation.integration.test.ts`, following i
 
 ## Done criteria
 
-- [ ] `pnpm type-check` exits 0
-- [ ] `pnpm test:integration` exits 0; atomicity test exists and passes
-- [ ] In `invoice-router.ts`, no `createGroupMirrorActivities` call remains outside a `$transaction` (`grep -n "createGroupMirrorActivities" src/server/api/routers/invoice-router.ts` and inspect each call site)
-- [ ] `pnpm lint` exits 0
-- [ ] No files outside the in-scope list modified (`git status`)
-- [ ] `docs/plans/README.md` status row updated
+- [x] `pnpm type-check` exits 0
+- [x] `pnpm test:integration` exits 0; atomicity test exists and passes
+- [x] In `invoice-router.ts`, no `createGroupMirrorActivities` call remains outside a `$transaction` (`grep -n "createGroupMirrorActivities" src/server/api/routers/invoice-router.ts` and inspect each call site)
+- [x] `pnpm lint` exits 0
+- [x] No files outside the in-scope list modified (`git status`)
+- [x] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 

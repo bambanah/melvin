@@ -219,6 +219,7 @@ const assertSupportItemsOwned = async (
  */
 const createGroupMirrorActivities = async (
 	ctx: RouterCtx,
+	db: Prisma.TransactionClient,
 	inputInvoice: InvoiceSchema,
 	ownerId: string
 ) => {
@@ -261,7 +262,7 @@ const createGroupMirrorActivities = async (
 		});
 	}
 
-	await ctx.prisma.activity.createMany(
+	await db.activity.createMany(
 		generateNestedWriteForGroupActivities(
 			groupActivitiesToCreate,
 			ownerId,
@@ -494,29 +495,38 @@ export const invoiceRouter = router({
 				inputInvoice.activitiesToCreate
 			);
 
-			const invoice = await ctx.prisma.invoice.create({
-				data: {
-					invoiceNo: inputInvoice.invoiceNo,
-					billTo: inputInvoice.billTo,
-					clientId: inputInvoice.clientId,
-					date: inputInvoice.date ? inputInvoice.date : new Date(),
-					ownerId: ctx.session.user.id,
-					activities: {
-						connect: inputInvoice.activityIds?.map((id) => ({ id })),
-						createMany: generateNestedWriteForActivities(
-							inputInvoice.activitiesToCreate,
-							client,
-							ctx.session.user.id
-						)
+			const invoice = await ctx.prisma.$transaction(async (tx) => {
+				const invoice = await tx.invoice.create({
+					data: {
+						invoiceNo: inputInvoice.invoiceNo,
+						billTo: inputInvoice.billTo,
+						clientId: inputInvoice.clientId,
+						date: inputInvoice.date ? inputInvoice.date : new Date(),
+						ownerId: ctx.session.user.id,
+						activities: {
+							connect: inputInvoice.activityIds?.map((id) => ({ id })),
+							createMany: generateNestedWriteForActivities(
+								inputInvoice.activitiesToCreate,
+								client,
+								ctx.session.user.id
+							)
+						}
 					}
+				});
+
+				if (!invoice) {
+					throw new TRPCError({ code: "NOT_FOUND" });
 				}
+
+				await createGroupMirrorActivities(
+					ctx,
+					tx,
+					inputInvoice,
+					ctx.session.user.id
+				);
+
+				return invoice;
 			});
-
-			if (!invoice) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
-
-			await createGroupMirrorActivities(ctx, inputInvoice, ctx.session.user.id);
 
 			return parseInvoice(invoice);
 		}),
@@ -563,39 +573,48 @@ export const invoiceRouter = router({
 				inputInvoice.activitiesToCreate
 			);
 
-			const invoice = await ctx.prisma.invoice.update({
-				where: {
-					id
-				},
-				data: {
-					invoiceNo: inputInvoice.invoiceNo,
-					billTo: inputInvoice.billTo,
-					clientId: inputInvoice.clientId,
-					date: inputInvoice.date
-						? dayjs.utc(inputInvoice.date).toDate()
-						: new Date(),
-					activities: {
-						connect: inputInvoice.activityIds?.map((id) => ({ id })),
-						createMany: inputInvoice.activitiesToCreate
-							? generateNestedWriteForActivities(
-									inputInvoice.activitiesToCreate,
-									client,
-									ctx.session.user.id
-								)
-							: undefined
+			const invoice = await ctx.prisma.$transaction(async (tx) => {
+				const invoice = await tx.invoice.update({
+					where: {
+						id
+					},
+					data: {
+						invoiceNo: inputInvoice.invoiceNo,
+						billTo: inputInvoice.billTo,
+						clientId: inputInvoice.clientId,
+						date: inputInvoice.date
+							? dayjs.utc(inputInvoice.date).toDate()
+							: new Date(),
+						activities: {
+							connect: inputInvoice.activityIds?.map((id) => ({ id })),
+							createMany: inputInvoice.activitiesToCreate
+								? generateNestedWriteForActivities(
+										inputInvoice.activitiesToCreate,
+										client,
+										ctx.session.user.id
+									)
+								: undefined
+						}
+					},
+					select: {
+						date: true,
+						invoiceNo: true
 					}
-				},
-				select: {
-					date: true,
-					invoiceNo: true
+				});
+
+				if (!invoice) {
+					throw new TRPCError({ code: "NOT_FOUND" });
 				}
+
+				await createGroupMirrorActivities(
+					ctx,
+					tx,
+					inputInvoice,
+					ctx.session.user.id
+				);
+
+				return invoice;
 			});
-
-			if (!invoice) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
-
-			await createGroupMirrorActivities(ctx, inputInvoice, ctx.session.user.id);
 
 			return {
 				invoice: parseInvoice(invoice)
