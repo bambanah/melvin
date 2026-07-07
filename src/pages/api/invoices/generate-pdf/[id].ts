@@ -15,11 +15,14 @@ const request = async (request: NextApiRequest, response: NextApiResponse) => {
 		return response.status(401).send("Unauthorized");
 	}
 
-	const { id, base64 } = request.query;
+	const { id, base64, versionNumber } = request.query;
 
 	const { pdfString, fileName } = await generatePDF(
 		String(id),
-		session.user.id
+		session.user.id,
+		{
+			versionNumber: versionNumber ? Number(versionNumber) : undefined
+		}
 	);
 
 	if (!pdfString) {

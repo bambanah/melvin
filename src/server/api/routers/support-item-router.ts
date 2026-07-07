@@ -238,6 +238,23 @@ export const supportItemRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			await ctx.owned.supportItem.assert(input.id);
 
+			// The schema cascade-deletes Activity rows on SupportItem delete —
+			// without this guard that would silently eat a sent invoice's
+			// frozen-in-spirit activities (docs/plans/017 Step 4).
+			const lockedActivity = await ctx.prisma.activity.findFirst({
+				where: {
+					supportItemId: input.id,
+					invoice: { status: { not: "CREATED" } }
+				},
+				select: { invoice: { select: { invoiceNo: true } } }
+			});
+			if (lockedActivity?.invoice) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: `Invoice ${lockedActivity.invoice.invoiceNo} is sent — amend it first`
+				});
+			}
+
 			const supportItem = await ctx.prisma.supportItem.delete({
 				where: {
 					id: input.id

@@ -1,4 +1,3 @@
-import { useRateContext } from "@/components/shared/use-rate-context";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -11,7 +10,6 @@ import {
 	DialogTrigger
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { debounce } from "@/lib/generic-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
@@ -23,7 +21,6 @@ import { toast } from "react-toastify";
 const LogPaymentDialog = () => {
 	const [amountPaid, setAmountPaid] = useState(0);
 	const [invoicesToUpdate, setInvoicesToUpdate] = useState<string[]>([]);
-	const rateContext = useRateContext();
 
 	const handleOpenChange = (open: boolean) => {
 		if (!open) {
@@ -44,7 +41,7 @@ const LogPaymentDialog = () => {
 		{ enabled: false }
 	);
 	const trpcUtils = trpc.useUtils();
-	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
+	const markPaidMutation = trpc.invoice.markPaid.useMutation();
 
 	const updateAmountPaid = debounce(
 		(value: number) => setAmountPaid(value),
@@ -53,10 +50,9 @@ const LogPaymentDialog = () => {
 
 	const updateMatchingInvoices = () => {
 		// Mark matching invoices as paid
-		markInvoiceAsMutation
+		markPaidMutation
 			.mutateAsync({
-				ids: invoicesToUpdate,
-				status: "PAID"
+				ids: invoicesToUpdate
 			})
 			.then(() => {
 				trpcUtils.invoice.list.invalidate();
@@ -106,10 +102,7 @@ const LogPaymentDialog = () => {
 				</div>
 				<div className="ml-auto text-right">
 					<p className="font-semibold">
-						{getTotalCostOfActivities(
-							invoice.activities,
-							rateContext
-						).toLocaleString(undefined, {
+						{invoice.total.toLocaleString(undefined, {
 							style: "currency",
 							currency: "AUD"
 						})}

@@ -270,6 +270,7 @@ export const activityRouter = router({
 			}
 
 			await ctx.owned.activity.assert(input.id);
+			await ctx.owned.activity.assertNoneOnLockedInvoice([input.id]);
 
 			// Delete existing transport items and recreate
 			if (transportItems !== undefined) {
@@ -314,6 +315,7 @@ export const activityRouter = router({
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
 			await ctx.owned.activity.assert(input.id);
+			await ctx.owned.activity.assertNoneOnLockedInvoice([input.id]);
 
 			const activity = await ctx.prisma.activity.delete({
 				where: {

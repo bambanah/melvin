@@ -5,7 +5,10 @@ export default defineConfig({
 	plugins: [tsconfigPaths()],
 	test: {
 		environment: "node",
-		include: ["./src/**/*.integration.test.ts"],
+		include: [
+			"./src/**/*.integration.test.ts",
+			"./prisma/**/*.integration.test.ts"
+		],
 		fileParallelism: false,
 		globalSetup: ["./src/server/api/test/global-setup.ts"],
 		watch: false

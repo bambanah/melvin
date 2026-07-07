@@ -1,14 +1,19 @@
 import prisma from "@/server/prisma";
-import { RateType, type User } from "@/generated/client";
+import type { Prisma, User } from "@/generated/client";
 import jspdf from "jspdf";
 import autoTable, { CellDef } from "jspdf-autotable";
 import {
 	type BillableActivity,
-	type BillableLine,
-	billableLines
+	billableLines,
+	lineDetailsText,
+	lineUnitPriceSuffix
 } from "./billing-lines";
-import { formatDuration } from "./date-utils";
+import { formatProviderDetails, type ProviderDetails } from "./invoice-version";
 import { round } from "./generic-utils";
+import {
+	invoiceVersionContentSchema,
+	type InvoiceVersionContent
+} from "@/schema/invoice-version-schema";
 
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
@@ -31,18 +36,22 @@ export interface InvoicePdfData {
 	rateContext: { userTransitRatePerKm: number };
 }
 
+/** The subset of a Prisma client/transaction client the loader needs. */
+type PdfPrismaClient = Pick<Prisma.TransactionClient, "invoice" | "user">;
+
 export const loadInvoiceForPdf = async (
 	invoiceId: string,
-	ownerId: string
+	ownerId: string,
+	client: PdfPrismaClient = prisma
 ): Promise<InvoicePdfData | null> => {
-	const invoiceRecord = await prisma.invoice.findFirst({
+	const invoiceRecord = await client.invoice.findFirst({
 		where: { id: invoiceId, ownerId },
 		select: { clientId: true }
 	});
 
 	if (!invoiceRecord?.clientId) return null;
 
-	const invoice = await prisma.invoice.findFirst({
+	const invoice = await client.invoice.findFirst({
 		where: { id: invoiceId, ownerId },
 		include: {
 			client: true,
@@ -62,7 +71,7 @@ export const loadInvoiceForPdf = async (
 
 	if (!invoice || !invoice.client || !invoice.activities) return null;
 
-	const user = await prisma.user.findUnique({ where: { id: invoice.ownerId } });
+	const user = await client.user.findUnique({ where: { id: invoice.ownerId } });
 
 	return {
 		invoice,
@@ -73,90 +82,60 @@ export const loadInvoiceForPdf = async (
 	};
 };
 
-/** The Details-column cell for a line, plus its Unit Price suffix. */
-const formatLine = (
-	line: BillableLine,
-	activity: BillableActivity
-): string[] => {
+/**
+ * A single printed table row's worth of data, already resolved to exactly
+ * what's printed — no `kind`-specific branching left to do, and no live
+ * `Activity` reference needed. Both rendering sources (live activities via
+ * plan 007's `billableLines`, and a frozen `InvoiceVersion.content`) build
+ * this shape so the drawing code below is source-agnostic (docs/plans/017
+ * Step 6).
+ */
+interface PdfLine {
+	description: string;
+	supportItemCode: string;
+	serviceDate: Date | string;
+	total: number;
+	unitPrice: number;
+	unitPriceSuffix?: "hr" | "km";
+	detailsText: string;
+}
+
+/** The Details-column cell for a line, plus its Unit Price column. */
+const formatPdfLine = (line: PdfLine): string[] => {
 	const dateCell = `${dayjs.utc(line.serviceDate).format("DD/MM/YY")}\n`;
 	const descriptionCell = `${line.description}\n${line.supportItemCode}\n`;
 	const totalCell = `$${line.total.toFixed(2)}\n`;
+	const detailsCell = `${line.detailsText}\n`;
+	const unitPriceCell = line.unitPriceSuffix
+		? `$${line.unitPrice.toFixed(2)}/${line.unitPriceSuffix}\n`
+		: `-\n`;
 
-	switch (line.kind) {
-		case "SUPPORT": {
-			if (line.unit === "HOUR") {
-				const detailsCell = `${dayjs
-					.utc(activity.startTime ?? undefined)
-					.format("HH:mm")}-${dayjs
-					.utc(activity.endTime ?? undefined)
-					.format("HH:mm")} (${formatDuration(line.quantity)})\n`;
-
-				return [
-					descriptionCell,
-					dateCell,
-					detailsCell,
-					`$${line.unitPrice.toFixed(2)}/hr\n`,
-					totalCell
-				];
-			}
-
-			return [
-				descriptionCell,
-				dateCell,
-				`${line.quantity} km\n`,
-				`$${line.unitPrice.toFixed(2)}/km\n`,
-				totalCell
-			];
-		}
-		case "TRAVEL_TIME": {
-			// Matches the printed unit-price suffix historically: it follows the
-			// activity's own rateType, not this line's unit (docs/plans/007).
-			const suffix =
-				activity.supportItem.rateType === RateType.HOUR ? "hr" : "km";
-
-			return [
-				descriptionCell,
-				dateCell,
-				`${line.quantity} minutes\n`,
-				`$${line.unitPrice.toFixed(2)}/${suffix}\n`,
-				totalCell
-			];
-		}
-		case "TRAVEL_KM":
-		case "ABT": {
-			return [
-				descriptionCell,
-				dateCell,
-				`${line.quantity} km\n`,
-				`$${line.unitPrice.toFixed(2)}/km\n`,
-				totalCell
-			];
-		}
-		case "EXPENSE": {
-			const typeLabels: Record<string, string> = {
-				PARKING: "Parking",
-				TOLL: "Toll",
-				OTHER: "Other Transport Expense"
-			};
-			const label =
-				typeLabels[line.transportType ?? ""] ?? line.transportType ?? "";
-
-			return [
-				descriptionCell,
-				dateCell,
-				`${label}${line.note ? ` - ${line.note}` : ""}\n`,
-				`-\n`,
-				totalCell
-			];
-		}
-	}
+	return [descriptionCell, dateCell, detailsCell, unitPriceCell, totalCell];
 };
 
-export const renderInvoicePdf = (
-	data: InvoicePdfData
-): { pdfString: string; fileName: string } => {
-	const { invoice, user, rateContext } = data;
+/**
+ * Everything `renderFromRenderable` needs to draw a PDF — built either from
+ * live `InvoicePdfData` (draft, watermarked) or a frozen
+ * `InvoiceVersionContent` (clean, possibly with a supersedes line).
+ */
+interface RenderableInvoice {
+	invoiceNoLabel: string;
+	date: Date | string;
+	participantName: string;
+	participantNumber?: string | null;
+	billTo?: string | null;
+	/** The previous version's display number, printed as a supersedes line. */
+	supersedesLabel?: string;
+	lines: PdfLine[];
+	total: number;
+	provider: ProviderDetails;
+	fileName: string;
+	watermark?: "DRAFT";
+}
 
+const renderFromRenderable = (
+	renderable: RenderableInvoice
+): { pdfString: string; fileName: string } => {
 	const margin = 20;
 
 	const document_ = new jspdf();
@@ -170,13 +149,17 @@ export const renderInvoicePdf = (
 
 	// Write details at top of page
 	const invoiceDetails: string[] = [
-		`Invoice Number: ${invoice.invoiceNo}`,
-		`Invoice Date: ${dayjs(invoice.date).format("DD/MM/YY")}`,
-		`Participant Name: ${invoice.client?.name}`
+		`Invoice Number: ${renderable.invoiceNoLabel}`,
+		`Invoice Date: ${dayjs(renderable.date).format("DD/MM/YY")}`,
+		`Participant Name: ${renderable.participantName}`
 	];
-	if (invoice.client?.number)
-		invoiceDetails.push(`Participant Number: ${invoice.client?.number}`);
-	if (invoice.billTo) invoiceDetails.push(`Bill To: ${invoice.billTo}`);
+	if (renderable.participantNumber)
+		invoiceDetails.push(`Participant Number: ${renderable.participantNumber}`);
+	if (renderable.billTo) invoiceDetails.push(`Bill To: ${renderable.billTo}`);
+	if (renderable.supersedesLabel)
+		invoiceDetails.push(
+			`This invoice amends and supersedes ${renderable.supersedesLabel}`
+		);
 
 	for (const [index, detail] of invoiceDetails.entries()) {
 		document_.text(detail, margin, margin + index * 5);
@@ -187,25 +170,13 @@ export const renderInvoicePdf = (
 		cells: string[];
 	}
 
-	const rows: Row[] = [];
-	const allLines: BillableLine[] = [];
-
-	for (const activity of invoice.activities) {
-		if (activity?.supportItem === null) continue;
-
-		const lines = billableLines(activity, rateContext);
-		allLines.push(...lines);
-
-		for (const line of lines) {
-			rows.push({
-				// ABT and EXPENSE lines for the same activity share one printed
-				// "Activity Based Transport" row (see formatLine), so the merge
-				// key is the description cell's content, not the line's kind.
-				key: `${line.supportItemCode}::${line.description}`,
-				cells: formatLine(line, activity)
-			});
-		}
-	}
+	const rows: Row[] = renderable.lines.map((line) => ({
+		// ABT and EXPENSE lines for the same activity share one printed
+		// "Activity Based Transport" row (see formatPdfLine), so the merge
+		// key is the description cell's content, not the line's kind.
+		key: `${line.supportItemCode}::${line.description}`,
+		cells: formatPdfLine(line)
+	}));
 
 	// Sort rows based on description
 	rows.sort((a, b) => {
@@ -236,11 +207,6 @@ export const renderInvoicePdf = (
 	// Activities only allows strings - need to allow strings and CellDef
 	const values: (CellDef | string)[][] = activityStrings;
 
-	const grandTotal = round(
-		allLines.reduce((total, line) => total + line.total, 0),
-		2
-	);
-
 	// Bottom section
 	values.push(
 		[
@@ -250,51 +216,46 @@ export const renderInvoicePdf = (
 				styles: { fontStyle: "bold", halign: "right" }
 			},
 			{
-				content: `$${grandTotal.toFixed(2)}`,
+				content: `$${renderable.total.toFixed(2)}`,
 				styles: { fontStyle: "bold" }
 			}
 		],
 		[{ content: "", colSpan: 5, styles: { fillColor: "#fff" } }]
 	);
 
-	if (user) {
-		const content = [
-			user.name ?? "",
-			user.abn
-				? `ABN: ${user.abn.toString().replaceAll(/\B(?=(\d{3})+(?!\d))/g, " ")}`
-				: "",
-			user.bankName ? `Bank: ${user.bankName}` : "",
-			user.bsb
-				? `BSB: ${user.bsb.toString().replaceAll(/\B(?=(\d{3})+(?!\d))/g, "-")}`
-				: "",
-			user.bankNumber
-				? `Account Number: ${user.bankNumber
-						?.toString()
-						.replaceAll(/\B(?=(\d{3})+(?!\d))/g, " ")}`
-				: ""
-		].filter((val) => val.length > 0);
+	const providerLines = [
+		renderable.provider.name ?? "",
+		renderable.provider.abn ? `ABN: ${renderable.provider.abn}` : "",
+		renderable.provider.bankName ? `Bank: ${renderable.provider.bankName}` : "",
+		renderable.provider.bsb ? `BSB: ${renderable.provider.bsb}` : "",
+		renderable.provider.accountNumber
+			? `Account Number: ${renderable.provider.accountNumber}`
+			: ""
+	].filter((val) => val.length > 0);
 
-		if (content.length === 5) {
-			values.push([
-				{
-					content: content.join("\n"),
-					colSpan: 5,
-					rowSpan: 2,
-					styles: {
-						minCellHeight: 46,
-						halign: "left",
-						fillColor: "#FFF",
-						fontStyle: "bold",
-						lineWidth: 0.2,
-						lineColor: "#000"
-					}
+	if (providerLines.length === 5) {
+		values.push([
+			{
+				content: providerLines.join("\n"),
+				colSpan: 5,
+				rowSpan: 2,
+				styles: {
+					minCellHeight: 46,
+					halign: "left",
+					fillColor: "#FFF",
+					fontStyle: "bold",
+					lineWidth: 0.2,
+					lineColor: "#000"
 				}
-			]);
-		}
+			}
+		]);
 	}
 
 	const startY =
-		35 + (invoice.billTo ? 5 : 0) + (invoice.client?.number ? 5 : 0);
+		35 +
+		(renderable.billTo ? 5 : 0) +
+		(renderable.participantNumber ? 5 : 0) +
+		(renderable.supersedesLabel ? 5 : 0);
 
 	autoTable(document_, {
 		head: [
@@ -333,22 +294,139 @@ export const renderInvoicePdf = (
 		}
 	});
 
-	const fileName = `${invoice.invoiceNo}.pdf`;
+	if (renderable.watermark === "DRAFT") {
+		document_.saveGraphicsState();
+		document_.setGState(document_.GState({ opacity: 0.15 }));
+		document_.setFontSize(80);
+		document_.setTextColor(150, 150, 150);
+		document_.text("DRAFT", 105, 180, { angle: 45, align: "center" });
+		document_.restoreGraphicsState();
+	}
 
 	return {
 		pdfString: document_
 			.output("dataurlstring")
 			.replace(/^data:application\/pdf;filename=.+\.pdf;base64,/, ""),
-		fileName
+		fileName: renderable.fileName
 	};
 };
 
-const generatePDF = async (invoiceId: string, ownerId: string) => {
+/** Renders live data — used only for drafts, so callers should pass `draftWatermark: true`. */
+export const renderInvoicePdf = (
+	data: InvoicePdfData,
+	options: { draftWatermark?: boolean } = {}
+): { pdfString: string; fileName: string } => {
+	const { invoice, user, rateContext } = data;
+
+	const lines: PdfLine[] = [];
+
+	for (const activity of invoice.activities) {
+		if (activity?.supportItem === null) continue;
+
+		for (const line of billableLines(activity, rateContext)) {
+			lines.push({
+				description: line.description,
+				supportItemCode: line.supportItemCode,
+				serviceDate: line.serviceDate,
+				total: line.total,
+				unitPrice: line.unitPrice,
+				unitPriceSuffix: lineUnitPriceSuffix(line, activity),
+				detailsText: lineDetailsText(line, activity)
+			});
+		}
+	}
+
+	const total = round(
+		lines.reduce((sum, line) => sum + line.total, 0),
+		2
+	);
+
+	return renderFromRenderable({
+		invoiceNoLabel: invoice.invoiceNo,
+		date: invoice.date,
+		participantName: invoice.client?.name ?? "",
+		participantNumber: invoice.client?.number,
+		billTo: invoice.billTo,
+		lines,
+		total,
+		provider: formatProviderDetails(user),
+		fileName: `${invoice.invoiceNo}.pdf`,
+		watermark: options.draftWatermark ? "DRAFT" : undefined
+	});
+};
+
+/**
+ * Renders a frozen `InvoiceVersion.content` document — no live reads, so a
+ * sent/paid invoice's clean PDF renders byte-identically no matter what
+ * changes upstream afterwards (docs/plans/017 Step 6).
+ */
+export const renderInvoiceVersionPdf = (
+	content: InvoiceVersionContent
+): { pdfString: string; fileName: string } =>
+	renderFromRenderable({
+		invoiceNoLabel: content.header.displayInvoiceNo,
+		date: content.header.date,
+		participantName: content.header.participantName,
+		participantNumber: content.header.participantNumber,
+		billTo: content.header.billTo,
+		supersedesLabel: content.header.amendsDisplayInvoiceNo,
+		lines: content.lines,
+		total: content.total,
+		provider: content.provider,
+		fileName: `${content.header.displayInvoiceNo}.pdf`
+	});
+
+export interface GeneratePdfOptions {
+	/** Render this specific version instead of resolving by invoice status. */
+	versionNumber?: number;
+}
+
+/**
+ * Resolves which of the two data sources above to render from
+ * (docs/plans/017 Step 6): an explicit version number always wins; failing
+ * that, a locked (non-draft) invoice renders its latest version; a draft
+ * invoice renders live data with the DRAFT watermark.
+ */
+const generatePDF = async (
+	invoiceId: string,
+	ownerId: string,
+	options: GeneratePdfOptions = {}
+): Promise<{ pdfString: string; fileName: string | null }> => {
+	const invoice = await prisma.invoice.findFirst({
+		where: { id: invoiceId, ownerId },
+		select: { status: true }
+	});
+
+	if (!invoice) return { pdfString: "", fileName: null };
+
+	if (options.versionNumber !== undefined) {
+		const version = await prisma.invoiceVersion.findFirst({
+			where: { invoiceId, versionNumber: options.versionNumber }
+		});
+		if (!version) return { pdfString: "", fileName: null };
+
+		return renderInvoiceVersionPdf(
+			invoiceVersionContentSchema.parse(version.content)
+		);
+	}
+
+	if (invoice.status !== "CREATED") {
+		const latestVersion = await prisma.invoiceVersion.findFirst({
+			where: { invoiceId },
+			orderBy: { versionNumber: "desc" }
+		});
+		if (!latestVersion) return { pdfString: "", fileName: null };
+
+		return renderInvoiceVersionPdf(
+			invoiceVersionContentSchema.parse(latestVersion.content)
+		);
+	}
+
 	const data = await loadInvoiceForPdf(invoiceId, ownerId);
 
 	if (!data) return { pdfString: "", fileName: null };
 
-	return renderInvoicePdf(data);
+	return renderInvoicePdf(data, { draftWatermark: true });
 };
 
 export default generatePDF;

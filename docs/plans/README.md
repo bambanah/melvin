@@ -6,7 +6,7 @@ See `manage-plans` skill for lifecycle conventions. TRDs in [`docs/trd/`](../trd
 
 | Plan | Title                                                          | Priority | Effort | Depends on | Status |
 | ---- | -------------------------------------------------------------- | -------- | ------ | ---------- | ------ |
-| 017  | Invoice versioning — sent invoices freeze an immutable version | P1       | L      | 007        | TODO   |
+| 017  | Invoice versioning — sent invoices freeze an immutable version | P1       | L      | 007        | DONE   |
 
 Status: `TODO` | `IN PROGRESS` | `DONE` | `BLOCKED (reason)` | `REJECTED (rationale)`
 

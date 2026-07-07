@@ -8,7 +8,7 @@ import type {
 	SupportItem,
 	SupportItemRates
 } from "@/generated/client";
-import { getDuration } from "./date-utils";
+import { formatDuration, getDuration } from "./date-utils";
 import { floorToCent, round } from "./generic-utils";
 import {
 	getActivityBasedTransportCode,
@@ -340,4 +340,73 @@ export function billableLines(
 	}
 
 	return lines;
+}
+
+const EXPENSE_TYPE_LABELS: Record<string, string> = {
+	PARKING: "Parking",
+	TOLL: "Toll",
+	OTHER: "Other Transport Expense"
+};
+
+/**
+ * The printed Unit Price column's suffix ("/hr" or "/km"), or `undefined`
+ * for EXPENSE lines (no unit price printed). TRAVEL_TIME follows the
+ * activity's own `rateType`, not this line's `unit` (which is always
+ * MINUTE) — everything else follows `unit` directly. Frozen into
+ * `InvoiceVersion` content at send time (docs/plans/017) alongside
+ * `lineDetailsText` so later changes here don't retroactively alter
+ * historic invoices' rendered text.
+ */
+export function lineUnitPriceSuffix(
+	line: BillableLine,
+	activity: BillableActivity
+): "hr" | "km" | undefined {
+	switch (line.kind) {
+		case "SUPPORT":
+			return line.unit === "HOUR" ? "hr" : "km";
+		case "TRAVEL_TIME":
+			return activity.supportItem.rateType === "HOUR" ? "hr" : "km";
+		case "TRAVEL_KM":
+		case "ABT":
+			return "km";
+		case "EXPENSE":
+			return undefined;
+	}
+}
+
+/**
+ * The printed Details-column text for a line. Frozen into `InvoiceVersion`
+ * content at send time (docs/plans/017) so later changes here don't
+ * retroactively alter historic invoices' rendered text.
+ */
+export function lineDetailsText(
+	line: BillableLine,
+	activity: BillableActivity
+): string {
+	switch (line.kind) {
+		case "SUPPORT": {
+			if (line.unit === "HOUR") {
+				return `${dayjs
+					.utc(activity.startTime ?? undefined)
+					.format("HH:mm")}-${dayjs
+					.utc(activity.endTime ?? undefined)
+					.format("HH:mm")} (${formatDuration(line.quantity)})`;
+			}
+
+			return `${line.quantity} km`;
+		}
+		case "TRAVEL_TIME":
+			return `${line.quantity} minutes`;
+		case "TRAVEL_KM":
+		case "ABT":
+			return `${line.quantity} km`;
+		case "EXPENSE": {
+			const label =
+				EXPENSE_TYPE_LABELS[line.transportType ?? ""] ??
+				line.transportType ??
+				"";
+
+			return `${label}${line.note ? ` - ${line.note}` : ""}`;
+		}
+	}
 }

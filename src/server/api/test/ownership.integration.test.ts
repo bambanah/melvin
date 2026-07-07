@@ -25,7 +25,7 @@ test("two users see only their own clients", async () => {
 	expect((await callerB.clients.list({})).clients).toHaveLength(0);
 });
 
-test("invoice.updateStatus scoped to caller's own invoices as a no-op, not a NOT_FOUND", async () => {
+test("invoice.send rejects a cross-tenant invoice, leaving it unaffected", async () => {
 	const userA = await createTestUser();
 	const userB = await createTestUser();
 	const callerA = callerFor(userA);
@@ -42,15 +42,9 @@ test("invoice.updateStatus scoped to caller's own invoices as a no-op, not a NOT
 		}
 	});
 
-	// NOTE: unlike the other single-record mutations in this suite,
-	// updateStatus uses `updateMany` scoped by ownerId rather than a
-	// findFirst-then-update, so a cross-tenant call silently matches zero
-	// rows instead of throwing NOT_FOUND. A's data is unaffected either way.
-	const payload = await callerB.invoice.updateStatus({
-		ids: [invoice.id],
-		status: "SENT"
-	});
-	expect(payload.count).toBe(0);
+	await expect(callerB.invoice.send({ ids: [invoice.id] })).rejects.toThrow(
+		TRPCError
+	);
 
 	const unchanged = await callerA.invoice.byId({ id: invoice.id });
 	expect(unchanged.status).toBe("CREATED");
@@ -157,7 +151,7 @@ test("invoice.getTotalOwing excludes another owner's SENT invoices", async () =>
 			activitiesToCreate: []
 		}
 	});
-	await callerA.invoice.updateStatus({ ids: [invoice.id], status: "SENT" });
+	await callerA.invoice.send({ ids: [invoice.id] });
 
 	expect(await callerA.invoice.getTotalOwing()).toBeGreaterThan(0);
 	expect(await callerB.invoice.getTotalOwing()).toBe(0);

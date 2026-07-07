@@ -1,7 +1,9 @@
 import {
 	getHighestInvoiceNo,
 	getNextInvoiceNo,
-	invoiceCandidatesFromPaymentAmount
+	invoiceCandidatesFromPaymentAmount,
+	invoiceVersionSuffix,
+	displayInvoiceNo
 } from "@/lib/invoice-utils";
 import { expect, test } from "vitest";
 
@@ -107,4 +109,21 @@ test("Should return a single empty combination for payment amount of 0", () => {
 	expect(
 		invoiceCandidatesFromPaymentAmount(0, new Map([[5, "INV-1"]]))
 	).toEqual([[]]);
+});
+
+test("Should derive invoice version display suffixes", () => {
+	expect(invoiceVersionSuffix(1)).toEqual("");
+	expect(invoiceVersionSuffix(2)).toEqual("a");
+	expect(invoiceVersionSuffix(3)).toEqual("b");
+	expect(invoiceVersionSuffix(27)).toEqual("z");
+	expect(invoiceVersionSuffix(28)).toEqual("aa");
+	expect(invoiceVersionSuffix(29)).toEqual("ab");
+	expect(invoiceVersionSuffix(53)).toEqual("az");
+	expect(invoiceVersionSuffix(54)).toEqual("ba");
+});
+
+test("Should build the display invoice number from the stored number + suffix", () => {
+	expect(displayInvoiceNo("INV-001", 1)).toEqual("INV-001");
+	expect(displayInvoiceNo("INV-001", 2)).toEqual("INV-001a");
+	expect(displayInvoiceNo("INV-001", 28)).toEqual("INV-001aa");
 });

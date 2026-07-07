@@ -13,6 +13,7 @@ const defaultClientSelect = {
 	number: true,
 	billTo: true,
 	invoiceNumberPrefix: true,
+	active: true,
 	invoices: {
 		select: {
 			invoiceNo: true,
@@ -23,10 +24,12 @@ const defaultClientSelect = {
 
 export const clientRouter = router({
 	list: authedProcedure
-		.input(baseListQueryInput)
+		.input(
+			baseListQueryInput.extend({ includeInactive: z.boolean().optional() })
+		)
 		.query(async ({ ctx, input }) => {
 			const limit = input.limit ?? DEFAULT_LIST_LIMIT;
-			const { cursor } = input;
+			const { cursor, includeInactive } = input;
 
 			const { items: clients, nextCursor } = await paginate({
 				limit,
@@ -49,6 +52,7 @@ export const clientRouter = router({
 								}
 							}
 						},
+						where: includeInactive ? undefined : { active: true },
 						cursor,
 						orderBy: {
 							createdAt: "desc"
@@ -219,6 +223,18 @@ export const clientRouter = router({
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ input, ctx }) => {
 			await ctx.owned.client.assert(input.id);
+
+			const versionedInvoice = await ctx.prisma.invoice.findFirst({
+				where: { clientId: input.id, versions: { some: {} } },
+				select: { id: true }
+			});
+			if (versionedInvoice) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message:
+						"Client has sent invoices and can't be deleted — deactivate instead"
+				});
+			}
 
 			const client = await ctx.prisma.client.delete({
 				where: {

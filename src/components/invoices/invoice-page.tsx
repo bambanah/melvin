@@ -1,15 +1,23 @@
 import { useRateContext } from "@/components/shared/use-rate-context";
 import { InvoiceStatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
+import { downloadOrSharePdf } from "@/lib/download-pdf";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogPanel, Transition } from "@headlessui/react";
 import { InvoiceStatus } from "@/generated/browser";
 import dayjs from "dayjs";
 import {
+	ChevronDown,
 	Clock,
 	DollarSign,
 	Download,
@@ -40,16 +48,51 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 	const { data: invoice, error } = trpc.invoice.byId.useQuery({
 		id: invoiceId
 	});
-	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
+	const sendMutation = trpc.invoice.send.useMutation();
+	const amendMutation = trpc.invoice.amend.useMutation();
+	const markPaidMutation = trpc.invoice.markPaid.useMutation();
 
-	const markInvoiceAs = (invoiceStatus: InvoiceStatus) => {
-		if (invoiceId)
-			markInvoiceAsMutation
-				.mutateAsync({ ids: [invoiceId], status: invoiceStatus })
-				.then(() => {
-					trpcUtils.invoice.byId.invalidate({ id: invoiceId });
-					trpcUtils.invoice.list.invalidate();
-				});
+	const invalidateInvoice = () => {
+		trpcUtils.invoice.byId.invalidate({ id: invoiceId });
+		trpcUtils.invoice.list.invalidate();
+	};
+
+	const sendInvoice = () => {
+		sendMutation.mutateAsync({ ids: [invoiceId] }).then(invalidateInvoice);
+	};
+
+	const markInvoiceAsPaid = () => {
+		markPaidMutation.mutateAsync({ ids: [invoiceId] }).then(invalidateInvoice);
+	};
+
+	const amendInvoice = () => {
+		if (!confirm("Amend this invoice? It will go back to draft.")) return;
+
+		amendMutation.mutateAsync({ id: invoiceId }).then(invalidateInvoice);
+	};
+
+	// docs/plans/017 Step 7: draft downloads carry a DRAFT watermark; a sent
+	// invoice's download is the frozen version the server resolves.
+	const downloadInvoicePdf = async (versionNumber?: number) => {
+		const dataUrl = await trpcUtils.pdf.forInvoice.fetch({
+			invoiceId,
+			returnBase64: true,
+			versionNumber
+		});
+
+		const displayNo = versionNumber
+			? (invoice?.versions?.find((v) => v.versionNumber === versionNumber)
+					?.displayInvoiceNo ?? invoice?.invoiceNo)
+			: invoice?.invoiceNo;
+
+		await downloadOrSharePdf(dataUrl, `${displayNo}.pdf`);
+	};
+
+	const sendAndDownloadInvoice = () => {
+		sendMutation.mutateAsync({ ids: [invoiceId] }).then(() => {
+			invalidateInvoice();
+			downloadInvoicePdf();
+		});
 	};
 
 	if (error) {
@@ -121,20 +164,24 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 				</div>
 				<div className="mx-auto flex w-full basis-1/2 flex-col px-4 py-4 md:pt-0">
 					<div className="flex items-center justify-between md:mb-5">
-						<Heading className="py-3">{invoice.invoiceNo}</Heading>
-						<Link
-							href={`/dashboard/invoices/${invoice.id}/edit`}
-							className="px-4 py-3 text-sm"
-						>
-							EDIT
-						</Link>
+						<Heading className="py-3">
+							{invoice.versions?.[0]?.displayInvoiceNo ?? invoice.invoiceNo}
+						</Heading>
+						{invoice.status === InvoiceStatus.CREATED && (
+							<Link
+								href={`/dashboard/invoices/${invoice.id}/edit`}
+								className="px-4 py-3 text-sm"
+							>
+								EDIT
+							</Link>
+						)}
 					</div>
 					<p className="text-foreground/80 text-sm">Total</p>
 					<div className="flex items-center justify-between">
 						<p className="text-xl" data-testid="invoice-total">
-							{getTotalCostOfActivities(
-								invoice.activities,
-								rateContext
+							{(invoice.status === InvoiceStatus.CREATED
+								? getTotalCostOfActivities(invoice.activities, rateContext)
+								: (invoice.versions?.[0]?.total ?? 0)
 							).toLocaleString(undefined, {
 								style: "currency",
 								currency: "AUD"
@@ -147,50 +194,64 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 						<div className="mt-5 flex justify-center gap-2">
 							{invoice.status === InvoiceStatus.CREATED &&
 								invoice.activities.length > 0 && (
-									<Button
-										onClick={() => {
-											markInvoiceAs(InvoiceStatus.SENT);
-										}}
-										className="w-1/2 grow"
-									>
+									<Button onClick={sendInvoice} className="w-1/2 grow">
 										<Plane className="mr-2 h-4 w-4" /> Mark as Sent
 									</Button>
 								)}
 							{invoice.status === InvoiceStatus.SENT && (
 								<Button
-									onClick={() => markInvoiceAs(InvoiceStatus.PAID)}
+									onClick={markInvoiceAsPaid}
 									variant="secondary"
 									className="w-1/2 grow"
 								>
 									<DollarSign className="mr-2 h-4 w-4" /> Mark as Paid
 								</Button>
 							)}
-							{invoice.status === InvoiceStatus.PAID && (
+							{(invoice.status === InvoiceStatus.SENT ||
+								invoice.status === InvoiceStatus.PAID) && (
 								<Button
-									onClick={() => {
-										markInvoiceAs("CREATED");
-									}}
+									onClick={amendInvoice}
 									className="w-1/2 grow"
 									variant="secondary"
 								>
 									<Undo className="mr-2 h-4 w-4" />
-									Revert to Created
+									Amend
 								</Button>
 							)}
-							<Button
-								asChild
-								className="w-1/2 grow"
-								variant={
-									invoice.status === InvoiceStatus.CREATED
-										? "secondary"
-										: "default"
-								}
-							>
-								<a href={`/api/invoices/generate-pdf/${invoiceId}`}>
+							{invoice.status === InvoiceStatus.CREATED &&
+							invoice.activities.length > 0 ? (
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button variant="secondary" className="w-1/2 grow">
+											<Download className="mr-2 h-4 w-4" />
+											Download
+											<ChevronDown className="ml-2 h-4 w-4" />
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent>
+										<DropdownMenuItem
+											className="cursor-pointer"
+											onClick={() => downloadInvoicePdf()}
+										>
+											Download draft
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											className="cursor-pointer"
+											onClick={sendAndDownloadInvoice}
+										>
+											Send & download
+										</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							) : (
+								<Button
+									className="w-1/2 grow"
+									onClick={() => downloadInvoicePdf()}
+								>
 									<Download className="mr-2 h-4 w-4" />
 									Download PDF
-								</a>
-							</Button>
+								</Button>
+							)}
 						</div>
 						{invoice.sentAt && (
 							<div className="text-foreground/80 flex flex-col gap-1">
@@ -200,6 +261,43 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					</div>
 				</div>
 			</div>
+
+			{invoice.versions && invoice.versions.length > 0 && (
+				<div className="flex w-full flex-col gap-2 p-2 px-4">
+					<p className="font-semibold">Version history</p>
+					{invoice.versions.map((version) => (
+						<div
+							key={version.versionNumber}
+							className="flex items-center justify-between rounded-md border p-3"
+						>
+							<div>
+								<p className="font-semibold">{version.displayInvoiceNo}</p>
+								<p className="text-foreground/60 text-sm">
+									Sent {dayjs.utc(version.sentAt).format("DD/MM/YYYY")}
+									{version.paidAt &&
+										` · Paid ${dayjs.utc(version.paidAt).format("DD/MM/YYYY")}`}
+									{version.backfilled && " · Backfilled"}
+								</p>
+							</div>
+							<div className="flex items-center gap-3">
+								<p className="font-semibold">
+									{version.total.toLocaleString(undefined, {
+										style: "currency",
+										currency: "AUD"
+									})}
+								</p>
+								<Button
+									variant="ghost"
+									size="icon"
+									onClick={() => downloadInvoicePdf(version.versionNumber)}
+								>
+									<Download className="h-4 w-4" />
+								</Button>
+							</div>
+						</div>
+					))}
+				</div>
+			)}
 			<div className="flex w-full flex-col justify-between md:flex-row md:pt-6">
 				<div className="flex basis-1/2 flex-col gap-0 p-2 px-4">
 					<p className="font-semibold">Info</p>

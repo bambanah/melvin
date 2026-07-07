@@ -20,8 +20,12 @@ export const DeleteEntityButton = ({
 				.then(() => {
 					trpcUtils[entityType].list.invalidate();
 				})
-				.catch(() => {
-					toast.error("An error occured. Please refresh and try again.");
+				.catch((error) => {
+					toast.error(
+						error instanceof Error
+							? error.message
+							: "An error occured. Please refresh and try again."
+					);
 				});
 		}
 	};
