@@ -106,11 +106,11 @@ export const getRateForActivity = (
 
 	if (
 		activity.endTime &&
-		dayjs.utc(activity.endTime).hour() >= 19 &&
+		dayjs.utc(activity.endTime).hour() >= 20 &&
 		activity.supportItem.weeknightCode?.length &&
 		activity.supportItem.weeknightRate
 	) {
-		// Day is a weekday and it's after 8pm
+		// Day is a weekday and it's 8pm or later
 		const rate = getRateForDay(
 			"weeknight",
 			activity.supportItem,

@@ -69,6 +69,14 @@ test("Should return correct rates", () => {
 	// Regular weekday - weekday
 	expect(getRateForActivity(activity)).toEqual(["weekday", 1]);
 
+	// 7:30pm weekday - still weekday rate (weeknight starts at 8pm)
+	activity.endTime = dayjs.utc("1970-01-01T19:30").toDate();
+	expect(getRateForActivity(activity)).toEqual(["weekday", 1]);
+
+	// 7:59pm weekday - still weekday rate
+	activity.endTime = dayjs.utc("1970-01-01T19:59").toDate();
+	expect(getRateForActivity(activity)).toEqual(["weekday", 1]);
+
 	// After 8pm - weeknight
 	activity.endTime = dayjs.utc("1970-01-01T20:10").toDate();
 	expect(getRateForActivity(activity)).toEqual(["weeknight", 2]);
@@ -280,6 +288,18 @@ test("Should use itemDistance when activity has no start/end times", () => {
 			}
 		])
 	).toEqual(28.9); // 34 * 0.85
+});
+
+// NOTE: characterizes current behavior — see docs/plans/README.md
+test("Should bill by time rather than itemDistance when an activity has both", () => {
+	expect(
+		getTotalCostOfActivities([
+			{
+				...getActivity("weekday", "16:00", "17:00", 0, 0),
+				itemDistance: 34
+			}
+		])
+	).toEqual(55.47); // duration (16:00-17:00) * weekdayRate, itemDistance ignored
 });
 
 test("Should resolve transit rate with correct precedence", () => {
