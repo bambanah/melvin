@@ -3,6 +3,7 @@ import { invoiceCandidatesFromPaymentAmount } from "@/lib/invoice-utils";
 import { baseListQueryInput } from "@/lib/trpc";
 import { activitySchema } from "@/schema/activity-schema";
 import { InvoiceSchema, invoiceSchema } from "@/schema/invoice-schema";
+import { paginate } from "@/server/api/owned";
 import { authedProcedure, router } from "@/server/api/trpc";
 import { Client, Invoice, InvoiceStatus } from "@/generated/client";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
@@ -98,41 +99,41 @@ export const invoiceRouter = router({
 			const limit = input.limit ?? DEFAULT_LIST_LIMIT;
 			const { cursor, status, clientId, search } = input;
 
-			const invoices = await ctx.prisma.invoice.findMany({
-				select: {
-					...defaultInvoiceSelect,
-					_count: {
-						select: { activities: true }
-					}
-				},
-				take: limit + 1,
-				where: {
-					ownerId: ctx.session.user.id,
-					status: { in: status },
-					clientId,
-					...(search && {
-						OR: [
-							{ invoiceNo: { contains: search, mode: "insensitive" } },
-							{ client: { name: { contains: search, mode: "insensitive" } } }
+			const { items: invoices, nextCursor } = await paginate({
+				limit,
+				cursor,
+				query: ({ take, cursor }) =>
+					ctx.owned.invoice.findMany({
+						select: {
+							...defaultInvoiceSelect,
+							_count: {
+								select: { activities: true }
+							}
+						},
+						take,
+						where: {
+							status: { in: status },
+							clientId,
+							...(search && {
+								OR: [
+									{ invoiceNo: { contains: search, mode: "insensitive" } },
+									{
+										client: { name: { contains: search, mode: "insensitive" } }
+									}
+								]
+							})
+						},
+						cursor,
+						orderBy: [
+							{
+								status: "asc"
+							},
+							{
+								createdAt: "desc"
+							}
 						]
 					})
-				},
-				cursor: cursor ? { id: cursor } : undefined,
-				orderBy: [
-					{
-						status: "asc"
-					},
-					{
-						createdAt: "desc"
-					}
-				]
 			});
-
-			let nextCursor: typeof cursor | undefined;
-			if (invoices.length > limit) {
-				const nextInvoice = invoices.pop();
-				nextCursor = nextInvoice?.id;
-			}
 
 			return {
 				invoices: invoices.map((invoice) => parseInvoice(invoice)),
@@ -140,7 +141,7 @@ export const invoiceRouter = router({
 			};
 		}),
 	getTotalOwing: authedProcedure.query(async ({ ctx }) => {
-		const invoices = await ctx.prisma.invoice.findMany({
+		const invoices = await ctx.owned.invoice.findMany({
 			select: {
 				activities: {
 					include: {
@@ -150,7 +151,6 @@ export const invoiceRouter = router({
 				}
 			},
 			where: {
-				ownerId: ctx.session.user.id,
 				status: "SENT"
 			}
 		});
@@ -174,7 +174,7 @@ export const invoiceRouter = router({
 	byId: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			const invoice = await ctx.prisma.invoice.findFirst({
+			const invoice = await ctx.owned.invoice.findFirst({
 				select: {
 					...defaultInvoiceSelect,
 					createdAt: true,
@@ -192,7 +192,6 @@ export const invoiceRouter = router({
 					}
 				},
 				where: {
-					ownerId: ctx.session.user.id,
 					id: input.id
 				}
 			});
@@ -212,8 +211,8 @@ export const invoiceRouter = router({
 		.mutation(async ({ input, ctx }) => {
 			const { invoice: inputInvoice } = input;
 
-			const client = await ctx.prisma.client.findFirst({
-				where: { id: inputInvoice.clientId, ownerId: ctx.session.user.id }
+			const client = await ctx.owned.client.findFirst({
+				where: { id: inputInvoice.clientId }
 			});
 
 			if (!client) {
@@ -224,19 +223,10 @@ export const invoiceRouter = router({
 			}
 
 			if (inputInvoice.activityIds && inputInvoice.activityIds.length > 0) {
-				const ownedActivities = await ctx.prisma.activity.findMany({
-					where: {
-						id: { in: inputInvoice.activityIds },
-						ownerId: ctx.session.user.id
-					},
-					select: { id: true }
-				});
-				if (ownedActivities.length !== inputInvoice.activityIds.length) {
-					throw new TRPCError({
-						code: "NOT_FOUND",
-						message: "One or more activities not found"
-					});
-				}
+				await ctx.owned.activity.assertAll(
+					inputInvoice.activityIds,
+					"One or more activities not found"
+				);
 			}
 
 			const invoice = await ctx.prisma.invoice.create({
@@ -269,9 +259,8 @@ export const invoiceRouter = router({
 					(activity) => activity.groupClientId
 				);
 
-				const clients = await ctx.prisma.client.findMany({
+				const clients = await ctx.owned.client.findMany({
 					where: {
-						ownerId: ctx.session.user.id,
 						id: {
 							in: groupClientIds
 						}
@@ -307,32 +296,17 @@ export const invoiceRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			const { id, invoice: inputInvoice } = input;
 
-			const existing = await ctx.prisma.invoice.findFirst({
-				where: { id, ownerId: ctx.session.user.id },
-				select: { id: true }
-			});
-			if (!existing) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
+			await ctx.owned.invoice.assert(id);
 
-			const client = await ctx.prisma.client.findFirst({
-				where: { id: inputInvoice.clientId, ownerId: ctx.session.user.id }
+			const client = await ctx.owned.client.findFirst({
+				where: { id: inputInvoice.clientId }
 			});
 
 			if (inputInvoice.activityIds && inputInvoice.activityIds.length > 0) {
-				const ownedActivities = await ctx.prisma.activity.findMany({
-					where: {
-						id: { in: inputInvoice.activityIds },
-						ownerId: ctx.session.user.id
-					},
-					select: { id: true }
-				});
-				if (ownedActivities.length !== inputInvoice.activityIds.length) {
-					throw new TRPCError({
-						code: "NOT_FOUND",
-						message: "One or more activities not found"
-					});
-				}
+				await ctx.owned.activity.assertAll(
+					inputInvoice.activityIds,
+					"One or more activities not found"
+				);
 			}
 
 			const invoice = await ctx.prisma.invoice.update({
@@ -394,9 +368,8 @@ export const invoiceRouter = router({
 				paidAt = new Date();
 			}
 
-			const payload = await ctx.prisma.invoice.updateMany({
+			const payload = await ctx.owned.invoice.updateMany({
 				where: {
-					ownerId: ctx.session.user.id,
 					id: {
 						in: ids
 					}
@@ -415,9 +388,8 @@ export const invoiceRouter = router({
 		.query(async ({ ctx, input }) => {
 			const { paymentAmount } = input;
 
-			const invoices = await ctx.prisma.invoice.findMany({
+			const invoices = await ctx.owned.invoice.findMany({
 				where: {
-					ownerId: ctx.session.user.id,
 					status: "SENT",
 					activities: {
 						some: {
@@ -493,13 +465,7 @@ export const invoiceRouter = router({
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
-			const existing = await ctx.prisma.invoice.findFirst({
-				where: { id: input.id, ownerId: ctx.session.user.id },
-				select: { id: true }
-			});
-			if (!existing) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
+			await ctx.owned.invoice.assert(input.id);
 
 			const invoice = await ctx.prisma.invoice.delete({
 				where: {
