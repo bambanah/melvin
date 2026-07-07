@@ -119,6 +119,11 @@ export const supportItemRouter = router({
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
+			await ctx.owned.supportItem.assert(input.supportItemRates.supportItemId);
+			if (input.supportItemRates.clientId) {
+				await ctx.owned.client.assert(input.supportItemRates.clientId);
+			}
+
 			const customRates = await ctx.prisma.supportItemRates.create({
 				data: {
 					...input.supportItemRates,
@@ -169,6 +174,11 @@ export const supportItemRouter = router({
 		)
 		.mutation(async ({ ctx, input }) => {
 			await ctx.owned.supportItemRates.assert(input.id);
+			if (input.supportItemRates.supportItemId) {
+				await ctx.owned.supportItem.assert(
+					input.supportItemRates.supportItemId
+				);
+			}
 
 			const customRate = await ctx.prisma.supportItemRates.update({
 				where: {

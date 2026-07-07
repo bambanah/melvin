@@ -207,6 +207,9 @@ export const activityRouter = router({
 				});
 			}
 
+			await ctx.owned.client.assert(activityData.clientId);
+			await ctx.owned.supportItem.assert(activityData.supportItemId);
+
 			const activity = await ctx.prisma.activity.create({
 				data: {
 					...activityData,
@@ -271,6 +274,8 @@ export const activityRouter = router({
 
 			await ctx.owned.activity.assert(input.id);
 			await ctx.owned.activity.assertNoneOnLockedInvoice([input.id]);
+			await ctx.owned.client.assert(activityData.clientId);
+			await ctx.owned.supportItem.assert(activityData.supportItemId);
 
 			// Delete existing transport items and recreate
 			if (transportItems !== undefined) {
@@ -341,6 +346,17 @@ export const activityRouter = router({
 
 			if (inputActivities.length === 0) {
 				return { activities: [], tripId: null };
+			}
+
+			const clientIds = [...new Set(inputActivities.map((a) => a.clientId))];
+			const supportItemIds = [
+				...new Set(inputActivities.map((a) => a.supportItemId))
+			];
+			for (const clientId of clientIds) {
+				await ctx.owned.client.assert(clientId);
+			}
+			for (const supportItemId of supportItemIds) {
+				await ctx.owned.supportItem.assert(supportItemId);
 			}
 
 			const groupSizeSupportItemIds = [

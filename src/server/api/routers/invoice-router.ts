@@ -520,6 +520,13 @@ export const invoiceRouter = router({
 				where: { id: inputInvoice.clientId }
 			});
 
+			if (!client) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Can't find that client"
+				});
+			}
+
 			if (inputInvoice.activityIds && inputInvoice.activityIds.length > 0) {
 				await ctx.owned.activity.assertAll(
 					inputInvoice.activityIds,
@@ -532,12 +539,10 @@ export const invoiceRouter = router({
 				);
 			}
 
-			if (client) {
-				await assertGroupRowsHaveParticipants(
-					ctx.owned,
-					inputInvoice.activitiesToCreate
-				);
-			}
+			await assertGroupRowsHaveParticipants(
+				ctx.owned,
+				inputInvoice.activitiesToCreate
+			);
 
 			const invoice = await ctx.prisma.invoice.update({
 				where: {
@@ -552,14 +557,13 @@ export const invoiceRouter = router({
 						: new Date(),
 					activities: {
 						connect: inputInvoice.activityIds?.map((id) => ({ id })),
-						createMany:
-							inputInvoice.activitiesToCreate && client
-								? generateNestedWriteForActivities(
-										inputInvoice.activitiesToCreate,
-										client,
-										ctx.session.user.id
-									)
-								: undefined
+						createMany: inputInvoice.activitiesToCreate
+							? generateNestedWriteForActivities(
+									inputInvoice.activitiesToCreate,
+									client,
+									ctx.session.user.id
+								)
+							: undefined
 					}
 				},
 				select: {
@@ -572,13 +576,7 @@ export const invoiceRouter = router({
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			if (client) {
-				await createGroupMirrorActivities(
-					ctx,
-					inputInvoice,
-					ctx.session.user.id
-				);
-			}
+			await createGroupMirrorActivities(ctx, inputInvoice, ctx.session.user.id);
 
 			return {
 				invoice: parseInvoice(invoice)
