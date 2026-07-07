@@ -2,10 +2,19 @@ import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { invoiceCandidatesFromPaymentAmount } from "@/lib/invoice-utils";
 import { baseListQueryInput } from "@/lib/trpc";
 import { activitySchema } from "@/schema/activity-schema";
-import { InvoiceSchema, invoiceSchema } from "@/schema/invoice-schema";
-import { paginate } from "@/server/api/owned";
+import {
+	InvoiceSchema,
+	invoiceSchema,
+	totalGroupSize
+} from "@/schema/invoice-schema";
+import { ownedDb, paginate } from "@/server/api/owned";
 import { authedProcedure, router } from "@/server/api/trpc";
-import { Client, Invoice, InvoiceStatus } from "@/generated/client";
+import {
+	Client,
+	Invoice,
+	InvoiceStatus,
+	PrismaClient
+} from "@/generated/client";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
 import { z } from "zod";
@@ -50,7 +59,7 @@ const generateNestedWriteForActivities = (
 	data: activitiesToCreate.flatMap(
 		({ supportItemId, groupClientIds, activities }) => {
 			const groupSize =
-				groupClientIds.length > 0 ? groupClientIds.length + 1 : undefined;
+				groupClientIds.length > 0 ? totalGroupSize(groupClientIds) : undefined;
 
 			return activities.map((activity) => ({
 				...activity,
@@ -75,7 +84,7 @@ const generateNestedWriteForGroupActivities = (
 ) => ({
 	data: activitiesToCreate.flatMap(
 		({ supportItemId, groupClientIds, activities }) => {
-			const groupSize = groupClientIds.length + 1;
+			const groupSize = totalGroupSize(groupClientIds);
 
 			return groupClientIds.flatMap((groupClientId) => {
 				const client = clients.find((c) => c.id === groupClientId);
@@ -96,6 +105,101 @@ const generateNestedWriteForGroupActivities = (
 		}
 	)
 });
+
+type GroupWriteCtx = {
+	owned: ReturnType<typeof ownedDb>;
+	prisma: PrismaClient;
+};
+
+/**
+ * Guard: a group support item on a row with no other participants can't be
+ * billed (its rate would divide by 1). Both create and modify enforce this.
+ */
+const assertGroupRowsHaveParticipants = async (
+	owned: GroupWriteCtx["owned"],
+	activitiesToCreate: InvoiceSchema["activitiesToCreate"]
+) => {
+	const soloRowSupportItemIds = [
+		...new Set(
+			activitiesToCreate
+				.filter((activity) => activity.groupClientIds.length === 0)
+				.map((activity) => activity.supportItemId)
+		)
+	];
+
+	if (soloRowSupportItemIds.length === 0) return;
+
+	const groupSupportItemsAmongSoloRows = await owned.supportItem.findMany({
+		where: { id: { in: soloRowSupportItemIds }, isGroup: true },
+		select: { id: true }
+	});
+
+	if (groupSupportItemsAmongSoloRows.length > 0) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "Group activities require at least one other participant"
+		});
+	}
+};
+
+/**
+ * Validate group rows and fan out one mirrored (pending) activity per other
+ * participant. Shared by create and modify so the invoice edit flow — which
+ * renders the same participant UI — can't persist a group primary with a
+ * `groupSize` but no sibling activities.
+ */
+const createGroupMirrorActivities = async (
+	ctx: GroupWriteCtx,
+	inputInvoice: InvoiceSchema,
+	ownerId: string
+) => {
+	const groupActivitiesToCreate = inputInvoice.activitiesToCreate.filter(
+		(activity) => activity.groupClientIds.length > 0
+	);
+
+	if (groupActivitiesToCreate.length === 0) return;
+
+	for (const activity of groupActivitiesToCreate) {
+		if (
+			new Set(activity.groupClientIds).size !== activity.groupClientIds.length
+		) {
+			throw new TRPCError({
+				code: "BAD_REQUEST",
+				message: "Group participants must be distinct"
+			});
+		}
+
+		if (activity.groupClientIds.includes(inputInvoice.clientId)) {
+			throw new TRPCError({
+				code: "BAD_REQUEST",
+				message: "The primary client cannot also be a group participant"
+			});
+		}
+	}
+
+	const allGroupClientIds = groupActivitiesToCreate.flatMap(
+		(activity) => activity.groupClientIds
+	);
+
+	const clients = await ctx.owned.client.findMany({
+		where: { id: { in: allGroupClientIds } }
+	});
+
+	if (clients.length !== new Set(allGroupClientIds).size) {
+		throw new TRPCError({
+			code: "NOT_FOUND",
+			message: "One or more group clients not found"
+		});
+	}
+
+	await ctx.prisma.activity.createMany(
+		generateNestedWriteForGroupActivities(
+			groupActivitiesToCreate,
+			ownerId,
+			clients
+		)
+	);
+};
 
 export const invoiceRouter = router({
 	list: authedProcedure
@@ -240,28 +344,10 @@ export const invoiceRouter = router({
 				);
 			}
 
-			const soloRowSupportItemIds = [
-				...new Set(
-					inputInvoice.activitiesToCreate
-						.filter((activity) => activity.groupClientIds.length === 0)
-						.map((activity) => activity.supportItemId)
-				)
-			];
-
-			if (soloRowSupportItemIds.length > 0) {
-				const groupSupportItemsAmongSoloRows =
-					await ctx.owned.supportItem.findMany({
-						where: { id: { in: soloRowSupportItemIds }, isGroup: true },
-						select: { id: true }
-					});
-
-				if (groupSupportItemsAmongSoloRows.length > 0) {
-					throw new TRPCError({
-						code: "BAD_REQUEST",
-						message: "Group activities require at least one other participant"
-					});
-				}
-			}
+			await assertGroupRowsHaveParticipants(
+				ctx.owned,
+				inputInvoice.activitiesToCreate
+			);
 
 			const invoice = await ctx.prisma.invoice.create({
 				data: {
@@ -285,57 +371,7 @@ export const invoiceRouter = router({
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			const groupActivitiesToCreate = inputInvoice.activitiesToCreate.filter(
-				(activity) => activity.groupClientIds.length > 0
-			);
-
-			if (groupActivitiesToCreate.length > 0) {
-				for (const activity of groupActivitiesToCreate) {
-					if (
-						new Set(activity.groupClientIds).size !==
-						activity.groupClientIds.length
-					) {
-						throw new TRPCError({
-							code: "BAD_REQUEST",
-							message: "Group participants must be distinct"
-						});
-					}
-
-					if (activity.groupClientIds.includes(inputInvoice.clientId)) {
-						throw new TRPCError({
-							code: "BAD_REQUEST",
-							message: "The primary client cannot also be a group participant"
-						});
-					}
-				}
-
-				const allGroupClientIds = groupActivitiesToCreate.flatMap(
-					(activity) => activity.groupClientIds
-				);
-
-				const clients = await ctx.owned.client.findMany({
-					where: {
-						id: {
-							in: allGroupClientIds
-						}
-					}
-				});
-
-				if (clients.length !== new Set(allGroupClientIds).size) {
-					throw new TRPCError({
-						code: "NOT_FOUND",
-						message: "One or more group clients not found"
-					});
-				}
-
-				await ctx.prisma.activity.createMany(
-					generateNestedWriteForGroupActivities(
-						groupActivitiesToCreate,
-						ctx.session.user.id,
-						clients
-					)
-				);
-			}
+			await createGroupMirrorActivities(ctx, inputInvoice, ctx.session.user.id);
 
 			return parseInvoice(invoice);
 		}),
@@ -360,6 +396,13 @@ export const invoiceRouter = router({
 				await ctx.owned.activity.assertAll(
 					inputInvoice.activityIds,
 					"One or more activities not found"
+				);
+			}
+
+			if (client) {
+				await assertGroupRowsHaveParticipants(
+					ctx.owned,
+					inputInvoice.activitiesToCreate
 				);
 			}
 
@@ -394,6 +437,14 @@ export const invoiceRouter = router({
 
 			if (!invoice) {
 				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			if (client) {
+				await createGroupMirrorActivities(
+					ctx,
+					inputInvoice,
+					ctx.session.user.id
+				);
 			}
 
 			return {

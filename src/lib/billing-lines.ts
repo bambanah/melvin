@@ -76,6 +76,18 @@ export function groupSizeOf(activity: BillableActivity): number {
 	return activity.supportItem.isGroup ? (activity.groupSize ?? 2) : 1;
 }
 
+/**
+ * A group activity's per-participant share of `rate`, floored to the cent so
+ * the summed claim across participants never exceeds the base (docs/plans/016).
+ * The full rate for non-group activities. This is the single place the isGroup
+ * gate and the floor policy live — every apportioned rate goes through here.
+ */
+function apportion(rate: number, activity: BillableActivity): number {
+	return activity.supportItem.isGroup
+		? floorToCent(rate / groupSizeOf(activity))
+		: rate;
+}
+
 const getRateForDay = (
 	day: "weekday" | "weeknight" | "saturday" | "sunday",
 	supportItem: BillableActivity["supportItem"],
@@ -162,11 +174,7 @@ export function getTransitRate(
 		rateContext?.userTransitRatePerKm ||
 		DEFAULT_TRANSIT_RATE;
 
-	if (activity.supportItem.isGroup) {
-		return floorToCent(effectiveRate / groupSizeOf(activity));
-	}
-
-	return effectiveRate;
+	return apportion(effectiveRate, activity);
 }
 
 export type LineKind =
@@ -206,9 +214,7 @@ export function billableLines(
 	const [itemCode, resolvedRate] = getRateForActivity(activity);
 	// Apportioned once so the support line, its printed unit price, and the
 	// labour-travel rate/60 all use the same per-participant figure.
-	const rate = activity.supportItem.isGroup
-		? floorToCent(resolvedRate / groupSizeOf(activity))
-		: resolvedRate;
+	const rate = apportion(resolvedRate, activity);
 
 	// SUPPORT: gated on rateType like the PDF (the printed truth), not on
 	// which fields happen to be populated. A KM-rate item always bills by
@@ -293,9 +299,10 @@ export function billableLines(
 
 	// Activity Based Transport items
 	if (activity.transportItems) {
-		const activityTransportRate = activity.supportItem.isGroup
-			? floorToCent(DEFAULT_ACTIVITY_TRANSPORT_RATE / groupSizeOf(activity))
-			: DEFAULT_ACTIVITY_TRANSPORT_RATE;
+		const activityTransportRate = apportion(
+			DEFAULT_ACTIVITY_TRANSPORT_RATE,
+			activity
+		);
 		const transportCode =
 			getActivityBasedTransportCode(activity.supportItem.weekdayCode) ?? "";
 

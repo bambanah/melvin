@@ -24,7 +24,15 @@ import type {
 	ActivitySchema,
 	ActivityTransportItemSchema
 } from "@/schema/activity-schema";
-import { MAX_GROUP_PARTICIPANTS } from "@/schema/invoice-schema";
+import {
+	appendParticipant,
+	removeParticipantAt,
+	setParticipantAt
+} from "@/lib/group-participants";
+import {
+	MAX_ADDITIONAL_GROUP_PARTICIPANTS,
+	totalGroupSize
+} from "@/schema/invoice-schema";
 import dayjs from "dayjs";
 import {
 	ChevronDown,
@@ -218,7 +226,7 @@ export function MultiActivityForm({
 
 			const groupSize =
 				row.isGroup && row.groupClientIds.length > 0
-					? row.groupClientIds.length + 1
+					? totalGroupSize(row.groupClientIds)
 					: undefined;
 
 			// Primary client activity (always created)
@@ -387,25 +395,20 @@ function ActivityRow({
 		});
 	};
 
-	const updateGroupClientId = (index: number, clientId: string) => {
-		const groupClientIds = [...row.groupClientIds];
-		groupClientIds[index] = clientId;
+	const setGroupClientIds = (groupClientIds: string[]) =>
 		onUpdate({
 			groupClientIds,
 			errors: { ...row.errors, groupClient: undefined }
 		});
-	};
 
-	const addGroupParticipant = () => {
-		if (row.groupClientIds.length >= MAX_GROUP_PARTICIPANTS) return;
-		onUpdate({ groupClientIds: [...row.groupClientIds, ""] });
-	};
+	const updateGroupClientId = (index: number, clientId: string) =>
+		setGroupClientIds(setParticipantAt(row.groupClientIds, index, clientId));
 
-	const removeGroupParticipant = (index: number) => {
-		onUpdate({
-			groupClientIds: row.groupClientIds.filter((_, i) => i !== index)
-		});
-	};
+	const addGroupParticipant = () =>
+		setGroupClientIds(appendParticipant(row.groupClientIds));
+
+	const removeGroupParticipant = (index: number) =>
+		setGroupClientIds(removeParticipantAt(row.groupClientIds, index));
 
 	return (
 		<div className="bg-muted/30 relative rounded-lg border p-4">
@@ -500,7 +503,7 @@ function ActivityRow({
 								</div>
 							))}
 						</div>
-						{row.groupClientIds.length < MAX_GROUP_PARTICIPANTS && (
+						{row.groupClientIds.length < MAX_ADDITIONAL_GROUP_PARTICIPANTS && (
 							<button
 								type="button"
 								onClick={addGroupParticipant}

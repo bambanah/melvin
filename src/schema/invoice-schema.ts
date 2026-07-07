@@ -1,7 +1,11 @@
 import { z } from "zod";
 
-/** A group activity's primary client plus up to this many other participants (10 total). */
-export const MAX_GROUP_PARTICIPANTS = 9;
+/** The most *other* participants a group activity can add to its primary client (10 total). */
+export const MAX_ADDITIONAL_GROUP_PARTICIPANTS = 9;
+
+/** Total participants sharing a group session: the primary client plus the other participants. */
+export const totalGroupSize = (otherParticipantIds: string[]): number =>
+	otherParticipantIds.length + 1;
 
 export const invoiceSchema = z.object({
 	date: z.date().optional(),
@@ -14,7 +18,7 @@ export const invoiceSchema = z.object({
 			supportItemId: z.string().min(1, "Support item is required"),
 			groupClientIds: z
 				.array(z.string())
-				.max(MAX_GROUP_PARTICIPANTS)
+				.max(MAX_ADDITIONAL_GROUP_PARTICIPANTS)
 				.default([]),
 			activities: z.array(
 				z
