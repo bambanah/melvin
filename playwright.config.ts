@@ -13,7 +13,10 @@ export default defineConfig({
 	reporter: [["list"], ["html", { open: "never" }]],
 	testDir: "./e2e",
 	webServer: {
-		command: "pnpm dev:next",
+		// CI runs against a production build: `next dev`'s on-demand route
+		// compilation races with CI's limited CPU/network and intermittently
+		// stalls navigations past test timeouts.
+		command: process.env.CI ? "pnpm start" : "pnpm dev:next",
 		url: "http://localhost:3000",
 		reuseExistingServer: !process.env.CI
 	}

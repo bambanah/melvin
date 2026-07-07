@@ -52,6 +52,9 @@ jobs:
       - name: Initialise database
         run: pnpm prisma:push
 
+      - name: Build application
+        run: pnpm build
+
       - name: Run tests
         run: pnpm test:e2e
 
