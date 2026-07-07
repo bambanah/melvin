@@ -86,7 +86,8 @@ export const clientRouter = router({
 					billTo: true
 				},
 				where: {
-					id: input.id
+					id: input.id,
+					ownerId: ctx.session.user.id
 				}
 			});
 
@@ -113,7 +114,8 @@ export const clientRouter = router({
 					invoiceNumberPrefix: true
 				},
 				where: {
-					id: input.id
+					id: input.id,
+					ownerId: ctx.session.user.id
 				}
 			});
 
@@ -184,6 +186,14 @@ export const clientRouter = router({
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
+			const existing = await ctx.prisma.client.findFirst({
+				where: { id: input.id, ownerId: ctx.session.user.id },
+				select: { id: true }
+			});
+			if (!existing) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
 			const client = await ctx.prisma.client.update({
 				where: {
 					id: input.id
@@ -213,6 +223,14 @@ export const clientRouter = router({
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ input, ctx }) => {
+			const existing = await ctx.prisma.client.findFirst({
+				where: { id: input.id, ownerId: ctx.session.user.id },
+				select: { id: true }
+			});
+			if (!existing) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
 			const client = await ctx.prisma.client.delete({
 				where: {
 					id: input.id

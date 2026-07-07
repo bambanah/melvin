@@ -171,6 +171,14 @@ export const supportItemRouter = router({
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
+			const existing = await ctx.prisma.supportItemRates.findFirst({
+				where: { id: input.id, ownerId: ctx.session.user.id },
+				select: { id: true }
+			});
+			if (!existing) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
 			const customRate = await ctx.prisma.supportItemRates.update({
 				where: {
 					id: input.id
@@ -192,6 +200,14 @@ export const supportItemRouter = router({
 	deleteCustomRate: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
+			const existing = await ctx.prisma.supportItemRates.findFirst({
+				where: { id: input.id, ownerId: ctx.session.user.id },
+				select: { id: true }
+			});
+			if (!existing) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
 			const customRate = await ctx.prisma.supportItemRates.delete({
 				where: {
 					id: input.id
@@ -214,6 +230,14 @@ export const supportItemRouter = router({
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
+			const existing = await ctx.prisma.supportItem.findFirst({
+				where: { id: input.supportItem.id, ownerId: ctx.session.user.id },
+				select: { id: true }
+			});
+			if (!existing) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
 			const supportItem = await ctx.prisma.supportItem.update({
 				where: {
 					id: input.supportItem.id
@@ -233,6 +257,14 @@ export const supportItemRouter = router({
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
+			const existing = await ctx.prisma.supportItem.findFirst({
+				where: { id: input.id, ownerId: ctx.session.user.id },
+				select: { id: true }
+			});
+			if (!existing) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
 			const supportItem = await ctx.prisma.supportItem.delete({
 				where: {
 					id: input.id

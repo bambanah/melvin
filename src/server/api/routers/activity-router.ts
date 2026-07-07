@@ -274,6 +274,14 @@ export const activityRouter = router({
 				});
 			}
 
+			const existing = await ctx.prisma.activity.findFirst({
+				where: { id: input.id, ownerId: ctx.session.user.id },
+				select: { id: true }
+			});
+			if (!existing) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
 			// Delete existing transport items and recreate
 			if (transportItems !== undefined) {
 				await ctx.prisma.activityTransportItem.deleteMany({
@@ -316,6 +324,14 @@ export const activityRouter = router({
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
+			const existing = await ctx.prisma.activity.findFirst({
+				where: { id: input.id, ownerId: ctx.session.user.id },
+				select: { id: true }
+			});
+			if (!existing) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
 			const activity = await ctx.prisma.activity.delete({
 				where: {
 					id: input.id
