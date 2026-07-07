@@ -61,10 +61,22 @@ test("should get support categories", () => {
 
 test("should get registration groups", () => {
 	const registrationGroups = getRegistrationGroups();
-	expect(registrationGroups.length).toEqual(35);
+	expect(registrationGroups.length).toEqual(36);
 });
 
 test("should get support items", () => {
 	const supportItems = getSupportItemDefs("Group And Centre Based Activities");
-	expect(supportItems.length).toEqual(104);
+	expect(supportItems.length).toEqual(14);
+});
+
+// Regression net for catalogue refreshes: the travel/ABT lookups match on the
+// exact `supportItemName` strings above. If a future catalogue renames those
+// items, these lookups silently return undefined and drop every invoice's
+// travel line — so pin that they resolve to a defined code for a group-0125
+// (community access) and group-0136 (group activities) item.
+test("travel/ABT lookups resolve to a defined code for the billed 0125/0136 families", () => {
+	expect(getNonLabourTravelCode("04_104_0125_6_1")).toBeDefined();
+	expect(getActivityBasedTransportCode("04_104_0125_6_1")).toBeDefined();
+	expect(getNonLabourTravelCode("04_102_0136_6_1")).toBeDefined();
+	expect(getActivityBasedTransportCode("04_102_0136_6_1")).toBeDefined();
 });

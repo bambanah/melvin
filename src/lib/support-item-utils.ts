@@ -1,4 +1,4 @@
-import supportItems from "./ndis-support-catalogue-22-23.json";
+import supportItems from "./ndis-support-catalogue.json";
 
 export const getSupportItemDefs = (registrationGroupName?: string) => {
 	return registrationGroupName === undefined
