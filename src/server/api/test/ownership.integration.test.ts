@@ -287,6 +287,100 @@ test("supportItem.addCustomRates rejects another user's supportItemId and create
 	expect(await prisma.supportItemRates.count()).toBe(0);
 });
 
+test("invoice.create rejects another user's supportItemId in activitiesToCreate", async () => {
+	const userA = await createTestUser();
+	const userB = await createTestUser();
+	const callerB = callerFor(userB);
+
+	const clientB = await callerB.clients.create({
+		client: { name: "B's client" }
+	});
+	const supportItemA = await prisma.supportItem.create({
+		data: {
+			description: "Support",
+			weekdayCode: "01",
+			weekdayRate: 100,
+			ownerId: userA.id
+		}
+	});
+
+	await expect(
+		callerB.invoice.create({
+			invoice: {
+				clientId: clientB.id,
+				invoiceNo: "INV-1",
+				activitiesToCreate: [
+					{
+						supportItemId: supportItemA.id,
+						groupClientIds: [],
+						activities: [
+							{
+								date: new Date("2024-01-01"),
+								startTime: "09:00",
+								endTime: "10:00",
+								itemDistance: 0
+							}
+						]
+					}
+				]
+			}
+		})
+	).rejects.toThrow(TRPCError);
+
+	expect(await prisma.activity.count()).toBe(0);
+});
+
+test("invoice.modify rejects another user's supportItemId in activitiesToCreate", async () => {
+	const userA = await createTestUser();
+	const userB = await createTestUser();
+	const callerB = callerFor(userB);
+
+	const clientB = await callerB.clients.create({
+		client: { name: "B's client" }
+	});
+	const supportItemA = await prisma.supportItem.create({
+		data: {
+			description: "Support",
+			weekdayCode: "01",
+			weekdayRate: 100,
+			ownerId: userA.id
+		}
+	});
+	const invoice = await callerB.invoice.create({
+		invoice: {
+			clientId: clientB.id,
+			invoiceNo: "INV-1",
+			activitiesToCreate: []
+		}
+	});
+
+	await expect(
+		callerB.invoice.modify({
+			id: invoice.id,
+			invoice: {
+				clientId: clientB.id,
+				invoiceNo: "INV-1",
+				activitiesToCreate: [
+					{
+						supportItemId: supportItemA.id,
+						groupClientIds: [],
+						activities: [
+							{
+								date: new Date("2024-01-01"),
+								startTime: "09:00",
+								endTime: "10:00",
+								itemDistance: 0
+							}
+						]
+					}
+				]
+			}
+		})
+	).rejects.toThrow(TRPCError);
+
+	expect(await prisma.activity.count()).toBe(0);
+});
+
 test("pdf.forInvoice denies a cross-tenant request", async () => {
 	const userA = await createTestUser();
 	const userB = await createTestUser();

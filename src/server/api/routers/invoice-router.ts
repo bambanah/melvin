@@ -197,6 +197,21 @@ const assertGroupRowsHaveParticipants = async (
 };
 
 /**
+ * Guard: every supportItemId in activitiesToCreate must belong to the caller
+ * before it's persisted onto an Activity row (docs/plans/018).
+ */
+const assertSupportItemsOwned = async (
+	owned: RouterCtx["owned"],
+	activitiesToCreate: InvoiceSchema["activitiesToCreate"]
+) => {
+	const supportItemIds = [
+		...new Set(activitiesToCreate.map((activity) => activity.supportItemId))
+	];
+
+	await Promise.all(supportItemIds.map((id) => owned.supportItem.assert(id)));
+};
+
+/**
  * Validate group rows and fan out one mirrored (pending) activity per other
  * participant. Shared by create and modify so the invoice edit flow — which
  * renders the same participant UI — can't persist a group primary with a
@@ -472,6 +487,8 @@ export const invoiceRouter = router({
 				);
 			}
 
+			await assertSupportItemsOwned(ctx.owned, inputInvoice.activitiesToCreate);
+
 			await assertGroupRowsHaveParticipants(
 				ctx.owned,
 				inputInvoice.activitiesToCreate
@@ -538,6 +555,8 @@ export const invoiceRouter = router({
 					inputInvoice.activityIds
 				);
 			}
+
+			await assertSupportItemsOwned(ctx.owned, inputInvoice.activitiesToCreate);
 
 			await assertGroupRowsHaveParticipants(
 				ctx.owned,
