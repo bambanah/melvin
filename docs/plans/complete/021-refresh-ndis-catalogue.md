@@ -13,6 +13,7 @@
 
 ## Status
 
+- **Status**: DONE
 - **Priority**: P1
 - **Effort**: S
 - **Risk**: MED (test-fixture and PDF-snapshot churn)
@@ -132,13 +133,13 @@ Change `support-item-utils.ts:1` to import `./ndis-support-catalogue.json`; dele
 
 ## Done criteria
 
-- [ ] `pnpm type-check` exits 0
-- [ ] `pnpm test:unit` exits 0
-- [ ] `grep -rn "ndis-support-catalogue-22-23" src/ scripts/` returns no matches; old JSON deleted
-- [ ] New unit test for the travel/ABT lookups exists and passes
-- [ ] `scripts/generate-ndis-catalogue.ts` + `catalogue:generate` script committed (rerunnable refresh path)
-- [ ] `pnpm lint` exits 0
-- [ ] `docs/plans/README.md` status row updated
+- [x] `pnpm type-check` exits 0
+- [x] `pnpm test:unit` exits 0
+- [x] `grep -rn "ndis-support-catalogue-22-23" src/ scripts/` returns no matches; old JSON deleted
+- [x] New unit test for the travel/ABT lookups exists and passes
+- [x] `scripts/generate-ndis-catalogue.ts` + `catalogue:generate` script committed (rerunnable refresh path)
+- [x] `pnpm lint` exits 0
+- [x] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 

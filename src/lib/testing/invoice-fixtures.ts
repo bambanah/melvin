@@ -127,7 +127,7 @@ const makeSupportItem = (
 /**
  * The group counterpart: "Group Activities - Standard" in the 0136
  * registration group, which derives the group travel/transport codes
- * (04_591_0136_6_1, 04_799_0136_6_1). Price limits in the 22-23 catalogue
+ * (04_591_0136_6_1, 04_799_0136_6_1). Price limits in the bundled catalogue
  * are identical to the solo 0125 item's.
  *
  * Rates are the FULL-SESSION amount (docs/plans/016 operator decision 3):
