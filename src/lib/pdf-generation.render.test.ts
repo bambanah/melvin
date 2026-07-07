@@ -40,7 +40,10 @@ describe("invoice PDF visual snapshots", () => {
 	test.each(RENDER_FIXTURES)("%s", async (name) => {
 		const fixture = getFixture(name);
 
-		const { pdfString } = await generatePDF(fixture.invoice.id);
+		const { pdfString } = await generatePDF(
+			fixture.invoice.id,
+			fixture.invoice.ownerId
+		);
 		expect(pdfString.length).toBeGreaterThan(0);
 
 		const png = await renderPdfPageToPng(pdfString, 1, 2);

@@ -22,24 +22,23 @@ dayjs.extend(timezone);
 
 // import "@/fonts/Inter-normal";
 
-const generatePDF = async (invoiceId: string) => {
-	const client = await prisma.invoice
-		.findUnique({
-			where: { id: invoiceId }
-		})
-		.client({ select: { id: true } });
+const generatePDF = async (invoiceId: string, ownerId: string) => {
+	const invoiceRecord = await prisma.invoice.findFirst({
+		where: { id: invoiceId, ownerId },
+		select: { clientId: true }
+	});
 
-	if (!client) return { pdfString: "", fileName: null };
+	if (!invoiceRecord?.clientId) return { pdfString: "", fileName: null };
 
 	const invoice = await prisma.invoice.findFirst({
-		where: { id: invoiceId },
+		where: { id: invoiceId, ownerId },
 		include: {
 			client: true,
 			activities: {
 				include: {
 					supportItem: {
 						include: {
-							supportItemRates: { where: { clientId: client.id } }
+							supportItemRates: { where: { clientId: invoiceRecord.clientId } }
 						}
 					},
 					transportItems: true
