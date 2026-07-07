@@ -1,3 +1,4 @@
+import { useRateContext } from "@/components/shared/use-rate-context";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
@@ -37,6 +38,8 @@ function groupByDate(activities: ActivityByDateRangeOutput) {
 }
 
 const CalendarAgenda = ({ currentMonth, activities, isLoading }: Props) => {
+	const rateContext = useRateContext();
+
 	if (isLoading) {
 		return <AgendaSkeleton />;
 	}
@@ -56,7 +59,7 @@ const CalendarAgenda = ({ currentMonth, activities, isLoading }: Props) => {
 			{groups.map(({ date, activities: dayActivities }) => {
 				const day = dayjs(date);
 				const holiday = isHoliday(day.toDate());
-				const dayCost = getTotalCostOfActivities(dayActivities);
+				const dayCost = getTotalCostOfActivities(dayActivities, rateContext);
 
 				return (
 					<div key={date} className="py-3">
@@ -78,7 +81,11 @@ const CalendarAgenda = ({ currentMonth, activities, isLoading }: Props) => {
 
 						<div className="flex flex-col">
 							{dayActivities.map((activity) => (
-								<AgendaRow key={activity.id} activity={activity} />
+								<AgendaRow
+									key={activity.id}
+									activity={activity}
+									rateContext={rateContext}
+								/>
 							))}
 						</div>
 					</div>
@@ -90,11 +97,12 @@ const CalendarAgenda = ({ currentMonth, activities, isLoading }: Props) => {
 
 interface AgendaRowProps {
 	activity: ActivityByDateRangeOutput[number];
+	rateContext?: { userTransitRatePerKm: number };
 }
 
-const AgendaRow = ({ activity }: AgendaRowProps) => {
+const AgendaRow = ({ activity, rateContext }: AgendaRowProps) => {
 	const isInvoiced = activity.invoiceId !== null;
-	const cost = getTotalCostOfActivities([activity]);
+	const cost = getTotalCostOfActivities([activity], rateContext);
 
 	return (
 		<Link

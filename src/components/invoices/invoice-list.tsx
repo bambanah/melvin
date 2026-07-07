@@ -1,5 +1,6 @@
 import { DeleteEntityButton } from "@/components/shared/delete-entity-button";
 import ListPage from "@/components/shared/list-page";
+import { useRateContext } from "@/components/shared/use-rate-context";
 import { Button } from "@/components/ui/button";
 import DataTable, { SortingHeader } from "@/components/ui/data-table";
 import {
@@ -125,6 +126,7 @@ export default function InvoiceList({ clientId: propClientId }: Props) {
 
 	const [searchInput, setSearchInput] = useState(urlSearch);
 	const debouncedSearch = useDebounce(searchInput, 300);
+	const rateContext = useRateContext();
 	const isClearing = useRef(false);
 	const isSyncingFromUrl = useRef(false);
 
@@ -221,7 +223,10 @@ export default function InvoiceList({ clientId: propClientId }: Props) {
 		{
 			id: "total-cost",
 			accessorFn: (invoice) => {
-				const totalCost = getTotalCostOfActivities(invoice.activities);
+				const totalCost = getTotalCostOfActivities(
+					invoice.activities,
+					rateContext
+				);
 
 				return totalCost > 0
 					? totalCost.toLocaleString(undefined, {

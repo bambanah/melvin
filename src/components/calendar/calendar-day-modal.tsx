@@ -1,3 +1,5 @@
+import { useRateContext } from "@/components/shared/use-rate-context";
+import TripEditorModal from "@/components/trips/trip-editor-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,7 +9,6 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog";
-import TripEditorModal from "@/components/trips/trip-editor-modal";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { trpc } from "@/lib/trpc";
 import { formatDuration, getDuration, isHoliday } from "@/lib/date-utils";
@@ -40,6 +41,7 @@ const CalendarDayModal = ({
 }: Props) => {
 	const [tripBuilderOpen, setTripBuilderOpen] = useState(false);
 	const [tripEditOpen, setTripEditOpen] = useState(false);
+	const rateContext = useRateContext();
 
 	const existingTripId = activities.find((a) => a.tripId)?.tripId;
 	const { data: existingTrip } = trpc.trip.getByDate.useQuery(
@@ -74,7 +76,11 @@ const CalendarDayModal = ({
 				) : (
 					<div className="flex flex-col divide-y">
 						{activities.map((activity) => (
-							<ActivityRow key={activity.id} activity={activity} />
+							<ActivityRow
+								key={activity.id}
+								activity={activity}
+								rateContext={rateContext}
+							/>
 						))}
 					</div>
 				)}
@@ -131,12 +137,13 @@ const CalendarDayModal = ({
 
 interface ActivityRowProps {
 	activity: ActivityByDateRangeOutput[number];
+	rateContext?: { userTransitRatePerKm: number };
 }
 
-const ActivityRow = ({ activity }: ActivityRowProps) => {
+const ActivityRow = ({ activity, rateContext }: ActivityRowProps) => {
 	const isInvoiced = activity.invoiceId !== null;
 	const isInTrip = activity.tripId !== null;
-	const cost = getTotalCostOfActivities([activity]);
+	const cost = getTotalCostOfActivities([activity], rateContext);
 
 	return (
 		<Link

@@ -1,6 +1,7 @@
 import InfiniteList from "@/components/shared/infinite-list";
 import ListFilterRow from "@/components/shared/list-filter-row";
 import ListPage from "@/components/shared/list-page";
+import { useRateContext } from "@/components/shared/use-rate-context";
 import { Badge } from "@/components/ui/badge";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import {
@@ -36,6 +37,7 @@ function ActivityList({
 	groupByAssignedStatus = true
 }: Props) {
 	const [assignedFilter, setAssignedFilter] = useState<boolean | undefined>();
+	const rateContext = useRateContext();
 
 	const queryResult = trpc.activity.list.useInfiniteQuery(
 		{
@@ -133,9 +135,10 @@ function ActivityList({
 												<div className="text-foreground/80 flex items-center gap-2 md:flex-row-reverse">
 													<CircleDollarSign className="h-4 w-4" />
 													<span>
-														{getTotalCostOfActivities([
-															activity
-														]).toLocaleString(undefined, {
+														{getTotalCostOfActivities(
+															[activity],
+															rateContext
+														).toLocaleString(undefined, {
 															style: "currency",
 															currency: "AUD"
 														})}
