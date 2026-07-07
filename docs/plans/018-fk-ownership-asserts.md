@@ -174,12 +174,12 @@ Verification: `pnpm test:integration` → all pass; the four new tests appear in
 
 Machine-checkable. ALL must hold:
 
-- [ ] `pnpm type-check` exits 0
-- [ ] `pnpm test:unit` exits 0
-- [ ] `pnpm test:integration` exits 0; the 4 new cross-tenant-FK tests exist and pass
-- [ ] `pnpm lint` exits 0
-- [ ] No files outside the in-scope list are modified (`git status`)
-- [ ] `docs/plans/README.md` status row updated
+- [x] `pnpm type-check` exits 0
+- [x] `pnpm test:unit` exits 0
+- [x] `pnpm test:integration` exits 0; the 4 new cross-tenant-FK tests exist and pass (6 landed: the review pass added two more for `invoice.create`/`invoice.modify` supportItemId checks)
+- [x] `pnpm lint` exits 0
+- [x] No files outside the in-scope list are modified (`git status`)
+- [x] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 
@@ -193,3 +193,4 @@ Stop and report back (do not improvise) if:
 
 - Any future procedure that persists a `clientId`/`supportItemId`/`activityId` from input must assert ownership first — reviewers should check this on every new mutation. The reviewer-sweep grep at `owned.ts:13-15` verifies raw-call discipline but does NOT catch missing FK asserts; that remains a review-time check.
 - Plan 025 adds broader integration coverage for the custom-rates path; these tests complement, not duplicate, it.
+- A fifth unguarded FK write site — `invoice.create`/`invoice.modify` persisting `activitiesToCreate[].supportItemId` without an ownership check — surfaced during the no-mistakes review pass, not in the original steps above. It was fixed the same way (an `assertSupportItemsOwned` helper next to `assertGroupRowsHaveParticipants` in `invoice-router.ts`), with two more cross-tenant tests added to match.
