@@ -19,9 +19,8 @@ vi.mock("@/server/prisma", async () => {
  *
  * Only three fixtures are rendered to keep repo growth bounded; the text
  * golden masters in pdf-generation.text.test.ts carry correctness for all
- * sixteen. Baselines are authored on Linux (CI is authoritative) via the
- * update-snapshots workflow; regenerate locally with
- * UPDATE_PDF_SNAPSHOTS=1 (see e2e/README.md).
+ * sixteen. Baselines are authored on Linux (CI is authoritative); regenerate
+ * locally with UPDATE_PDF_SNAPSHOTS=1 (see e2e/README.md).
  */
 const RENDER_FIXTURES = [
 	"basic-weekday",

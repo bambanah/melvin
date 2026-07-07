@@ -2,12 +2,11 @@
 
 ## Layers
 
-| Layer                                                 | Command            | Where snapshots live              |
-| ----------------------------------------------------- | ------------------ | --------------------------------- |
-| Pricing unit tests + PDF text golden masters          | `pnpm test:unit`   | `src/lib/__pdf_text__/*.txt`      |
-| PDF visual snapshots (PNG renders of sample invoices) | `pnpm test:unit`   | `src/lib/__pdf_snapshots__/*.png` |
-| e2e invoice → PDF flow                                | `pnpm test:e2e`    | —                                 |
-| UI visual regression                                  | `pnpm test:visual` | `e2e/visual/__screenshots__/`     |
+| Layer                                                 | Command          | Where snapshots live              |
+| ----------------------------------------------------- | ---------------- | --------------------------------- |
+| Pricing unit tests + PDF text golden masters          | `pnpm test:unit` | `src/lib/__pdf_text__/*.txt`      |
+| PDF visual snapshots (PNG renders of sample invoices) | `pnpm test:unit` | `src/lib/__pdf_snapshots__/*.png` |
+| e2e invoice → PDF flow                                | `pnpm test:e2e`  | —                                 |
 
 The `.txt` golden masters are the correctness guarantee: each one is a
 human-readable rendering of an invoice's full text (line items, codes, rates,
@@ -17,14 +16,9 @@ PRs.
 
 ## Snapshot philosophy: Linux is authoritative
 
-All image baselines (PDF PNGs and UI screenshots) are generated on ubuntu —
-CI's platform — never on dev machines.
+PDF PNG baselines are generated on ubuntu — CI's platform — never on dev
+machines.
 
-- **UI screenshots** definitely drift across OSes (browser font rendering),
-  which is why `pnpm test:e2e` runs only the `e2e` Playwright project;
-  Windows/macOS devs never execute the `visual` project by default. The
-  `snapshotPathTemplate` in `playwright.config.ts` drops the platform suffix
-  so there is exactly one (Linux) baseline set.
 - **PDF PNG renders** are near platform-independent (jsPDF built-in Helvetica
   is substituted with pdfjs's bundled Foxit fonts and rasterized with
   bundled Skia — no OS font stack), and this was verified: Windows-rendered
@@ -36,12 +30,6 @@ CI's platform — never on dev machines.
   carry the correctness guarantee regardless.
 
 ## Updating baselines
-
-**Primary flow:** run the **Update Visual Baselines** workflow
-(`workflow_dispatch`) against your PR branch. It regenerates the PDF PNGs and
-UI screenshots on ubuntu and pushes a `chore: update visual baselines` commit
-to the branch — the PR then shows the old-vs-new image diffs for review.
-Review those diffs; that review is the acceptance step.
 
 **Text golden masters** update locally like any Vitest snapshot:
 `pnpm vitest run src/lib/pdf-generation.text.test.ts -u`. Review every
@@ -76,5 +64,3 @@ extraction whitespace and rasterization output.
 - `createRichInvoice()` seeds via direct Prisma writes because the
   invoice-create UI path cannot persist transport items
   (`invoice-schema.ts`'s `activitiesToCreate` omits them).
-- Visual specs seed rows prefixed `VIS-` and screenshot
-  `/dashboard/invoices?q=VIS-` so parallel e2e specs can't pollute the list.

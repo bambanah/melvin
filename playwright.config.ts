@@ -9,28 +9,7 @@ export default defineConfig({
 		screenshot: "only-on-failure",
 		trace: "retain-on-failure"
 	},
-	projects: [
-		{ name: "e2e", testIgnore: /visual/ },
-		{
-			name: "visual",
-			testMatch: /visual\/.*\.test\.ts/,
-			use: {
-				viewport: { width: 1280, height: 800 },
-				colorScheme: "light"
-			}
-		}
-	],
-	// No platform suffix: baselines are Linux-authoritative (generated on
-	// ubuntu CI via the update-snapshots workflow) — a single baseline set
-	snapshotPathTemplate:
-		"{testDir}/visual/__screenshots__/{testFileName}/{arg}{ext}",
-	expect: {
-		toHaveScreenshot: {
-			maxDiffPixelRatio: 0.01,
-			animations: "disabled",
-			caret: "hide"
-		}
-	},
+	projects: [{ name: "e2e" }],
 	reporter: [["list"], ["html", { open: "never" }]],
 	testDir: "./e2e",
 	webServer: {

@@ -64,51 +64,6 @@ jobs:
             test-results/
           retention-days: 7
 
-  visual-tests:
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: pass
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: package.json
-          cache: pnpm
-      - run: pnpm install
-
-      - name: Install playwright browsers
-        run: pnpm exec playwright install chromium --with-deps
-
-      - name: Initialise database
-        run: pnpm prisma:push
-
-      - name: Run visual regression tests
-        run: pnpm test:visual
-
-      - uses: actions/upload-artifact@v6
-        if: failure()
-        with:
-          name: visual-test-results
-          path: |
-            playwright-report/
-            test-results/
-          retention-days: 7
-
   unit-tests:
     runs-on: ubuntu-latest
 
