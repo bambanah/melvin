@@ -1,10 +1,13 @@
+// Type-only: this module is bundled into the client (via activity-utils.ts's
+// UI callers), so it must not pull in the generated Prisma client's runtime
+// (@prisma/client imports node:module, which the browser bundle can't have).
 import type {
 	ActivityTransportType,
 	Prisma,
+	RateType,
 	SupportItem,
 	SupportItemRates
 } from "@/generated/client";
-import { RateType } from "@/generated/client";
 import { getDuration } from "./date-utils";
 import { round } from "./generic-utils";
 import {
@@ -200,7 +203,7 @@ export function billableLines(
 	// SUPPORT: gated on rateType like the PDF (the printed truth), not on
 	// which fields happen to be populated. A KM-rate item always bills by
 	// itemDistance, even if it also has a time span (docs/plans/007).
-	if (activity.supportItem.rateType === RateType.KM) {
+	if (activity.supportItem.rateType === "KM") {
 		if (activity.itemDistance) {
 			lines.push({
 				kind: "SUPPORT",
