@@ -142,7 +142,10 @@ describe("invoice PDF text golden masters", () => {
 	test.each(invoiceFixtures.map((fixture) => [fixture.name, fixture] as const))(
 		"%s",
 		async (name, fixture) => {
-			const { pdfString, fileName } = await generatePDF(fixture.invoice.id);
+			const { pdfString, fileName } = await generatePDF(
+				fixture.invoice.id,
+				fixture.invoice.ownerId
+			);
 
 			expect(fileName).toEqual(`${fixture.invoice.invoiceNo}.pdf`);
 			expect(pdfString.length).toBeGreaterThan(0);

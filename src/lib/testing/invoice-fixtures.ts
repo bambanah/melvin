@@ -719,9 +719,10 @@ export const getFixture = (name: string): InvoiceFixture => {
 /**
  * Builds the mock module shape for `vi.mock("@/server/prisma", ...)`.
  *
- * The first query in `generatePDF` is fluent —
- * `findUnique({ where }).client({ select })` — so `findUnique` must return an
- * object bearing an async `.client()` method, not a plain promise.
+ * `generatePDF(invoiceId, ownerId)` runs two queries:
+ *   1. `findFirst({ where: { id, ownerId }, select: { clientId } })`
+ *   2. `findFirst({ where: { id, ownerId }, include: { ... } })`
+ * Both require id AND ownerId to match.
  */
 export const mockPrismaForFixtures = (fixtures: InvoiceFixture[]) => {
 	const byInvoiceId = new Map(fixtures.map((f) => [f.invoice.id, f]));
@@ -730,15 +731,17 @@ export const mockPrismaForFixtures = (fixtures: InvoiceFixture[]) => {
 	return {
 		default: {
 			invoice: {
-				findUnique: ({ where }: { where: { id: string } }) => ({
-					client: async () => {
-						const fixture = byInvoiceId.get(where.id);
-
-						return fixture ? { id: fixture.invoice.clientId } : null;
-					}
-				}),
-				findFirst: async ({ where }: { where: { id: string } }) =>
-					byInvoiceId.get(where.id)?.invoice ?? null
+				findFirst: async ({
+					where
+				}: {
+					where: { id: string; ownerId?: string };
+				}) => {
+					const fixture = byInvoiceId.get(where.id);
+					if (!fixture) return null;
+					if (where.ownerId && fixture.invoice.ownerId !== where.ownerId)
+						return null;
+					return fixture.invoice;
+				}
 			},
 			user: {
 				findUnique: async ({ where }: { where: { id: string } }) =>

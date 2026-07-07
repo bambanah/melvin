@@ -6,7 +6,6 @@ See `manage-plans` skill for lifecycle conventions. TRDs in [`docs/trd/`](../trd
 
 | Plan | Title                                                        | Priority | Effort | Depends on    | Status |
 | ---- | ------------------------------------------------------------ | -------- | ------ | ------------- | ------ |
-| 001  | Require auth + ownership on all PDF generation paths         | P1       | S      | —             | TODO   |
 | 002  | Move the NextAuth secret to the environment and rotate it    | P1       | S      | —             | TODO   |
 | 003  | Enforce `ownerId` scoping across the tRPC routers            | P1       | M      | —             | TODO   |
 | 004  | Start the weeknight rate at 8pm, not 7pm                     | P1       | S      | —             | TODO   |
@@ -21,13 +20,13 @@ Status: `TODO` | `IN PROGRESS` | `DONE` | `BLOCKED (reason)` | `REJECTED (ration
 
 ## Completed
 
-In [`complete/`](complete/): 011, 012, 015. Rejected: 013 (superseded by 005–008).
+In [`complete/`](complete/): 001, 011, 012, 015. Rejected: 013 (superseded by 005–008).
 
 ## Dependency Notes
 
-- **001, 002, 003, 004** — independent, can run in parallel
+- **002, 003, 004** — independent, can run in parallel
 - **005 → 004** — tests lock in corrected 8pm boundary
-- **006 → 001, 005** — edits `generatePDF` (changed by 001), needs characterization safety net
+- **006 → 005** — needs characterization safety net (001 done)
 - **007 → 006** — same files; its `BillableLine[]` interface feeds TRD-002/006
 - **008 → 005** — foundation for TRD-004
 - **009 → 003** — regression net for ownership rules

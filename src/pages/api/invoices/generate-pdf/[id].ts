@@ -1,4 +1,5 @@
 import generatePDF from "@/lib/pdf-generation";
+import { getServerAuthSession } from "@/server/auth";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const request = async (request: NextApiRequest, response: NextApiResponse) => {
@@ -9,9 +10,17 @@ const request = async (request: NextApiRequest, response: NextApiResponse) => {
 			.send("Method Not Allowed");
 	}
 
+	const session = await getServerAuthSession({ req: request, res: response });
+	if (!session?.user) {
+		return response.status(401).send("Unauthorized");
+	}
+
 	const { id, base64 } = request.query;
 
-	const { pdfString, fileName } = await generatePDF(String(id));
+	const { pdfString, fileName } = await generatePDF(
+		String(id),
+		session.user.id
+	);
 
 	if (!pdfString) {
 		return response.status(404).send("Can't find PDF");
