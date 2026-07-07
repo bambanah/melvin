@@ -3,7 +3,7 @@ const { z } = require("zod");
 
 const serverSchema = z.object({
 	NODE_ENV: z.enum(["development", "test", "production"]),
-	NEXTAUTH_SECRET: z.string().min(1).optional(),
+	NEXTAUTH_SECRET: z.string().min(1),
 	NEXTAUTH_URL: z.preprocess(
 		(str) => process.env.VERCEL_URL ?? str,
 		process.env.VERCEL ? z.string() : z.string().url()
