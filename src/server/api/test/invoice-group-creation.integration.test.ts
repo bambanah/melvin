@@ -202,3 +202,81 @@ describe("invoice.create with group activities", () => {
 		).rejects.toThrow(/at least one other participant/i);
 	});
 });
+
+describe("invoice.modify with group activities", () => {
+	test("fans out mirrored activities and stamps groupSize when a group row is added on edit", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const supportItem = await createGroupSupportItem(owner);
+		const [primary, ...others] = await createClients(owner, 3);
+
+		const invoice = await caller.invoice.create({
+			invoice: {
+				clientId: primary.id,
+				invoiceNo: "INV-1",
+				activitiesToCreate: []
+			}
+		});
+
+		await caller.invoice.modify({
+			id: invoice.id,
+			invoice: {
+				clientId: primary.id,
+				invoiceNo: "INV-1",
+				activitiesToCreate: [
+					activityToCreate({
+						supportItemId: supportItem.id,
+						groupClientIds: others.map((c) => c.id)
+					})
+				]
+			}
+		});
+
+		const onInvoice = await prisma.activity.findMany({
+			where: { invoiceId: invoice.id },
+			select: { clientId: true, groupSize: true }
+		});
+		const pending = await prisma.activity.findMany({
+			where: { ownerId: owner.id, invoiceId: null },
+			select: { clientId: true, groupSize: true }
+		});
+
+		expect(onInvoice).toEqual([{ clientId: primary.id, groupSize: 3 }]);
+		expect(pending).toHaveLength(2);
+		expect(new Set(pending.map((a) => a.clientId))).toEqual(
+			new Set(others.map((c) => c.id))
+		);
+		expect(pending.every((a) => a.groupSize === 3)).toBe(true);
+	});
+
+	test("rejects the primary client appearing among the group clients on edit", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const supportItem = await createGroupSupportItem(owner);
+		const [primary, other] = await createClients(owner, 2);
+
+		const invoice = await caller.invoice.create({
+			invoice: {
+				clientId: primary.id,
+				invoiceNo: "INV-1",
+				activitiesToCreate: []
+			}
+		});
+
+		await expect(
+			caller.invoice.modify({
+				id: invoice.id,
+				invoice: {
+					clientId: primary.id,
+					invoiceNo: "INV-1",
+					activitiesToCreate: [
+						activityToCreate({
+							supportItemId: supportItem.id,
+							groupClientIds: [other.id, primary.id]
+						})
+					]
+				}
+			})
+		).rejects.toThrow(/primary client/i);
+	});
+});

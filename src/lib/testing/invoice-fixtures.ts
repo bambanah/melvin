@@ -635,10 +635,11 @@ const recurringSlot = (() => {
  * 0125 codes ($0.99/km); odd durations (1h 5m, 5h 30m, 4h 5m); provider
  * travel labour billed per minute at each parent item's rate; and both
  * Participant Number and Bill To in the header. The source invoice printed a
- * Total of $1168.15 — $7.28 above its own line-item sum — because it exhibited
+ * Total of $1168.15 that ran above its own line-item sum because it exhibited
  * quirk Q1 (the Total charged the group's 13 km at $0.99/km instead of the
- * group rate). With Q1 fixed, the Total was $1160.87; docs/plans/016's
- * deliberate -1c/km transit apportioning change brings it to $1160.74.
+ * group rate). With Q1 fixed the Total matches its line-item sum; docs/plans/016's
+ * deliberate -1c/km transit apportioning — the group's 13 km moving from $0.43
+ * to $0.42/km — trims a further $0.13 to reach the current golden $1153.46.
  * (The original paginated onto page 2; with the price guide's shorter item
  * names the table now fits on one page.)
  */

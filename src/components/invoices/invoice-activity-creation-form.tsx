@@ -18,7 +18,15 @@ import {
 import { stripTimezone } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
-import { InvoiceSchema, MAX_GROUP_PARTICIPANTS } from "@/schema/invoice-schema";
+import {
+	appendParticipant,
+	removeParticipantAt,
+	setParticipantAt
+} from "@/lib/group-participants";
+import {
+	InvoiceSchema,
+	MAX_ADDITIONAL_GROUP_PARTICIPANTS
+} from "@/schema/invoice-schema";
 import { format } from "date-fns";
 import {
 	ArrowRight,
@@ -142,42 +150,46 @@ const InvoiceActivityCreationForm = ({
 		});
 	}, [isGroupSupportItem, setValue, activitiesToCreate]);
 
-	const updateGroupClientId = (
-		activityIndex: number,
-		participantIndex: number,
-		clientId: string
-	) => {
-		const groupClientIds = [
-			...(getValues().activitiesToCreate[activityIndex].groupClientIds ?? [])
-		];
-		groupClientIds[participantIndex] = clientId;
+	const setGroupClientIds = (activityIndex: number, groupClientIds: string[]) =>
 		setValue(
 			`activitiesToCreate.${activityIndex}.groupClientIds`,
 			groupClientIds
 		);
-	};
 
-	const addGroupParticipant = (activityIndex: number) => {
-		const groupClientIds =
-			getValues().activitiesToCreate[activityIndex].groupClientIds ?? [];
-		if (groupClientIds.length >= MAX_GROUP_PARTICIPANTS) return;
-		setValue(`activitiesToCreate.${activityIndex}.groupClientIds`, [
-			...groupClientIds,
-			""
-		]);
-	};
+	const currentGroupClientIds = (activityIndex: number): string[] =>
+		getValues().activitiesToCreate[activityIndex].groupClientIds ?? [];
+
+	const updateGroupClientId = (
+		activityIndex: number,
+		participantIndex: number,
+		clientId: string
+	) =>
+		setGroupClientIds(
+			activityIndex,
+			setParticipantAt(
+				currentGroupClientIds(activityIndex),
+				participantIndex,
+				clientId
+			)
+		);
+
+	const addGroupParticipant = (activityIndex: number) =>
+		setGroupClientIds(
+			activityIndex,
+			appendParticipant(currentGroupClientIds(activityIndex))
+		);
 
 	const removeGroupParticipant = (
 		activityIndex: number,
 		participantIndex: number
-	) => {
-		const groupClientIds =
-			getValues().activitiesToCreate[activityIndex].groupClientIds ?? [];
-		setValue(
-			`activitiesToCreate.${activityIndex}.groupClientIds`,
-			groupClientIds.filter((_, i) => i !== participantIndex)
+	) =>
+		setGroupClientIds(
+			activityIndex,
+			removeParticipantAt(
+				currentGroupClientIds(activityIndex),
+				participantIndex
+			)
 		);
-	};
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -253,7 +265,7 @@ const InvoiceActivityCreationForm = ({
 										</div>
 									))}
 									{(watch(`activitiesToCreate.${index}.groupClientIds`) ?? [])
-										.length < MAX_GROUP_PARTICIPANTS && (
+										.length < MAX_ADDITIONAL_GROUP_PARTICIPANTS && (
 										<Button
 											onClick={() => addGroupParticipant(index)}
 											className="mr-auto"
