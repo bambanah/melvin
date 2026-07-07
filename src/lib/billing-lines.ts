@@ -8,6 +8,7 @@ import type {
 	SupportItem,
 	SupportItemRates
 } from "@/generated/client";
+import type { UnitPriceSuffix } from "@/schema/invoice-version-schema";
 import { formatDuration, getDuration } from "./date-utils";
 import { floorToCent, round } from "./generic-utils";
 import {
@@ -360,7 +361,7 @@ const EXPENSE_TYPE_LABELS: Record<string, string> = {
 export function lineUnitPriceSuffix(
 	line: BillableLine,
 	activity: BillableActivity
-): "hr" | "km" | undefined {
+): UnitPriceSuffix | undefined {
 	switch (line.kind) {
 		case "SUPPORT":
 			return line.unit === "HOUR" ? "hr" : "km";

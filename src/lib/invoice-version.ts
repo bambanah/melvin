@@ -65,21 +65,23 @@ export function buildInvoiceVersionContent(
 	const lines: InvoiceVersionLine[] = invoice.activities
 		.filter((activity) => activity.supportItem !== null)
 		.flatMap((activity) =>
-			billableLines(activity, rateContext).map((line) => ({
-				kind: line.kind,
-				description: line.description,
-				supportItemCode: line.supportItemCode,
-				serviceDate: dayjs.utc(line.serviceDate).toISOString(),
-				quantity: line.quantity,
-				unit: line.unit,
-				unitPrice: line.unitPrice,
-				total: line.total,
-				...(line.activityId ? { activityId: line.activityId } : {}),
-				detailsText: lineDetailsText(line, activity),
-				...(lineUnitPriceSuffix(line, activity)
-					? { unitPriceSuffix: lineUnitPriceSuffix(line, activity) }
-					: {})
-			}))
+			billableLines(activity, rateContext).map((line) => {
+				const unitPriceSuffix = lineUnitPriceSuffix(line, activity);
+
+				return {
+					kind: line.kind,
+					description: line.description,
+					supportItemCode: line.supportItemCode,
+					serviceDate: dayjs.utc(line.serviceDate).toISOString(),
+					quantity: line.quantity,
+					unit: line.unit,
+					unitPrice: line.unitPrice,
+					total: line.total,
+					...(line.activityId ? { activityId: line.activityId } : {}),
+					detailsText: lineDetailsText(line, activity),
+					...(unitPriceSuffix ? { unitPriceSuffix } : {})
+				};
+			})
 		);
 
 	const total = round(
