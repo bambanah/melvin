@@ -1,5 +1,6 @@
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 
+import { ownedDb } from "@/server/api/owned";
 import { getServerAuthSession } from "@/server/auth";
 import prisma from "@/server/prisma";
 
@@ -31,7 +32,8 @@ export const authMiddleware = t.middleware(({ next, ctx }) => {
 
 	return next({
 		ctx: {
-			session: { ...ctx.session, user: ctx.session.user }
+			session: { ...ctx.session, user: ctx.session.user },
+			owned: ownedDb(ctx.prisma, ctx.session.user.id)
 		}
 	});
 });
