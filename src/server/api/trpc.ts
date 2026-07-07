@@ -22,6 +22,7 @@ const t = initTRPC
 
 export const router = t.router;
 export const publicProcedure = t.procedure;
+export const createCallerFactory = t.createCallerFactory;
 
 export const authMiddleware = t.middleware(({ next, ctx }) => {
 	if (!ctx.session?.user) {

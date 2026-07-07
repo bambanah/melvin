@@ -30,6 +30,7 @@
 		"format:write": "prettier . --write",
 		"test": "run-s test:unit test:e2e",
 		"test:unit": "vitest run",
+		"test:integration": "vitest run --config vitest.integration.config.mts",
 		"test:e2e": "playwright test --project=e2e",
 		"test:pdf-snapshots:update": "cross-env UPDATE_PDF_SNAPSHOTS=1 vitest run src/lib/pdf-generation.render.test.ts",
 		"pw:codegen": "playwright codegen http://localhost:3000 --load-storage=e2e/setup/storage-state.json"
