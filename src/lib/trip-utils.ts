@@ -1,6 +1,6 @@
 import type { Prisma } from "@/generated/client";
 
-const MAX_TRANSIT_DURATION_MINUTES = 30;
+export const MAX_TRANSIT_DURATION_MINUTES = 30;
 
 export interface TripActivity {
 	id: string;
@@ -107,17 +107,54 @@ export function calculateTripTransit(
 	return result;
 }
 
-interface ClientWithRates {
-	transitRatePerKm: Prisma.Decimal | null;
+export function standaloneTransit(
+	client: {
+		distanceToClient: Prisma.Decimal | null;
+		travelTimeToClient: Prisma.Decimal | null;
+	} | null
+): TransitValues {
+	const rawDuration = Number(client?.travelTimeToClient ?? 0);
+	const durationCapped = rawDuration > MAX_TRANSIT_DURATION_MINUTES;
+	const cappedDuration = Math.min(rawDuration, MAX_TRANSIT_DURATION_MINUTES);
+
+	return {
+		transitDistance: Number(client?.distanceToClient ?? 0) * 2,
+		transitDuration: cappedDuration * 2,
+		durationCapped
+	};
 }
 
-interface UserWithRates {
-	transitRatePerKm: Prisma.Decimal;
+export interface TransitUpdate {
+	activityId: string;
+	transitDistance: number;
+	transitDuration: number;
 }
 
-export function getEffectiveTransitRate(
-	client: ClientWithRates | null,
-	user: UserWithRates
-): number {
-	return Number(client?.transitRatePerKm ?? user.transitRatePerKm);
+export function tripTransitUpdates(
+	activities: TripActivity[],
+	legs: InterClientLeg[]
+): TransitUpdate[] {
+	const transit = calculateTripTransit(activities, legs);
+
+	return activities.map((activity) => {
+		const values = transit.get(activity.id);
+		return {
+			activityId: activity.id,
+			transitDistance: values?.transitDistance ?? 0,
+			transitDuration: values?.transitDuration ?? 0
+		};
+	});
+}
+
+export function standaloneTransitUpdates(
+	activities: TripActivity[]
+): TransitUpdate[] {
+	return activities.map((activity) => {
+		const values = standaloneTransit(activity.client);
+		return {
+			activityId: activity.id,
+			transitDistance: values.transitDistance,
+			transitDuration: values.transitDuration
+		};
+	});
 }

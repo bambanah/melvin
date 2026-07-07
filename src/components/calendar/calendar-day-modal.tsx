@@ -7,8 +7,7 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog";
-import TripBuilderModal from "@/components/trips/trip-builder-modal";
-import TripEditModal from "@/components/trips/trip-edit-modal";
+import TripEditorModal from "@/components/trips/trip-editor-modal";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { trpc } from "@/lib/trpc";
 import { formatDuration, getDuration, isHoliday } from "@/lib/date-utils";
@@ -108,7 +107,8 @@ const CalendarDayModal = ({
 				</DialogFooter>
 			</DialogContent>
 
-			<TripBuilderModal
+			<TripEditorModal
+				mode="create"
 				date={day.toDate()}
 				activities={activities}
 				open={tripBuilderOpen}
@@ -117,7 +117,8 @@ const CalendarDayModal = ({
 			/>
 
 			{existingTrip && (
-				<TripEditModal
+				<TripEditorModal
+					mode="edit"
 					trip={existingTrip}
 					open={tripEditOpen}
 					onOpenChange={setTripEditOpen}

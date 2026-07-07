@@ -1,5 +1,10 @@
-import { calculateTripTransit } from "@/lib/trip-utils";
+import {
+	standaloneTransitUpdates,
+	tripTransitUpdates,
+	type TransitUpdate
+} from "@/lib/trip-utils";
 import { authedProcedure, router } from "@/server/api/trpc";
+import type { Prisma } from "@/generated/client";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { z } from "zod";
 
@@ -17,6 +22,7 @@ const tripActivitySelect = {
 	transitDistance: true,
 	transitDuration: true,
 	date: true,
+	tripId: true,
 	client: {
 		select: {
 			id: true,
@@ -32,6 +38,21 @@ const tripActivitySelect = {
 		}
 	}
 };
+
+async function applyTransitUpdates(
+	tx: Prisma.TransactionClient,
+	updates: TransitUpdate[]
+) {
+	for (const update of updates) {
+		await tx.activity.update({
+			where: { id: update.activityId },
+			data: {
+				transitDistance: update.transitDistance,
+				transitDuration: update.transitDuration
+			}
+		});
+	}
+}
 
 export const tripRouter = router({
 	create: authedProcedure
@@ -58,57 +79,44 @@ export const tripRouter = router({
 				});
 			}
 
-			const existingTrip = activities.find((a) => {
-				const activityAny = a as { tripId?: string };
-				return activityAny.tripId;
-			});
-			if (existingTrip) {
+			if (activities.some((a) => a.tripId)) {
 				throw new TRPCError({
 					code: "CONFLICT",
 					message: "One or more activities are already in a trip"
 				});
 			}
 
-			const transit = calculateTripTransit(activities, input.interClientLegs);
+			const updates = tripTransitUpdates(activities, input.interClientLegs);
 
-			const trip = await ctx.prisma.trip.create({
-				data: {
-					date: input.date,
-					ownerId: ctx.session.user.id,
-					activities: {
-						connect: input.activityIds.map((id) => ({ id }))
-					},
-					interClientLegs: {
-						create: input.interClientLegs.map((leg) => ({
-							fromActivityId: leg.fromActivityId,
-							toActivityId: leg.toActivityId,
-							distance: leg.distance,
-							duration: leg.duration
-						}))
-					}
-				},
-				include: {
-					activities: {
-						select: tripActivitySelect
-					},
-					interClientLegs: true
-				}
-			});
-
-			for (const activity of trip.activities) {
-				const values = transit.get(activity.id);
-				if (values) {
-					await ctx.prisma.activity.update({
-						where: { id: activity.id },
-						data: {
-							transitDistance: values.transitDistance,
-							transitDuration: values.transitDuration
+			return ctx.prisma.$transaction(async (tx) => {
+				const trip = await tx.trip.create({
+					data: {
+						date: input.date,
+						ownerId: ctx.session.user.id,
+						activities: {
+							connect: input.activityIds.map((id) => ({ id }))
+						},
+						interClientLegs: {
+							create: input.interClientLegs.map((leg) => ({
+								fromActivityId: leg.fromActivityId,
+								toActivityId: leg.toActivityId,
+								distance: leg.distance,
+								duration: leg.duration
+							}))
 						}
-					});
-				}
-			}
+					},
+					include: {
+						activities: {
+							select: tripActivitySelect
+						},
+						interClientLegs: true
+					}
+				});
 
-			return trip;
+				await applyTransitUpdates(tx, updates);
+
+				return trip;
+			});
 		}),
 
 	addActivity: authedProcedure
@@ -153,37 +161,28 @@ export const tripRouter = router({
 
 			const allActivities = [...trip.activities, activity];
 			const allLegs = [...trip.interClientLegs, ...input.interClientLegs];
-			const transit = calculateTripTransit(allActivities, allLegs);
+			const updates = tripTransitUpdates(allActivities, allLegs);
 
-			await ctx.prisma.activity.update({
-				where: { id: input.activityId },
-				data: { tripId: input.tripId }
-			});
-
-			for (const leg of input.interClientLegs) {
-				await ctx.prisma.interClientLeg.create({
-					data: {
-						tripId: input.tripId,
-						fromActivityId: leg.fromActivityId,
-						toActivityId: leg.toActivityId,
-						distance: leg.distance,
-						duration: leg.duration
-					}
+			await ctx.prisma.$transaction(async (tx) => {
+				await tx.activity.update({
+					where: { id: input.activityId },
+					data: { tripId: input.tripId }
 				});
-			}
 
-			for (const act of allActivities) {
-				const values = transit.get(act.id);
-				if (values) {
-					await ctx.prisma.activity.update({
-						where: { id: act.id },
+				for (const leg of input.interClientLegs) {
+					await tx.interClientLeg.create({
 						data: {
-							transitDistance: values.transitDistance,
-							transitDuration: values.transitDuration
+							tripId: input.tripId,
+							fromActivityId: leg.fromActivityId,
+							toActivityId: leg.toActivityId,
+							distance: leg.distance,
+							duration: leg.duration
 						}
 					});
 				}
-			}
+
+				await applyTransitUpdates(tx, updates);
+			});
 
 			return ctx.prisma.trip.findFirst({
 				where: { id: input.tripId },
@@ -232,72 +231,61 @@ export const tripRouter = router({
 			);
 
 			if (remainingActivities.length < 2) {
-				await ctx.prisma.interClientLeg.deleteMany({
-					where: { tripId: input.tripId }
-				});
+				const updates = standaloneTransitUpdates(trip.activities);
 
-				for (const act of trip.activities) {
-					const distance = Number(act.client?.distanceToClient ?? 0) * 2;
-					const duration = Number(act.client?.travelTimeToClient ?? 0) * 2;
-					await ctx.prisma.activity.update({
-						where: { id: act.id },
-						data: {
-							tripId: null,
-							transitDistance: distance,
-							transitDuration: duration
-						}
+				await ctx.prisma.$transaction(async (tx) => {
+					await tx.interClientLeg.deleteMany({
+						where: { tripId: input.tripId }
 					});
-				}
 
-				await ctx.prisma.trip.delete({
-					where: { id: input.tripId }
+					for (const act of trip.activities) {
+						await tx.activity.update({
+							where: { id: act.id },
+							data: { tripId: null }
+						});
+					}
+
+					await applyTransitUpdates(tx, updates);
+
+					await tx.trip.delete({
+						where: { id: input.tripId }
+					});
 				});
 
 				return { dissolved: true };
 			}
 
-			await ctx.prisma.interClientLeg.deleteMany({
-				where: {
-					tripId: input.tripId,
-					OR: [
-						{ fromActivityId: input.activityId },
-						{ toActivityId: input.activityId }
-					]
-				}
+			const standaloneUpdates = standaloneTransitUpdates([activityToRemove]);
+			const remainingUpdates = tripTransitUpdates(
+				remainingActivities,
+				trip.interClientLegs.filter(
+					(leg) =>
+						leg.fromActivityId !== input.activityId &&
+						leg.toActivityId !== input.activityId
+				)
+			);
+
+			await ctx.prisma.$transaction(async (tx) => {
+				await tx.interClientLeg.deleteMany({
+					where: {
+						tripId: input.tripId,
+						OR: [
+							{ fromActivityId: input.activityId },
+							{ toActivityId: input.activityId }
+						]
+					}
+				});
+
+				await tx.activity.update({
+					where: { id: input.activityId },
+					data: { tripId: null }
+				});
+
+				await applyTransitUpdates(tx, [
+					...standaloneUpdates,
+					...remainingUpdates
+				]);
 			});
-
-			const standaloneDistance =
-				Number(activityToRemove.client?.distanceToClient ?? 0) * 2;
-			const standaloneDuration =
-				Number(activityToRemove.client?.travelTimeToClient ?? 0) * 2;
-
-			await ctx.prisma.activity.update({
-				where: { id: input.activityId },
-				data: {
-					tripId: null,
-					transitDistance: standaloneDistance,
-					transitDuration: standaloneDuration
-				}
-			});
-
-			const remainingLegs = await ctx.prisma.interClientLeg.findMany({
-				where: { tripId: input.tripId }
-			});
-
-			const transit = calculateTripTransit(remainingActivities, remainingLegs);
-
-			for (const act of remainingActivities) {
-				const values = transit.get(act.id);
-				if (values) {
-					await ctx.prisma.activity.update({
-						where: { id: act.id },
-						data: {
-							transitDistance: values.transitDistance,
-							transitDuration: values.transitDuration
-						}
-					});
-				}
-			}
 
 			return {
 				dissolved: false,
@@ -342,37 +330,28 @@ export const tripRouter = router({
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			await ctx.prisma.interClientLeg.deleteMany({
-				where: { tripId: input.tripId }
-			});
-
-			await ctx.prisma.interClientLeg.createMany({
-				data: input.interClientLegs.map((leg) => ({
-					tripId: input.tripId,
-					fromActivityId: leg.fromActivityId,
-					toActivityId: leg.toActivityId,
-					distance: leg.distance,
-					duration: leg.duration
-				}))
-			});
-
-			const transit = calculateTripTransit(
+			const updates = tripTransitUpdates(
 				trip.activities,
 				input.interClientLegs
 			);
 
-			for (const activity of trip.activities) {
-				const values = transit.get(activity.id);
-				if (values) {
-					await ctx.prisma.activity.update({
-						where: { id: activity.id },
-						data: {
-							transitDistance: values.transitDistance,
-							transitDuration: values.transitDuration
-						}
-					});
-				}
-			}
+			await ctx.prisma.$transaction(async (tx) => {
+				await tx.interClientLeg.deleteMany({
+					where: { tripId: input.tripId }
+				});
+
+				await tx.interClientLeg.createMany({
+					data: input.interClientLegs.map((leg) => ({
+						tripId: input.tripId,
+						fromActivityId: leg.fromActivityId,
+						toActivityId: leg.toActivityId,
+						distance: leg.distance,
+						duration: leg.duration
+					}))
+				});
+
+				await applyTransitUpdates(tx, updates);
+			});
 
 			return ctx.prisma.trip.findFirst({
 				where: { id: input.tripId },
@@ -400,22 +379,21 @@ export const tripRouter = router({
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			for (const activity of trip.activities) {
-				const distance = Number(activity.client?.distanceToClient ?? 0) * 2;
-				const duration = Number(activity.client?.travelTimeToClient ?? 0) * 2;
+			const updates = standaloneTransitUpdates(trip.activities);
 
-				await ctx.prisma.activity.update({
-					where: { id: activity.id },
-					data: {
-						tripId: null,
-						transitDistance: distance,
-						transitDuration: duration
-					}
+			await ctx.prisma.$transaction(async (tx) => {
+				for (const activity of trip.activities) {
+					await tx.activity.update({
+						where: { id: activity.id },
+						data: { tripId: null }
+					});
+				}
+
+				await applyTransitUpdates(tx, updates);
+
+				await tx.trip.delete({
+					where: { id: input.tripId }
 				});
-			}
-
-			await ctx.prisma.trip.delete({
-				where: { id: input.tripId }
 			});
 
 			return { success: true };

@@ -1,7 +1,9 @@
 import {
 	calculateTripTransit,
-	getEffectiveTransitRate,
 	sortActivitiesByTime,
+	standaloneTransit,
+	standaloneTransitUpdates,
+	tripTransitUpdates,
 	type InterClientLeg,
 	type TripActivity
 } from "@/lib/trip-utils";
@@ -180,22 +182,6 @@ test("Activities out of startTime order are allocated as if sorted; null startTi
 	});
 });
 
-test("getEffectiveTransitRate: client override wins over the user rate", () => {
-	const client = { transitRatePerKm: new Prisma.Decimal(0.75) };
-	const user = { transitRatePerKm: new Prisma.Decimal(0.99) };
-
-	expect(getEffectiveTransitRate(client, user)).toEqual(0.75);
-});
-
-test("getEffectiveTransitRate: falls back to the user rate when client has none", () => {
-	const user = { transitRatePerKm: new Prisma.Decimal(0.99) };
-
-	expect(getEffectiveTransitRate(null, user)).toEqual(0.99);
-	expect(getEffectiveTransitRate({ transitRatePerKm: null }, user)).toEqual(
-		0.99
-	);
-});
-
 test("Prisma.Decimal distance/duration inputs produce plain-number outputs", () => {
 	const activity = getTripActivity("a1", "09:00", {
 		distanceToClient: 10,
@@ -215,4 +201,78 @@ test("sortActivitiesByTime: sorts by startTime, null startTimes last", () => {
 	const c = { startTime: null };
 
 	expect(sortActivitiesByTime([a, b, c])).toEqual([b, a, c]);
+});
+
+test("standaloneTransit: uncapped input doubles distance and duration", () => {
+	const result = standaloneTransit({
+		distanceToClient: new Prisma.Decimal(5),
+		travelTimeToClient: new Prisma.Decimal(15)
+	});
+
+	expect(result).toEqual({
+		transitDistance: 10,
+		transitDuration: 30,
+		durationCapped: false
+	});
+});
+
+test("standaloneTransit: capped input at 45 min restores to 60, not 90", () => {
+	const result = standaloneTransit({
+		distanceToClient: new Prisma.Decimal(5),
+		travelTimeToClient: new Prisma.Decimal(45)
+	});
+
+	expect(result).toEqual({
+		transitDistance: 10,
+		transitDuration: 60,
+		durationCapped: true
+	});
+});
+
+test("standaloneTransit: null client yields zeros", () => {
+	expect(standaloneTransit(null)).toEqual({
+		transitDistance: 0,
+		transitDuration: 0,
+		durationCapped: false
+	});
+});
+
+test("tripTransitUpdates agrees with calculateTripTransit for a 3-activity fixture", () => {
+	const first = getTripActivity("a1", "09:00");
+	const middle = getTripActivity("a2", "10:00");
+	const last = getTripActivity("a3", "11:00");
+	const legs = [getLeg("a1", "a2", 3, 8), getLeg("a2", "a3", 4, 6)];
+	const activities = [first, middle, last];
+
+	const transit = calculateTripTransit(activities, legs);
+	const updates = tripTransitUpdates(activities, legs);
+
+	expect(updates).toEqual(
+		activities.map((activity) => {
+			const values = transit.get(activity.id);
+			return {
+				activityId: activity.id,
+				transitDistance: values?.transitDistance,
+				transitDuration: values?.transitDuration
+			};
+		})
+	);
+});
+
+test("standaloneTransitUpdates: maps each activity to its capped standalone restore", () => {
+	const first = getTripActivity("a1", "09:00", {
+		distanceToClient: 5,
+		travelTimeToClient: 15
+	});
+	const second = getTripActivity("a2", "10:00", {
+		distanceToClient: 5,
+		travelTimeToClient: 45
+	});
+
+	const updates = standaloneTransitUpdates([first, second]);
+
+	expect(updates).toEqual([
+		{ activityId: "a1", transitDistance: 10, transitDuration: 30 },
+		{ activityId: "a2", transitDistance: 10, transitDuration: 60 }
+	]);
 });
