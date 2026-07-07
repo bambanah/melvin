@@ -1,6 +1,7 @@
 import { checkActivityOverlap, formatOverlapError } from "@/lib/overlap-utils";
 import { baseListQueryInput } from "@/lib/trpc";
 import { activitySchema } from "@/schema/activity-schema";
+import { paginate } from "@/server/api/owned";
 import { authedProcedure, router } from "@/server/api/trpc";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { z } from "zod";
@@ -62,35 +63,33 @@ export const activityRouter = router({
 			const limit = input.limit ?? DEFAULT_LIST_LIMIT;
 			const { assigned, invoiceId, clientId, cursor } = input;
 
-			const activities = await ctx.prisma.activity.findMany({
-				select: {
-					...defaultActivitySelect,
-					invoice: {
-						select: { id: true, invoiceNo: true }
-					}
-				},
-				take: limit + 1,
-				cursor: cursor ? { id: cursor } : undefined,
-				where: {
-					ownerId: ctx.session.user.id,
-					invoiceId: invoiceId ?? getInvoiceIdWhereCondition(assigned),
-					clientId
-				},
-				orderBy: [
-					{
-						date: "desc"
-					},
-					{
-						startTime: "desc"
-					}
-				]
+			const { items: activities, nextCursor } = await paginate({
+				limit,
+				cursor,
+				query: ({ take, cursor }) =>
+					ctx.owned.activity.findMany({
+						select: {
+							...defaultActivitySelect,
+							invoice: {
+								select: { id: true, invoiceNo: true }
+							}
+						},
+						take,
+						cursor,
+						where: {
+							invoiceId: invoiceId ?? getInvoiceIdWhereCondition(assigned),
+							clientId
+						},
+						orderBy: [
+							{
+								date: "desc"
+							},
+							{
+								startTime: "desc"
+							}
+						]
+					})
 			});
-
-			let nextCursor: typeof cursor | undefined;
-			if (activities.length > limit) {
-				const nextInvoice = activities.pop();
-				nextCursor = nextInvoice?.id;
-			}
 
 			return {
 				activities,
@@ -98,10 +97,9 @@ export const activityRouter = router({
 			};
 		}),
 	pending: authedProcedure.query(async ({ ctx }) => {
-		const activities = await ctx.prisma.activity.findMany({
+		const activities = await ctx.owned.activity.findMany({
 			select: defaultActivitySelect,
 			where: {
-				ownerId: ctx.session.user.id,
 				invoiceId: null
 			}
 		});
@@ -132,13 +130,12 @@ export const activityRouter = router({
 			})
 		)
 		.query(async ({ ctx, input }) => {
-			const activities = await ctx.prisma.activity.findMany({
+			const activities = await ctx.owned.activity.findMany({
 				select: {
 					...defaultActivitySelect,
 					invoiceId: true
 				},
 				where: {
-					ownerId: ctx.session.user.id,
 					date: {
 						gte: input.startDate,
 						lt: input.endDate
@@ -152,11 +149,10 @@ export const activityRouter = router({
 	byId: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
-			const activity = await ctx.prisma.activity.findFirst({
+			const activity = await ctx.owned.activity.findFirst({
 				select: defaultActivitySelect,
 				where: {
-					id: input.id,
-					ownerId: ctx.session.user.id
+					id: input.id
 				}
 			});
 
@@ -169,10 +165,9 @@ export const activityRouter = router({
 	forInvoice: authedProcedure
 		.input(z.object({ invoiceId: z.string() }))
 		.query(async ({ input, ctx }) => {
-			const activities = await ctx.prisma.activity.findMany({
+			const activities = await ctx.owned.activity.findMany({
 				select: defaultActivitySelect,
 				where: {
-					ownerId: ctx.session.user.id,
 					invoiceId: input.invoiceId
 				}
 			});
@@ -274,13 +269,7 @@ export const activityRouter = router({
 				});
 			}
 
-			const existing = await ctx.prisma.activity.findFirst({
-				where: { id: input.id, ownerId: ctx.session.user.id },
-				select: { id: true }
-			});
-			if (!existing) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
+			await ctx.owned.activity.assert(input.id);
 
 			// Delete existing transport items and recreate
 			if (transportItems !== undefined) {
@@ -324,13 +313,7 @@ export const activityRouter = router({
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
-			const existing = await ctx.prisma.activity.findFirst({
-				where: { id: input.id, ownerId: ctx.session.user.id },
-				select: { id: true }
-			});
-			if (!existing) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
+			await ctx.owned.activity.assert(input.id);
 
 			const activity = await ctx.prisma.activity.delete({
 				where: {
