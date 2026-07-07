@@ -8,6 +8,12 @@ import { z } from "zod";
  * breaking shape change bumps the literal and the renderer branches on it.
  * Never rewrite stored content to match a newer schema version.
  */
+// The printed Unit Price column's suffix. Single source of truth for the
+// "/hr" | "/km" concept shared by the live billing lines, the PDF renderer,
+// and the frozen snapshot (docs/plans/017 Step 6).
+export const unitPriceSuffixSchema = z.enum(["hr", "km"]);
+export type UnitPriceSuffix = z.infer<typeof unitPriceSuffixSchema>;
+
 export const invoiceVersionLineSchema = z.object({
 	kind: z.enum(["SUPPORT", "TRAVEL_TIME", "TRAVEL_KM", "ABT", "EXPENSE"]),
 	description: z.string(),
@@ -23,7 +29,7 @@ export const invoiceVersionLineSchema = z.object({
 	detailsText: z.string(),
 	// The printed Unit Price column's suffix — absent for EXPENSE lines,
 	// which print no unit price (docs/plans/017 Step 6).
-	unitPriceSuffix: z.enum(["hr", "km"]).optional()
+	unitPriceSuffix: unitPriceSuffixSchema.optional()
 });
 
 export const invoiceVersionContentSchema = z.object({

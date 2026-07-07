@@ -11,7 +11,7 @@ import {
 	invoiceSchema,
 	totalGroupSize
 } from "@/schema/invoice-schema";
-import { ownedDb, paginate } from "@/server/api/owned";
+import { amendFirst, ownedDb, paginate } from "@/server/api/owned";
 import { authedProcedure, router } from "@/server/api/trpc";
 import {
 	Client,
@@ -54,6 +54,15 @@ const versionSelect = {
 	total: true,
 	content: true
 } satisfies Prisma.InvoiceVersionSelect;
+
+// The version rows every status transition returns to its UI caller, newest
+// first. Shared so `send`/`amend`/`markPaid`/`unmarkPaid` can't drift apart.
+const versionInclude = {
+	versions: {
+		select: versionSelect,
+		orderBy: { versionNumber: "desc" }
+	}
+} satisfies Prisma.InvoiceInclude;
 
 type VersionRow = {
 	versionNumber: number;
@@ -151,7 +160,7 @@ const generateNestedWriteForGroupActivities = (
 	)
 });
 
-type GroupWriteCtx = {
+type RouterCtx = {
 	owned: ReturnType<typeof ownedDb>;
 	prisma: PrismaClient;
 };
@@ -161,7 +170,7 @@ type GroupWriteCtx = {
  * billed (its rate would divide by 1). Both create and modify enforce this.
  */
 const assertGroupRowsHaveParticipants = async (
-	owned: GroupWriteCtx["owned"],
+	owned: RouterCtx["owned"],
 	activitiesToCreate: InvoiceSchema["activitiesToCreate"]
 ) => {
 	const soloRowSupportItemIds = [
@@ -194,7 +203,7 @@ const assertGroupRowsHaveParticipants = async (
  * `groupSize` but no sibling activities.
  */
 const createGroupMirrorActivities = async (
-	ctx: GroupWriteCtx,
+	ctx: RouterCtx,
 	inputInvoice: InvoiceSchema,
 	ownerId: string
 ) => {
@@ -245,6 +254,75 @@ const createGroupMirrorActivities = async (
 		)
 	);
 };
+
+/**
+ * Shared scaffolding for the bulk id-list transitions (`send`, `markPaid`,
+ * `unmarkPaid`): per id, assert ownership, run `work` in its own transaction,
+ * and return the parsed invoices. Each transition supplies only its inner
+ * transactional body.
+ */
+async function transitionInvoices<
+	T extends Partial<Invoice> & { versions?: VersionRow[] }
+>(
+	ctx: RouterCtx,
+	ids: string[],
+	work: (tx: Prisma.TransactionClient, id: string) => Promise<T>
+) {
+	const invoices: T[] = [];
+
+	for (const id of ids) {
+		await ctx.owned.invoice.assert(id);
+		invoices.push(await ctx.prisma.$transaction((tx) => work(tx, id)));
+	}
+
+	return { invoices: invoices.map((invoice) => parseInvoice(invoice)) };
+}
+
+/**
+ * `markPaid` / `unmarkPaid`: both re-check the source status, stamp (or clear)
+ * `paidAt` on the invoice and its latest version, and flip the status. They
+ * differ only in the required source status, the target status, the `paidAt`
+ * value, and the conflict message.
+ */
+function setPaidState(
+	ctx: RouterCtx,
+	ids: string[],
+	opts: {
+		from: InvoiceStatus;
+		to: InvoiceStatus;
+		paidAt: Date | null;
+		conflictMessage: (invoiceNo: string) => string;
+	}
+) {
+	return transitionInvoices(ctx, ids, async (tx, id) => {
+		const existing = await tx.invoice.findUniqueOrThrow({ where: { id } });
+
+		if (existing.status !== opts.from) {
+			throw new TRPCError({
+				code: "CONFLICT",
+				message: opts.conflictMessage(existing.invoiceNo)
+			});
+		}
+
+		const latestVersion = await tx.invoiceVersion.findFirst({
+			where: { invoiceId: id },
+			orderBy: { versionNumber: "desc" }
+		});
+
+		if (latestVersion) {
+			await tx.invoiceVersion.update({
+				where: { id: latestVersion.id },
+				data: { paidAt: opts.paidAt }
+			});
+		}
+
+		return tx.invoice.update({
+			where: { id },
+			data: { status: opts.to, paidAt: opts.paidAt },
+			include: versionInclude
+		});
+	});
+}
 
 export const invoiceRouter = router({
 	list: authedProcedure
@@ -508,79 +586,56 @@ export const invoiceRouter = router({
 		}),
 	send: authedProcedure
 		.input(z.object({ ids: z.array(z.string()) }))
-		.mutation(async ({ ctx, input }) => {
-			const invoices = [];
+		.mutation(({ ctx, input }) =>
+			transitionInvoices(ctx, input.ids, async (tx, id) => {
+				const existing = await tx.invoice.findUniqueOrThrow({ where: { id } });
 
-			for (const id of input.ids) {
-				await ctx.owned.invoice.assert(id);
+				if (existing.status !== InvoiceStatus.CREATED) {
+					amendFirst(existing.invoiceNo);
+				}
 
-				const invoice = await ctx.prisma.$transaction(async (tx) => {
-					const existing = await tx.invoice.findUniqueOrThrow({
-						where: { id }
+				const data = await loadInvoiceForPdf(id, ctx.session.user.id, tx);
+
+				if (!data || data.invoice.activities.length === 0) {
+					throw new TRPCError({
+						code: "BAD_REQUEST",
+						message: "Invoice has no activities"
 					});
+				}
 
-					if (existing.status !== InvoiceStatus.CREATED) {
-						throw new TRPCError({
-							code: "CONFLICT",
-							message: `Invoice ${existing.invoiceNo} has already been sent — amend it first`
-						});
-					}
+				const previousVersion = await tx.invoiceVersion.findFirst({
+					where: { invoiceId: id },
+					orderBy: { versionNumber: "desc" }
+				});
+				const versionNumber = (previousVersion?.versionNumber ?? 0) + 1;
+				const previousDisplayInvoiceNo = previousVersion
+					? displayInvoiceNo(existing.invoiceNo, previousVersion.versionNumber)
+					: undefined;
 
-					const data = await loadInvoiceForPdf(id, ctx.session.user.id, tx);
-
-					if (!data || data.invoice.activities.length === 0) {
-						throw new TRPCError({
-							code: "BAD_REQUEST",
-							message: "Invoice has no activities"
-						});
-					}
-
-					const previousVersion = await tx.invoiceVersion.findFirst({
-						where: { invoiceId: id },
-						orderBy: { versionNumber: "desc" }
-					});
-					const versionNumber = (previousVersion?.versionNumber ?? 0) + 1;
-					const previousDisplayInvoiceNo = previousVersion
-						? displayInvoiceNo(
-								existing.invoiceNo,
-								previousVersion.versionNumber
-							)
-						: undefined;
-
-					const content = buildInvoiceVersionContent(data, {
-						versionNumber,
-						previousDisplayInvoiceNo
-					});
-
-					const sentAt = new Date();
-
-					await tx.invoiceVersion.create({
-						data: {
-							invoiceId: id,
-							versionNumber,
-							sentAt,
-							total: content.total,
-							content
-						}
-					});
-
-					return tx.invoice.update({
-						where: { id },
-						data: { status: InvoiceStatus.SENT, sentAt },
-						include: {
-							versions: {
-								select: versionSelect,
-								orderBy: { versionNumber: "desc" }
-							}
-						}
-					});
+				const content = buildInvoiceVersionContent(data, {
+					versionNumber,
+					previousDisplayInvoiceNo
 				});
 
-				invoices.push(invoice);
-			}
+				const sentAt = new Date();
 
-			return { invoices: invoices.map((invoice) => parseInvoice(invoice)) };
-		}),
+				await tx.invoiceVersion.create({
+					data: {
+						invoiceId: id,
+						versionNumber,
+						sentAt,
+						total: content.total,
+						content
+					}
+				});
+
+				return tx.invoice.update({
+					where: { id },
+					data: { status: InvoiceStatus.SENT, sentAt },
+					include: versionInclude
+				});
+			})
+		),
 	amend: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
@@ -604,116 +659,31 @@ export const invoiceRouter = router({
 					sentAt: null,
 					paidAt: null
 				},
-				include: {
-					versions: {
-						select: versionSelect,
-						orderBy: { versionNumber: "desc" }
-					}
-				}
+				include: versionInclude
 			});
 
 			return parseInvoice(invoice);
 		}),
 	markPaid: authedProcedure
 		.input(z.object({ ids: z.array(z.string()) }))
-		.mutation(async ({ ctx, input }) => {
-			const invoices = [];
-
-			for (const id of input.ids) {
-				await ctx.owned.invoice.assert(id);
-
-				const invoice = await ctx.prisma.$transaction(async (tx) => {
-					const existing = await tx.invoice.findUniqueOrThrow({
-						where: { id }
-					});
-
-					if (existing.status !== InvoiceStatus.SENT) {
-						throw new TRPCError({
-							code: "CONFLICT",
-							message: `Invoice ${existing.invoiceNo} is not sent`
-						});
-					}
-
-					const paidAt = new Date();
-
-					const latestVersion = await tx.invoiceVersion.findFirst({
-						where: { invoiceId: id },
-						orderBy: { versionNumber: "desc" }
-					});
-
-					if (latestVersion) {
-						await tx.invoiceVersion.update({
-							where: { id: latestVersion.id },
-							data: { paidAt }
-						});
-					}
-
-					return tx.invoice.update({
-						where: { id },
-						data: { status: InvoiceStatus.PAID, paidAt },
-						include: {
-							versions: {
-								select: versionSelect,
-								orderBy: { versionNumber: "desc" }
-							}
-						}
-					});
-				});
-
-				invoices.push(invoice);
-			}
-
-			return { invoices: invoices.map((invoice) => parseInvoice(invoice)) };
-		}),
+		.mutation(({ ctx, input }) =>
+			setPaidState(ctx, input.ids, {
+				from: InvoiceStatus.SENT,
+				to: InvoiceStatus.PAID,
+				paidAt: new Date(),
+				conflictMessage: (invoiceNo) => `Invoice ${invoiceNo} is not sent`
+			})
+		),
 	unmarkPaid: authedProcedure
 		.input(z.object({ ids: z.array(z.string()) }))
-		.mutation(async ({ ctx, input }) => {
-			const invoices = [];
-
-			for (const id of input.ids) {
-				await ctx.owned.invoice.assert(id);
-
-				const invoice = await ctx.prisma.$transaction(async (tx) => {
-					const existing = await tx.invoice.findUniqueOrThrow({
-						where: { id }
-					});
-
-					if (existing.status !== InvoiceStatus.PAID) {
-						throw new TRPCError({
-							code: "CONFLICT",
-							message: `Invoice ${existing.invoiceNo} is not paid`
-						});
-					}
-
-					const latestVersion = await tx.invoiceVersion.findFirst({
-						where: { invoiceId: id },
-						orderBy: { versionNumber: "desc" }
-					});
-
-					if (latestVersion) {
-						await tx.invoiceVersion.update({
-							where: { id: latestVersion.id },
-							data: { paidAt: null }
-						});
-					}
-
-					return tx.invoice.update({
-						where: { id },
-						data: { status: InvoiceStatus.SENT, paidAt: null },
-						include: {
-							versions: {
-								select: versionSelect,
-								orderBy: { versionNumber: "desc" }
-							}
-						}
-					});
-				});
-
-				invoices.push(invoice);
-			}
-
-			return { invoices: invoices.map((invoice) => parseInvoice(invoice)) };
-		}),
+		.mutation(({ ctx, input }) =>
+			setPaidState(ctx, input.ids, {
+				from: InvoiceStatus.PAID,
+				to: InvoiceStatus.SENT,
+				paidAt: null,
+				conflictMessage: (invoiceNo) => `Invoice ${invoiceNo} is not paid`
+			})
+		),
 	// Keys candidates on each invoice's latest version's frozen total, not a
 	// live recompute (docs/plans/017 Step 8).
 	matchByPayment: authedProcedure

@@ -19,7 +19,7 @@ function notFound(message?: string): never {
 }
 
 /** docs/adr/0004: locked ⇔ status !== CREATED — sent/paid invoices freeze content. */
-function amendFirst(invoiceNo: string): never {
+export function amendFirst(invoiceNo: string): never {
 	throw new TRPCError({
 		code: "CONFLICT",
 		message: `Invoice ${invoiceNo} is sent — amend it first`

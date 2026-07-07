@@ -1,7 +1,7 @@
 import { baseListQueryInput } from "@/lib/trpc";
 import { supportItemRatesSchema } from "@/schema/support-item-rates-schema";
 import { supportItemSchema } from "@/schema/support-item-schema";
-import { paginate } from "@/server/api/owned";
+import { amendFirst, paginate } from "@/server/api/owned";
 import { authedProcedure, router } from "@/server/api/trpc";
 import { Prisma } from "@/generated/client";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
@@ -249,10 +249,7 @@ export const supportItemRouter = router({
 				select: { invoice: { select: { invoiceNo: true } } }
 			});
 			if (lockedActivity?.invoice) {
-				throw new TRPCError({
-					code: "CONFLICT",
-					message: `Invoice ${lockedActivity.invoice.invoiceNo} is sent — amend it first`
-				});
+				amendFirst(lockedActivity.invoice.invoiceNo);
 			}
 
 			const supportItem = await ctx.prisma.supportItem.delete({

@@ -12,7 +12,8 @@ import { formatProviderDetails, type ProviderDetails } from "./invoice-version";
 import { round } from "./generic-utils";
 import {
 	invoiceVersionContentSchema,
-	type InvoiceVersionContent
+	type InvoiceVersionContent,
+	type UnitPriceSuffix
 } from "@/schema/invoice-version-schema";
 
 import dayjs from "dayjs";
@@ -96,7 +97,7 @@ interface PdfLine {
 	serviceDate: Date | string;
 	total: number;
 	unitPrice: number;
-	unitPriceSuffix?: "hr" | "km";
+	unitPriceSuffix?: UnitPriceSuffix;
 	detailsText: string;
 }
 
