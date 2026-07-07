@@ -6,7 +6,7 @@
 
 Melvin's pricing knowledge is typed in by hand from a PDF and then trusted forever:
 
-- Support items are created by manually entering four codes + four rates; the in-app reference link is the 2024-25 price guide; the bundled autocomplete/code-mapping JSON (`ndis-support-catalogue-22-23.json`) is four price-guide generations old and silently drives the travel/ABT code lookups on every invoice.
+- Support items are created by manually entering four codes + four rates; the in-app reference link is the 2024-25 price guide. The bundled autocomplete/code-mapping JSON (`ndis-support-catalogue.json`, refreshed to 2026-27 by plan 021) silently drives the travel/ABT code lookups on every invoice — the refresh fixed the stale-year problem, but the underlying design (a single hardcoded-year snapshot, not effective-dated data) still rolls over to another manual refresh next year.
 - There is **no public-holiday tier** anywhere (schema, form, rate resolution) — PH work bills at weekend rates at best (~$60/h under-billed) and `isHoliday()` is display-only, current-year-only, and missing Easter and all state holidays.
 - Rates are **not effective-dated**: NDIS limits changed on 1 Jul 2026 (two days ago); a July invoice covering June work needs both years' limits. Today the user would overwrite rates in place, corrupting historical invoices' regenerated PDFs.
 - Custom per-client rates (`SupportItemRates`) validate against nothing, and `getRateForDay` picks the first rate row with the day populated — when callers pass rates for multiple clients (the invoice-list total path does), one client's negotiated rate can bleed into another's total.
@@ -41,7 +41,7 @@ catalogueVersion                          // e.g. "2026-27 v1.0"
 
 Seed with (at minimum) 2025-26 and 2026-27 rows so the 1-Jul rollover is testable immediately. Multiple catalogue versions coexist; resolution picks the row where `effectiveFrom ≤ serviceDate ≤ effectiveTo`.
 
-`getNonLabourTravelCode` / `getActivityBasedTransportCode` re-point at this table (keyed by registration group, like today) and the 22-23 JSON is deleted.
+`getNonLabourTravelCode` / `getActivityBasedTransportCode` re-point at this table (keyed by registration group, like today) and `ndis-support-catalogue.json` is deleted.
 
 ### D2. Variant groups
 
@@ -94,7 +94,7 @@ Client rate scoping: resolution receives _only_ the rates for the activity's cli
 1. Seed `SupportItemDef` + variant map + holiday table.
 2. Match existing `SupportItem` codes against the catalogue; report mismatches (UI list: "couldn't verify these items").
 3. Existing rates: keep as overrides where ≤ limit; flag where > limit (historical invoices unaffected — see TRD-006 for freezing).
-4. Delete `ndis-support-catalogue-22-23.json` after re-pointing the code lookups.
+4. Delete `ndis-support-catalogue.json` after re-pointing the code lookups.
 
 ## Testing notes
 

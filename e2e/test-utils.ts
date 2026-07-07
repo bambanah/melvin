@@ -96,9 +96,9 @@ export async function createRichInvoice() {
 		}
 	});
 
-	// The two support items our users actually bill, verbatim from the 22-23
-	// support catalogue: the solo community-access item plus its activity
-	// transport companion
+	// The two support items our users actually bill, verbatim from the
+	// bundled support catalogue: the solo community-access item plus its
+	// activity transport companion
 	const hourItem = await prisma.supportItem.create({
 		data: {
 			description: "Access Community Social and Rec Activ - Standard",
