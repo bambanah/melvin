@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { trpc } from "@/lib/trpc";
-import { formatDuration, getDuration, isHoliday } from "@/lib/date-utils";
+import { formatActivityDuration, isHoliday } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import type { ActivityByDateRangeOutput } from "@/server/api/routers/activity-router";
 import dayjs, { type Dayjs } from "dayjs";
@@ -143,7 +143,9 @@ interface ActivityRowProps {
 const ActivityRow = ({ activity, rateContext }: ActivityRowProps) => {
 	const isInvoiced = activity.invoiceId !== null;
 	const isInTrip = activity.tripId !== null;
-	const cost = getTotalCostOfActivities([activity], rateContext);
+	const cost = getTotalCostOfActivities([activity], rateContext, {
+		forDisplay: true
+	});
 
 	return (
 		<Link
@@ -180,10 +182,7 @@ const ActivityRow = ({ activity, rateContext }: ActivityRowProps) => {
 							<Clock className="h-3 w-3" />
 							{dayjs.utc(activity.startTime).format("H:mm")} -{" "}
 							{dayjs.utc(activity.endTime).format("H:mm")} (
-							{formatDuration(
-								getDuration(activity.startTime, activity.endTime)
-							)}
-							)
+							{formatActivityDuration(activity.startTime, activity.endTime)})
 						</span>
 					) : null}
 				</div>

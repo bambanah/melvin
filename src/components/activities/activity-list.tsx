@@ -5,8 +5,7 @@ import { useRateContext } from "@/components/shared/use-rate-context";
 import { Badge } from "@/components/ui/badge";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import {
-	formatDuration,
-	getDuration,
+	formatActivityDuration,
 	isHoliday as isDateHoliday
 } from "@/lib/date-utils";
 import { groupBy } from "@/lib/generic-utils";
@@ -110,11 +109,9 @@ function ActivityList({
 															(
 															{activity.startTime &&
 																activity.endTime &&
-																formatDuration(
-																	getDuration(
-																		activity.startTime,
-																		activity.endTime
-																	)
+																formatActivityDuration(
+																	activity.startTime,
+																	activity.endTime
 																)}
 															)
 														</span>
@@ -135,10 +132,9 @@ function ActivityList({
 												<div className="text-foreground/80 flex items-center gap-2 md:flex-row-reverse">
 													<CircleDollarSign className="h-4 w-4" />
 													<span>
-														{getTotalCostOfActivities(
-															[activity],
-															rateContext
-														).toLocaleString(undefined, {
+														{getTotalCostOfActivities([activity], rateContext, {
+															forDisplay: true
+														}).toLocaleString(undefined, {
 															style: "currency",
 															currency: "AUD"
 														})}

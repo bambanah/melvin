@@ -180,7 +180,9 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					<div className="flex items-center justify-between">
 						<p className="text-xl" data-testid="invoice-total">
 							{(invoice.status === InvoiceStatus.CREATED
-								? getTotalCostOfActivities(invoice.activities, rateContext)
+								? getTotalCostOfActivities(invoice.activities, rateContext, {
+										forDisplay: true
+									})
 								: (invoice.versions?.[0]?.total ?? 0)
 							).toLocaleString(undefined, {
 								style: "currency",

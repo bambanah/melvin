@@ -20,6 +20,14 @@
 - **Category**: bug
 - **Planned at**: commit `4b83de4`, 2026-07-07
 
+## Revision note (2026-07-08)
+
+The core plan (schema refine + `getDuration` throw) landed in `6245be2`, matching the scope below. Two follow-up commits then extended it:
+
+- `cc5f364` ("gracefully degrade reversed activity times at render time") and `d07e33e` ("Split billableLines display vs invoice paths so reversed-time totals degrade, not crash") add a `BillableLinesOptions.forDisplay` flag to `billableLines`/`getTotalCostOfActivities` (`src/lib/billing-lines.ts`, `src/lib/activity-utils.ts`) and a `formatActivityDuration` helper (`src/lib/date-utils.ts`).
+- **Why**: the Maintenance note below ("pre-existing rows will now throw ... that is intended") was too aggressive for read-only list views — a legacy reversed-time row crashed the activities list, calendar agenda/day-modal, and invoice list/page instead of failing only where money is computed. Those five display components now pass `{ forDisplay: true }` and drop the unresolvable SUPPORT line (contributing $0, showing "invalid time"); PDF generation (`pdf-generation.ts`) and invoice-version freezing (`invoice-version.ts`) call `billableLines` without the option and still hard-throw on a reversed row, per the original intent.
+- **Scope deviation**: this plan's "Out of scope" said `billing-lines.ts` needed no change; in practice it and `activity-utils.ts` plus five display components were touched to add the degrade-gracefully path. Money math (PDF/invoice totals) is unaffected.
+
 ## Why this matters
 
 Activity start/end times are stored as date-less Postgres `time` columns (`prisma/schema.prisma:147-148`). `getDuration` computes billed hours with `Math.abs(diff)`, so an entry whose end time precedes its start time — a 23:00→01:00 overnight shift, or a simple start/end swap typo — silently bills the _complement_: a 2-hour overnight shift bills as 22 hours. This flows directly into invoice SUPPORT-line quantities and totals. The product decision is already recorded in `docs/trd/trd-002-support-item-catalogue-and-rate-engine.md` (D4): **"Overnight spans: reject at capture … classify Sat-23:00→Sun-01:00 as invalid input with a clear message rather than mis-billing."** The server currently enforces nothing; this plan adds the schema-level rejection and removes the masking `Math.abs`.
@@ -135,12 +143,12 @@ Add the cases in "Test plan".
 
 ## Done criteria
 
-- [ ] `pnpm type-check` exits 0
-- [ ] `pnpm test:unit` exits 0, including new schema + duration tests
-- [ ] `pnpm test:integration` exits 0, including the rejected-overnight-entry test
-- [ ] `grep -n "Math.abs" src/lib/date-utils.ts` returns no matches
-- [ ] No files outside the in-scope list modified (`git status`)
-- [ ] `docs/plans/README.md` status row updated
+- [x] `pnpm type-check` exits 0
+- [x] `pnpm test:unit` exits 0, including new schema + duration tests
+- [x] `pnpm test:integration` exits 0, including the rejected-overnight-entry test
+- [x] `grep -n "Math.abs" src/lib/date-utils.ts` returns no matches
+- [ ] No files outside the in-scope list modified (`git status`) — superseded; see Revision note (2026-07-08)
+- [x] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 
@@ -153,4 +161,4 @@ Stop and report back if:
 ## Maintenance notes
 
 - If genuine overnight shifts are ever needed, the change is a product decision recorded against TRD-002 D4: day-attribution rules (which day's rate applies to which portion) must be designed first — do not just relax the refine.
-- Pre-existing DB rows with reversed times (if any) will now throw at PDF/total computation instead of silently mis-billing. That is intended; a data-fix query can be run if the tripwire ever fires.
+- Pre-existing DB rows with reversed times (if any) now throw at PDF/total computation (`pdf-generation.ts`, `invoice-version.ts`) instead of silently mis-billing. That remains intended; a data-fix query can be run if the tripwire ever fires. Display-only paths (activity list, calendar agenda/day-modal, invoice list/page) instead degrade gracefully via `billableLines(activity, rateContext, { forDisplay: true })` — see the Revision note above.

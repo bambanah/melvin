@@ -12,10 +12,25 @@ export function getDuration(startTime: Date, endTime: Date): number {
 	const startDate = dayjs(startTime);
 	const endDate = dayjs(endTime);
 
-	const diffInMinutes = Math.abs(startDate.diff(endDate, "minutes"));
+	const diffInMinutes = endDate.diff(startDate, "minutes");
+
+	if (diffInMinutes < 0) {
+		throw new Error(
+			`getDuration: endTime ${endDate.toISOString()} precedes startTime ${startDate.toISOString()}`
+		);
+	}
+
 	const diffInHours = diffInMinutes / 60;
 
 	return diffInHours;
+}
+
+export function formatActivityDuration(startTime: Date, endTime: Date): string {
+	try {
+		return formatDuration(getDuration(startTime, endTime));
+	} catch {
+		return "invalid time";
+	}
 }
 
 export const formatDuration = (duration: number) => {

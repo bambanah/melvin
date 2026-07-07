@@ -2,7 +2,6 @@ import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import prisma from "@/server/prisma";
 import { Page } from "@playwright/test";
 import { randomUUID } from "crypto";
-import { parse } from "date-fns";
 import dayjs from "dayjs";
 import { randomClient } from "./random/random-client";
 import { randomSupportItem } from "./random/random-support-item";
@@ -365,8 +364,12 @@ export async function createRandomActivity(
 			clientId,
 			supportItemId,
 			date: new Date(),
-			startTime: parse(startTime, "HH:mm", new Date()).toISOString(),
-			endTime: parse(endTime, "HH:mm", new Date()).toISOString(),
+			// Stored as epoch-date UTC times (like every other activity fixture
+			// in this file) — parsing "HH:mm" against a local `new Date()` and
+			// converting to ISO shifts the date under UTC+ timezones (e.g.
+			// AEST), which can wrap a same-day range into a reversed one.
+			startTime: new Date(`1970-01-01T${startTime}:00.000Z`),
+			endTime: new Date(`1970-01-01T${endTime}:00.000Z`),
 			ownerId: testUser.id
 		}
 	});

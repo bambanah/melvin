@@ -202,6 +202,18 @@ export interface BillableLine {
 	note?: string | null;
 }
 
+export interface BillableLinesOptions {
+	/**
+	 * Display-only callers (activity/calendar list totals) must never crash on
+	 * a legacy reversed-time row — a SUPPORT line with an unresolvable
+	 * duration is dropped (contributing 0), matching `formatActivityDuration`'s
+	 * per-row "invalid time" degradation. Invoicing callers (PDF generation,
+	 * `buildInvoiceVersionContent`) must omit this so a reversed row still
+	 * hard-stops rather than silently billing 0.
+	 */
+	forDisplay?: boolean;
+}
+
 /**
  * The single implementation of "what a line on an invoice costs". Everything
  * that needs to know an activity's cost — the printed PDF rows, the printed
@@ -209,7 +221,8 @@ export interface BillableLine {
  */
 export function billableLines(
 	activity: BillableActivity,
-	rateContext?: TransitRateContext
+	rateContext?: TransitRateContext,
+	options?: BillableLinesOptions
 ): BillableLine[] {
 	const lines: BillableLine[] = [];
 	const [itemCode, resolvedRate] = getRateForActivity(activity);
@@ -235,19 +248,26 @@ export function billableLines(
 			});
 		}
 	} else if (activity.startTime && activity.endTime) {
-		const duration = getDuration(activity.startTime, activity.endTime);
+		let duration: number | undefined;
+		try {
+			duration = getDuration(activity.startTime, activity.endTime);
+		} catch (error) {
+			if (!options?.forDisplay) throw error;
+		}
 
-		lines.push({
-			kind: "SUPPORT",
-			description: activity.supportItem.description ?? "",
-			supportItemCode: itemCode,
-			serviceDate: activity.date,
-			quantity: duration,
-			unit: "HOUR",
-			unitPrice: Number(rate),
-			total: round(Number(rate) * duration, 2),
-			activityId: activity.id
-		});
+		if (duration !== undefined) {
+			lines.push({
+				kind: "SUPPORT",
+				description: activity.supportItem.description ?? "",
+				supportItemCode: itemCode,
+				serviceDate: activity.date,
+				quantity: duration,
+				unit: "HOUR",
+				unitPrice: Number(rate),
+				total: round(Number(rate) * duration, 2),
+				activityId: activity.id
+			});
+		}
 	} else if (activity.itemDistance) {
 		lines.push({
 			kind: "SUPPORT",
