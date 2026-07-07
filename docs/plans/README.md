@@ -5,7 +5,7 @@ See `manage-plans` skill for lifecycle conventions. TRDs in [`docs/trd/`](../trd
 ## Active Plans
 
 | Plan | Title                                                    | Priority | Effort | Depends on    | Status |
-| ---- | --------------------------------------------------------- | -------- | ------ | ------------- | ------ |
+| ---- | -------------------------------------------------------- | -------- | ------ | ------------- | ------ |
 | 007  | One billable-lines interface; the PDF becomes a renderer | P2       | M–L    | 001, 005, 006 | TODO   |
 | 016  | Group activities with up to 10 participants              | P2       | L      | 006, 007      | TODO   |
 
