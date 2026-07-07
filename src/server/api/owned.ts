@@ -3,9 +3,14 @@ import { Prisma, type PrismaClient } from "@/generated/client";
 
 // Reviewer sweep: after routers are migrated onto this module, no raw
 // ctx.prisma.<tenant-model>.* calls should remain in the four migrated
-// routers except `create` (ownerId is set directly in `data`) and nested
-// writes under an already-asserted parent (e.g. ActivityTransportItem rows
-// under an asserted Activity). Run:
+// routers except:
+//   - `create` (ownerId is set directly in `data`)
+//   - nested writes under an already-asserted parent (e.g.
+//     ActivityTransportItem rows under an asserted Activity)
+//   - the `update`/`delete` immediately following a `ctx.owned.<model>.assert(id)`
+//     pre-check — Prisma can't scope a unique `where` by ownerId, so the
+//     assert is the scoping and the mutation itself stays raw, by id only
+// Run:
 //   grep -n "ctx\.prisma\.\(client\|invoice\|activity\|supportItem\|supportItemRates\)\." \
 //     src/server/api/routers/{invoice,activity,client,support-item}-router.ts
 
