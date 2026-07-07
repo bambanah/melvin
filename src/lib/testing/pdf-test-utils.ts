@@ -145,8 +145,7 @@ export const comparePng = async (
 	if (!existsSync(baselinePath)) {
 		throw new Error(
 			`Missing PNG baseline: ${baselinePath}\n` +
-				`Baselines are authored on Linux (CI). Generate with the ` +
-				`update-snapshots workflow, or locally with ` +
+				`Baselines are authored on Linux (CI). Generate locally with ` +
 				`UPDATE_PDF_SNAPSHOTS=1 (see e2e/README.md).`
 		);
 	}
