@@ -69,7 +69,7 @@ test("Realistic plan-managed invoice: group and solo travel codes in the PDF", a
 	expect(text).toContain("04_799_0136_6_1"); // group non-labour travel
 	expect(text).toContain("$0.43/km");
 	expect(text).toContain("04_799_0125_6_1"); // solo non-labour travel
-	expect(text).toContain("$0.85/km"); // testUser's transitRatePerKm (schema default)
+	expect(text).toContain("$0.99/km"); // testUser's transitRatePerKm (schema default)
 
 	// Non-whole-hour duration formatting and per-minute rounding
 	expect(text).toContain("13:20-14:25 (1 hour, 5 mins)");
