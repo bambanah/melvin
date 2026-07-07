@@ -2,9 +2,11 @@ import Loading from "@/components/ui/loading";
 import InvoiceForm from "@/components/invoices/invoice-form";
 import Layout from "@/components/shared/layout";
 import { InvoiceSchema } from "@/schema/invoice-schema";
+import { InvoiceStatus } from "@/generated/browser";
 import { trpc } from "@/lib/trpc";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 
 const EditInvoice = () => {
@@ -20,6 +22,14 @@ const EditInvoice = () => {
 		id: invoiceId ?? ""
 	});
 
+	// A sent/paid invoice is locked (docs/plans/017 Step 4) — amend it
+	// first rather than editing it directly.
+	useEffect(() => {
+		if (invoice && invoice.status !== InvoiceStatus.CREATED) {
+			router.replace(`/dashboard/invoices/${invoice.id}`);
+		}
+	}, [invoice, router]);
+
 	if (error) {
 		return (
 			<Layout>
@@ -28,7 +38,7 @@ const EditInvoice = () => {
 		);
 	}
 
-	if (!invoice) {
+	if (!invoice || invoice.status !== InvoiceStatus.CREATED) {
 		return (
 			<Layout>
 				<Loading />

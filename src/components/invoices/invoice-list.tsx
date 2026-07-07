@@ -168,16 +168,35 @@ export default function InvoiceList({ clientId: propClientId }: Props) {
 	const clients = clientsData?.clients ?? [];
 
 	const trpcUtils = trpc.useUtils();
-	const markInvoiceAsMutation = trpc.invoice.updateStatus.useMutation();
+	const sendMutation = trpc.invoice.send.useMutation();
+	const amendMutation = trpc.invoice.amend.useMutation();
+	const markPaidMutation = trpc.invoice.markPaid.useMutation();
+	const unmarkPaidMutation = trpc.invoice.unmarkPaid.useMutation();
 
-	const markInvoiceAs = (invoiceId: string, invoiceStatus: InvoiceStatus) => {
-		if (invoiceId)
-			markInvoiceAsMutation
-				.mutateAsync({ ids: [invoiceId], status: invoiceStatus })
-				.then(() => {
-					trpcUtils.invoice.byId.invalidate({ id: invoiceId });
-					trpcUtils.invoice.list.invalidate();
-				});
+	const invalidateInvoice = (invoiceId: string) => {
+		trpcUtils.invoice.byId.invalidate({ id: invoiceId });
+		trpcUtils.invoice.list.invalidate();
+	};
+
+	// Maps the status the user picked in the dropdown onto the intent-named
+	// transition that gets the invoice there (docs/plans/017 Step 3).
+	const markInvoiceAs = (
+		invoiceId: string,
+		currentStatus: InvoiceStatus,
+		targetStatus: InvoiceStatus
+	) => {
+		const mutation =
+			targetStatus === InvoiceStatus.SENT &&
+			currentStatus === InvoiceStatus.CREATED
+				? sendMutation.mutateAsync({ ids: [invoiceId] })
+				: targetStatus === InvoiceStatus.PAID
+					? markPaidMutation.mutateAsync({ ids: [invoiceId] })
+					: targetStatus === InvoiceStatus.SENT &&
+						  currentStatus === InvoiceStatus.PAID
+						? unmarkPaidMutation.mutateAsync({ ids: [invoiceId] })
+						: amendMutation.mutateAsync({ id: invoiceId });
+
+		mutation.then(() => invalidateInvoice(invoiceId));
 	};
 
 	const hasActiveFilters =
@@ -223,10 +242,12 @@ export default function InvoiceList({ clientId: propClientId }: Props) {
 		{
 			id: "total-cost",
 			accessorFn: (invoice) => {
-				const totalCost = getTotalCostOfActivities(
-					invoice.activities,
-					rateContext
-				);
+				// Locked invoices show the latest version's frozen total, not a
+				// live recompute (docs/plans/017 Step 7/8).
+				const totalCost =
+					invoice.status === InvoiceStatus.CREATED
+						? getTotalCostOfActivities(invoice.activities, rateContext)
+						: (invoice.versions?.[0]?.total ?? 0);
 
 				return totalCost > 0
 					? totalCost.toLocaleString(undefined, {
@@ -258,7 +279,9 @@ export default function InvoiceList({ clientId: propClientId }: Props) {
 							.map((status) => (
 								<DropdownMenuItem
 									key={status}
-									onClick={() => markInvoiceAs(row.original.id, status)}
+									onClick={() =>
+										markInvoiceAs(row.original.id, row.original.status, status)
+									}
 									className="cursor-pointer"
 								>
 									<InvoiceStatusBadge invoiceStatus={status} />

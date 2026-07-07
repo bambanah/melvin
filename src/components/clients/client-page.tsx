@@ -1,6 +1,7 @@
 import CustomRatesTable from "@/components/clients/custom-rates-table";
 import SupportItemOverrideDialog from "@/components/clients/support-item-override-dialog";
 import InvoiceList from "@/components/invoices/invoice-list";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -11,7 +12,14 @@ import {
 import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
 import { trpc } from "@/lib/trpc";
-import { EllipsisVertical, ExternalLink, Pencil, Trash } from "lucide-react";
+import {
+	Archive,
+	ArchiveRestore,
+	EllipsisVertical,
+	ExternalLink,
+	Pencil,
+	Trash
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
@@ -25,6 +33,7 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 	});
 
 	const deleteClientMutation = trpc.clients.delete.useMutation();
+	const updateClientMutation = trpc.clients.update.useMutation();
 
 	const deleteClient = () => {
 		if (confirm("Are you sure?"))
@@ -35,9 +44,40 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 					toast.success("Client deleted");
 					router.push("/dashboard/clients");
 				})
-				.catch(() => {
-					toast.error("An error occured. Please refresh and try again.");
+				.catch((error) => {
+					toast.error(
+						error instanceof Error
+							? error.message
+							: "An error occured. Please refresh and try again."
+					);
 				});
+	};
+
+	const toggleActive = () => {
+		if (!client) return;
+
+		updateClientMutation
+			.mutateAsync({
+				id: client.id,
+				client: {
+					name: client.name,
+					number: client.number ?? undefined,
+					billTo: client.billTo ?? undefined,
+					invoiceNumberPrefix: client.invoiceNumberPrefix ?? undefined,
+					distanceToClient: client.distanceToClient?.toString(),
+					travelTimeToClient: client.travelTimeToClient?.toString(),
+					transitRatePerKm: client.transitRatePerKm?.toString(),
+					invoiceEmail: client.invoiceEmail ?? undefined,
+					active: !client.active
+				}
+			})
+			.then(() => {
+				trpcUtils.clients.byId.invalidate({ id: clientId });
+				trpcUtils.clients.list.invalidate();
+				toast.success(
+					client.active ? "Client deactivated" : "Client reactivated"
+				);
+			});
 	};
 
 	if (error) {
@@ -50,7 +90,10 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 		<div className="mx-auto flex w-full max-w-4xl flex-col items-start justify-center p-4">
 			<div className="my-2 flex w-full flex-col gap-2 px-4 sm:my-8">
 				<div className="mb-2 flex items-center justify-between">
-					<Heading>{client.name}</Heading>
+					<div className="flex items-center gap-2">
+						<Heading>{client.name}</Heading>
+						{!client.active && <Badge variant="secondary">Inactive</Badge>}
+					</div>
 
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild className="grow-0">
@@ -65,6 +108,23 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 									<span>Edit</span>
 								</DropdownMenuItem>
 							</Link>
+
+							<DropdownMenuItem
+								onClick={() => toggleActive()}
+								className="cursor-pointer"
+							>
+								{client.active ? (
+									<>
+										<Archive className="mr-2 h-4 w-4" />
+										<span>Deactivate</span>
+									</>
+								) : (
+									<>
+										<ArchiveRestore className="mr-2 h-4 w-4" />
+										<span>Reactivate</span>
+									</>
+								)}
+							</DropdownMenuItem>
 
 							<DropdownMenuItem
 								onClick={() => deleteClient()}

@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
   moduleFormat = "cjs"
 }
 
@@ -86,10 +86,11 @@ model Client {
   name         String
   number       String?
   invoiceEmail String?
+  active       Boolean @default(true)
 
-  distanceToClient      Decimal? @map("defaultTransitDistance")
-  travelTimeToClient    Decimal? @map("defaultTransitTime")
-  transitRatePerKm Decimal?
+  distanceToClient   Decimal? @map("defaultTransitDistance")
+  travelTimeToClient Decimal? @map("defaultTransitTime")
+  transitRatePerKm   Decimal?
 
   billTo              String?
   invoiceNumberPrefix String?
@@ -103,23 +104,39 @@ model Client {
 }
 
 model Invoice {
-  id         String        @id @default(cuid())
-  createdAt  DateTime      @default(now()) @map("created")
-  updatedAt  DateTime      @default(now()) @updatedAt
+  id         String           @id @default(cuid())
+  createdAt  DateTime         @default(now()) @map("created")
+  updatedAt  DateTime         @default(now()) @updatedAt
   sentAt     DateTime?
   paidAt     DateTime?
   invoiceNo  String
   billTo     String?
   date       DateTime
-  status     InvoiceStatus @default(CREATED)
+  status     InvoiceStatus    @default(CREATED)
   clientId   String
   ownerId    String
   activities Activity[]
-  client     Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  owner      User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  client     Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  owner      User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  versions   InvoiceVersion[]
 
   @@index([clientId])
   @@index([ownerId])
+}
+
+model InvoiceVersion {
+  id            String    @id @default(cuid())
+  createdAt     DateTime  @default(now())
+  invoiceId     String
+  invoice       Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  versionNumber Int // 1-based; display suffix derived from this
+  sentAt        DateTime // freeze moment
+  paidAt        DateTime? // stamped by markPaid; survives amendment
+  total         Decimal // denormalized for lists/owing queries
+  content       Json // full frozen document, Zod-validated
+
+  @@unique([invoiceId, versionNumber])
+  @@index([invoiceId])
 }
 
 model Activity {
@@ -144,7 +161,7 @@ model Activity {
   invoice         Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
   trip            Trip?       @relation(fields: [tripId], references: [id], onDelete: SetNull)
 
-  transportItems  ActivityTransportItem[]
+  transportItems ActivityTransportItem[]
 
   @@index([ownerId])
   @@index([ownerId, date, startTime])

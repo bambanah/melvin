@@ -18,6 +18,14 @@ function notFound(message?: string): never {
 	throw new TRPCError({ code: "NOT_FOUND", message });
 }
 
+/** docs/adr/0004: locked ⇔ status !== CREATED — sent/paid invoices freeze content. */
+function amendFirst(invoiceNo: string): never {
+	throw new TRPCError({
+		code: "CONFLICT",
+		message: `Invoice ${invoiceNo} is sent — amend it first`
+	});
+}
+
 function ownedClient(prisma: PrismaClient, ownerId: string) {
 	const model = prisma.client;
 
@@ -74,6 +82,16 @@ function ownedInvoice(prisma: PrismaClient, ownerId: string) {
 			});
 			if (!record) notFound();
 			return record;
+		},
+		/** Throws NOT_FOUND if unowned, CONFLICT if sent/paid (docs/plans/017 Step 4). */
+		async assertUnlocked(id: string) {
+			const record = await model.findFirst({
+				where: { id, ownerId },
+				select: { id: true, invoiceNo: true, status: true }
+			});
+			if (!record) notFound();
+			if (record.status !== "CREATED") amendFirst(record.invoiceNo);
+			return record;
 		}
 	};
 }
@@ -109,6 +127,26 @@ function ownedActivity(prisma: PrismaClient, ownerId: string) {
 			});
 			if (records.length !== ids.length) notFound(message);
 			return records;
+		},
+		/**
+		 * Throws CONFLICT if any of these activities sits on a sent/paid
+		 * invoice (docs/plans/017 Step 4). A no-op for activities with no
+		 * invoice, or whose invoice is still a draft (ADR 0003 still applies
+		 * there).
+		 */
+		async assertNoneOnLockedInvoice(ids: string[]) {
+			if (ids.length === 0) return;
+
+			const locked = await model.findFirst({
+				where: {
+					id: { in: ids },
+					ownerId,
+					invoice: { status: { not: "CREATED" } }
+				},
+				select: { invoice: { select: { invoiceNo: true } } }
+			});
+
+			if (locked?.invoice) amendFirst(locked.invoice.invoiceNo);
 		}
 	};
 }

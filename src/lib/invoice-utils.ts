@@ -60,6 +60,34 @@ export const getHighestInvoiceNo = (
 	return getNumber(highest) ? highest : undefined;
 };
 
+const SUFFIX_ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+
+/**
+ * Version ordinal → display suffix: 1 → "", 2 → "a", 3 → "b" … 27 → "z",
+ * 28 → "aa" (bijective base-26, like spreadsheet column letters).
+ */
+export function invoiceVersionSuffix(versionNumber: number): string {
+	let n = versionNumber - 1;
+	if (n <= 0) return "";
+
+	let suffix = "";
+	while (n > 0) {
+		n -= 1;
+		suffix = SUFFIX_ALPHABET[n % 26] + suffix;
+		n = Math.floor(n / 26);
+	}
+
+	return suffix;
+}
+
+/** The number as printed/downloaded: stored `invoiceNo` + version suffix. */
+export function displayInvoiceNo(
+	invoiceNo: string,
+	versionNumber: number
+): string {
+	return `${invoiceNo}${invoiceVersionSuffix(versionNumber)}`;
+}
+
 export function invoiceCandidatesFromPaymentAmount(
 	paymentAmount: number,
 	invoiceTotals: Map<number, string | string[]>

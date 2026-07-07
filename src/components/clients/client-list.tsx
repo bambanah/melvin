@@ -1,6 +1,8 @@
 import { DeleteEntityButton } from "@/components/shared/delete-entity-button";
 import ListPage from "@/components/shared/list-page";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import DataTable, { SortingHeader } from "@/components/ui/data-table";
 import {
 	DropdownMenu,
@@ -13,14 +15,19 @@ import { ClientListOutput } from "@/server/api/routers/client-router";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 const columns: ColumnDef<ClientListOutput>[] = [
 	{
 		accessorKey: "name",
 		header: ({ column }) => <SortingHeader column={column}>Name</SortingHeader>,
 		cell: ({ row }) => (
-			<Link href={`/dashboard/clients/${row.original.id}`}>
+			<Link
+				href={`/dashboard/clients/${row.original.id}`}
+				className="flex items-center gap-2"
+			>
 				{row.getValue("name")}
+				{!row.original.active && <Badge variant="secondary">Inactive</Badge>}
 			</Link>
 		)
 	},
@@ -73,13 +80,25 @@ const columns: ColumnDef<ClientListOutput>[] = [
 ];
 
 const ClientList = () => {
-	const { data: clients } = trpc.clients.list.useQuery({});
+	const [includeInactive, setIncludeInactive] = useState(false);
+	const { data: clients } = trpc.clients.list.useQuery({ includeInactive });
 
 	return (
 		<ListPage>
 			<ListPage.Header
 				title="Clients"
 				createNewHref="/dashboard/clients/create"
+				extraButtons={
+					<label className="flex items-center gap-2 text-sm whitespace-nowrap">
+						<Checkbox
+							checked={includeInactive}
+							onCheckedChange={(checked) =>
+								setIncludeInactive(checked === true)
+							}
+						/>
+						Show inactive
+					</label>
+				}
 			/>
 
 			{clients && <DataTable columns={columns} data={clients.clients} />}

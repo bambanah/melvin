@@ -86,6 +86,8 @@ export const tripRouter = router({
 				});
 			}
 
+			await ctx.owned.activity.assertNoneOnLockedInvoice(input.activityIds);
+
 			const updates = tripTransitUpdates(activities, input.interClientLegs);
 
 			return ctx.prisma.$transaction(async (tx) => {
@@ -159,6 +161,11 @@ export const tripRouter = router({
 				});
 			}
 
+			await ctx.owned.activity.assertNoneOnLockedInvoice([
+				...trip.activities.map((a) => a.id),
+				activity.id
+			]);
+
 			const allActivities = [...trip.activities, activity];
 			const allLegs = [...trip.interClientLegs, ...input.interClientLegs];
 			const updates = tripTransitUpdates(allActivities, allLegs);
@@ -225,6 +232,10 @@ export const tripRouter = router({
 					message: "Activity not in trip"
 				});
 			}
+
+			await ctx.owned.activity.assertNoneOnLockedInvoice(
+				trip.activities.map((a) => a.id)
+			);
 
 			const remainingActivities = trip.activities.filter(
 				(a) => a.id !== input.activityId
@@ -330,6 +341,10 @@ export const tripRouter = router({
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
+			await ctx.owned.activity.assertNoneOnLockedInvoice(
+				trip.activities.map((a) => a.id)
+			);
+
 			const updates = tripTransitUpdates(
 				trip.activities,
 				input.interClientLegs
@@ -378,6 +393,10 @@ export const tripRouter = router({
 			if (!trip) {
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
+
+			await ctx.owned.activity.assertNoneOnLockedInvoice(
+				trip.activities.map((a) => a.id)
+			);
 
 			const updates = standaloneTransitUpdates(trip.activities);
 

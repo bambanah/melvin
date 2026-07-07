@@ -8,13 +8,16 @@ export const pdfRouter = router({
 		.input(
 			z.object({
 				invoiceId: z.string(),
-				returnBase64: z.boolean().nullish()
+				returnBase64: z.boolean().nullish(),
+				versionNumber: z.number().int().positive().nullish()
 			})
 		)
 		.query(async ({ input, ctx }) => {
-			const { invoiceId, returnBase64 } = input;
+			const { invoiceId, returnBase64, versionNumber } = input;
 
-			const { pdfString } = await generatePDF(invoiceId, ctx.session.user.id);
+			const { pdfString } = await generatePDF(invoiceId, ctx.session.user.id, {
+				versionNumber: versionNumber ?? undefined
+			});
 
 			if (!pdfString) {
 				throw new TRPCError({ code: "NOT_FOUND" });

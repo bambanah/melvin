@@ -85,6 +85,7 @@ const makeClient = (
 	name: "Jane Citizen",
 	number: null,
 	invoiceEmail: null,
+	active: true,
 	distanceToClient: null,
 	travelTimeToClient: null,
 	transitRatePerKm: null,
