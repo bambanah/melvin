@@ -16,6 +16,7 @@
 
 ## Status
 
+- **Status**: DONE
 - **Priority**: P1
 - **Effort**: L
 - **Risk**: MED-HIGH (new invariants across five routers; a missed guard or a
@@ -304,14 +305,14 @@ no-op; `getTotalOwing` matches pre-backfill values at time of backfill.
 
 Machine-checkable. ALL must hold:
 
-- [ ] `grep -n "updateStatus" src/server/api/routers/invoice-router.ts src/components` → no matches
-- [ ] `grep -rn "InvoiceVersion" prisma/schema.prisma` shows `onDelete: Restrict`
-- [ ] Byte-stability golden test exists and passes (mutate-upstream → identical render)
-- [ ] Every clean PDF path reads stored content when the invoice is locked (no live-data render without watermark — demonstrated by Step 6 goldens)
-- [ ] All guard tests from Steps 3–4 pass; `pnpm exec vitest run` exits 0
-- [ ] Backfill script idempotency test passes
-- [ ] `pnpm type-check`, `pnpm lint`, `pnpm format:check` exit 0
-- [ ] `docs/plans/README.md` and TRD-006 header updated
+- [x] `grep -n "updateStatus" src/server/api/routers/invoice-router.ts src/components` → no matches
+- [x] `grep -rn "InvoiceVersion" prisma/schema.prisma` shows `onDelete: Restrict`
+- [x] Byte-stability golden test exists and passes (mutate-upstream → identical render)
+- [x] Every clean PDF path reads stored content when the invoice is locked (no live-data render without watermark — demonstrated by Step 6 goldens)
+- [x] All guard tests from Steps 3–4 pass; `pnpm exec vitest run` exits 0
+- [x] Backfill script idempotency test passes
+- [x] `pnpm type-check`, `pnpm lint`, `pnpm format:check` exit 0
+- [x] `docs/plans/README.md` and TRD-006 header updated
 
 ## STOP conditions
 
