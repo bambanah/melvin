@@ -4,19 +4,18 @@ See `manage-plans` skill for lifecycle conventions. TRDs in [`docs/trd/`](../trd
 
 ## Active Plans
 
-| Plan | Title                                                       | Priority | Effort | Depends on    | Status |
-| ---- | ----------------------------------------------------------- | -------- | ------ | ------------- | ------ |
-| 006  | One source of truth for the Provider Travel per-km rate     | P1       | M      | 001, 005      | TODO   |
-| 007  | One billable-lines interface; the PDF becomes a renderer    | P2       | M–L    | 001, 005, 006 | TODO   |
-| 008  | Make the Trip transit module the only transit authority     | P2       | M–L    | 005           | TODO   |
-| 009  | Router-level test harness (test through the tRPC interface) | P2       | M      | 003           | DONE   |
-| 010  | A tenant-scoping seam under the routers                     | P3       | M      | 003, 009      | TODO   |
+| Plan | Title                                                    | Priority | Effort | Depends on    | Status |
+| ---- | -------------------------------------------------------- | -------- | ------ | ------------- | ------ |
+| 006  | One source of truth for the Provider Travel per-km rate  | P1       | M      | 001, 005      | TODO   |
+| 007  | One billable-lines interface; the PDF becomes a renderer | P2       | M–L    | 001, 005, 006 | TODO   |
+| 008  | Make the Trip transit module the only transit authority  | P2       | M–L    | 005           | TODO   |
+| 010  | A tenant-scoping seam under the routers                  | P3       | M      | 003, 009      | TODO   |
 
 Status: `TODO` | `IN PROGRESS` | `DONE` | `BLOCKED (reason)` | `REJECTED (rationale)`
 
 ## Completed
 
-In [`complete/`](complete/): 001, 002, 003, 004, 005, 011, 012, 015. Rejected: 013 (superseded by 005–008).
+In [`complete/`](complete/): 001, 002, 003, 004, 005, 009, 011, 012, 015. Rejected: 013 (superseded by 005–008).
 
 ## Dependency Notes
 
