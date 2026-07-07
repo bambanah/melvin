@@ -346,6 +346,22 @@ test("Should resolve transit rate with correct precedence", () => {
 	).toEqual(63.97); // falls through to userTransitRatePerKm
 });
 
+test("Group branch beats a client transit rate override", () => {
+	// Group activities always bill transit at GROUP_TRANSIT_RATE, even when
+	// the client has a custom transitRatePerKm — until plan 016 replaces the
+	// constant with effective-rate ÷ group-size
+	const groupActivityWithClientOverride = {
+		...getActivity("weekday", "16:00", "17:00", 0, 10, true),
+		client: { transitRatePerKm: new Prisma.Decimal(0.5) }
+	};
+
+	expect(
+		getTotalCostOfActivities([groupActivityWithClientOverride], {
+			userTransitRatePerKm: 0.85
+		})
+	).toEqual(59.77); // 55.47 + 10 * 0.43 (GROUP_TRANSIT_RATE, not 0.5 or 0.85)
+});
+
 test("Should return correct total for group activities", () => {
 	// Group activities price transit distance at the group rate ($0.43/km),
 	// matching the PDF's non-labour travel line items

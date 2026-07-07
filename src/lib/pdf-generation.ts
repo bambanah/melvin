@@ -41,7 +41,8 @@ const generatePDF = async (invoiceId: string, ownerId: string) => {
 							supportItemRates: { where: { clientId: invoiceRecord.clientId } }
 						}
 					},
-					transportItems: true
+					transportItems: true,
+					client: { select: { transitRatePerKm: true } }
 				}
 			}
 		}
@@ -49,6 +50,12 @@ const generatePDF = async (invoiceId: string, ownerId: string) => {
 
 	if (!invoice || !invoice.client || !invoice.activities)
 		return { pdfString: "", fileName: null };
+
+	const user = await prisma.user.findUnique({ where: { id: invoice.ownerId } });
+
+	const rateContext = {
+		userTransitRatePerKm: Number(user?.transitRatePerKm ?? 0.99)
+	};
 
 	const margin = 20;
 
@@ -136,7 +143,7 @@ const generatePDF = async (invoiceId: string, ownerId: string) => {
 
 			// Provider Travel - Non Labour Costs
 			if (activity.transitDistance) {
-				const ratePerKm = getTransitRate(activity);
+				const ratePerKm = getTransitRate(activity, rateContext);
 				const travelTotal = ratePerKm * Number(activity.transitDistance);
 
 				const supportItemCode = getNonLabourTravelCode(
@@ -147,7 +154,7 @@ const generatePDF = async (invoiceId: string, ownerId: string) => {
 					`Provider travel - non-labour costs\n${supportItemCode ?? ""}\n`,
 					`${dayjs.utc(activity.date).format("DD/MM/YY")}\n`,
 					`${activity.transitDistance} km\n`,
-					`$${ratePerKm}/km\n`,
+					`$${ratePerKm.toFixed(2)}/km\n`,
 					`$${travelTotal.toFixed(2)}\n`
 				]);
 			}
@@ -229,7 +236,7 @@ const generatePDF = async (invoiceId: string, ownerId: string) => {
 	// Activities only allows strings - need to allow strings and CellDef
 	const values: (CellDef | string)[][] = activityStrings;
 
-	const totalCost = getTotalCostOfActivities(invoice.activities);
+	const totalCost = getTotalCostOfActivities(invoice.activities, rateContext);
 
 	// Bottom section
 	values.push(
@@ -246,8 +253,6 @@ const generatePDF = async (invoiceId: string, ownerId: string) => {
 		],
 		[{ content: "", colSpan: 5, styles: { fillColor: "#fff" } }]
 	);
-
-	const user = await prisma.user.findUnique({ where: { id: invoice.ownerId } });
 
 	if (user) {
 		const content = [

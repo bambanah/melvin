@@ -26,13 +26,13 @@ costs
 Provider travel - labour | 24/06/23 | 30 minutes | $98.83/hr | $49.42
 costs
 04_105_0125_6_1
-Provider travel - non-labour | 22/06/23 | 26 km | $0.99/km | $25.74
-costs | 24/06/23 | 26 km | $0.99/km | $25.74
+Provider travel - non-labour | 22/06/23 | 26 km | $0.85/km | $22.10
+costs | 24/06/23 | 26 km | $0.85/km | $22.10
 04_799_0125_6_1
 Provider travel - non-labour | 20/06/23 | 13 km | $0.43/km | $5.59
 costs
 04_799_0136_6_1
-Total | $1160.87
+Total | $1153.59
 Marlee Provider
 ABN: 12 345 678 901
 Bank: Sample Bank
