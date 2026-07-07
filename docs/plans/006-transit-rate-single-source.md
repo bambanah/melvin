@@ -7,61 +7,83 @@
 > in `docs/plans/README.md` — unless a reviewer dispatched you and told you they
 > maintain the index.
 >
-> **Drift check (run first)**: `git diff --stat c48e1dd..HEAD -- src/lib/pdf-generation.ts src/lib/activity-utils.ts src/server/api/routers/invoice-router.ts`
-> Plans 001 (generatePDF signature), 004 (`>= 20`), and 005 (tests) are
-> EXPECTED to have landed — those diffs are fine. Any OTHER change to these
-> files: compare the "Current state" excerpts against the live code before
-> proceeding; on a mismatch, treat it as a STOP condition.
+> **Drift check (run first)**: `git diff --stat f2f1154..HEAD -- src/lib/pdf-generation.ts src/lib/activity-utils.ts src/server/api/routers/invoice-router.ts src/lib/testing/invoice-fixtures.ts`
+> This plan was revised at `f2f1154` (2026-07-07) and its excerpts match that
+> commit. ANY diff in these files since then: compare the "Current state"
+> excerpts against the live code before proceeding; on a mismatch, treat it
+> as a STOP condition.
 
 ## Status
 
 - **Priority**: P1
-- **Effort**: M
+- **Effort**: S–M (shrunk from M — commit `f8e5097` already extracted and single-sourced the rate function)
 - **Risk**: MED (changes visible invoice figures — that is the point, but review carefully)
-- **Depends on**: docs/plans/001-secure-pdf-endpoint.md, docs/plans/005-money-math-characterization-tests.md
+- **Depends on**: docs/plans/complete/001-secure-pdf-endpoint.md, docs/plans/complete/005-money-math-characterization-tests.md (both DONE)
 - **Category**: bug
-- **Planned at**: commit `c48e1dd`, 2026-07-02
+- **Planned at**: commit `c48e1dd`, 2026-07-02. **Revised**: commit `f2f1154`, 2026-07-07.
 
-## Why this matters
+## Revision note (2026-07-07)
 
-The same invoice PDF computes Provider Travel (non-labour, per-km) **two different ways**: the line items use hardcoded rates (`isGroup ? 0.43 : 0.99` at `pdf-generation.ts:138`), while the printed Total uses `getTotalCostOfActivities`, whose transit rate is `client.transitRatePerKm || 0.99`. Consequences, all verified in code:
+Commit `f8e5097` ("test: implement invoice test harness") did part of this
+plan's work and reversed one of its decisions:
 
-1. For group activities or clients with a custom rate, **the PDF's line items do not sum to its own Total**.
-2. The user's configured rate (`User.transitRatePerKm`, default 0.85, editable in account settings — `prisma/schema.prisma:61`) is **never used anywhere**: `getTransitRate` only consults it via a `rateContext` parameter that no caller passes, and `getEffectiveTransitRate` (`trip-utils.ts:118`) has no production caller at all.
-3. `invoice.matchByPayment` matches bank payments against totals computed with the wrong rate, so payment matching can fail for exactly the invoices whose PDFs showed a different amount.
+- `getTransitRate` is now **exported** from `activity-utils.ts` (original
+  Step 1 — done) and gained a group branch: `isGroup` activities return
+  `GROUP_TRANSIT_RATE` (0.43) before the client → user → 0.99 precedence.
+- The PDF's hardcoded `isGroup ? 0.43 : 0.99` line-item rate was replaced
+  with a `getTransitRate(activity)` call. Line items and the printed Total
+  now share one rate function, so the original headline bug (group invoices
+  whose line items didn't sum to their own Total — quirk Q1) is **fixed**.
+- **Decision reversed**: the original plan said "do not preserve the 0.43".
+  The group rate is now intentional product behavior, single-sourced in
+  `getTransitRate`. KEEP the group branch. Plan 016 replaces the constant
+  with effective-rate ÷ group-size (up to 10 participants).
+- A PDF golden-master test harness now exists (see Current state). Use it —
+  the original Step 4's "only if mockable" hedging is obsolete.
 
-After this plan: one function decides the Provider Travel per-km rate (client override → user rate → 0.99 NDIS max), and the PDF line items, PDF total, and invoice-router aggregates all use it.
+**What remains for this plan**: no caller passes `rateContext`, and the
+PDF/aggregate queries don't include the activity's client rate. So:
+
+1. `User.transitRatePerKm` (default 0.85, editable in account settings) is
+   still never used anywhere.
+2. Client-specific `transitRatePerKm` overrides never reach the PDF line
+   items, the PDF Total, `getTotalOwing`, or `matchByPayment` — all of them
+   silently fall through to the 0.99 default for non-group activities.
+3. `invoice.matchByPayment` therefore still matches bank payments against
+   totals computed at the wrong rate for clients with a custom rate.
+
+After this plan: the PDF line items, PDF Total, and invoice-router
+aggregates all resolve the non-group Provider Travel rate as
+client override → user rate → 0.99, via the already-shared `getTransitRate`.
 
 ## Current state
 
-- Domain rules (CONTEXT.md, "Billable Driving"): _"Transit Rate: The per-kilometre rate charged for Provider Travel. Defaults to the User's configured rate (max $0.99/km per NDIS rules). Can be overridden per Client."_ Note: CONTEXT.md also mentions a `groupTransitRatePerKm` — that field **no longer exists** in the schema (removed in commit `3d7c5a9` "fix: remove invoice FY totals and group transit rate"). There is no configurable group transit rate; the PDF's `0.43` is an orphaned hardcode. **Decision taken by this plan**: group and individual activities use the same effective Provider Travel rate. Do not preserve the 0.43.
-- **Activity Based Transport is a different thing and is already consistent** — `0.49` (group) / `0.99` at `pdf-generation.ts:157` matches `getTotalCostOfActivities` (`activity-utils.ts:165-168`). DO NOT change those.
+(Excerpts at `f2f1154`.)
 
-- `src/lib/activity-utils.ts`:
+- `src/lib/activity-utils.ts:51-58`:
 
 ```ts
-// activity-utils.ts:51-55
 interface TransitRateContext {
 	userTransitRatePerKm?: number;
 }
 
 const DEFAULT_TRANSIT_RATE = 0.99;
+
+// TODO: Handle groups other than 2 clients
+const GROUP_TRANSIT_RATE = 0.43;
 ```
 
-```ts
-// activity-utils.ts:152-155 (inside getTotalCostOfActivities)
-if (activity.transitDistance) {
-	const ratePerKm = getTransitRate(activity, rateContext);
-	subTotal += round(Number(activity.transitDistance) * ratePerKm, 2);
-}
-```
+- `src/lib/activity-utils.ts:188-201` — exported, group branch first:
 
 ```ts
-// activity-utils.ts:185-194 (module-private)
-function getTransitRate(
+export function getTransitRate(
 	activity: Activity,
 	rateContext?: TransitRateContext
 ): number {
+	if (activity.supportItem.isGroup) {
+		return GROUP_TRANSIT_RATE;
+	}
+
 	return (
 		Number(activity.client?.transitRatePerKm) ||
 		rateContext?.userTransitRatePerKm ||
@@ -70,25 +92,26 @@ function getTransitRate(
 }
 ```
 
-- `src/lib/pdf-generation.ts` (after plan 001, `generatePDF(invoiceId: string, ownerId: string)`):
+- `src/lib/pdf-generation.ts:137-152` — line items already call the shared
+  function, but with no `rateContext`, and the invoice query's activities
+  include (`supportItem`, `transportItems`) does NOT include `client`, so
+  non-group activities always resolve 0.99:
 
 ```ts
-// pdf-generation.ts:134-150 — the hardcoded line-item rate to replace
-			// Provider Travel - Non Labour Costs
-			if (activity.transitDistance) {
-				// TODO: Handle groups other than 2 clients
-				const isGroup = activity.supportItem.isGroup;
-				const ratePerKm = isGroup ? 0.43 : 0.99;
-				const travelTotal = ratePerKm * Number(activity.transitDistance);
+// Provider Travel - Non Labour Costs
+if (activity.transitDistance) {
+	const ratePerKm = getTransitRate(activity);
+	const travelTotal = ratePerKm * Number(activity.transitDistance);
+	...
+	`$${ratePerKm}/km\n`,   // line 150 — unformatted; 0.9 would print "$0.9/km"
 ```
 
-and the total at line 228: `const totalCost = getTotalCostOfActivities(invoice.activities);`
-Note: the invoice query inside `generatePDF` includes `client: true` (full client row), so `activity`-level access to the client rate must come via `invoice.client` — the activities in this query do NOT include their own `client` relation. Check the actual `include` shape when editing (all activities on an invoice belong to the invoice's single client, except group-created activities — see STOP conditions).
-
-- `src/server/api/routers/invoice-router.ts` — the two aggregate call sites (after plan 003 these are owner-scoped):
+- `src/lib/pdf-generation.ts:232` — `const totalCost = getTotalCostOfActivities(invoice.activities);` (no `rateContext`; same missing `client` include).
+- `src/server/api/routers/invoice-router.ts` — the two aggregate call sites
+  (owner-scoped since plan 003), both with `activities: { include: { supportItem: true } }`-shaped queries that lack the client rate and pass no context:
 
 ```ts
-// invoice-router.ts:156-160 (getTotalOwing)
+// invoice-router.ts:157-160 (getTotalOwing)
 const totalOwing = invoices.reduce(
 	(total, invoice) => (total += getTotalCostOfActivities(invoice.activities)),
 	0
@@ -96,15 +119,36 @@ const totalOwing = invoices.reduce(
 ```
 
 ```ts
-// invoice-router.ts:395 (matchByPayment)
+// invoice-router.ts:446 (matchByPayment)
 const total = getTotalCostOfActivities(invoice.activities);
 ```
 
-Neither query currently selects the activity's `client` relation (their `include` is `activities: { include: { supportItem: true } }`), so today the client-override rate isn't even reachable there — totals silently use 0.99. This plan adds `client: { select: { transitRatePerKm: true } }` to those activity includes AND passes the user rate.
-
-- UI components also call `getTotalCostOfActivities` with no `rateContext` (6 sites: `calendar-day-modal.tsx:138`, `calendar-agenda.tsx:59,97`, `invoice-page.tsx:130`, `invoice-list.tsx:217`, `log-payment-dialog.tsx:107`, `activity-list.tsx:136`). **Out of scope** — see Scope. After this plan they may display totals that differ from the PDF when the user has a non-default rate and the client has no override; that residual gap is recorded in Maintenance notes.
-
-- Repo conventions: tabs, double quotes; unit-test style per `src/lib/activity-utils.test.ts`.
+- **PDF golden-master harness** (new since original planning):
+  - `src/lib/testing/invoice-fixtures.ts` — 16 hand-authored fixtures shaped
+    exactly like `generatePDF`'s Prisma reads, plus `mockPrismaForFixtures`
+    for `vi.mock("@/server/prisma", ...)`. The fixture user's
+    `transitRatePerKm` is **0.85**.
+  - `src/lib/pdf-generation.text.test.ts` — extracts PDF text and asserts
+    against `src/lib/__pdf_text__/*.txt` via `toMatchFileSnapshot` (update
+    with `pnpm exec vitest run -u`), plus targeted inline assertions.
+  - `src/lib/pdf-generation.render.test.ts` — PNG snapshots in
+    `src/lib/__pdf_snapshots__/` (update with `UPDATE_PDF_SNAPSHOTS=1`).
+- **Expected golden-master impact of this plan**: fixtures whose non-group
+  activities have `transitDistance` currently print `$0.99/km`; once the
+  user rate (0.85) is threaded they will print `$0.85/km` and their Totals
+  drop accordingly. Affected fixtures: `transit-solo`, `kitchen-sink`,
+  `plan-managed-week` (its two solo travel legs; its group leg stays
+  $0.43/km). `transit-group` and `transport-group-distance` must NOT change.
+- Activity Based Transport (`0.49` group / `0.99`) is a different thing,
+  consistent between PDF and totals — DO NOT change it (plan 016 makes it
+  ÷ group-size).
+- UI components also call `getTotalCostOfActivities` with no `rateContext`
+  (6 sites: `calendar-agenda.tsx:59,97`, `calendar-day-modal.tsx:138`,
+  `log-payment-dialog.tsx:107`, `invoice-page.tsx:133`,
+  `invoice-list.tsx:224`, `activity-list.tsx:136`). **Out of scope** — plan
+  007 Step 6 closes this gap.
+- Repo conventions: tabs, double quotes; unit-test style per
+  `src/lib/activity-utils.test.ts`.
 
 ## Commands you will need
 
@@ -121,18 +165,20 @@ Neither query currently selects the activity's `client` relation (their `include
 
 **In scope** (the only files you should modify):
 
-- `src/lib/activity-utils.ts` (export `getTransitRate`; no behavioral change to it)
-- `src/lib/pdf-generation.ts` (fetch user rate; use `getTransitRate` for line items; pass `rateContext` to the total)
+- `src/lib/pdf-generation.ts` (fetch user rate; pass `rateContext`; include client rate; format printed rate)
 - `src/server/api/routers/invoice-router.ts` (`getTotalOwing` + `matchByPayment`: include client rate in the query, fetch user rate, pass `rateContext`)
-- `src/lib/activity-utils.test.ts` and/or `src/lib/pdf-generation.test.ts` (tests)
+- `src/lib/activity-utils.test.ts` (rate-precedence additions if needed)
+- `src/lib/pdf-generation.text.test.ts` inline expectations + `src/lib/__pdf_text__/*.txt` + `src/lib/__pdf_snapshots__/*.png` (deliberate golden regeneration ONLY for the documented $0.99→$0.85 diffs)
 
 **Out of scope** (do NOT touch, even though they look related):
 
-- The 6 UI component call sites — threading the user rate to the client would need a user query per component; deferred (Maintenance notes).
-- Activity Based Transport rates (`0.49`/`0.99`) — already consistent between PDF and totals.
-- Provider Travel **Labour** costs (`pdf-generation.ts:117-132`, `activity-utils.ts:157-162`) — both already use the activity rate/60; consistent.
-- The `rateType` time-vs-distance quirk characterized in plan 005 — separate finding.
-- `trip-utils.ts` — you may CALL `getEffectiveTransitRate` if convenient, but prefer `getTransitRate` (activity-shaped); do not modify trip-utils.
+- `src/lib/activity-utils.ts` — `getTransitRate` is already exported with the
+  behavior this plan needs; the group branch stays (plan 016's job).
+- The 6 UI component call sites — plan 007 Step 6.
+- Activity Based Transport rates (`0.49`/`0.99`) — plan 016.
+- Provider Travel **Labour** costs — both paths already use the activity rate/60; consistent.
+- The `rateType` time-vs-distance quirk characterized in plan 005 — plan 007 Step 1 decides it.
+- `trip-utils.ts` / `src/lib/testing/invoice-fixtures.ts` (fixture VALUES must not change — only goldens regenerate).
 
 ## Git workflow
 
@@ -142,17 +188,18 @@ Neither query currently selects the activity's `client` relation (their `include
 
 ## Steps
 
-### Step 1: Export the rate function
+### Step 1: Confirm the landed prerequisite work
 
-In `src/lib/activity-utils.ts`, change `function getTransitRate(` to `export function getTransitRate(` and export the `TransitRateContext` interface. No logic changes.
+`getTransitRate` must already be exported with the group branch (Current
+state excerpt). Nothing to change in `activity-utils.ts`.
 
-**Verify**: `pnpm type-check` → exit 0; `pnpm exec vitest run` → all pass (plan 005's tests cover this function's precedence order).
+**Verify**: `grep -n "export function getTransitRate" src/lib/activity-utils.ts` → one match; `pnpm exec vitest run` → all pass.
 
 ### Step 2: Thread the owner's rate through `generatePDF`
 
 In `src/lib/pdf-generation.ts`:
 
-1. After the owner-scoped invoice lookup (plan 001), fetch the owner's rate once:
+1. After the owner-scoped invoice lookup, fetch the owner's rate once:
 
 ```ts
 const owner = await prisma.user.findUnique({
@@ -164,28 +211,24 @@ const rateContext = {
 };
 ```
 
-2. Replace the hardcoded line-item rate (lines 137-139) with the shared function. The activity objects in this scope don't carry their own `client` relation, so pass the invoice's client rate explicitly:
+(Note: `generatePDF` already runs a full `prisma.user.findUnique` near the
+end for the payment footer — you may instead hoist that single query above
+the line-item loop and reuse it, keeping one user read total.)
 
-```ts
-const ratePerKm = getTransitRate(
-	{
-		...activity,
-		client: { transitRatePerKm: invoice.client.transitRatePerKm }
-	},
-	rateContext
-);
-const travelTotal = round(ratePerKm * Number(activity.transitDistance), 2);
-```
+2. Add the client rate to the activities include in the invoice query:
+   `client: { select: { transitRatePerKm: true } }` — group-created
+   activities can belong to a different client than `invoice.client`, so use
+   the per-activity relation, not `invoice.client`.
+3. Pass the context at the line-item call: `getTransitRate(activity, rateContext)`.
+4. Pass it to the Total: `getTotalCostOfActivities(invoice.activities, rateContext)`.
+5. Format the printed rate at line 150: `` `$${ratePerKm.toFixed(2)}/km` `` so a rate like `0.9` prints as `0.90`.
 
-    (If `getTransitRate`'s `Activity` parameter type makes the spread awkward, adjust the call to construct only the fields it reads — `client.transitRatePerKm` — rather than widening types.) Also update the printed rate string on the line at `pdf-generation.ts:149` (`` `$${ratePerKm}/km` ``) to `` `$${ratePerKm.toFixed(2)}/km` `` so a rate like `0.9` prints as `0.90`.
-
-3. Pass the context to the total at line 228: `getTotalCostOfActivities(invoice.activities, rateContext)` — and confirm the activities in that query include their `client` rate or inherit the invoice client's. **Important consistency check**: `getTotalCostOfActivities` reads `activity.client?.transitRatePerKm`. The invoice query's activities include (`supportItem`, `transportItems`) — NOT `client`. Add `client: { select: { transitRatePerKm: true } }` to the activities include in `generatePDF`'s invoice query so the total sees the same client rate the line items use.
-
-**Verify**: `pnpm type-check` → exit 0. `grep -n "0.43" src/lib/pdf-generation.ts` → no matches.
+**Verify**: `pnpm type-check` → exit 0.
 
 ### Step 3: Fix the invoice-router aggregates
 
-In `src/server/api/routers/invoice-router.ts`, for BOTH `getTotalOwing` and `matchByPayment`:
+In `src/server/api/routers/invoice-router.ts`, for BOTH `getTotalOwing` and
+`matchByPayment`:
 
 1. Add the client rate to the activity include: `activities: { include: { supportItem: true, client: { select: { transitRatePerKm: true } } } }`.
 2. Fetch the caller's rate once per procedure:
@@ -204,12 +247,26 @@ const rateContext = {
 
 **Verify**: `pnpm type-check` → exit 0. `pnpm lint` → exit 0.
 
-### Step 4: Tests
+### Step 4: Tests and golden-master regeneration
 
-1. In `src/lib/activity-utils.test.ts`, add: group activity with `transitDistance` and a client rate → transit is billed at the client rate (asserting the old 0.43/0.99 split is gone from totals is impossible here since totals never used 0.43 — the group-rate assertion belongs to the PDF side, next).
-2. Create `src/lib/pdf-generation.test.ts` ONLY if you can do it without a database: `generatePDF` queries Prisma directly, so unit-testing it requires mocking `@/server/prisma` (vitest `vi.mock`). If that mock exceeds ~50 lines of setup, skip the file and note it — the arithmetic is already covered via `getTotalCostOfActivities` tests; the line-item/total agreement then rests on both paths calling `getTransitRate` (verifiable by grep, done criteria below).
+1. In `src/lib/activity-utils.test.ts`, confirm/extend coverage: group
+   activity with `transitDistance` and a client override still bills at
+   `GROUP_TRANSIT_RATE` (the group branch beats the override — current,
+   intentional behavior until plan 016).
+2. Run `pnpm exec vitest run` and inspect the text-test failures. Update the
+   inline expectations in `pdf-generation.text.test.ts` where they encode
+   the $0.99/km rate for the affected fixtures, then regenerate goldens:
+   `pnpm exec vitest run -u` and (if the render test fails)
+   `UPDATE_PDF_SNAPSHOTS=1 pnpm exec vitest run src/lib/pdf-generation.render.test.ts`.
+3. **Review the golden diffs line by line**: only `$0.99/km` non-labour
+   travel lines becoming `$0.85/km` (and the arithmetic that follows —
+   travel line totals and invoice Totals) may change. Group lines
+   (`$0.43/km`), ABT lines (`$0.49`/`$0.99` per-km transport), labour
+   travel lines, and support lines must be byte-identical.
 
-**Verify**: `pnpm exec vitest run` → all pass, including plan 005's suite (its rate-precedence tests must still pass unchanged — this plan adds callers, it does not change `getTransitRate` behavior).
+**Verify**: `pnpm exec vitest run` → all pass, including plan 005's suite
+(rate-precedence tests unchanged — this plan adds callers, it does not
+change `getTransitRate` behavior).
 
 ### Step 5: Full verification
 
@@ -218,17 +275,18 @@ const rateContext = {
 ## Test plan
 
 - Rate precedence (client → user → 0.99): already locked by plan 005; must still pass.
-- New: group-activity transit billed at the effective rate, not a special group rate.
-- New (optional, mock-permitting): PDF line-item sum equals PDF `totalCost` for a fixture invoice with a custom client rate.
+- Group branch beats client override: locked (until plan 016 redefines it).
+- Golden masters: the ONLY diffs are the documented $0.99→$0.85 lines and dependent totals in `transit-solo`, `kitchen-sink`, `plan-managed-week`.
 
 ## Done criteria
 
 Machine-checkable. ALL must hold:
 
-- [ ] `grep -n "0.43" src/lib/pdf-generation.ts` → no matches
-- [ ] `grep -n "getTransitRate" src/lib/pdf-generation.ts` → at least one match (line items use the shared function)
+- [ ] `grep -c "rateContext" src/lib/pdf-generation.ts` → at least 2 (declared + passed to line items and total)
 - [ ] `grep -c "rateContext" src/server/api/routers/invoice-router.ts` → at least 4 (two procedures × declare + pass)
-- [ ] `pnpm exec vitest run` exits 0 (including all plan-005 characterization tests, unmodified except where this plan's Step 4 explicitly adds cases)
+- [ ] `grep -n "transitRatePerKm" src/lib/pdf-generation.ts src/server/api/routers/invoice-router.ts` → client rate included in the activity queries
+- [ ] `git diff --stat` on `src/lib/__pdf_text__/` touches only `transit-solo`, `kitchen-sink`, `plan-managed-week`
+- [ ] `pnpm exec vitest run` exits 0 (including all plan-005 characterization tests, unmodified)
 - [ ] `pnpm type-check`, `pnpm lint` exit 0
 - [ ] No files outside the in-scope list are modified (`git status`)
 - [ ] `docs/plans/README.md` status row updated
@@ -237,14 +295,21 @@ Machine-checkable. ALL must hold:
 
 Stop and report back (do not improvise) if:
 
-- Plans 001 or 005 have not landed (`generatePDF` still takes one argument, or `src/lib/trip-utils.test.ts` doesn't exist).
-- You find a configurable group transit rate somewhere in the live schema (would contradict this plan's "no group rate" decision — the operator must choose).
-- Group-created activities on an invoice can belong to a DIFFERENT client than `invoice.client` (check how group activities are created — `invoice-router.ts` `generateNestedWriteForGroupActivities` sets `clientId: groupClientId`). If the invoice query's activities can carry a different client's rate than `invoice.client`, use the per-activity `client` relation everywhere instead of `invoice.client` and note the deviation. Do not guess silently.
-- Any plan-005 characterization test needs its EXPECTED VALUE changed for a reason other than "group transit now uses the effective rate" — report before editing the test.
+- The drift check shows changes to the four watched files since `f2f1154` that contradict the Current state excerpts.
+- Plan 016 has already landed (`getTransitRate` consults a group size, or `GROUP_TRANSIT_RATE` is gone) — this plan's group expectations are then stale; reconcile with 016 before proceeding.
+- Regenerating goldens changes any group transit line ($0.43/km), any ABT line, or any fixture other than the three documented ones.
+- Group-created activities on an invoice carry a client whose `transitRatePerKm` differs from `invoice.client`'s AND the line items and Total disagree after your change — the per-activity `client` relation must be used consistently in both paths; report if the query shapes make that impossible.
+- Any plan-005 characterization test needs its EXPECTED VALUE changed — report before editing the test.
 
 ## Maintenance notes
 
-- **Operator decision to confirm in review**: this plan removes the orphaned `0.43` group Provider Travel rate in favor of the unified effective rate, based on commit `3d7c5a9` having removed the configurable group rate. If a distinct group rate is actually required by NDIS rules, it must return as a schema field, not a hardcode. Historical PDFs printed with 0.43 differ from what re-generation will now produce.
-- Residual known gap: the 6 UI call sites still show totals without the user rate (default 0.99 when no client override). Follow-up: expose the user's rate via existing user tRPC state and thread `rateContext` through those components.
-- CONTEXT.md still mentions `groupTransitRatePerKm` (stale — field removed); update the doc when convenient.
-- The `rateType` time-vs-distance precedence quirk (plan 005, Step 2, case 5) remains open.
+- The group Provider Travel rate (0.43) and group ABT rate (0.49) remain
+  2-participant hardcodes; **plan 016** replaces both with
+  floor(effective-rate ÷ group-size) and adds `Activity.groupSize`.
+- Residual known gap: the 6 UI call sites still show totals without the user
+  rate — **plan 007 Step 6** closes it.
+- CONTEXT.md ("Billable Driving" → Transit Rate) still mentions the removed
+  `groupTransitRatePerKm` field — plan 016 updates the doc with the new
+  group-size semantics.
+- The `rateType` time-vs-distance precedence quirk (plan 005, Step 2, case 5)
+  remains open — plan 007 Step 1 decides it.
