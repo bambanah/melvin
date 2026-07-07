@@ -189,8 +189,13 @@ export async function createRichInvoice() {
 		}
 	});
 
-	// What generatePDF prints as Total (custom rates + transport included)
-	const expectedPdfTotal = getTotalCostOfActivities(invoice.activities);
+	// What generatePDF prints as Total (custom rates + transport included).
+	// testUser has no transitRatePerKm override, so it resolves to the
+	// schema default (0.85) — mirror that here since generatePDF now threads
+	// the owner's rate through non-group Provider Travel.
+	const expectedPdfTotal = getTotalCostOfActivities(invoice.activities, {
+		userTransitRatePerKm: 0.85
+	});
 
 	// What the invoice page shows: the byId query selects neither
 	// supportItemRates nor transportItems, so its total omits custom rates
@@ -328,8 +333,11 @@ export async function createRealisticInvoice() {
 	});
 
 	// Same page-total vs PDF-total split as createRichInvoice: the byId query
-	// omits transportItems, so the page total excludes transport costs
-	const expectedPdfTotal = getTotalCostOfActivities(invoice.activities);
+	// omits transportItems, so the page total excludes transport costs.
+	// testUser's transitRatePerKm resolves to the schema default (0.85).
+	const expectedPdfTotal = getTotalCostOfActivities(invoice.activities, {
+		userTransitRatePerKm: 0.85
+	});
 	const expectedPageTotal = getTotalCostOfActivities(
 		invoice.activities.map((activity) => ({
 			...activity,

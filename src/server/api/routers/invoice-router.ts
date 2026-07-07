@@ -144,7 +144,8 @@ export const invoiceRouter = router({
 			select: {
 				activities: {
 					include: {
-						supportItem: true
+						supportItem: true,
+						client: { select: { transitRatePerKm: true } }
 					}
 				}
 			},
@@ -154,9 +155,17 @@ export const invoiceRouter = router({
 			}
 		});
 
+		const user = await ctx.prisma.user.findUnique({
+			where: { id: ctx.session.user.id },
+			select: { transitRatePerKm: true }
+		});
+		const rateContext = {
+			userTransitRatePerKm: Number(user?.transitRatePerKm ?? 0.99)
+		};
+
 		const totalOwing = invoices.reduce(
 			(total, invoice) =>
-				(total += getTotalCostOfActivities(invoice.activities)),
+				(total += getTotalCostOfActivities(invoice.activities, rateContext)),
 			0
 		);
 
@@ -427,7 +436,8 @@ export const invoiceRouter = router({
 					},
 					activities: {
 						include: {
-							supportItem: true
+							supportItem: true,
+							client: { select: { transitRatePerKm: true } }
 						}
 					}
 				}
@@ -440,10 +450,18 @@ export const invoiceRouter = router({
 				};
 			}
 
+			const user = await ctx.prisma.user.findUnique({
+				where: { id: ctx.session.user.id },
+				select: { transitRatePerKm: true }
+			});
+			const rateContext = {
+				userTransitRatePerKm: Number(user?.transitRatePerKm ?? 0.99)
+			};
+
 			// Convert array of invoices to map of <total, invoiceId>
 			const totals = new Map<number, string | string[]>();
 			for (const invoice of invoices) {
-				const total = getTotalCostOfActivities(invoice.activities);
+				const total = getTotalCostOfActivities(invoice.activities, rateContext);
 
 				if (totals.has(total)) {
 					const val = totals.get(total) as string | string[];

@@ -50,10 +50,10 @@ const invariants: Record<string, { contains: string[]; excludes?: string[] }> =
 				"Provider travel - labour",
 				"Provider travel - non-labour",
 				"04_799_0125_6_1",
-				"$0.99/km",
+				"$0.85/km",
 				"$31.09",
-				"$14.85",
-				"$170.28"
+				"$12.75",
+				"$168.18"
 			]
 		},
 		"transit-group": {
@@ -91,7 +91,7 @@ const invariants: Record<string, { contains: string[]; excludes?: string[] }> =
 				"04_590_0125_6_1",
 				"Participant Number: 431234567",
 				"Bill To: HELP Plan Managers",
-				"$722.87"
+				"$720.77"
 			]
 		},
 		"no-payment-footer": {
@@ -132,8 +132,10 @@ const invariants: Record<string, { contains: string[]; excludes?: string[] }> =
 				"$0.49/km",
 				"$0.43/km",
 				// The source invoice printed $1168.15 ($7.28 above its line-item
-				// sum — quirk Q1); with Q1 fixed the Total equals the line items
-				"$1160.87"
+				// sum — quirk Q1); with Q1 fixed the Total equals the line items.
+				// Once the user's 0.85 rate is threaded through (this plan), the
+				// two solo travel legs drop from $0.99/km to $0.85/km.
+				"$1153.59"
 			]
 		}
 	};

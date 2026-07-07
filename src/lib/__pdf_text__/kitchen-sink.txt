@@ -22,10 +22,10 @@ Activity Based Transport | 11/01/23 | 10 km | $0.99/km | $9.90
 Provider travel - labour | 11/01/23 | 30 minutes | $62.17/hr | $31.09
 costs
 04_104_0125_6_1
-Provider travel - non-labour | 11/01/23 | 15 km | $0.99/km | $14.85
+Provider travel - non-labour | 11/01/23 | 15 km | $0.85/km | $12.75
 costs
 04_799_0125_6_1
-Total | $722.87
+Total | $720.77
 Marlee Provider
 ABN: 12 345 678 901
 Bank: Sample Bank
