@@ -34,7 +34,7 @@ export default defineConfig({
 	reporter: [["list"], ["html", { open: "never" }]],
 	testDir: "./e2e",
 	webServer: {
-		command: "pnpm dev",
+		command: "pnpm dev:next",
 		url: "http://localhost:3000",
 		reuseExistingServer: !process.env.CI
 	}

@@ -29,7 +29,7 @@
 		"format:check": "prettier . --check",
 		"format:write": "prettier . --write",
 		"test": "run-s test:unit test:e2e",
-		"test:unit": "vitest",
+		"test:unit": "vitest run",
 		"test:e2e": "playwright test --project=e2e",
 		"test:visual": "playwright test --project=visual",
 		"test:pdf-snapshots:update": "cross-env UPDATE_PDF_SNAPSHOTS=1 vitest run src/lib/pdf-generation.render.test.ts",

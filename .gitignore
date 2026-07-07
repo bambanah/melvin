@@ -20,3 +20,5 @@ next-env.d.ts
 generated/
 
 .DS_Store
+
+.claude/worktrees
