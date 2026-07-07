@@ -1,6 +1,7 @@
 import { baseListQueryInput } from "@/lib/trpc";
 import { supportItemRatesSchema } from "@/schema/support-item-rates-schema";
 import { supportItemSchema } from "@/schema/support-item-schema";
+import { paginate } from "@/server/api/owned";
 import { authedProcedure, router } from "@/server/api/trpc";
 import { Prisma } from "@/generated/client";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
@@ -34,30 +35,28 @@ export const supportItemRouter = router({
 			const limit = input.limit ?? DEFAULT_LIST_LIMIT;
 			const { cursor, description, isGroup } = input;
 
-			const supportItems = await ctx.prisma.supportItem.findMany({
-				select: defaultSupportItemSelect,
-				take: limit + 1,
-				where: {
-					ownerId: ctx.session.user.id,
-					description: description
-						? {
-								contains: description,
-								mode: "insensitive"
-							}
-						: undefined,
-					isGroup
-				},
-				cursor: cursor ? { id: cursor } : undefined,
-				orderBy: {
-					createdAt: "desc"
-				}
+			const { items: supportItems, nextCursor } = await paginate({
+				limit,
+				cursor,
+				query: ({ take, cursor }) =>
+					ctx.owned.supportItem.findMany({
+						select: defaultSupportItemSelect,
+						take,
+						where: {
+							description: description
+								? {
+										contains: description,
+										mode: "insensitive"
+									}
+								: undefined,
+							isGroup
+						},
+						cursor,
+						orderBy: {
+							createdAt: "desc"
+						}
+					})
 			});
-
-			let nextCursor: typeof cursor | undefined;
-			if (supportItems.length > limit) {
-				const nextSupportItem = supportItems.pop();
-				nextCursor = nextSupportItem?.id;
-			}
 
 			return {
 				supportItems,
@@ -67,7 +66,7 @@ export const supportItemRouter = router({
 	byId: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			const supportItem = await ctx.prisma.supportItem.findFirst({
+			const supportItem = await ctx.owned.supportItem.findFirst({
 				select: {
 					...defaultSupportItemSelect,
 					weeknightCode: true,
@@ -78,7 +77,6 @@ export const supportItemRouter = router({
 					sundayRate: true
 				},
 				where: {
-					ownerId: ctx.session.user.id,
 					id: input.id
 				}
 			});
@@ -140,9 +138,8 @@ export const supportItemRouter = router({
 	getCustomRatesForClient: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			const customRates = await ctx.prisma.supportItemRates.findMany({
+			const customRates = await ctx.owned.supportItemRates.findMany({
 				where: {
-					ownerId: ctx.session.user.id,
 					clientId: input.id
 				},
 				include: {
@@ -171,13 +168,7 @@ export const supportItemRouter = router({
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
-			const existing = await ctx.prisma.supportItemRates.findFirst({
-				where: { id: input.id, ownerId: ctx.session.user.id },
-				select: { id: true }
-			});
-			if (!existing) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
+			await ctx.owned.supportItemRates.assert(input.id);
 
 			const customRate = await ctx.prisma.supportItemRates.update({
 				where: {
@@ -200,13 +191,7 @@ export const supportItemRouter = router({
 	deleteCustomRate: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
-			const existing = await ctx.prisma.supportItemRates.findFirst({
-				where: { id: input.id, ownerId: ctx.session.user.id },
-				select: { id: true }
-			});
-			if (!existing) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
+			await ctx.owned.supportItemRates.assert(input.id);
 
 			const customRate = await ctx.prisma.supportItemRates.delete({
 				where: {
@@ -230,13 +215,7 @@ export const supportItemRouter = router({
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
-			const existing = await ctx.prisma.supportItem.findFirst({
-				where: { id: input.supportItem.id, ownerId: ctx.session.user.id },
-				select: { id: true }
-			});
-			if (!existing) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
+			await ctx.owned.supportItem.assert(input.supportItem.id);
 
 			const supportItem = await ctx.prisma.supportItem.update({
 				where: {
@@ -257,13 +236,7 @@ export const supportItemRouter = router({
 	delete: authedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
-			const existing = await ctx.prisma.supportItem.findFirst({
-				where: { id: input.id, ownerId: ctx.session.user.id },
-				select: { id: true }
-			});
-			if (!existing) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
+			await ctx.owned.supportItem.assert(input.id);
 
 			const supportItem = await ctx.prisma.supportItem.delete({
 				where: {
