@@ -5,11 +5,20 @@
 **Invoice**
 A grouping of Activities for a single Client, representing a bill for NDIS-funded services. Can be exported as a PDF for submission to the billing handler.
 
+**Invoice Version**
+An immutable snapshot of an Invoice's resolved content (line items, rates, totals, header details) frozen at the moment the Invoice is sent. An Invoice accumulates versions as it is amended and re-sent; every version remains downloadable forever. The first version is displayed with the bare invoice number (INV-001), subsequent versions with a letter suffix derived from the version ordinal (INV-001a, INV-001b, …).
+
+**Draft**
+An Invoice (or PDF render of one) whose content is not yet frozen in an Invoice Version — either never sent, or re-opened by an Amendment. A PDF rendered from live data always carries a DRAFT watermark; a clean PDF can only be rendered from an Invoice Version.
+
+**Amendment**
+Correcting an already-sent Invoice (wrong support item, client out of funding, etc.). Sent and paid Invoices are locked against editing; Amending is the deliberate action that re-opens the working Invoice (from sent or paid), and re-sending it freezes the next Invoice Version. The previously sent versions are unaffected.
+
 **Activity**
 A single service delivery to a Client. Has a date, start/end time, and is billed under a Support Item. May include Activity Based Transport and Provider Travel costs.
 
 **Client**
-A participant receiving NDIS-funded support. Has a stored `distanceToClient` used to calculate Provider Travel.
+A participant receiving NDIS-funded support. Has a stored `distanceToClient` used to calculate Provider Travel. Either active (a current client) or inactive (a former client, hidden from pickers but retained with full invoice history). A Client with any sent Invoice cannot be deleted — only deactivated.
 
 **Trip**
 A group of back-to-back Activities on the same day where transit is shared. The first activity's transit is from home, middle activities have inter-client transit, and the last activity includes the return leg.

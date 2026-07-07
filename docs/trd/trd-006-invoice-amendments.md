@@ -1,6 +1,15 @@
 # TRD-006 — Invoice Amendments & Corrections
 
-**Status**: Proposed · **Priority**: P2 · **Depends on**: TRD-005 D3 (send = seal point) conceptually; implementable independently against `SENT` status · **Relates to**: TRD-002 (rate snapshots), finding #9 (payment matching)
+**Status**: Accepted with amended design — see ADR-0004 and plan 017 · **Priority**: P2 · **Depends on**: TRD-005 D3 (send = seal point) conceptually; implementable independently against `SENT` status · **Relates to**: TRD-002 (rate snapshots), finding #9 (payment matching)
+
+> **Design amendment (2026-07-07)**: ADR-0004 supersedes D1/D2's mechanism.
+> Amendments are **versions within one Invoice** (`InvoiceVersion` jsonb
+> snapshots; INV-001 → INV-001a) — no `amendsInvoiceId` chain, no `AMENDED`
+> status, no relational `InvoiceLine` table. D3 simplifies away (one invoice
+> row carries payment state; `paidAt` is stamped onto the paid version before
+> an amendment clears it). D4's guard rails, the migration approach, the
+> testing notes, and the answered open questions carry forward unchanged.
+> Implementation: docs/plans/017-invoice-versioning.md.
 
 ## Problem
 

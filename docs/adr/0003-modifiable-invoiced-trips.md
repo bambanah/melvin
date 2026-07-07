@@ -1,6 +1,6 @@
 # ADR 0003: Allow Trip Modification After Invoicing
 
-**Status**: Accepted  
+**Status**: Superseded by ADR-0004 for activities on sent/paid invoices (still applies to draft invoices)  
 **Date**: 2026-06-19
 
 ## Context
