@@ -6,15 +6,11 @@ Numbered, referenceable plans live in `docs/plans/`, indexed in `docs/plans/READ
 
 ### Issue tracker
 
-GitHub Issues for bambanah/melvin. See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-Default vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+Issues and PRDs live as GitHub issues in this repo. See `docs/agents/issue-tracker.md`.
 
 ### Domain docs
 
-Single-context: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+Single-context layout — `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
 
 ## Git conventions
 
