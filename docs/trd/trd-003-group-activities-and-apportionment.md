@@ -1,6 +1,6 @@
 # TRD-003 — Group Activities & Apportionment
 
-**Status**: Proposed · **Priority**: P1 · **Depends on**: TRD-002 (rate engine), reconciling the group-form WIP in the working tree + finding #7 (invoice group double-write) · **Blocks**: TRD-007's group-cancellation rule
+**Status**: Partially delivered (plan 016 — group activities & apportionment shipped; rate-engine-dependent items remain) · **Priority**: P1 · **Depends on**: TRD-002 (rate engine) + finding #7 (invoice group double-write) · **Blocks**: TRD-007's group-cancellation rule
 
 ## Problem
 

@@ -39,7 +39,7 @@ TRD-001 and TRD-002 are independent of each other and can run in parallel. TRD-0
 
 ## Known conflicts to resolve during implementation
 
-- **ADR-0003** (modifiable invoiced trips) is superseded by TRD-006's sealing model — update the ADR when TRD-006 lands.
-- `CONTEXT.md` still mentions `groupTransitRatePerKm` (removed in `3d7c5a9`); TRD-003 removes the concept entirely — update the glossary (add: Group Session, Cancellation, NF2F, Sealed Invoice, Due Bundle).
+- **ADR-0003** (modifiable invoiced trips) was superseded by TRD-006's sealing model — resolved: TRD-006 landed as plan 017, and `docs/adr/0003-modifiable-invoiced-trips.md` now carries `Status: Superseded by ADR-0004`.
+- TRD-003 removes the `groupTransitRatePerKm` concept entirely; the glossary additions (Group Session, Cancellation, NF2F, Sealed Invoice, Due Bundle) still aren't folded into `CONTEXT.md` — keep as a live item for TRD-005/007 implementation.
 - Plan 013's (`docs/plans/013-architecture-deepening.md`) transit-module proposal is _how_ to build TRD-002/004's engine seams — it complements, not conflicts.
 - `ndis-support-catalogue.json` (refreshed to 2026-27 by plan 021, the interim fix) and the stale `price-guide-24-25.pdf` reference are deleted by TRD-002.

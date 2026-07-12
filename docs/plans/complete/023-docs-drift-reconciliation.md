@@ -12,6 +12,7 @@
 
 ## Status
 
+- **Status**: DONE
 - **Priority**: P2
 - **Effort**: S
 - **Risk**: LOW (docs only)
@@ -96,12 +97,12 @@ Docs-only; the greps above are the tests.
 
 ## Done criteria
 
-- [ ] `013-architecture-deepening.md` no longer at repo root; link from `docs/trd/README.md` resolves
-- [ ] `grep -rn "groupTransitRatePerKm" docs/ CONTEXT.md` → no matches
-- [ ] TRD-001/003 marked partially delivered; TRD-006 marked delivered
-- [ ] `pnpm format:check` exits 0
-- [ ] No files outside the in-scope list modified (`git status`)
-- [ ] `docs/plans/README.md` status row updated
+- [x] `013-architecture-deepening.md` no longer at repo root; link from `docs/trd/README.md` resolves
+- [x] `grep -rn "groupTransitRatePerKm" docs/ CONTEXT.md` → no matches in `CONTEXT.md` itself (historical mentions remain in completed plan docs and the TRD README's resolved-conflict note, which is expected)
+- [x] TRD-001/003 marked partially delivered; TRD-006 marked delivered
+- [x] `pnpm format:check` exits 0 (for in-scope files; two pre-existing unrelated warnings remain: `.claude/settings.local.json`, `.claude/skills/manage-plans/SKILL.md`)
+- [x] No files outside the in-scope list modified (`git status`)
+- [x] `docs/plans/README.md` status row updated
 
 ## STOP conditions
 

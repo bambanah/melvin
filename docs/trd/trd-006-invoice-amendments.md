@@ -1,6 +1,6 @@
 # TRD-006 — Invoice Amendments & Corrections
 
-**Status**: Accepted with amended design — see ADR-0004 and plan 017 · **Priority**: P2 · **Depends on**: TRD-005 D3 (send = seal point) conceptually; implementable independently against `SENT` status · **Relates to**: TRD-002 (rate snapshots), finding #9 (payment matching)
+**Status**: Delivered (plan 017, ADR-0004) — design amended from D1/D2's original mechanism, see note below · **Priority**: P2 · **Depends on**: TRD-005 D3 (send = seal point) conceptually; implementable independently against `SENT` status · **Relates to**: TRD-002 (rate snapshots), finding #9 (payment matching)
 
 > **Design amendment (2026-07-07)**: ADR-0004 supersedes D1/D2's mechanism.
 > Amendments are **versions within one Invoice** (`InvoiceVersion` jsonb
