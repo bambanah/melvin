@@ -12,6 +12,7 @@
  * Run with: pnpm exec tsx prisma/scripts/backfill-invoice-versions.ts
  */
 import "dotenv/config";
+import { pathToFileURL } from "node:url";
 import prisma from "@/server/prisma";
 import { InvoiceStatus } from "@/generated/client";
 import { loadInvoiceForPdf } from "@/lib/pdf-generation";
@@ -44,34 +45,46 @@ export async function backfillInvoiceVersions(): Promise<BackfillResult> {
 	let skipped = 0;
 
 	for (const invoice of invoices) {
-		const data = await loadInvoiceForPdf(invoice.id, invoice.ownerId);
+		try {
+			const data = await loadInvoiceForPdf(invoice.id, invoice.ownerId);
 
-		if (!data) {
+			if (!data) {
+				console.warn(
+					`Skipping ${invoice.invoiceNo} (${invoice.id}) — could not load for PDF (missing client or activities).`
+				);
+				skipped += 1;
+				continue;
+			}
+
+			const content = buildInvoiceVersionContent(data, {
+				versionNumber: 1,
+				backfilled: true
+			});
+
+			await prisma.invoiceVersion.create({
+				data: {
+					invoiceId: invoice.id,
+					versionNumber: 1,
+					sentAt: invoice.sentAt ?? invoice.date,
+					paidAt: invoice.paidAt,
+					total: content.total,
+					content
+				}
+			});
+
+			backfilled += 1;
+			console.log(`Backfilled v1 for ${invoice.invoiceNo} (${invoice.id}).`);
+		} catch (error) {
+			// A single un-backfillable invoice (e.g. an activity whose end time
+			// precedes its start time throws in `getDuration`) must not abort
+			// the whole batch — log it and carry on so the rest still backfill.
 			console.warn(
-				`Skipping ${invoice.invoiceNo} (${invoice.id}) — could not load for PDF (missing client or activities).`
+				`Skipping ${invoice.invoiceNo} (${invoice.id}) — failed to backfill: ${
+					error instanceof Error ? error.message : String(error)
+				}`
 			);
 			skipped += 1;
-			continue;
 		}
-
-		const content = buildInvoiceVersionContent(data, {
-			versionNumber: 1,
-			backfilled: true
-		});
-
-		await prisma.invoiceVersion.create({
-			data: {
-				invoiceId: invoice.id,
-				versionNumber: 1,
-				sentAt: invoice.sentAt ?? invoice.date,
-				paidAt: invoice.paidAt,
-				total: content.total,
-				content
-			}
-		});
-
-		backfilled += 1;
-		console.log(`Backfilled v1 for ${invoice.invoiceNo} (${invoice.id}).`);
 	}
 
 	console.log(`Done. Backfilled ${backfilled}, skipped ${skipped}.`);
@@ -81,8 +94,9 @@ export async function backfillInvoiceVersions(): Promise<BackfillResult> {
 
 // Only auto-run when executed directly (`pnpm exec tsx
 // prisma/scripts/backfill-invoice-versions.ts`) — not when imported by
-// the integration test.
-if (import.meta.url === `file://${process.argv[1]}`) {
+// the integration test. `pathToFileURL` normalises the argv path so this
+// matches on Windows (`file:///C:/…`) as well as POSIX.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 	backfillInvoiceVersions()
 		.catch((error) => {
 			console.error(error);
