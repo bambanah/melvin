@@ -700,6 +700,78 @@ export const invoiceRouter = router({
 
 			return parseInvoice(invoice);
 		}),
+	// Drops the most recent version outright, rather than amend+resend which
+	// would burn its number and push the next send to a further suffix. Deleting
+	// the sole version leaves the invoice as if it was never sent — recovering an
+	// accidental send.
+	deleteVersion: authedProcedure
+		.input(z.object({ id: z.string(), versionNumber: z.number().int() }))
+		.mutation(async ({ ctx, input }) => {
+			await ctx.owned.invoice.assert(input.id);
+
+			const invoice = await ctx.prisma.$transaction(async (tx) => {
+				const existing = await tx.invoice.findUniqueOrThrow({
+					where: { id: input.id }
+				});
+
+				const latest = await tx.invoiceVersion.findFirst({
+					where: { invoiceId: input.id },
+					orderBy: { versionNumber: "desc" }
+				});
+
+				if (!latest) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "Invoice has no versions"
+					});
+				}
+
+				// Only the latest version can be dropped: deleting an earlier one
+				// would leave a gap and misalign every later version's suffix.
+				if (latest.versionNumber !== input.versionNumber) {
+					throw new TRPCError({
+						code: "CONFLICT",
+						message: "Only the latest version can be deleted"
+					});
+				}
+
+				await tx.invoiceVersion.delete({ where: { id: latest.id } });
+
+				const remaining = await tx.invoiceVersion.findFirst({
+					where: { invoiceId: input.id },
+					orderBy: { versionNumber: "desc" }
+				});
+
+				// No versions left → revert to a draft, as if never sent. Otherwise
+				// re-adopt the new latest version's sent/paid state — unless the
+				// invoice is already being re-drafted (amended), in which case its
+				// own draft status stands.
+				const data =
+					remaining === null
+						? {
+								status: InvoiceStatus.CREATED,
+								sentAt: null,
+								paidAt: null
+							}
+						: existing.status === InvoiceStatus.CREATED
+							? {}
+							: {
+									status: remaining.paidAt
+										? InvoiceStatus.PAID
+										: InvoiceStatus.SENT,
+									sentAt: remaining.sentAt,
+									paidAt: remaining.paidAt
+								};
+
+				return tx.invoice.update({
+					where: { id: input.id },
+					data,
+					include: versionInclude
+				});
+			});
+
+			return parseInvoice(invoice);
+		}),
 	markPaid: authedProcedure
 		.input(z.object({ ids: z.array(z.string()) }))
 		.mutation(({ ctx, input }) =>

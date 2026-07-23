@@ -236,11 +236,89 @@ test("matchByPayment finds the frozen amount, unaffected by a post-send rate edi
 	expect(matched.total).toBe(frozenTotal);
 });
 
-test("send/amend/markPaid/unmarkPaid are scoped to the caller's own invoices", async () => {
+test("deleteVersion drops the sole version and reverts the invoice to draft", async () => {
+	const user = await createTestUser();
+	const { caller, invoice } = await setupInvoiceWithActivity(user);
+
+	await caller.invoice.send({ ids: [invoice.id] });
+
+	const result = await caller.invoice.deleteVersion({
+		id: invoice.id,
+		versionNumber: 1
+	});
+	expect(result.status).toBe("CREATED");
+	expect(result.sentAt).toBeNull();
+	expect(result.versions).toHaveLength(0);
+
+	const versions = await prisma.invoiceVersion.findMany({
+		where: { invoiceId: invoice.id }
+	});
+	expect(versions).toHaveLength(0);
+});
+
+test("deleting the sole version then re-sending reuses v1 with no suffix", async () => {
+	const user = await createTestUser();
+	const { caller, invoice } = await setupInvoiceWithActivity(user);
+
+	await caller.invoice.send({ ids: [invoice.id] });
+	await caller.invoice.deleteVersion({ id: invoice.id, versionNumber: 1 });
+
+	const { invoices } = await caller.invoice.send({ ids: [invoice.id] });
+	expect(invoices[0].versions).toHaveLength(1);
+	expect(invoices[0].versions![0].versionNumber).toBe(1);
+	expect(invoices[0].versions![0].displayInvoiceNo).toBe("INV-1");
+});
+
+test("deleting the latest of two versions re-adopts the previous version's state and reuses its number", async () => {
+	const user = await createTestUser();
+	const { caller, invoice } = await setupInvoiceWithActivity(user);
+
+	// v1, then amend + re-send for v2 (INV-1a).
+	await caller.invoice.send({ ids: [invoice.id] });
+	await caller.invoice.amend({ id: invoice.id });
+	await caller.invoice.send({ ids: [invoice.id] });
+
+	const deleted = await caller.invoice.deleteVersion({
+		id: invoice.id,
+		versionNumber: 2
+	});
+	expect(deleted.status).toBe("SENT");
+	expect(deleted.versions).toHaveLength(1);
+	expect(deleted.versions![0].versionNumber).toBe(1);
+
+	// Re-sending reuses number 2 (INV-1a) rather than pushing to a further suffix.
+	await caller.invoice.amend({ id: invoice.id });
+	const { invoices } = await caller.invoice.send({ ids: [invoice.id] });
+	const latest = invoices[0].versions![0];
+	expect(latest.versionNumber).toBe(2);
+	expect(latest.displayInvoiceNo).toBe("INV-1a");
+});
+
+test("deleteVersion rejects deleting a non-latest version", async () => {
+	const user = await createTestUser();
+	const { caller, invoice } = await setupInvoiceWithActivity(user);
+
+	await caller.invoice.send({ ids: [invoice.id] });
+	await caller.invoice.amend({ id: invoice.id });
+	await caller.invoice.send({ ids: [invoice.id] });
+
+	await expect(
+		caller.invoice.deleteVersion({ id: invoice.id, versionNumber: 1 })
+	).rejects.toThrow(TRPCError);
+
+	const versions = await prisma.invoiceVersion.findMany({
+		where: { invoiceId: invoice.id }
+	});
+	expect(versions).toHaveLength(2);
+});
+
+test("send/amend/markPaid/unmarkPaid/deleteVersion are scoped to the caller's own invoices", async () => {
 	const userA = await createTestUser();
 	const userB = await createTestUser();
-	const { invoice } = await setupInvoiceWithActivity(userA);
+	const { caller, invoice } = await setupInvoiceWithActivity(userA);
 	const callerB = callerFor(userB);
+
+	await caller.invoice.send({ ids: [invoice.id] });
 
 	await expect(callerB.invoice.send({ ids: [invoice.id] })).rejects.toThrow(
 		TRPCError
@@ -253,5 +331,8 @@ test("send/amend/markPaid/unmarkPaid are scoped to the caller's own invoices", a
 	);
 	await expect(
 		callerB.invoice.unmarkPaid({ ids: [invoice.id] })
+	).rejects.toThrow(TRPCError);
+	await expect(
+		callerB.invoice.deleteVersion({ id: invoice.id, versionNumber: 1 })
 	).rejects.toThrow(TRPCError);
 });

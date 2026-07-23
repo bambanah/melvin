@@ -24,6 +24,7 @@ import {
 	Dumbbell,
 	Plane,
 	Search,
+	Trash2,
 	Undo,
 	User
 } from "lucide-react";
@@ -51,6 +52,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 	const sendMutation = trpc.invoice.send.useMutation();
 	const amendMutation = trpc.invoice.amend.useMutation();
 	const markPaidMutation = trpc.invoice.markPaid.useMutation();
+	const deleteVersionMutation = trpc.invoice.deleteVersion.useMutation();
 
 	const invalidateInvoice = () => {
 		trpcUtils.invoice.byId.invalidate({ id: invoiceId });
@@ -69,6 +71,17 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 		if (!confirm("Amend this invoice? It will go back to draft.")) return;
 
 		amendMutation.mutateAsync({ id: invoiceId }).then(invalidateInvoice);
+	};
+
+	const deleteVersion = (versionNumber: number, isOnly: boolean) => {
+		const message = isOnly
+			? "Delete this version? The invoice will return to draft, as if it was never sent."
+			: "Delete this version? It will be dropped and its number reused on the next send.";
+		if (!confirm(message)) return;
+
+		deleteVersionMutation
+			.mutateAsync({ id: invoiceId, versionNumber })
+			.then(invalidateInvoice);
 	};
 
 	// docs/plans/017 Step 7: draft downloads carry a DRAFT watermark; a sent
@@ -267,7 +280,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 			{invoice.versions && invoice.versions.length > 0 && (
 				<div className="flex w-full flex-col gap-2 p-2 px-4">
 					<p className="font-semibold">Version history</p>
-					{invoice.versions.map((version) => (
+					{invoice.versions.map((version, index) => (
 						<div
 							key={version.versionNumber}
 							className="flex items-center justify-between rounded-md border p-3"
@@ -295,6 +308,21 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 								>
 									<Download className="h-4 w-4" />
 								</Button>
+								{index === 0 && (
+									<Button
+										variant="ghost"
+										size="icon"
+										onClick={() =>
+											deleteVersion(
+												version.versionNumber,
+												invoice.versions!.length === 1
+											)
+										}
+										aria-label="Delete version"
+									>
+										<Trash2 className="text-destructive h-4 w-4" />
+									</Button>
+								)}
 							</div>
 						</div>
 					))}
