@@ -330,6 +330,11 @@ export function billableLines(
 		for (const item of activity.transportItems) {
 			const amount = Number(item.amount);
 
+			// Skip zero-value transport so it doesn't show up on the invoice
+			if (amount === 0) {
+				continue;
+			}
+
 			if (item.type === "DISTANCE") {
 				lines.push({
 					kind: "ABT",

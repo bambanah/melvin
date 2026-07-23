@@ -176,6 +176,36 @@ test("EXPENSE lines (PARKING/TOLL/OTHER) bill at face value", () => {
 	expect(expenseLine?.note).toEqual("CityLink");
 });
 
+test("drops zero-value transport items so they don't show up on the invoice", () => {
+	const lines = billableLines({
+		...fullyLoadedActivity,
+		transitDuration: null,
+		transitDistance: null,
+		transportItems: [
+			{
+				type: "DISTANCE" as const,
+				amount: new Prisma.Decimal(0),
+				note: null
+			},
+			{
+				type: "TOLL" as const,
+				amount: new Prisma.Decimal(0),
+				note: "free ride"
+			},
+			{
+				type: "PARKING" as const,
+				amount: new Prisma.Decimal(4.5),
+				note: null
+			}
+		]
+	});
+
+	expect(lines.filter((line) => line.kind === "ABT")).toHaveLength(0);
+	const expenseLines = lines.filter((line) => line.kind === "EXPENSE");
+	expect(expenseLines).toHaveLength(1);
+	expect(expenseLines[0]?.total).toEqual(4.5);
+});
+
 test("billableLines throws on a reversed time range by default (invoicing must hard-stop)", () => {
 	const reversed = {
 		...fullyLoadedActivity,
