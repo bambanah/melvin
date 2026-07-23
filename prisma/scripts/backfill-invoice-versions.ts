@@ -1,11 +1,11 @@
 /**
- * One-off backfill (docs/plans/017 Step 9): every SENT/PAID invoice sent
+ * One-off backfill: every SENT/PAID invoice sent
  * before this feature existed has no `InvoiceVersion` row. This builds a v1
  * from *current* live data for each of them, flagged `backfilled: true`.
  *
  * Idempotent — only touches invoices with zero versions, so re-running is a
  * no-op. Must run once, after the schema migration, before the
- * frozen-total money queries (docs/plans/017 Step 8) see production traffic:
+ * frozen-total money queries see production traffic:
  * those queries read `versions[0].total`, which is `0` for a SENT/PAID
  * invoice with no version yet.
  *

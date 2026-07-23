@@ -9,7 +9,7 @@ import {
 import { round } from "./generic-utils";
 
 // Re-exported for backward compatibility — billing-lines.ts is now the
-// single implementation of activity rate/line math (docs/plans/007).
+// single implementation of activity rate/line math.
 export { getRateForActivity, getTransitRate };
 
 export const getTotalCostOfActivities = (

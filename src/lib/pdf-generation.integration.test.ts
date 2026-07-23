@@ -52,7 +52,7 @@ async function setupSentInvoice(
 	return { caller, client, supportItem, activity, invoice };
 }
 
-test("clean render of a sent invoice is byte-stable across every upstream mutation (docs/plans/017 Step 6 headline)", async () => {
+test("clean render of a sent invoice is byte-stable across every upstream mutation (#437 Step 6)", async () => {
 	const user = await createTestUser();
 	const { supportItem, client, activity, invoice } =
 		await setupSentInvoice(user);

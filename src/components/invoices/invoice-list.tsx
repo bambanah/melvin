@@ -179,7 +179,7 @@ export default function InvoiceList({ clientId: propClientId }: Props) {
 	};
 
 	// Maps the status the user picked in the dropdown onto the intent-named
-	// transition that gets the invoice there (docs/plans/017 Step 3).
+	// transition that gets the invoice there.
 	const markInvoiceAs = (
 		invoiceId: string,
 		currentStatus: InvoiceStatus,
@@ -243,7 +243,7 @@ export default function InvoiceList({ clientId: propClientId }: Props) {
 			id: "total-cost",
 			accessorFn: (invoice) => {
 				// Locked invoices show the latest version's frozen total, not a
-				// live recompute (docs/plans/017 Step 7/8).
+				// live recompute.
 				const totalCost =
 					invoice.status === InvoiceStatus.CREATED
 						? getTotalCostOfActivities(invoice.activities, rateContext, {

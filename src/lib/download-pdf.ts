@@ -1,7 +1,6 @@
 /**
  * Downloads a PDF, or offers the device's native share sheet when one's
- * available (mobile browsers) — used for the Step 7 send/download flows
- * (docs/plans/017).
+ * available (mobile browsers) — used for the send/download flows.
  */
 export async function downloadOrSharePdf(
 	base64DataUrl: string,

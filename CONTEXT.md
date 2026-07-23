@@ -30,7 +30,10 @@ The recipient printed on an Invoice (e.g. a plan manager or the participant them
 A single service delivery to a Client. Has a date, and is billed under a Support Item — by time span (start/end) for hourly items or by its own distance for per-km items. May include Activity Based Transport and Provider Travel costs.
 
 **Pending Activity**
-An Activity not yet attached to any Invoice. Pending Activities are grouped by Client and offered for pick-up when the Client's next Invoice is created.
+An Activity not yet attached to any Invoice. Pending Activities are grouped by Client and offered for pick-up when the Client's next Invoice is created. Every Pending Activity is also an Unbilled Activity, but not vice versa.
+
+**Unbilled Activity**
+An Activity for which the next action toward getting paid still lies with the Provider - sending an Invoice. Covers Pending Activities and activities attached to a Draft Invoice (never sent, or re-opened by an Amendment). Sending the Invoice is what moves work out of the unbilled set.
 
 **Client**
 A participant receiving NDIS-funded support. Has a stored `distanceToClient` used to calculate Provider Travel. Either active (a current client) or inactive (a former client, hidden from pickers but retained with full invoice history). A Client with any sent Invoice cannot be deleted — only deactivated.

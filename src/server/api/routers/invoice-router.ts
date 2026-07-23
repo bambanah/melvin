@@ -198,7 +198,7 @@ const assertGroupRowsHaveParticipants = async (
 
 /**
  * Guard: every supportItemId in activitiesToCreate must belong to the caller
- * before it's persisted onto an Activity row (docs/plans/018).
+ * before it's persisted onto an Activity row.
  */
 const assertSupportItemsOwned = async (
 	owned: RouterCtx["owned"],
@@ -401,7 +401,7 @@ export const invoiceRouter = router({
 		}),
 	// Sums the latest version's frozen total for each SENT invoice — not a
 	// live recompute — so a post-send rate/catalogue edit can't move an
-	// amount already owed (docs/plans/017 Step 8).
+	// amount already owed.
 	getTotalOwing: authedProcedure.query(async ({ ctx }) => {
 		const invoices = await ctx.owned.invoice.findMany({
 			select: {
@@ -482,7 +482,7 @@ export const invoiceRouter = router({
 					"One or more activities not found"
 				);
 				// `connect` below would silently reassign an activity away from
-				// whatever invoice currently holds it (docs/plans/017 Step 4 audit).
+				// whatever invoice currently holds it.
 				await ctx.owned.activity.assertNoneOnLockedInvoice(
 					inputInvoice.activityIds
 				);
@@ -560,7 +560,7 @@ export const invoiceRouter = router({
 					"One or more activities not found"
 				);
 				// `connect` below would silently reassign an activity away from
-				// whatever invoice currently holds it (docs/plans/017 Step 4 audit).
+				// whatever invoice currently holds it.
 				await ctx.owned.activity.assertNoneOnLockedInvoice(
 					inputInvoice.activityIds
 				);
@@ -793,7 +793,7 @@ export const invoiceRouter = router({
 			})
 		),
 	// Keys candidates on each invoice's latest version's frozen total, not a
-	// live recompute (docs/plans/017 Step 8).
+	// live recompute.
 	matchByPayment: authedProcedure
 		.input(z.object({ paymentAmount: z.number() }))
 		.query(async ({ ctx, input }) => {

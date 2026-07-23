@@ -7,7 +7,7 @@ import {
 } from "./test-utils";
 
 /**
- * The schema now rejects end-before-start times on write (docs/plans/019),
+ * The schema now rejects end-before-start times on write,
  * but rows written before that fix can still exist. This seeds one directly
  * via Prisma — bypassing the app layer, the only way such a row can exist —
  * to prove the activities list degrades instead of crashing on it.

@@ -101,7 +101,7 @@ test("Middle activity of three gets exactly its incoming leg, no return componen
 	});
 });
 
-// NOTE: characterizes current behavior — see docs/plans/README.md
+// NOTE: characterizes current behavior (#429)
 test("A missing inter-client leg silently yields zero transit for that activity", () => {
 	const first = getTripActivity("a1", "09:00");
 	const middle = getTripActivity("a2", "10:00");
@@ -130,7 +130,7 @@ test("Travel Time Cap: first activity duration is capped at 30 minutes", () => {
 	});
 });
 
-// NOTE: characterizes current behavior — see docs/plans/README.md
+// NOTE: characterizes current behavior (#429)
 test("Cap stacking: the last activity's incoming leg and return leg are each capped independently", () => {
 	const first = getTripActivity("a1", "09:00");
 	const last = getTripActivity("a2", "10:00", { travelTimeToClient: 45 });

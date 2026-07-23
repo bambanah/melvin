@@ -60,7 +60,7 @@ function baseUnitPriceFor(
 
 /**
  * Maps an Activity's canonical `billableLines` into priced display rows for the
- * activity detail page (docs/plans/037). Pure and total-preserving: the sum of
+ * activity detail page. Pure and total-preserving: the sum of
  * `row.total` equals `getTotalCostOfActivities([activity], …)` by construction.
  */
 export function activityBreakdownRows(

@@ -202,7 +202,7 @@ describe("invoice.create with group activities", () => {
 		).rejects.toThrow(/at least one other participant/i);
 	});
 
-	// docs/plans/020: a nonexistent group client is only discovered inside
+	// A nonexistent group client is only discovered inside
 	// createGroupMirrorActivities, which runs *after* the invoice write. Before
 	// the transaction wrap, this left a committed invoice + primary activity
 	// with a groupSize but zero participant rows.
@@ -282,7 +282,7 @@ describe("invoice.modify with group activities", () => {
 		expect(pending.every((a) => a.groupSize === 3)).toBe(true);
 	});
 
-	// docs/plans/020 characterization: `invoice-form.tsx` seeds `activityIds`
+	// Characterization: `invoice-form.tsx` seeds `activityIds`
 	// from `existingInvoice.activities` (the persisted primary row) and leaves
 	// `activitiesToCreate` empty on edit — mirror participant rows have
 	// `invoiceId: null` so they never appear in `existingInvoice.activities`

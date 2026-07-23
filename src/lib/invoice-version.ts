@@ -30,7 +30,7 @@ export interface ProviderDetails {
 /**
  * The provider/payment-footer fields exactly as the PDF prints them —
  * shared by the live render and the frozen `InvoiceVersion` builder so the
- * two paths can never drift (docs/plans/017 Step 2).
+ * two paths can never drift.
  */
 export function formatProviderDetails(
 	user: InvoicePdfData["user"]
@@ -54,7 +54,7 @@ export interface BuildInvoiceVersionContentOptions {
 	backfilled?: boolean;
 }
 
-/** Pure builder from plan 007's PDF loader output to the frozen snapshot shape. */
+/** Pure builder from the PDF loader output to the frozen snapshot shape. */
 export function buildInvoiceVersionContent(
 	data: InvoicePdfData,
 	options: BuildInvoiceVersionContentOptions

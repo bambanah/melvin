@@ -70,8 +70,8 @@ export const DEFAULT_ACTIVITY_TRANSPORT_RATE = 0.99;
 
 /**
  * The number of participants a group activity's rate is divided across.
- * Defaults to 2 for group activities created before `groupSize` existed
- * (docs/plans/016). Non-group activities always have a single participant.
+ * Defaults to 2 for group activities created before `groupSize` existed.
+ * Non-group activities always have a single participant.
  */
 export function groupSizeOf(activity: BillableActivity): number {
 	return activity.supportItem.isGroup ? (activity.groupSize ?? 2) : 1;
@@ -79,7 +79,7 @@ export function groupSizeOf(activity: BillableActivity): number {
 
 /**
  * A group activity's per-participant share of `rate`, floored to the cent so
- * the summed claim across participants never exceeds the base (docs/plans/016).
+ * the summed claim across participants never exceeds the base (#436).
  * The full rate for non-group activities. This is the single place the isGroup
  * gate and the floor policy live — every apportioned rate goes through here.
  */
@@ -239,7 +239,7 @@ export function billableLines(
 
 	// SUPPORT: gated on rateType like the PDF (the printed truth), not on
 	// which fields happen to be populated. A KM-rate item always bills by
-	// itemDistance, even if it also has a time span (docs/plans/007).
+	// itemDistance, even if it also has a time span.
 	if (activity.supportItem.rateType === "KM") {
 		if (activity.itemDistance) {
 			lines.push({
@@ -386,7 +386,7 @@ const EXPENSE_TYPE_LABELS: Record<string, string> = {
  * for EXPENSE lines (no unit price printed). TRAVEL_TIME follows the
  * activity's own `rateType`, not this line's `unit` (which is always
  * MINUTE) — everything else follows `unit` directly. Frozen into
- * `InvoiceVersion` content at send time (docs/plans/017) alongside
+ * `InvoiceVersion` content at send time (#437) alongside
  * `lineDetailsText` so later changes here don't retroactively alter
  * historic invoices' rendered text.
  */
@@ -409,7 +409,7 @@ export function lineUnitPriceSuffix(
 
 /**
  * The printed Details-column text for a line. Frozen into `InvoiceVersion`
- * content at send time (docs/plans/017) so later changes here don't
+ * content at send time (#437) so later changes here don't
  * retroactively alter historic invoices' rendered text.
  */
 export function lineDetailsText(

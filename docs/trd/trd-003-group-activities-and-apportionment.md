@@ -1,6 +1,6 @@
 # TRD-003 — Group Activities & Apportionment
 
-**Status**: Partially delivered (plan 016 — group activities & apportionment shipped; rate-engine-dependent items remain) · **Priority**: P1 · **Depends on**: TRD-002 (rate engine) + finding #7 (invoice group double-write) · **Blocks**: TRD-007's group-cancellation rule
+**Status**: Partially delivered (#436 — group activities & apportionment shipped; rate-engine-dependent items remain) · **Priority**: P1 · **Depends on**: TRD-002 (rate engine) + finding #7 (invoice group double-write) · **Blocks**: TRD-007's group-cancellation rule
 
 ## Problem
 
@@ -55,7 +55,7 @@ The rate engine (TRD-002 D4) takes `groupSize`: per-participant unit price = min
 ### D3. Transport apportionment
 
 - ABT items (`ActivityTransportItem`) move conceptually to the session for group sessions: entered once, with a **participant subset** (default: all) among whom the cost divides equally. Per-participant line = amount ÷ |subset| at the raw rate ($0.99/km vehicle, full amount for parking/tolls), against `04_591_0136_6_1`.
-- Provider travel (to/from the session venue): apportion `transitDistance`/`transitDuration` equally across participants whose agreement allows it (default all). Kills the `0.43`/`0.49` constants (coordinate with plan 006, which unifies the travel rate source first — this TRD then generalizes ÷2 to ÷|subset|).
+- Provider travel (to/from the session venue): apportion `transitDistance`/`transitDuration` equally across participants whose agreement allows it (default all). Kills the `0.43`/`0.49` constants (coordinate with #427, which unifies the travel rate source first — this TRD then generalizes ÷2 to ÷|subset|).
 - Rounding: compute per-participant amounts to the cent; assign the remainder cent(s) to the first participant(s) so the sum equals the actual cost (property-tested).
 
 ### D4. Attendance & group cancellation

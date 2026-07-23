@@ -44,11 +44,10 @@ const defaultActivitySelect = {
 	}
 };
 
-// byId feeds the activity detail / billing-breakdown page (docs/plans/037),
-// which needs the invoice's status and the trip's sibling legs to render the
-// live breakdown and trip summary. Kept separate from defaultActivitySelect so
-// list/forInvoice payloads stay lean (a widening of the shared select is a STOP
-// condition in the plan).
+// byId feeds the activity detail / billing-breakdown page, which needs the
+// invoice's status and the trip's sibling legs to render the live breakdown
+// and trip summary. Kept separate from defaultActivitySelect so list/forInvoice
+// payloads stay lean — deliberately do not widen the shared select.
 const byIdActivitySelect = {
 	...defaultActivitySelect,
 	// Without this the page's groupSizeOf falls back to the default group size

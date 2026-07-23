@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 /**
- * The frozen shape of an `InvoiceVersion.content` jsonb document (docs/adr/0004,
- * docs/plans/017). Every read of `content` parses through this schema.
+ * The frozen shape of an `InvoiceVersion.content` jsonb document (docs/adr/0004).
+ * Every read of `content` parses through this schema.
  *
  * `schemaVersion` is the evolution mechanism: add new fields as optional; a
  * breaking shape change bumps the literal and the renderer branches on it.
@@ -10,7 +10,7 @@ import { z } from "zod";
  */
 // The printed Unit Price column's suffix. Single source of truth for the
 // "/hr" | "/km" concept shared by the live billing lines, the PDF renderer,
-// and the frozen snapshot (docs/plans/017 Step 6).
+// and the frozen snapshot.
 export const unitPriceSuffixSchema = z.enum(["hr", "km"]);
 export type UnitPriceSuffix = z.infer<typeof unitPriceSuffixSchema>;
 
@@ -24,11 +24,10 @@ export const invoiceVersionLineSchema = z.object({
 	unitPrice: z.number(),
 	total: z.number(),
 	activityId: z.string().optional(),
-	// The printed Details column, frozen so re-renders can't drift
-	// (docs/plans/017 Step 2).
+	// The printed Details column, frozen so re-renders can't drift.
 	detailsText: z.string(),
 	// The printed Unit Price column's suffix — absent for EXPENSE lines,
-	// which print no unit price (docs/plans/017 Step 6).
+	// which print no unit price.
 	unitPriceSuffix: unitPriceSuffixSchema.optional()
 });
 

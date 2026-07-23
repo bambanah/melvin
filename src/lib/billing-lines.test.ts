@@ -62,7 +62,7 @@ test("group activity's ABT DISTANCE lines at 0.49/km", () => {
 	expect(abtLine?.total).toEqual(round(10 * 0.49, 2));
 });
 
-test("group activity's TRAVEL_KM line apportions the effective rate by group size (docs/plans/016)", () => {
+test("group activity's TRAVEL_KM line apportions the effective rate by group size", () => {
 	const lines = billableLines(
 		{
 			...fullyLoadedActivity,
@@ -131,7 +131,7 @@ test("non-group activity is unaffected by groupSize apportioning", () => {
 	expect(lines.find((line) => line.kind === "ABT")?.unitPrice).toEqual(0.99);
 });
 
-test("solo activity's TRAVEL_KM line resolves the plan-006 effective rate (client → user → 0.99)", () => {
+test("solo activity's TRAVEL_KM line resolves the effective rate (client → user → 0.99)", () => {
 	const solo = { ...fullyLoadedActivity, transportItems: [] };
 
 	// Client override wins

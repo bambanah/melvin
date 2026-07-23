@@ -14,6 +14,8 @@ Sending an invoice freezes an **Invoice Version**: the _resolved output_ — lin
 
 A clean PDF can only be rendered from a version; live-data renders carry a DRAFT watermark. Sent/paid invoices — including their activities, transport items, and trips touching those activities — are locked against mutation; the explicit Amend action unlocks them, and re-sending freezes the next version. Invoices with a version can never be deleted, and neither can anything whose delete would cascade into them (clients get an active/inactive flag instead; `InvoiceVersion` FK is `onDelete: Restrict`). Existing sent/paid invoices are backfilled with a v1 from current data, flagged `backfilled`.
 
+Versions are not created by cascade, so they are not covered by the no-cascade-delete guarantee above: the **latest** version can be explicitly deleted (accident recovery for a mistaken send). Deletion is restricted to the highest ordinal so remaining versions keep a contiguous suffix sequence, and the freed number is reused on the next send rather than advancing the suffix. Dropping the sole version reverts the invoice to a draft, as if it was never sent. This is the only path that removes a version; the `onDelete: Restrict` FK still forbids cascade deletion.
+
 ## Considered options
 
 - **Store PDF bytes** — byte-exact downloads, but opaque (no display/diffing) and needs blob storage. Content-exactness is what NDIS invoicing requires; layout drift is cosmetic.

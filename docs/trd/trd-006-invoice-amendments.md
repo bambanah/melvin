@@ -1,6 +1,6 @@
 # TRD-006 — Invoice Amendments & Corrections
 
-**Status**: Delivered (plan 017, ADR-0004) — design amended from D1/D2's original mechanism, see note below · **Priority**: P2 · **Depends on**: TRD-005 D3 (send = seal point) conceptually; implementable independently against `SENT` status · **Relates to**: TRD-002 (rate snapshots), finding #9 (payment matching)
+**Status**: Delivered (#437, ADR-0004) — design amended from D1/D2's original mechanism, see note below · **Priority**: P2 · **Depends on**: TRD-005 D3 (send = seal point) conceptually; implementable independently against `SENT` status · **Relates to**: TRD-002 (rate snapshots), finding #9 (payment matching)
 
 > **Design amendment (2026-07-07)**: ADR-0004 supersedes D1/D2's mechanism.
 > Amendments are **versions within one Invoice** (`InvoiceVersion` jsonb
@@ -9,7 +9,7 @@
 > row carries payment state; `paidAt` is stamped onto the paid version before
 > an amendment clears it). D4's guard rails, the migration approach, the
 > testing notes, and the answered open questions carry forward unchanged.
-> Implementation: docs/plans/017-invoice-versioning.md.
+> Implementation: #437.
 
 ## Problem
 
@@ -83,7 +83,7 @@ status          InvoiceStatus  // + AMENDED terminal state for the original
 - Byte-stability: seal an invoice, change every upstream input (rates, client transit rate, support item codes, activity times via direct DB write), re-render → identical PDF. This is the headline regression test.
 - Amendment E2E: send → amend → edit activity → send amendment → original AMENDED + excluded from owing totals; PDF header references original; payment on original migrates to head.
 - Chain: amend twice; assert only head payable; invoice list shows the chain sensibly (one logical row, expandable).
-- Guard: editing sealed activity blocked in both UI and router (router-level test — ownership-scoping harness from docs/plans/003 is the right home).
+- Guard: editing sealed activity blocked in both UI and router (router-level test — ownership-scoping harness from #424 is the right home).
 
 ## Open questions
 

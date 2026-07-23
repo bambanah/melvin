@@ -1,12 +1,12 @@
 # TRD-002 — Support Item Catalogue & Rate Engine
 
-**Status**: Proposed · **Priority**: P1 · **Depends on**: docs/plans/004 (8pm boundary), docs/plans/005 (characterization tests), docs/plans/006 (travel-rate single source) · **Blocks**: TRD-003 (group limits), TRD-007 (cancellation rates), TRD-001 D6 (billing receipt)
+**Status**: Proposed · **Priority**: P1 · **Depends on**: #425 (8pm boundary), #426 (characterization tests), #427 (travel-rate single source) · **Blocks**: TRD-003 (group limits), TRD-007 (cancellation rates), TRD-001 D6 (billing receipt)
 
 ## Problem
 
 Melvin's pricing knowledge is typed in by hand from a PDF and then trusted forever:
 
-- Support items are created by manually entering four codes + four rates; the in-app reference link is the 2024-25 price guide. The bundled autocomplete/code-mapping JSON (`ndis-support-catalogue.json`, refreshed to 2026-27 by plan 021) silently drives the travel/ABT code lookups on every invoice — the refresh fixed the stale-year problem, but the underlying design (a single hardcoded-year snapshot, not effective-dated data) still rolls over to another manual refresh next year.
+- Support items are created by manually entering four codes + four rates; the in-app reference link is the 2024-25 price guide. The bundled autocomplete/code-mapping JSON (`ndis-support-catalogue.json`, refreshed to 2026-27 by #441) silently drives the travel/ABT code lookups on every invoice — the refresh fixed the stale-year problem, but the underlying design (a single hardcoded-year snapshot, not effective-dated data) still rolls over to another manual refresh next year.
 - There is **no public-holiday tier** anywhere (schema, form, rate resolution) — PH work bills at weekend rates at best (~$60/h under-billed) and `isHoliday()` is display-only, current-year-only, and missing Easter and all state holidays.
 - Rates are **not effective-dated**: NDIS limits changed on 1 Jul 2026 (two days ago); a July invoice covering June work needs both years' limits. Today the user would overwrite rates in place, corrupting historical invoices' regenerated PDFs.
 - Custom per-client rates (`SupportItemRates`) validate against nothing, and `getRateForDay` picks the first rate row with the day populated — when callers pass rates for multiple clients (the invoice-list total path does), one client's negotiated rate can bleed into another's total.
@@ -57,7 +57,7 @@ The catalogue is flat; Melvin's `SupportItem` concept ("the thing I bill this ki
 
 ### D4. Rate resolution engine
 
-Single pure module (deepen per `docs/plans/013-architecture-deepening.md` #1's philosophy):
+Single pure module (deepen per #434 #1's philosophy):
 
 ```
 resolveRate(input: {
@@ -85,7 +85,7 @@ Client rate scoping: resolution receives _only_ the rates for the activity's cli
 
 ### D6. Consumers
 
-- `getRateForActivity` / `getTotalCostOfActivities` / `pdf-generation.ts` all become callers of the engine (plan 006 will have already unified the travel rate; this absorbs it).
+- `getRateForActivity` / `getTotalCostOfActivities` / `pdf-generation.ts` all become callers of the engine (#427 will have already unified the travel rate; this absorbs it).
 - TRD-001's billing receipt renders `variant + unitPrice + warnings`.
 - Invoice creation surfaces blocking warnings ("2 activities have rate warnings") before generating.
 

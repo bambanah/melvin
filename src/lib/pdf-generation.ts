@@ -87,9 +87,8 @@ export const loadInvoiceForPdf = async (
  * A single printed table row's worth of data, already resolved to exactly
  * what's printed — no `kind`-specific branching left to do, and no live
  * `Activity` reference needed. Both rendering sources (live activities via
- * plan 007's `billableLines`, and a frozen `InvoiceVersion.content`) build
- * this shape so the drawing code below is source-agnostic (docs/plans/017
- * Step 6).
+ * `billableLines`, and a frozen `InvoiceVersion.content`) build this shape so
+ * the drawing code below is source-agnostic.
  */
 interface PdfLine {
 	description: string;
@@ -359,7 +358,7 @@ export const renderInvoicePdf = (
 /**
  * Renders a frozen `InvoiceVersion.content` document — no live reads, so a
  * sent/paid invoice's clean PDF renders byte-identically no matter what
- * changes upstream afterwards (docs/plans/017 Step 6).
+ * changes upstream afterwards.
  */
 export const renderInvoiceVersionPdf = (
 	content: InvoiceVersionContent
@@ -383,8 +382,8 @@ export interface GeneratePdfOptions {
 }
 
 /**
- * Resolves which of the two data sources above to render from
- * (docs/plans/017 Step 6): an explicit version number always wins; failing
+ * Resolves which of the two data sources above to render from: an explicit
+ * version number always wins; failing
  * that, a locked (non-draft) invoice renders its latest version; a draft
  * invoice renders live data with the DRAFT watermark.
  */

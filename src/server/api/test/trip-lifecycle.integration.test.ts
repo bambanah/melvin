@@ -142,8 +142,8 @@ describe("trip.removeActivity", () => {
 
 		// NOTE: the standalone-restore formula (distanceToClient * 2,
 		// travelTimeToClient * 2, uncapped) intentionally diverges from what
-		// calculateTripTransit would compute for a single-activity list — see
-		// plan 008's "uncapped-restore divergence". Asserting against the
+		// calculateTripTransit would compute for a single-activity list — the
+		// uncapped-restore divergence. Asserting against the
 		// router's actual formula here, not against calculateTripTransit.
 		const removed = await prisma.activity.findUniqueOrThrow({
 			where: { id: a2.id }
@@ -194,7 +194,7 @@ describe("trip.delete", () => {
 		await caller.trip.delete({ tripId: trip.id });
 
 		// NOTE: same uncapped-restore formula as trip.removeActivity's
-		// dissolve/standalone path — see plan 008.
+		// dissolve/standalone path.
 		for (const [activity, client] of [
 			[a1, clients[0]],
 			[a2, clients[1]],

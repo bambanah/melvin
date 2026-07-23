@@ -132,7 +132,7 @@ test("amend unlocks a PAID invoice back to CREATED, and re-sending adds v2 with 
 	expect(amended.paidAt).toBeNull();
 
 	// The paid version keeps its own paidAt even after the invoice-level
-	// field is cleared by amend (docs/plans/017 Step 3).
+	// field is cleared by amend.
 	const v1 = await prisma.invoiceVersion.findFirstOrThrow({
 		where: { invoiceId: invoice.id, versionNumber: 1 }
 	});

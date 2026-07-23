@@ -22,7 +22,7 @@ const EditInvoice = () => {
 		id: invoiceId ?? ""
 	});
 
-	// A sent/paid invoice is locked (docs/plans/017 Step 4) — amend it
+	// A sent/paid invoice is locked — amend it
 	// first rather than editing it directly.
 	useEffect(() => {
 		if (invoice && invoice.status !== InvoiceStatus.CREATED) {

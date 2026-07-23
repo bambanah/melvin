@@ -84,7 +84,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 			.then(invalidateInvoice);
 	};
 
-	// docs/plans/017 Step 7: draft downloads carry a DRAFT watermark; a sent
+	// Draft downloads carry a DRAFT watermark; a sent
 	// invoice's download is the frozen version the server resolves.
 	const downloadInvoicePdf = async (versionNumber?: number) => {
 		const dataUrl = await trpcUtils.pdf.forInvoice.fetch({

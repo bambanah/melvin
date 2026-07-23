@@ -83,7 +83,7 @@ function ownedInvoice(prisma: PrismaClient, ownerId: string) {
 			if (!record) notFound();
 			return record;
 		},
-		/** Throws NOT_FOUND if unowned, CONFLICT if sent/paid (docs/plans/017 Step 4). */
+		/** Throws NOT_FOUND if unowned, CONFLICT if sent/paid. */
 		async assertUnlocked(id: string) {
 			const record = await model.findFirst({
 				where: { id, ownerId },
@@ -130,7 +130,7 @@ function ownedActivity(prisma: PrismaClient, ownerId: string) {
 		},
 		/**
 		 * Throws CONFLICT if any of these activities sits on a sent/paid
-		 * invoice (docs/plans/017 Step 4). A no-op for activities with no
+		 * invoice. A no-op for activities with no
 		 * invoice, or whose invoice is still a draft (ADR 0003 still applies
 		 * there).
 		 */

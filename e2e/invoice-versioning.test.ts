@@ -9,7 +9,7 @@ import {
 } from "./test-utils";
 
 /**
- * The Step 7 journey from docs/plans/017-invoice-versioning.md: create →
+ * The end-to-end invoice-versioning journey: create →
  * download draft (watermarked) → send & download (clean v1) → amend
  * (confirm) → edit an activity → send → v2 with the supersedes line; both
  * versions stay downloadable; the list shows one row for the one invoice.

@@ -9,7 +9,7 @@ import { extractPdfText } from "@/lib/testing/pdf-test-utils";
 import { describe, expect, test } from "vitest";
 
 // pdfjs breaks under the project-default jsdom environment, hence the
-// node environment directive above (docs/plans/017 Step 6).
+// node environment directive above.
 
 describe("draft (live) rendering", () => {
 	test("no watermark by default", async () => {

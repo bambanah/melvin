@@ -1,6 +1,6 @@
 # TRD-004 — Provider Travel & Trips UX
 
-**Status**: Proposed · **Priority**: P2 · **Depends on**: docs/plans/006 (travel-rate single source), docs/plans/005 (characterization tests); coordinates with finding #8 (trip mutation robustness) and #12 (duplicate trip modals)
+**Status**: Proposed · **Priority**: P2 · **Depends on**: #427 (travel-rate single source), #426 (characterization tests); coordinates with finding #8 (trip mutation robustness) and #12 (duplicate trip modals)
 
 ## Problem
 
@@ -57,7 +57,7 @@ model ClientPairDistance { fromClientId; toClientId; distance; duration; updated
 
 ## Testing notes
 
-- Characterization first (plan 005 covers trip transit; extend for `bulkAdd`-created trips).
+- Characterization first (#426 covers trip transit; extend for `bulkAdd`-created trips).
 - Unit: leg resolution order (remembered pair → reversed pair → prompt); cap by region; first/middle/last allocation unchanged (regression on ADR-0001 semantics).
 - E2E: quick-form 3 contiguous activities with one known and one unknown pair → single prompt for the unknown → trip complete; invoice shows travel labour + non-labour lines per leg owner.
 - Golden invoice: fixture trip reproducing the PAPL single-participant worked example ($41.67 time + $46.80 km on $50/h, 25 min + 60 km legs — `provider-travel.md`).

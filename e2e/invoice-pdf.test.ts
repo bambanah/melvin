@@ -68,7 +68,7 @@ test("Realistic plan-managed invoice: group and solo travel codes in the PDF", a
 	expect(text).toContain("04_591_0136_6_1"); // group activity transport
 	expect(text).toContain("$0.49/km");
 	expect(text).toContain("04_799_0136_6_1"); // group non-labour travel
-	// docs/plans/016: group provider travel apportions the effective rate by
+	// Group provider travel apportions the effective rate by
 	// group size (defaults to 2) — testUser's transitRatePerKm is 0.99 (schema
 	// default), which coincides with the ABT group rate above.
 	expect(text).toContain(`$${floorToCent(0.99 / 2).toFixed(2)}/km`);
@@ -79,8 +79,7 @@ test("Realistic plan-managed invoice: group and solo travel codes in the PDF", a
 	expect(text).toContain("13:20-14:25 (1 hour, 5 mins)");
 
 	// The printed Total equals getTotalCostOfActivities over the same
-	// activities — group travel priced at the apportioned rate on both sides
-	// (Q1 fixed; docs/plans/016)
+	// activities — group travel priced at the apportioned rate on both sides.
 	expect(text).toContain(`$${expectedPdfTotal.toFixed(2)}`);
 });
 

@@ -250,7 +250,7 @@ export const supportItemRouter = router({
 
 			// The schema cascade-deletes Activity rows on SupportItem delete —
 			// without this guard that would silently eat a sent invoice's
-			// frozen-in-spirit activities (docs/plans/017 Step 4).
+			// frozen-in-spirit activities.
 			const lockedActivity = await ctx.prisma.activity.findFirst({
 				where: {
 					supportItemId: input.id,

@@ -48,7 +48,7 @@ async function createLegacySentInvoice(
 		}
 	});
 
-	// Simulate a pre-plan-017 SENT/PAID invoice: status set directly, no
+	// Simulate a pre-versioning SENT/PAID invoice: status set directly, no
 	// InvoiceVersion row — this is exactly what `send` could never produce
 	// after this plan, but is the real shape of historic data.
 	const sentAt = new Date("2024-01-05");

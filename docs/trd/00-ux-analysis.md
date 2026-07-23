@@ -12,7 +12,7 @@ This document analyses each flow as it exists at commit `c48e1dd` + working-tree
 
 The note app's actual feature set: **instant open, zero navigation, works offline, never loses input, accepts any format, no login**. Melvin must match the first four; the last two are structural (format: the quick-entry form's chips + single time field are close enough; login: session persistence must just never interrupt capture).
 
-The quick-activity-entry work (plan 012, already shipped) got the _form_ right. What still loses to the note:
+The quick-activity-entry work (#433, already shipped) got the _form_ right. What still loses to the note:
 
 | #   | Friction                            | Detail                                                                                                                                                                                                                                                                                                                                        | Fix               |
 | --- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
@@ -33,7 +33,7 @@ Dashboard calendar → FAB `+` → dialog: date (defaults today), per row: clien
 
 ### 2.2 Activity entry (full form)
 
-Separate page with react-hook-form; transit distance/duration fields editable; single transport item slot; support item select. Used for edits. Two divergent forms already drifted (transport amount parsing bug was fixed in one, then the other — plan 015, `docs/plans/015-transport-amount-validation.md`). Keep both, but TRD-001 makes the quick form complete enough that the full form is only for edits.
+Separate page with react-hook-form; transit distance/duration fields editable; single transport item slot; support item select. Used for edits. Two divergent forms already drifted (transport amount parsing bug was fixed in one, then the other — #435). Keep both, but TRD-001 makes the quick form complete enough that the full form is only for edits.
 
 ### 2.3 Auto-filled transit
 
@@ -79,4 +79,4 @@ WIP form creates 2 mirrored Activity records; transport on primary only; group r
 | TRD-006 | Invoice amendment & corrections      | Required by plan-managed payers; unblocks trust in "Sent".                                                                        |
 | TRD-007 | Cancellations & NF2F claims          | New revenue surfaces that currently live in the note app (F6).                                                                    |
 
-Sequencing assumption (per product owner): security/correctness plans `docs/plans/001-006` land **before** all of this. TRD-002 additionally builds on plan 006 (single travel-rate source) and plan 004 (8pm boundary); TRD-003 must reconcile the group-form WIP in the working tree before starting.
+Sequencing assumption (per product owner): security/correctness plans #422-#427 land **before** all of this. TRD-002 additionally builds on #427 (single travel-rate source) and #425 (8pm boundary); TRD-003 must reconcile the group-form WIP in the working tree before starting.

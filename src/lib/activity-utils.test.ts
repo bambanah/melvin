@@ -222,7 +222,7 @@ test("Should include activity based transport items in total", () => {
 		])
 	).toEqual(77.25); // 55.47 + 22 * 0.99
 
-	// DISTANCE group (N=2, docs/plans/016): support and ABT both apportioned
+	// DISTANCE group (N=2): support and ABT both apportioned
 	// by group size — floorToCent(55.47/2) + 22 * floorToCent(0.99/2)
 	expect(
 		getTotalCostOfActivities([
@@ -291,7 +291,7 @@ test("Should use itemDistance when activity has no start/end times", () => {
 	).toEqual(28.9); // 34 * 0.85
 });
 
-// Plan 007: support-line math now gates on rateType (matching the PDF)
+// Support-line math now gates on rateType (matching the PDF)
 // instead of "does a time span exist". A KM-rate item bills by itemDistance
 // even when it also has a time span — the inverse of the old default-gating
 // rule, which is exactly why that default doesn't apply to real data (every
@@ -355,7 +355,7 @@ test("Should resolve transit rate with correct precedence", () => {
 });
 
 test("Group branch beats a client transit rate override", () => {
-	// Group transit still resolves client → user → default first (docs/plans/016);
+	// Group transit still resolves client → user → default first;
 	// the client override wins over both the rateContext and the 0.99 default,
 	// then the effective rate is apportioned by group size (N=2 default).
 	const groupActivityWithClientOverride = {
@@ -372,8 +372,8 @@ test("Group branch beats a client transit rate override", () => {
 
 test("Should return correct total for group activities", () => {
 	// Group activities apportion every rate category by group size (N=2
-	// default when unset) — hourly support/labour-travel and transit per-km
-	// (docs/plans/016). Support rate: floorToCent(55.47/2) = 27.73.
+	// default when unset) — hourly support/labour-travel and transit per-km.
+	// Support rate: floorToCent(55.47/2) = 27.73.
 	expect(
 		getTotalCostOfActivities([
 			getActivity("weekday", "16:00", "17:00", 0, 0, true)
