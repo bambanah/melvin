@@ -132,6 +132,7 @@ const CalendarView = () => {
 			/>
 
 			<MultiActivityForm
+				key={quickAddDay?.toISOString() ?? "closed"}
 				date={quickAddDay?.toDate() ?? null}
 				open={quickAddDay !== null}
 				onOpenChange={(open) => {

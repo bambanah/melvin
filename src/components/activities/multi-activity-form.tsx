@@ -18,6 +18,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { stripTimezone } from "@/lib/date-utils";
+import {
+	appendParticipant,
+	removeParticipantAt,
+	setParticipantAt
+} from "@/lib/group-participants";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import type {
@@ -25,22 +30,16 @@ import type {
 	ActivityTransportItemSchema
 } from "@/schema/activity-schema";
 import {
-	appendParticipant,
-	removeParticipantAt,
-	setParticipantAt
-} from "@/lib/group-participants";
-import {
 	MAX_ADDITIONAL_GROUP_PARTICIPANTS,
 	totalGroupSize
 } from "@/schema/invoice-schema";
-import dayjs from "dayjs";
 import {
 	ChevronDown,
 	ChevronUp,
+	Link2,
 	Loader2,
 	Plus,
 	Trash2,
-	Link2,
 	Users
 } from "lucide-react";
 import { useState } from "react";
