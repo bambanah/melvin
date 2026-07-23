@@ -36,7 +36,10 @@ An Activity not yet attached to any Invoice. Pending Activities are grouped by C
 A participant receiving NDIS-funded support. Has a stored `distanceToClient` used to calculate Provider Travel. Either active (a current client) or inactive (a former client, hidden from pickers but retained with full invoice history). A Client with any sent Invoice cannot be deleted — only deactivated.
 
 **Trip**
-A group of back-to-back Activities on the same day where transit is shared. The first activity's transit is from home, middle activities have inter-client transit, and the last activity includes the return leg.
+A group of back-to-back Activities on the same day where transit is shared. The first leg's transit is from home, middle legs have inter-client transit, and the last leg includes the return segment.
+
+**Leg**
+One Activity within a Trip. Legs are ordered by start time; a leg is the first, a middle, or the last of its Trip, which determines how its Provider Travel is derived.
 
 **Support Item**
 An NDIS line item with a code, description, and rates. Activities are billed against a Support Item. Carries a Rate Type and up to four Day Rates.
@@ -60,8 +63,11 @@ One priced row on an invoice. An Activity expands into lines of five kinds: the 
 **Provider Travel**
 Driving to and from clients (home → client → home). Billed in two parts: **labour costs** — the travel minutes, charged at the Activity's resolved hourly Day Rate — and **non-labour costs** — the kilometres, charged at the Transit Rate under the Registration Group's travel code. Stored as `transitDuration` and `transitDistance` on Activity, calculated automatically from the Client's stored distance/travel time and Trip structure.
 
+**Transit Segment**
+One span of driving between two points in a Trip: home to the first leg, one leg to the next, or the last leg back home. Every gap between (or bracketing) legs is a Transit Segment. **Inter-Client Transit** is the specific kind connecting two legs; the home segments are derived from the Client's stored `distanceToClient` rather than entered.
+
 **Inter-Client Transit**
-The distance and travel time between two clients in a Trip. Entered manually by the provider for each leg. Used to calculate Provider Travel for middle and last activities in a Trip.
+A Transit Segment connecting two legs of a Trip - the distance and travel time between the two clients. Entered manually by the provider for each such segment. Used to calculate Provider Travel for middle and last legs in a Trip.
 
 **Transit Rate**
 The per-kilometre rate charged for Provider Travel non-labour costs. Defaults to the User's configured rate (max $0.99/km per NDIS rules). Can be overridden per Client. For group activities, the resolved rate is apportioned by participant count — see **Group Activity**.

@@ -44,6 +44,60 @@ const defaultActivitySelect = {
 	}
 };
 
+// byId feeds the activity detail / billing-breakdown page (docs/plans/037),
+// which needs the invoice's status and the trip's sibling legs to render the
+// live breakdown and trip summary. Kept separate from defaultActivitySelect so
+// list/forInvoice payloads stay lean (a widening of the shared select is a STOP
+// condition in the plan).
+const byIdActivitySelect = {
+	...defaultActivitySelect,
+	invoice: {
+		select: {
+			invoiceNo: true,
+			id: true,
+			status: true
+		}
+	},
+	trip: {
+		select: {
+			id: true,
+			date: true,
+			activities: {
+				select: {
+					id: true,
+					startTime: true,
+					endTime: true,
+					itemDistance: true,
+					transitDistance: true,
+					transitDuration: true,
+					client: {
+						select: {
+							id: true,
+							name: true,
+							distanceToClient: true,
+							travelTimeToClient: true,
+							transitRatePerKm: true
+						}
+					},
+					supportItem: {
+						select: {
+							description: true
+						}
+					}
+				}
+			},
+			interClientLegs: {
+				select: {
+					fromActivityId: true,
+					toActivityId: true,
+					distance: true,
+					duration: true
+				}
+			}
+		}
+	}
+};
+
 function getInvoiceIdWhereCondition(invoiceIdAssigned?: boolean) {
 	if (invoiceIdAssigned === undefined) return;
 
@@ -150,7 +204,7 @@ export const activityRouter = router({
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
 			const activity = await ctx.owned.activity.findFirst({
-				select: defaultActivitySelect,
+				select: byIdActivitySelect,
 				where: {
 					id: input.id
 				}

@@ -66,7 +66,7 @@ export interface TransitRateContext {
 
 const DEFAULT_TRANSIT_RATE = 0.99;
 
-const DEFAULT_ACTIVITY_TRANSPORT_RATE = 0.99;
+export const DEFAULT_ACTIVITY_TRANSPORT_RATE = 0.99;
 
 /**
  * The number of participants a group activity's rate is divided across.
@@ -165,17 +165,24 @@ export const getRateForActivity = (
 	return [activity.supportItem.weekdayCode, Number(rate)];
 };
 
+/** The non-labour travel rate per km before any group apportionment: client → user → default. */
+export function getBaseTransitRate(
+	activity: BillableActivity,
+	rateContext?: TransitRateContext
+): number {
+	return (
+		Number(activity.client?.transitRatePerKm) ||
+		rateContext?.userTransitRatePerKm ||
+		DEFAULT_TRANSIT_RATE
+	);
+}
+
 /** The effective non-labour travel rate per km: client → user → default, apportioned by group size. */
 export function getTransitRate(
 	activity: BillableActivity,
 	rateContext?: TransitRateContext
 ): number {
-	const effectiveRate =
-		Number(activity.client?.transitRatePerKm) ||
-		rateContext?.userTransitRatePerKm ||
-		DEFAULT_TRANSIT_RATE;
-
-	return apportion(effectiveRate, activity);
+	return apportion(getBaseTransitRate(activity, rateContext), activity);
 }
 
 export type LineKind =
@@ -323,7 +330,7 @@ export function billableLines(
 		const activityTransportRate = apportion(
 			DEFAULT_ACTIVITY_TRANSPORT_RATE,
 			activity
-		);
+		); // base rate exported for the breakdown page's apportionment display
 		const transportCode =
 			getActivityBasedTransportCode(activity.supportItem.weekdayCode) ?? "";
 

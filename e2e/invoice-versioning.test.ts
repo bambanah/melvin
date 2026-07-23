@@ -101,11 +101,7 @@ test("Invoice versioning journey: draft → send → amend → edit → re-send 
 		.getByRole("link")
 		.filter({ hasText: supportItem.description })
 		.click();
-	await page
-		.locator("div")
-		.filter({ hasText: new RegExp(`^${supportItem.description}$`) })
-		.getByRole("button")
-		.click();
+	await page.getByRole("button", { name: "Activity actions" }).click();
 	await page.getByRole("menuitem", { name: "Edit" }).click();
 	await page.getByLabel("Start Time").fill("09:30");
 	await page.getByLabel("End Time").fill("11:00");

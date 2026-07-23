@@ -38,11 +38,7 @@ test("Can edit activity", async ({ page }) => {
 		.filter({ hasText: supportItem.description })
 		.click();
 
-	await page
-		.locator("div")
-		.filter({ hasText: new RegExp(`^${supportItem.description}$`) })
-		.getByRole("button")
-		.click();
+	await page.getByRole("button", { name: "Activity actions" }).click();
 	await page.getByRole("menuitem", { name: "Edit" }).click();
 
 	await page.getByLabel("Start Time").fill("11:30");
@@ -50,6 +46,26 @@ test("Can edit activity", async ({ page }) => {
 	await page.getByRole("button", { name: "Update" }).click();
 	await waitForAlert(page, "activity updated");
 	await expect(page).toHaveURL(`/dashboard/activities/${activity.id}`);
+});
+
+test("Activity detail shows the billing breakdown", async ({ page }) => {
+	const client = await createRandomClient();
+	const supportItem = await createRandomSupportItem();
+	const activity = await createRandomActivity(client.id, supportItem.id, {
+		startTime: "09:00",
+		endTime: "10:00"
+	});
+
+	await page.goto(`/dashboard/activities/${activity.id}`);
+
+	// Header surfaces the support item code the SUPPORT line bills under (it
+	// also appears on the SUPPORT breakdown row, hence `.first()`).
+	await expect(page.getByText(supportItem.weekdayCode).first()).toBeVisible();
+	// Uninvoiced activities read as Pending.
+	await expect(page.getByText("Pending")).toBeVisible();
+	// The centrepiece breakdown with a priced total.
+	await expect(page.getByText("Billing breakdown")).toBeVisible();
+	await expect(page.getByTestId("breakdown-total")).toContainText("$");
 });
 
 test("Can delete activity", async ({ page }) => {
@@ -67,11 +83,7 @@ test("Can delete activity", async ({ page }) => {
 		.filter({ hasText: supportItem.description })
 		.click();
 
-	await page
-		.locator("div")
-		.filter({ hasText: new RegExp(`^${supportItem.description}$`) })
-		.getByRole("button")
-		.click();
+	await page.getByRole("button", { name: "Activity actions" }).click();
 	page.once("dialog", (dialog) => {
 		dialog.accept().catch(() => {});
 	});
