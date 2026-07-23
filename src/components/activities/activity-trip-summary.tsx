@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import {
 	calculateTripTransit,
 	sortActivitiesByTime,
@@ -7,7 +6,6 @@ import {
 import type { ActivityByIdOutput } from "@/server/api/routers/activity-router";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { MapPin } from "lucide-react";
 import Link from "next/link";
 
 dayjs.extend(require("dayjs/plugin/utc"));
@@ -25,9 +23,9 @@ const positionLabel = (index: number, count: number) => {
 
 const timeSpan = (leg: Leg) =>
 	leg.startTime && leg.endTime
-		? `${dayjs.utc(leg.startTime).format("HH:mm")} - ${dayjs
+		? `${dayjs.utc(leg.startTime).format("h:mma")} - ${dayjs
 				.utc(leg.endTime)
-				.format("HH:mm")}`
+				.format("h:mma")}`
 		: null;
 
 function LegRow({
@@ -44,40 +42,66 @@ function LegRow({
 	transit?: TransitValues;
 }) {
 	const span = timeSpan(leg);
-	const inner = (
+	const hasTransit =
+		transit && (transit.transitDistance > 0 || transit.transitDuration > 0);
+
+	const content = (
 		<div
 			className={cn(
-				"flex flex-col gap-1 rounded-md border p-3",
-				isCurrent
-					? "border-primary bg-primary/5"
-					: "hover:bg-foreground/5 transition-colors"
+				"flex min-w-0 flex-1 flex-col gap-0.5 rounded-lg px-3 py-2",
+				isCurrent ? "bg-primary/5" : "hover:bg-foreground/5 transition-colors"
 			)}
 		>
-			<div className="flex items-center justify-between gap-2">
-				<span className="font-medium">
+			<div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+				<p className="text-sm font-medium">
 					{leg.client?.name ?? "Unknown client"}
-				</span>
-				<Badge variant="secondary">{positionLabel(index, count)}</Badge>
+				</p>
+				{isCurrent && (
+					<span className="text-primary text-xs font-medium tracking-wide uppercase">
+						This activity
+					</span>
+				)}
 			</div>
-			{span && <p className="text-foreground/70 text-sm">{span}</p>}
-			{transit &&
-				(transit.transitDistance > 0 || transit.transitDuration > 0) && (
-					<p className="text-foreground/60 text-xs">
-						Provider travel: {transit.transitDistance} km ·{" "}
+			{span && <p className="text-foreground/60 text-xs">{span}</p>}
+			<p className="text-foreground/50 text-xs">
+				{positionLabel(index, count)}
+				{hasTransit && (
+					<>
+						{" "}
+						· {transit.transitDistance} km ·{" "}
 						{formatMinutes(transit.transitDuration)}
 						{index === count - 1 && count > 1 && " (incl. return home)"}
 						{transit.durationCapped && " · capped at 30 min"}
-					</p>
+					</>
 				)}
+			</p>
 		</div>
 	);
 
-	if (isCurrent) return inner;
-
 	return (
-		<Link href={`/dashboard/activities/${leg.id}`} className="block">
-			{inner}
-		</Link>
+		<li className="flex gap-3">
+			<div className="flex flex-col items-center pt-3">
+				<span
+					className={cn(
+						"h-3 w-3 shrink-0 rounded-full",
+						isCurrent
+							? "bg-primary ring-primary/20 ring-4"
+							: "border-foreground/30 bg-card border-2"
+					)}
+				/>
+				{index < count - 1 && <span className="bg-border mt-1 w-px flex-1" />}
+			</div>
+			{isCurrent ? (
+				<div className="min-w-0 flex-1 pb-4">{content}</div>
+			) : (
+				<Link
+					href={`/dashboard/activities/${leg.id}`}
+					className="min-w-0 flex-1 pb-4"
+				>
+					{content}
+				</Link>
+			)}
+		</li>
 	);
 }
 
@@ -99,13 +123,21 @@ function ActivityTripSummary({
 	}
 
 	return (
-		<div className="flex flex-col gap-3 rounded-lg border p-4">
-			<div className="flex items-center gap-2">
-				<MapPin className="h-4 w-4" />
-				<p className="font-semibold">Trip ({sorted.length} legs)</p>
+		<section className="bg-card overflow-hidden rounded-xl border">
+			<div className="flex items-baseline justify-between gap-2 border-b px-5 py-3.5">
+				<h2 className="text-sm font-semibold">
+					Trip
+					<span className="text-foreground/50 font-normal">
+						{" "}
+						· {sorted.length} stops
+					</span>
+				</h2>
+				<p className="text-foreground/60 text-xs tabular-nums">
+					{totalDistance} km · {formatMinutes(totalDuration)} transit
+				</p>
 			</div>
 
-			<div className="flex flex-col gap-2">
+			<ol className="flex flex-col px-4 pt-3 pb-0">
 				{sorted.map((leg, index) => (
 					<LegRow
 						key={leg.id}
@@ -116,15 +148,8 @@ function ActivityTripSummary({
 						transit={transit.get(leg.id)}
 					/>
 				))}
-			</div>
-
-			<div className="flex items-center justify-between border-t pt-3 text-sm">
-				<p className="font-semibold">Total trip transit</p>
-				<p className="font-semibold">
-					{totalDistance} km · {formatMinutes(totalDuration)}
-				</p>
-			</div>
-		</div>
+			</ol>
+		</section>
 	);
 }
 

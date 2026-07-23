@@ -51,6 +51,9 @@ const defaultActivitySelect = {
 // condition in the plan).
 const byIdActivitySelect = {
 	...defaultActivitySelect,
+	// Without this the page's groupSizeOf falls back to the default group size
+	// and renders the wrong apportionment for groups of 3+.
+	groupSize: true,
 	invoice: {
 		select: {
 			invoiceNo: true,

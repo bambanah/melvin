@@ -27,7 +27,7 @@ function ApportionmentNote({
 	suffix?: string;
 }) {
 	return (
-		<p className="text-foreground/60 text-xs">
+		<p className="text-foreground/50 text-xs tabular-nums">
 			{formatCurrency(apportionment.baseUnitPrice)}
 			{suffixLabel(suffix)} ÷ {apportionment.groupSize} ={" "}
 			{formatCurrency(apportionment.apportionedUnitPrice)}
@@ -44,15 +44,18 @@ function BreakdownRowItem({
 	showCapNote: boolean;
 }) {
 	return (
-		<div className="flex items-start justify-between gap-4 py-3">
-			<div className="flex flex-col gap-0.5">
-				<p className="font-medium">{row.description}</p>
-				{row.supportItemCode && (
-					<p className="text-foreground/50 font-mono text-xs">
-						{row.supportItemCode}
-					</p>
-				)}
-				<p className="text-foreground/70 text-sm">{row.detailsText}</p>
+		<div className="flex items-start justify-between gap-6 py-4">
+			<div className="flex min-w-0 flex-col gap-0.5">
+				<p className="text-sm font-medium">{row.description}</p>
+				<p className="text-foreground/60 text-xs">
+					{row.detailsText}
+					{row.supportItemCode && (
+						<span className="text-foreground/40 font-mono text-xs">
+							{" "}
+							· {row.supportItemCode}
+						</span>
+					)}
+				</p>
 				{row.apportionment && (
 					<ApportionmentNote
 						apportionment={row.apportionment}
@@ -65,10 +68,12 @@ function BreakdownRowItem({
 					</Badge>
 				)}
 			</div>
-			<div className="flex shrink-0 flex-col items-end">
-				<p className="font-semibold">{formatCurrency(row.total)}</p>
+			<div className="flex shrink-0 flex-col items-end gap-0.5">
+				<p className="text-sm font-semibold tabular-nums">
+					{formatCurrency(row.total)}
+				</p>
 				{row.unitPriceSuffix && (
-					<p className="text-foreground/60 text-xs">
+					<p className="text-foreground/50 text-xs tabular-nums">
 						{formatCurrency(row.unitPrice)}
 						{suffixLabel(row.unitPriceSuffix)}
 					</p>
@@ -103,15 +108,15 @@ function ActivityBreakdown({
 	const groupSize = groupSizeOf(activity);
 
 	return (
-		<div className="flex flex-col gap-1 rounded-lg border p-4">
-			<div className="flex items-center justify-between">
-				<p className="font-semibold">Billing breakdown</p>
+		<section className="bg-card overflow-hidden rounded-xl border">
+			<div className="flex items-center justify-between gap-2 border-b px-5 py-3.5">
+				<h2 className="text-sm font-semibold">Billing breakdown</h2>
 				{groupSize > 1 && (
 					<Badge variant="secondary">Group of {groupSize}</Badge>
 				)}
 			</div>
 
-			<div className="divide-y">
+			<div className="divide-y px-5">
 				{rows.map((row, index) => (
 					<BreakdownRowItem
 						key={`${row.kind}-${index}`}
@@ -121,23 +126,28 @@ function ActivityBreakdown({
 				))}
 			</div>
 
-			<div className="mt-2 flex items-center justify-between border-t pt-3">
-				<p className="font-semibold">Total</p>
-				<p className="text-lg font-semibold" data-testid="breakdown-total">
-					{formatCurrency(total)}
-				</p>
-			</div>
-
-			{showLiveRatesCaveat && (
-				<div className="text-foreground/60 mt-2 flex items-start gap-2 text-xs">
-					<Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-					<p>
-						Reflects current rates - see the invoice for the amount actually
-						billed.
+			<div className="bg-muted/40 flex flex-col gap-2 border-t px-5 py-4">
+				<div className="flex items-baseline justify-between gap-4">
+					<p className="text-foreground/70 text-sm font-medium">Total</p>
+					<p
+						className="text-lg font-semibold tracking-tight tabular-nums"
+						data-testid="breakdown-total"
+					>
+						{formatCurrency(total)}
 					</p>
 				</div>
-			)}
-		</div>
+
+				{showLiveRatesCaveat && (
+					<div className="text-foreground/50 flex items-start gap-1.5 text-xs">
+						<Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+						<p>
+							Reflects current rates - see the invoice for the amount actually
+							billed.
+						</p>
+					</div>
+				)}
+			</div>
+		</section>
 	);
 }
 

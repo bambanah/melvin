@@ -38,8 +38,7 @@ test("Can edit activity", async ({ page }) => {
 		.filter({ hasText: supportItem.description })
 		.click();
 
-	await page.getByRole("button", { name: "Activity actions" }).click();
-	await page.getByRole("menuitem", { name: "Edit" }).click();
+	await page.getByRole("link", { name: "Edit" }).click();
 
 	await page.getByLabel("Start Time").fill("11:30");
 	await page.getByLabel("End Time").fill("12:30");
