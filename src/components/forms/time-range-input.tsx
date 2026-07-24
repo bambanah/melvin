@@ -120,6 +120,19 @@ export function TimeRangeInput({
 	);
 }
 
+/** Parse a strict "HH:MM" string into minutes-since-midnight, or null if the
+ * string is malformed or out of range (hours 0-23, minutes 0-59). */
+function timeToMinutes(time: string): number | null {
+	const match = /^(\d{1,2}):(\d{2})$/.exec(time);
+	if (!match) return null;
+
+	const hours = Number(match[1]);
+	const minutes = Number(match[2]);
+	if (hours > 23 || minutes > 59) return null;
+
+	return hours * 60 + minutes;
+}
+
 export function validateTimeRange(
 	value: TimeRangeValue | undefined
 ): string | null {
@@ -127,11 +140,12 @@ export function validateTimeRange(
 		return "Time range is required";
 	}
 
-	const [startH, startM] = value.startTime.split(":").map(Number);
-	const [endH, endM] = value.endTime.split(":").map(Number);
+	const startMinutes = timeToMinutes(value.startTime);
+	const endMinutes = timeToMinutes(value.endTime);
 
-	const startMinutes = startH * 60 + startM;
-	const endMinutes = endH * 60 + endM;
+	if (startMinutes === null || endMinutes === null) {
+		return "Invalid time";
+	}
 
 	if (endMinutes <= startMinutes) {
 		return "End time must be after start time";
