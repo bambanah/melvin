@@ -29,6 +29,9 @@ export function callerFor(user: User) {
 }
 
 const APP_TABLES = [
+	"WorkSessionTransportItem",
+	"WorkSessionParticipant",
+	"WorkSession",
 	"ActivityTransportItem",
 	"InterClientLeg",
 	"Activity",
