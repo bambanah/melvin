@@ -136,7 +136,38 @@ describe("log.start", () => {
 		expect(persisted.endTime).toEqual(new Date("1970-01-01T11:15:00Z"));
 	});
 
-	test("end rejects a finish time at or before the start — Sessions can't cross midnight", async () => {
+	test("last write wins on end too - a delayed end replay never clobbers a newer edit", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const [client] = await createClients(owner, 1);
+
+		const session = await caller.log.start({
+			date: DAY,
+			startTime: "09:00",
+			clientIds: [client.id],
+			updatedAt: new Date("2024-01-01T09:00:00Z")
+		});
+		await caller.log.edit({
+			id: session.id,
+			date: DAY,
+			startTime: "09:00",
+			endTime: "11:30",
+			clientIds: [client.id],
+			updatedAt: new Date("2024-01-01T12:00:00Z")
+		});
+
+		// A stale offline end replay stamped before the edit above.
+		await caller.log.end({
+			id: session.id,
+			endTime: "11:00",
+			updatedAt: new Date("2024-01-01T11:00:00Z")
+		});
+
+		const [persisted] = await caller.log.listByDay({ date: DAY });
+		expect(persisted.endTime).toEqual(new Date("1970-01-01T11:30:00Z"));
+	});
+
+	test("end rejects a finish time at or before the start - Sessions can't cross midnight", async () => {
 		const owner = await createTestUser();
 		const caller = callerFor(owner);
 		const [client] = await createClients(owner, 1);
@@ -195,6 +226,59 @@ describe("log.edit", () => {
 		expect(persisted.participants.map((p) => p.clientId)).toEqual([second.id]);
 	});
 
+	test("corrects a mistyped trip and cost by replacing the Session's transport items", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const [client] = await createClients(owner, 1);
+
+		const session = await caller.log.start({
+			date: DAY,
+			startTime: "09:00",
+			clientIds: [client.id]
+		});
+		await caller.log.recordTrip({ workSessionId: session.id, distance: 12 });
+		await caller.log.recordCost({
+			workSessionId: session.id,
+			type: "PARKING",
+			amount: 80
+		});
+
+		await caller.log.edit({
+			id: session.id,
+			date: DAY,
+			startTime: "09:00",
+			clientIds: [client.id],
+			transportItems: [{ type: "PARKING", amount: 8 }]
+		});
+
+		const [persisted] = await caller.log.listByDay({ date: DAY });
+		expect(persisted.transportItems).toHaveLength(1);
+		expect(Number(persisted.transportItems[0].amount)).toBe(8);
+	});
+
+	test("an edit that omits transportItems leaves the captured trips and costs alone", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const [client] = await createClients(owner, 1);
+
+		const session = await caller.log.start({
+			date: DAY,
+			startTime: "09:00",
+			clientIds: [client.id]
+		});
+		await caller.log.recordTrip({ workSessionId: session.id, distance: 12 });
+
+		await caller.log.edit({
+			id: session.id,
+			date: DAY,
+			startTime: "09:30",
+			clientIds: [client.id]
+		});
+
+		const [persisted] = await caller.log.listByDay({ date: DAY });
+		expect(persisted.transportItems).toHaveLength(1);
+	});
+
 	test("backfills a past-dated Session with typed times as an upsert", async () => {
 		const owner = await createTestUser();
 		const caller = callerFor(owner);
@@ -216,7 +300,7 @@ describe("log.edit", () => {
 		expect(sessions[0].endTime).toEqual(new Date("1970-01-01T14:00:00Z"));
 	});
 
-	test("last write wins — a replayed edit older than the stored record is ignored", async () => {
+	test("last write wins - a replayed edit older than the stored record is ignored", async () => {
 		const owner = await createTestUser();
 		const caller = callerFor(owner);
 		const [client] = await createClients(owner, 1);
@@ -624,6 +708,26 @@ describe("log.listByClient", () => {
 		expect(sections[0].sessions.map((s) => s.id)).toEqual([group.id]);
 		expect(sections[1].sessions.map((s) => s.id)).toEqual([group.id]);
 		expect(sections[2].sessions).toEqual([]);
+	});
+
+	test("a deactivated Client keeps their section while unpromoted Sessions remain", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const [alice] = await createClients(owner, 1);
+
+		await caller.log.start({
+			date: DAY,
+			startTime: "09:00",
+			clientIds: [alice.id]
+		});
+		await prisma.client.update({
+			where: { id: alice.id },
+			data: { active: false }
+		});
+
+		const sections = await caller.log.listByClient();
+		expect(sections.map((s) => s.client.id)).toEqual([alice.id]);
+		expect(sections[0].sessions).toHaveLength(1);
 	});
 });
 

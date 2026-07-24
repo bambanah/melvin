@@ -39,7 +39,7 @@ const tripActivitySelect = {
 	}
 };
 
-async function applyTransitUpdates(
+export async function applyTransitUpdates(
 	tx: Prisma.TransactionClient,
 	updates: TransitUpdate[]
 ) {

@@ -11,6 +11,7 @@ import {
 	tripTransitUpdates,
 	type TransitUpdate
 } from "@/lib/trip-utils";
+import { applyTransitUpdates } from "@/server/api/routers/trip-router";
 import {
 	captureHandoverSchema,
 	timeOfDaySchema,
@@ -44,6 +45,31 @@ type LogContext = {
 	prisma: PrismaClient;
 	owned: ReturnType<typeof ownedDb>;
 };
+
+const participantsCreate = (clientIds: string[]) => ({
+	create: clientIds.map((clientId) => ({ clientId }))
+});
+
+// What promoteDay needs back from each created Activity: identity for the
+// Trip, and the TripActivity shape trip-utils' transit allocation reads.
+const promotedActivitySelect = {
+	id: true,
+	startTime: true,
+	endTime: true,
+	transitDistance: true,
+	transitDuration: true,
+	client: {
+		select: {
+			distanceToClient: true,
+			travelTimeToClient: true,
+			transitRatePerKm: true
+		}
+	}
+} satisfies Prisma.ActivitySelect;
+
+type PromotedActivity = Prisma.ActivityGetPayload<{
+	select: typeof promotedActivitySelect;
+}>;
 
 // Shared by recordTrip (a DISTANCE item in km) and recordCost (flat Transport
 // Expenses). Idempotent on the client-generated item id for offline replays.
@@ -92,7 +118,7 @@ const participantChangeSchema = z.object({
 
 // A composition change is an In-Place Handover: the current Session closes at
 // the pivot instant and a new one opens at the same instant carrying the
-// existing Client(s) plus/minus one — producing the correct per-composition
+// existing Client(s) plus/minus one - producing the correct per-composition
 // split. No driving is recorded: nobody moved.
 async function splitAtPivot(
 	ctx: LogContext,
@@ -123,7 +149,7 @@ async function splitAtPivot(
 		throw new TRPCError({
 			code: "CONFLICT",
 			message:
-				"Participants can only change on an Open Session — edit the captured Sessions instead"
+				"Participants can only change on an Open Session - edit the captured Sessions instead"
 		});
 	}
 
@@ -153,9 +179,7 @@ async function splitAtPivot(
 				startTime: pivot,
 				precededByWorkSessionId: session.id,
 				handoverType: "IN_PLACE",
-				participants: {
-					create: clientIds.map((clientId) => ({ clientId }))
-				}
+				participants: participantsCreate(clientIds)
 			},
 			select: workSessionSelect
 		});
@@ -195,7 +219,7 @@ export const logRouter = router({
 					throw new TRPCError({
 						code: "CONFLICT",
 						message:
-							"An Open Session can't be closed at this start time — end it with the right time first"
+							"An Open Session can't be closed at this start time - end it with the right time first"
 					});
 				}
 			}
@@ -215,9 +239,7 @@ export const logRouter = router({
 						date: input.date,
 						startTime,
 						updatedAt: input.updatedAt,
-						participants: {
-							create: input.clientIds.map((clientId) => ({ clientId }))
-						}
+						participants: participantsCreate(input.clientIds)
 					},
 					select: workSessionSelect
 				});
@@ -225,26 +247,41 @@ export const logRouter = router({
 		}),
 
 	end: authedProcedure
-		.input(z.object({ id: z.string(), endTime: timeOfDaySchema }))
+		.input(
+			z.object({
+				id: z.string(),
+				endTime: timeOfDaySchema,
+				updatedAt: z.date().optional()
+			})
+		)
 		.mutation(async ({ ctx, input }) => {
 			const session = await ctx.owned.workSession.findFirst({
 				where: { id: input.id },
-				select: { id: true, startTime: true }
+				select: { id: true, startTime: true, updatedAt: true }
 			});
 			if (!session) throw new TRPCError({ code: "NOT_FOUND" });
+
+			// Last-write-wins: a delayed offline end replay never clobbers a
+			// newer edit of the same Session.
+			if (input.updatedAt && session.updatedAt > input.updatedAt) {
+				return ctx.owned.workSession.findFirst({
+					where: { id: input.id },
+					select: workSessionSelect
+				});
+			}
 
 			const endTime = parseUtcTime(input.endTime);
 			if (endTime <= session.startTime) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
 					message:
-						"End time must be after start time — Sessions can't cross midnight"
+						"End time must be after start time - Sessions can't cross midnight"
 				});
 			}
 
 			return ctx.prisma.workSession.update({
 				where: { id: session.id },
-				data: { endTime },
+				data: { endTime, updatedAt: input.updatedAt },
 				select: workSessionSelect
 			});
 		}),
@@ -256,6 +293,9 @@ export const logRouter = router({
 				await ctx.owned.client.assert(clientId);
 			}
 
+			// Raw (unscoped) read by design: the upsert must distinguish "exists
+			// but unowned" (NOT_FOUND) from "absent, safe to create with this
+			// client-generated id" - ctx.owned can't express that.
 			const existing = await ctx.prisma.workSession.findUnique({
 				where: { id: input.id },
 				select: { id: true, ownerId: true, updatedAt: true }
@@ -284,13 +324,21 @@ export const logRouter = router({
 					await tx.workSessionParticipant.deleteMany({
 						where: { workSessionId: existing.id }
 					});
+					// Full-replace when provided; omitting the field leaves the
+					// captured trips and costs alone.
+					if (input.transportItems) {
+						await tx.workSessionTransportItem.deleteMany({
+							where: { workSessionId: existing.id }
+						});
+					}
 					return tx.workSession.update({
 						where: { id: existing.id },
 						data: {
 							...data,
-							participants: {
-								create: input.clientIds.map((clientId) => ({ clientId }))
-							}
+							participants: participantsCreate(input.clientIds),
+							transportItems: input.transportItems
+								? { create: input.transportItems }
+								: undefined
 						},
 						select: workSessionSelect
 					});
@@ -301,9 +349,10 @@ export const logRouter = router({
 						...data,
 						id: input.id,
 						ownerId: ctx.session.user.id,
-						participants: {
-							create: input.clientIds.map((clientId) => ({ clientId }))
-						}
+						participants: participantsCreate(input.clientIds),
+						transportItems: input.transportItems
+							? { create: input.transportItems }
+							: undefined
 					},
 					select: workSessionSelect
 				});
@@ -350,7 +399,7 @@ export const logRouter = router({
 				if (remaining.length === 0) {
 					throw new TRPCError({
 						code: "BAD_REQUEST",
-						message: "A Session needs at least one Client — delete it instead"
+						message: "A Session needs at least one Client - delete it instead"
 					});
 				}
 				return remaining;
@@ -374,7 +423,7 @@ export const logRouter = router({
 			if (!preceding.endTime) {
 				throw new TRPCError({
 					code: "CONFLICT",
-					message: "The previous Session is still Open — end it first"
+					message: "The previous Session is still Open - end it first"
 				});
 			}
 			if (
@@ -404,7 +453,7 @@ export const logRouter = router({
 
 			// The gap between the two stamped times is known here, so surface the
 			// pre-fill and the fits-the-gap warning to the capture UI. Warn, never
-			// block — the billable clamp is applied at Promotion.
+			// block - the billable clamp is applied at Promotion.
 			const gapMinutes = differenceInMinutes(
 				session.startTime,
 				preceding.endTime
@@ -458,7 +507,7 @@ export const logRouter = router({
 	// Day-atomic Promotion: every captured Session becomes a Pending Activity
 	// (group Sessions mirrored per participant sharing a groupSize) and the
 	// day's Handover links assemble into a Trip whose inter-client legs bill
-	// the captured distances. Consumed Sessions are deleted — the Log is a
+	// the captured distances. Consumed Sessions are deleted - the Log is a
 	// pure capture layer and the Activity/Invoice world is the source of truth.
 	promoteDay: authedProcedure
 		.input(
@@ -498,7 +547,7 @@ export const logRouter = router({
 				throw new TRPCError({
 					code: "CONFLICT",
 					message:
-						"A Session that day is still Open — end it before promoting the day"
+						"A Session that day is still Open - end it before promoting the day"
 				});
 			}
 
@@ -553,7 +602,7 @@ export const logRouter = router({
 
 			// A Handover leg exists only between adjacent Sessions joined by a
 			// TRAVEL link; an IN_PLACE link records no driving. The billable
-			// duration applies the gap clamp — entered time is warned about at
+			// duration applies the gap clamp - entered time is warned about at
 			// capture but never bills beyond what physically fit.
 			const legPlans: {
 				fromSessionId: string;
@@ -590,37 +639,8 @@ export const logRouter = router({
 			}
 
 			return ctx.prisma.$transaction(async (tx) => {
-				const createdActivitySelect = {
-					id: true,
-					startTime: true,
-					endTime: true,
-					transitDistance: true,
-					transitDuration: true,
-					client: {
-						select: {
-							distanceToClient: true,
-							travelTimeToClient: true,
-							transitRatePerKm: true
-						}
-					}
-				};
-
 				const activityIds: string[] = [];
-				const primaryBySessionId = new Map<
-					string,
-					{
-						id: string;
-						startTime: Date | null;
-						endTime: Date | null;
-						transitDistance: Prisma.Decimal | null;
-						transitDuration: Prisma.Decimal | null;
-						client: {
-							distanceToClient: Prisma.Decimal | null;
-							travelTimeToClient: Prisma.Decimal | null;
-							transitRatePerKm: Prisma.Decimal | null;
-						} | null;
-					}
-				>();
+				const primaryBySessionId = new Map<string, PromotedActivity>();
 
 				for (const session of sessions) {
 					const groupSize =
@@ -628,19 +648,22 @@ export const logRouter = router({
 							? session.participants.length
 							: undefined;
 
+					const supportItemId = supportItemIdBySession.get(session.id);
+					if (!supportItemId) continue; // unreachable: seeded above
+
 					for (const [index, participant] of session.participants.entries()) {
 						const isPrimary = index === 0;
 						const activity = await tx.activity.create({
 							data: {
 								ownerId: ctx.session.user.id,
 								clientId: participant.clientId,
-								supportItemId: supportItemIdBySession.get(session.id) as string,
+								supportItemId,
 								date: input.date,
 								startTime: session.startTime,
 								endTime: session.endTime,
 								groupSize,
 								// The Session's trips and costs bill once, on the
-								// primary participant's Activity — mirrors share the
+								// primary participant's Activity - mirrors share the
 								// support time, not the transport.
 								transportItems:
 									isPrimary && session.transportItems.length > 0
@@ -653,16 +676,14 @@ export const logRouter = router({
 											}
 										: undefined
 							},
-							select: createdActivitySelect
+							select: promotedActivitySelect
 						});
 						activityIds.push(activity.id);
 						if (isPrimary) primaryBySessionId.set(session.id, activity);
 					}
 				}
 
-				const primaries = sessions.map(
-					(session) => primaryBySessionId.get(session.id)!
-				);
+				const primaries = [...primaryBySessionId.values()];
 
 				// Provider Travel bills once per Session, on the primary Activity:
 				// mirrors never join the Trip. Home legs derive from the Clients'
@@ -671,12 +692,19 @@ export const logRouter = router({
 				let tripId: string | null = null;
 				let transitUpdates: TransitUpdate[];
 				if (primaries.length >= 2) {
-					const legs = legPlans.map((leg) => ({
-						fromActivityId: primaryBySessionId.get(leg.fromSessionId)!.id,
-						toActivityId: primaryBySessionId.get(leg.toSessionId)!.id,
-						distance: leg.distance,
-						duration: leg.duration
-					}));
+					const legs = legPlans.flatMap((leg) => {
+						const from = primaryBySessionId.get(leg.fromSessionId);
+						const to = primaryBySessionId.get(leg.toSessionId);
+						if (!from || !to) return []; // unreachable: legs link loaded sessions
+						return [
+							{
+								fromActivityId: from.id,
+								toActivityId: to.id,
+								distance: leg.distance,
+								duration: leg.duration
+							}
+						];
+					});
 
 					const trip = await tx.trip.create({
 						data: {
@@ -694,15 +722,7 @@ export const logRouter = router({
 					transitUpdates = standaloneTransitUpdates(primaries);
 				}
 
-				for (const update of transitUpdates) {
-					await tx.activity.update({
-						where: { id: update.activityId },
-						data: {
-							transitDistance: update.transitDistance,
-							transitDuration: update.transitDuration
-						}
-					});
-				}
+				await applyTransitUpdates(tx, transitUpdates);
 
 				await tx.workSession.deleteMany({
 					where: { id: { in: sessions.map((session) => session.id) } }
@@ -713,11 +733,13 @@ export const logRouter = router({
 		}),
 
 	// The per-Client sections of the Log tab, mirroring the notes-app habit.
-	// Every active Client keeps a section — standing scaffolding — even with no
+	// Every active Client keeps a section - standing scaffolding - even with no
 	// current Sessions; a group Session appears under each of its participants.
+	// A deactivated Client keeps their section while unpromoted Sessions remain,
+	// so captured work never silently disappears from the Log.
 	listByClient: authedProcedure.query(async ({ ctx }) => {
 		const clients = await ctx.owned.client.findMany({
-			where: { active: true },
+			where: { OR: [{ active: true }, { workSessions: { some: {} } }] },
 			select: { id: true, name: true },
 			orderBy: { name: "asc" }
 		});

@@ -3,14 +3,22 @@ import { z } from "zod";
 export const timeOfDaySchema = z
 	.string()
 	.regex(/^\d{2}:\d{2}$/, "Time must be HH:mm");
-const timeOfDay = timeOfDaySchema;
+
+// Mirrors ActivityTransportItem: a logged trip is a DISTANCE item (km),
+// parking/toll/other are flat Transport Expenses (dollars).
+export const workSessionTransportItemSchema = z.object({
+	id: z.string().optional(),
+	type: z.enum(["DISTANCE", "PARKING", "TOLL", "OTHER"]),
+	amount: z.number().min(0),
+	note: z.string().optional()
+});
 
 // All Log writes accept a client-generated id (a cuid minted on-device) so
 // offline captures have stable identity when the sync client replays them.
 export const workSessionStartSchema = z.object({
 	id: z.string().optional(),
 	date: z.date({ required_error: "Date is required" }),
-	startTime: timeOfDay,
+	startTime: timeOfDaySchema,
 	// The client's tap-time stamp: offline captures are stamped when made, not
 	// when they sync, and last-write-wins compares these stamps.
 	updatedAt: z.date().optional(),
@@ -27,14 +35,17 @@ export type WorkSessionStartSchema = z.infer<typeof workSessionStartSchema>;
 // Full-replace upsert: covers correcting any field of a captured Session and
 // backfilling a past-dated one with typed times. `updatedAt` is the client's
 // stamp for last-write-wins conflict resolution on offline replays.
+// `transportItems` replaces the Session's trips and costs when provided;
+// omitting it leaves them untouched.
 export const workSessionEditSchema = workSessionStartSchema
 	.extend({
 		id: z.string(),
-		endTime: timeOfDay.nullish()
+		endTime: timeOfDaySchema.nullish(),
+		transportItems: z.array(workSessionTransportItemSchema).optional()
 	})
 	.refine((data) => !data.endTime || data.startTime < data.endTime, {
 		message:
-			"End time must be after start time — Sessions can't cross midnight",
+			"End time must be after start time - Sessions can't cross midnight",
 		path: ["endTime"]
 	});
 export type WorkSessionEditSchema = z.infer<typeof workSessionEditSchema>;
