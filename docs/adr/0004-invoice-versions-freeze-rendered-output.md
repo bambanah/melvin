@@ -28,3 +28,4 @@ Versions are not created by cascade, so they are not covered by the no-cascade-d
 - `getTotalOwing` / payment matching read frozen totals for sent invoices instead of recomputing.
 - ADR 0003's allow-recalc-with-warning now applies only to activities on draft invoices; trip edits touching a locked invoice's activities are rejected with an "amend first" error.
 - `paidAt` is stamped onto the paid version before an amendment clears the invoice-level field, preserving what was paid.
+- The `onDelete: Restrict` blocks only _accidental_ cascade deletes. A confirmed account reset (`user.reset`) is the sanctioned exception: it deletes the user's `InvoiceVersion` rows explicitly first, in a transaction, so a full "remove all my data" wipe succeeds rather than rolling back on the Restrict.
