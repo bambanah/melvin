@@ -16,7 +16,14 @@ export default defineConfig({
 		// CI runs against a production build: `next dev`'s on-demand route
 		// compilation races with CI's limited CPU/network and intermittently
 		// stalls navigations past test timeouts.
-		command: process.env.CI ? "pnpm start" : "pnpm dev:next",
+		//
+		// E2E_WEB_SERVER_COMMAND overrides the command so the better-auth
+		// migration (#418) and framework swap (#419) can point Playwright at a
+		// different server without editing this file; the defaults keep existing
+		// local and CI runs unchanged.
+		command:
+			process.env.E2E_WEB_SERVER_COMMAND ??
+			(process.env.CI ? "pnpm start" : "pnpm dev:next"),
 		url: "http://localhost:3000",
 		reuseExistingServer: !process.env.CI
 	}

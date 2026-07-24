@@ -2,7 +2,7 @@ import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import prisma from "@/server/prisma";
 import { Page } from "@playwright/test";
 import { randomUUID } from "crypto";
-import { addMonths } from "date-fns";
+import { addMonths, getUnixTime } from "date-fns";
 import { randomClient } from "./random/random-client";
 import { randomSupportItem } from "./random/random-support-item";
 
@@ -34,6 +34,30 @@ export const testUser = {
 		}
 	}
 };
+
+/**
+ * Establishes an authenticated session for `testUser` on `page`.
+ *
+ * Today this injects a raw next-auth `session-token` cookie (the bypass the
+ * app relied on before better-auth). #418 swaps the body for a real password
+ * sign-in; keeping session establishment behind this single helper contains
+ * that change to here rather than every test's setup.
+ */
+export async function authenticateAsTestUser(page: Page, baseURL: string) {
+	await page.goto(baseURL);
+
+	await page.context().addCookies([
+		{
+			name: "next-auth.session-token",
+			value: testUser.sessions.create.sessionToken,
+			domain: "localhost",
+			path: "/",
+			httpOnly: true,
+			sameSite: "Lax",
+			expires: getUnixTime(addMonths(new Date(), 1))
+		}
+	]);
+}
 
 export async function waitForAlert(page: Page, text: string) {
 	return await page
