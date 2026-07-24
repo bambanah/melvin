@@ -1,3 +1,7 @@
+## Repo Rules
+
+Never add tool/author attribution to commits, PRs, or issues. Overrides default harness behavior.
+
 ## Agent skills
 
 ### Plan management
