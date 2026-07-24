@@ -1,22 +1,43 @@
 import { round } from "./generic-utils";
 
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
-dayjs.extend(customParseFormat);
-dayjs.extend(utc);
-dayjs.extend(timezone);
+import { TZDate, tz } from "@date-fns/tz";
+import {
+	differenceInMinutes,
+	format,
+	getHours,
+	getMinutes,
+	parse,
+	setDate,
+	setHours,
+	setMinutes,
+	setMonth
+} from "date-fns";
+
+/**
+ * A UTC-anchored view of an instant - the single place the `"UTC"` timezone
+ * lives. Use it to read wall-clock fields (`getHours`, `getDay`, ...) or to
+ * `format`/`toISOString` an instant as UTC, regardless of the viewer's zone.
+ */
+export const utcDate = (value: Date | string | number): TZDate =>
+	new TZDate(new Date(value), "UTC");
+
+/**
+ * Parses an `HH:mm` wall-clock string into a UTC-anchored Date on the epoch
+ * day (1970-01-01). The date portion is irrelevant to callers - only the
+ * time-of-day is ever read back - so the epoch reference keeps it deterministic.
+ * A missing time yields an Invalid Date, matching the prior dayjs behaviour.
+ */
+export const parseUtcTime = (time: string | undefined): Date =>
+	time === undefined
+		? new Date(NaN)
+		: parse(time, "HH:mm", new TZDate(0, "UTC"), { in: tz("UTC") });
 
 export function getDuration(startTime: Date, endTime: Date): number {
-	const startDate = dayjs(startTime);
-	const endDate = dayjs(endTime);
-
-	const diffInMinutes = endDate.diff(startDate, "minutes");
+	const diffInMinutes = differenceInMinutes(endTime, startTime);
 
 	if (diffInMinutes < 0) {
 		throw new Error(
-			`getDuration: endTime ${endDate.toISOString()} precedes startTime ${startDate.toISOString()}`
+			`getDuration: endTime ${endTime.toISOString()} precedes startTime ${startTime.toISOString()}`
 		);
 	}
 
@@ -34,14 +55,15 @@ export function formatActivityDuration(startTime: Date, endTime: Date): string {
 }
 
 export const formatDuration = (duration: number) => {
-	const hourItem = dayjs()
-		.set("hours", duration)
-		.set("minutes", round((duration % 1) * 60, 0));
+	const hourItem = setMinutes(
+		setHours(new Date(), duration),
+		round((duration % 1) * 60, 0)
+	);
 
 	let durationString = "";
 
-	const hours = hourItem.get("hours");
-	const minutes = hourItem.get("minutes");
+	const hours = getHours(hourItem);
+	const minutes = getMinutes(hourItem);
 	if (hours > 0) durationString += `${hours} hour${hours === 1 ? "" : "s"}`;
 
 	if (minutes > 0)
@@ -54,17 +76,20 @@ export const formatDuration = (duration: number) => {
 
 // TODO: Implement dynamic holidays
 // (e.g. Easter occurs on the Sunday after the first full moon following the vernal equinox)
+const holiday = (day: number, month: number) =>
+	format(setMonth(setDate(new Date(), day), month), "dd/MM/yyyy");
+
 const HOLIDAYS = new Set([
-	dayjs().date(1).month(0).format("DD/MM/YYYY"),
-	dayjs().date(26).month(0).format("DD/MM/YYYY"),
-	dayjs().date(25).month(3).format("DD/MM/YYYY"),
-	dayjs().date(24).month(11).format("DD/MM/YYYY"),
-	dayjs().date(25).month(11).format("DD/MM/YYYY"),
-	dayjs().date(26).month(11).format("DD/MM/YYYY")
+	holiday(1, 0),
+	holiday(26, 0),
+	holiday(25, 3),
+	holiday(24, 11),
+	holiday(25, 11),
+	holiday(26, 11)
 ]);
 
 export function isHoliday(date: Date | string) {
-	return HOLIDAYS.has(dayjs(date).format("DD/MM/YYYY"));
+	return HOLIDAYS.has(format(new Date(date), "dd/MM/yyyy"));
 }
 
 /**

@@ -1,11 +1,4 @@
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import { round } from "./generic-utils";
-dayjs.extend(customParseFormat);
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 const getNumber = (invoiceNo: string): number | undefined => {
 	const matches = invoiceNo.match(/\d+$/);

@@ -17,7 +17,7 @@ import {
 	PopoverContent,
 	PopoverTrigger
 } from "@/components/ui/popover";
-import { stripTimezone } from "@/lib/date-utils";
+import { stripTimezone, utcDate } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { ActivitySchema, activitySchema } from "@/schema/activity-schema";
@@ -37,11 +37,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-import dayjs from "dayjs";
 import { useSearchParams } from "next/navigation";
-dayjs.extend(require("dayjs/plugin/utc"));
-dayjs.extend(require("dayjs/plugin/localizedFormat"));
-dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
 interface Props {
 	existingActivity?: Partial<ActivityByIdOutput> & {
@@ -99,10 +95,10 @@ const ActivityForm = ({ existingActivity }: Props) => {
 			supportItemId: existingActivity?.supportItem?.id ?? "",
 			clientId: existingActivity?.client?.id ?? "",
 			startTime: existingActivity?.startTime
-				? dayjs.utc(existingActivity?.startTime).format("HH:mm")
+				? format(utcDate(existingActivity.startTime), "HH:mm")
 				: "",
-			endTime: existingActivity?.startTime
-				? dayjs.utc(existingActivity?.endTime).format("HH:mm")
+			endTime: existingActivity?.endTime
+				? format(utcDate(existingActivity.endTime), "HH:mm")
 				: "",
 			itemDistance: existingActivity?.itemDistance ?? undefined,
 			transitDistance: existingActivity?.transitDistance

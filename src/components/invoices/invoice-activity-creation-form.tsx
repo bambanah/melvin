@@ -46,11 +46,6 @@ import {
 	useFieldArray
 } from "react-hook-form";
 
-import dayjs from "dayjs";
-dayjs.extend(require("dayjs/plugin/utc"));
-dayjs.extend(require("dayjs/plugin/localizedFormat"));
-dayjs.extend(require("dayjs/plugin/customParseFormat"));
-
 interface Props {
 	control: Control<InvoiceSchema>;
 	getValues: UseFormGetValues<InvoiceSchema>;

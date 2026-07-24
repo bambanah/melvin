@@ -16,11 +16,8 @@ import {
 	type UnitPriceSuffix
 } from "@/schema/invoice-version-schema";
 
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
-dayjs.extend(utc);
-dayjs.extend(timezone);
+import { utcDate } from "./date-utils";
+import { format } from "date-fns";
 
 // import "@/fonts/Inter-normal";
 
@@ -102,7 +99,7 @@ interface PdfLine {
 
 /** The Details-column cell for a line, plus its Unit Price column. */
 const formatPdfLine = (line: PdfLine): string[] => {
-	const dateCell = `${dayjs.utc(line.serviceDate).format("DD/MM/YY")}\n`;
+	const dateCell = `${format(utcDate(line.serviceDate), "dd/MM/yy")}\n`;
 	const descriptionCell = `${line.description}\n${line.supportItemCode}\n`;
 	const totalCell = `$${line.total.toFixed(2)}\n`;
 	const detailsCell = `${line.detailsText}\n`;
@@ -150,7 +147,7 @@ const renderFromRenderable = (
 	// Write details at top of page
 	const invoiceDetails: string[] = [
 		`Invoice Number: ${renderable.invoiceNoLabel}`,
-		`Invoice Date: ${dayjs(renderable.date).format("DD/MM/YY")}`,
+		`Invoice Date: ${format(new Date(renderable.date), "dd/MM/yy")}`,
 		`Participant Name: ${renderable.participantName}`
 	];
 	if (renderable.participantNumber)

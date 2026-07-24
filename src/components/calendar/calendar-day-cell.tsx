@@ -1,20 +1,18 @@
 import { cn } from "@/lib/utils";
 import type { ActivityByDateRangeOutput } from "@/server/api/routers/activity-router";
-import dayjs, { type Dayjs } from "dayjs";
-import utc from "dayjs/plugin/utc";
+import { utcDate } from "@/lib/date-utils";
+import { format, getDate, getDay } from "date-fns";
 import Link from "next/link";
-
-dayjs.extend(utc);
 
 const MAX_VISIBLE_ACTIVITIES = 3;
 
 interface Props {
-	day: Dayjs;
+	day: Date;
 	activities: ActivityByDateRangeOutput;
 	isCurrentMonth: boolean;
 	isToday: boolean;
 	isFocused: boolean;
-	onDayClick: (day: Dayjs) => void;
+	onDayClick: (day: Date) => void;
 }
 
 const CalendarDayCell = ({
@@ -36,7 +34,7 @@ const CalendarDayCell = ({
 			tabIndex={isFocused ? 0 : -1}
 			className={cn(
 				"border-border hover:bg-accent/50 flex h-16 cursor-pointer flex-col border-r border-b p-1 text-left transition-colors focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-inset sm:h-32",
-				day.day() === 1 && "border-l",
+				getDay(day) === 1 && "border-l",
 				!isCurrentMonth && "bg-muted/30",
 				isCurrentMonth && !hasActivities && "bg-muted/10",
 				isFocused && "ring-ring ring-2 ring-inset"
@@ -50,7 +48,7 @@ const CalendarDayCell = ({
 						isToday && "bg-primary text-primary-foreground font-semibold"
 					)}
 				>
-					{day.date()}
+					{getDate(day)}
 				</span>
 			</div>
 
@@ -100,7 +98,7 @@ const ActivityCard = ({ activity }: ActivityCardProps) => {
 	const timeLabel = activity.itemDistance
 		? `${activity.itemDistance}km`
 		: activity.startTime
-			? dayjs.utc(activity.startTime).format("H:mm")
+			? format(utcDate(activity.startTime), "H:mm")
 			: "";
 
 	const clientName = activity.client?.name ?? "";

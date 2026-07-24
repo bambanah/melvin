@@ -21,8 +21,9 @@ import { InvoiceStatus } from "@/generated/browser";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { trpc } from "@/lib/trpc";
 import { InvoiceListOutput } from "@/server/api/routers/invoice-router";
+import { utcDate } from "@/lib/date-utils";
 import { ColumnDef } from "@tanstack/react-table";
-import dayjs from "dayjs";
+import { format } from "date-fns";
 import {
 	Copy,
 	Download,
@@ -49,7 +50,6 @@ import {
 	InputGroupAddon,
 	InputGroupInput
 } from "../ui/input-group";
-dayjs.extend(require("dayjs/plugin/utc"));
 
 interface Props {
 	clientId?: string;
@@ -214,7 +214,7 @@ export default function InvoiceList({ clientId: propClientId }: Props) {
 			header: ({ column }) => (
 				<SortingHeader column={column}>Date</SortingHeader>
 			),
-			cell: ({ row }) => <>{dayjs.utc(row.original.date).format("DD/MM/YY")}</>
+			cell: ({ row }) => <>{format(utcDate(row.original.date), "dd/MM/yy")}</>
 		},
 		{
 			accessorKey: "invoiceNo",

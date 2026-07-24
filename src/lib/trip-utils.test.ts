@@ -10,10 +10,6 @@ import {
 import { Prisma } from "@/generated/client";
 import { expect, test } from "vitest";
 
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-dayjs.extend(utc);
-
 const getTripActivity = (
 	id: string,
 	startTime: string | null,
@@ -23,7 +19,7 @@ const getTripActivity = (
 	}: { distanceToClient?: number; travelTimeToClient?: number } = {}
 ): TripActivity => ({
 	id,
-	startTime: startTime ? dayjs.utc(`1970-01-01T${startTime}`).toDate() : null,
+	startTime: startTime ? new Date(`1970-01-01T${startTime}Z`) : null,
 	endTime: null,
 	transitDistance: null,
 	transitDuration: null,
@@ -196,8 +192,8 @@ test("Prisma.Decimal distance/duration inputs produce plain-number outputs", () 
 });
 
 test("sortActivitiesByTime: sorts by startTime, null startTimes last", () => {
-	const a = { startTime: dayjs.utc("1970-01-01T10:00").toDate() };
-	const b = { startTime: dayjs.utc("1970-01-01T09:00").toDate() };
+	const a = { startTime: new Date("1970-01-01T10:00Z") };
+	const b = { startTime: new Date("1970-01-01T09:00Z") };
 	const c = { startTime: null };
 
 	expect(sortActivitiesByTime([a, b, c])).toEqual([b, a, c]);

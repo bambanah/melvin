@@ -3,7 +3,8 @@ import Heading from "@/components/ui/heading";
 import { cn } from "@/lib/utils";
 import { InvoiceSchema } from "@/schema/invoice-schema";
 import { ActivityListOutput } from "@/server/api/routers/activity-router";
-import dayjs from "dayjs";
+import { utcDate } from "@/lib/date-utils";
+import { format } from "date-fns";
 import { Calendar, Car, Clock } from "lucide-react";
 import { UseFormGetValues, UseFormSetValue } from "react-hook-form";
 
@@ -64,13 +65,13 @@ const UnassignedActivities = ({ activities, getValues, setValue }: Props) => {
 								<div className="flex justify-start gap-6 text-sm md:text-sm">
 									<div className="flex items-center gap-2">
 										<Calendar className="h-4 w-4" />
-										{dayjs.utc(activity.date).format("dddd DD/MM")}
+										{format(utcDate(activity.date), "EEEE dd/MM")}
 									</div>
 									{activity.startTime && activity.endTime ? (
 										<div className="flex items-center gap-2">
 											<Clock className="h-4 w-4" />
-											{dayjs.utc(activity.startTime).format("h:mma")}-
-											{dayjs.utc(activity.endTime).format("h:mma")}
+											{format(utcDate(activity.startTime), "h:mmaaa")}-
+											{format(utcDate(activity.endTime), "h:mmaaa")}
 										</div>
 									) : (
 										<div className="flex items-center gap-2">

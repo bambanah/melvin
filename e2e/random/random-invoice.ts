@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import dayjs from "dayjs";
+import { format } from "date-fns";
 
 export const randomInvoice = ({
 	invoiceNo,
@@ -23,7 +23,7 @@ export const randomInvoice = ({
 			supportItemId: supportItemId ?? "",
 			ownerId: ownerId ?? "",
 			clientId: clientId ?? "",
-			date: dayjs().format("YYYY-MM-DD"),
+			date: format(new Date(), "yyyy-MM-dd"),
 			startTime: "13:00",
 			endTime: "14:00",
 			transitDistance: faker.number.int({ min: 1, max: 20 }),

@@ -1,33 +1,41 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { ActivityByDateRangeOutput } from "@/server/api/routers/activity-router";
-import dayjs, { type Dayjs } from "dayjs";
+import {
+	addDays,
+	format,
+	getDay,
+	getDaysInMonth,
+	getMonth,
+	startOfMonth,
+	subDays
+} from "date-fns";
 import { useCallback, useMemo, useRef, useState } from "react";
 import CalendarDayCell from "./calendar-day-cell";
 
 const DAYS_OF_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
 interface Props {
-	currentMonth: Dayjs;
+	currentMonth: Date;
 	activities: ActivityByDateRangeOutput;
 	isLoading: boolean;
-	onDayClick: (day: Dayjs) => void;
+	onDayClick: (day: Date) => void;
 }
 
-function getCalendarDays(month: Dayjs) {
-	const firstOfMonth = month.startOf("month");
-	// dayjs .day() is 0=Sun, we want 0=Mon
-	const startDay = (firstOfMonth.day() + 6) % 7;
-	const calendarStart = firstOfMonth.subtract(startDay, "day");
+function getCalendarDays(month: Date) {
+	const firstOfMonth = startOfMonth(month);
+	// getDay is 0=Sun, we want 0=Mon
+	const startDay = (getDay(firstOfMonth) + 6) % 7;
+	const calendarStart = subDays(firstOfMonth, startDay);
 
-	const daysInMonth = month.daysInMonth();
+	const daysInMonth = getDaysInMonth(month);
 	const totalCells = startDay + daysInMonth;
 	const totalRows = Math.ceil(totalCells / 7);
 	const totalDays = totalRows * 7;
 
-	const days: Dayjs[] = [];
+	const days: Date[] = [];
 	for (let i = 0; i < totalDays; i++) {
-		days.push(calendarStart.add(i, "day"));
+		days.push(addDays(calendarStart, i));
 	}
 
 	return days;
@@ -36,7 +44,7 @@ function getCalendarDays(month: Dayjs) {
 function groupActivitiesByDate(activities: ActivityByDateRangeOutput) {
 	const map = new Map<string, ActivityByDateRangeOutput>();
 	for (const activity of activities) {
-		const key = dayjs(activity.date).format("YYYY-MM-DD");
+		const key = format(new Date(activity.date), "yyyy-MM-dd");
 		const existing = map.get(key);
 		if (existing) {
 			existing.push(activity);
@@ -59,7 +67,7 @@ const CalendarMonth = ({
 		[activities]
 	);
 
-	const today = dayjs().format("YYYY-MM-DD");
+	const today = format(new Date(), "yyyy-MM-dd");
 	const gridRef = useRef<HTMLDivElement>(null);
 
 	// Track focused day index for keyboard navigation
@@ -130,12 +138,12 @@ const CalendarMonth = ({
 				ref={gridRef}
 				className="grid grid-cols-7"
 				role="grid"
-				aria-label={currentMonth.format("MMMM YYYY")}
+				aria-label={format(currentMonth, "MMMM yyyy")}
 				onKeyDown={handleKeyDown}
 			>
 				{days.map((day, index) => {
-					const dateKey = day.format("YYYY-MM-DD");
-					const isCurrentMonth = day.month() === currentMonth.month();
+					const dateKey = format(day, "yyyy-MM-dd");
+					const isCurrentMonth = getMonth(day) === getMonth(currentMonth);
 					const isToday = dateKey === today;
 					const dayActivities = activitiesByDate.get(dateKey) ?? [];
 

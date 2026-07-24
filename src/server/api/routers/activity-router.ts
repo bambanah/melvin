@@ -9,13 +9,12 @@ import { authedProcedure, router } from "@/server/api/trpc";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { z } from "zod";
 
-import dayjs from "dayjs";
+import { parseUtcTime, utcDate } from "@/lib/date-utils";
+import { format } from "date-fns";
 import {
 	DEFAULT_LIST_LIMIT,
 	DEFAULT_UNBILLED_PAGE_SIZE
 } from "./router.constants";
-dayjs.extend(require("dayjs/plugin/utc"));
-dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
 const defaultActivitySelect = {
 	id: true,
@@ -321,10 +320,10 @@ export const activityRouter = router({
 			const { transportItems, ...activityData } = inputActivity;
 
 			const startTime = activityData.startTime
-				? dayjs.utc(activityData.startTime, "HH:mm").toDate()
+				? parseUtcTime(activityData.startTime)
 				: undefined;
 			const endTime = activityData.endTime
-				? dayjs.utc(activityData.endTime, "HH:mm").toDate()
+				? parseUtcTime(activityData.endTime)
 				: undefined;
 
 			const conflicting = await checkActivityOverlap(ctx.prisma, {
@@ -385,10 +384,10 @@ export const activityRouter = router({
 			const { transportItems, ...activityData } = input.activity;
 
 			const startTime = activityData.startTime
-				? dayjs.utc(activityData.startTime, "HH:mm").toDate()
+				? parseUtcTime(activityData.startTime)
 				: undefined;
 			const endTime = activityData.endTime
-				? dayjs.utc(activityData.endTime, "HH:mm").toDate()
+				? parseUtcTime(activityData.endTime)
 				: undefined;
 
 			const conflicting = await checkActivityOverlap(ctx.prisma, {
@@ -520,10 +519,10 @@ export const activityRouter = router({
 				return {
 					...activityData,
 					startTime: activityData.startTime
-						? dayjs.utc(activityData.startTime, "HH:mm").toDate()
+						? parseUtcTime(activityData.startTime)
 						: undefined,
 					endTime: activityData.endTime
-						? dayjs.utc(activityData.endTime, "HH:mm").toDate()
+						? parseUtcTime(activityData.endTime)
 						: undefined,
 					transportItems
 				};
@@ -586,8 +585,8 @@ export const activityRouter = router({
 					if (!prevActivity.endTime || !activity.startTime) return false;
 					// Check if end time of previous equals start time of current
 					return (
-						dayjs.utc(prevActivity.endTime).format("HH:mm") ===
-						dayjs.utc(activity.startTime).format("HH:mm")
+						format(utcDate(prevActivity.endTime), "HH:mm") ===
+						format(utcDate(activity.startTime), "HH:mm")
 					);
 				});
 

@@ -3,7 +3,13 @@ import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import type { ActivityByDateRangeOutput } from "@/server/api/routers/activity-router";
-import dayjs, { type Dayjs } from "dayjs";
+import {
+	addMonths,
+	format,
+	isSameMonth,
+	startOfMonth,
+	subMonths
+} from "date-fns";
 import { CalendarDays, ChevronLeft, ChevronRight, List } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import CalendarAgenda from "./calendar-agenda";
@@ -22,7 +28,7 @@ function getStoredViewMode(): ViewMode {
 
 const CalendarView = () => {
 	const [currentMonth, setCurrentMonth] = useState(() =>
-		dayjs().startOf("month")
+		startOfMonth(new Date())
 	);
 	// Safe to read localStorage in the initializer: `Layout` renders a skeleton
 	// (not this view) until the session resolves client-side, so CalendarView
@@ -33,11 +39,11 @@ const CalendarView = () => {
 		setViewMode(mode);
 		localStorage.setItem(VIEW_MODE_KEY, mode);
 	}, []);
-	const [selectedDay, setSelectedDay] = useState<Dayjs | null>(null);
-	const [quickAddDay, setQuickAddDay] = useState<Dayjs | null>(null);
+	const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+	const [quickAddDay, setQuickAddDay] = useState<Date | null>(null);
 
-	const startDate = currentMonth.toDate();
-	const endDate = currentMonth.add(1, "month").toDate();
+	const startDate = currentMonth;
+	const endDate = addMonths(currentMonth, 1);
 
 	const {
 		data: activities,
@@ -51,7 +57,7 @@ const CalendarView = () => {
 	const activitiesByDate = useMemo(() => {
 		const map = new Map<string, ActivityByDateRangeOutput>();
 		for (const activity of activities ?? []) {
-			const key = dayjs(activity.date).format("YYYY-MM-DD");
+			const key = format(new Date(activity.date), "yyyy-MM-dd");
 			const existing = map.get(key);
 			if (existing) {
 				existing.push(activity);
@@ -63,10 +69,10 @@ const CalendarView = () => {
 	}, [activities]);
 
 	const selectedDayActivities = selectedDay
-		? (activitiesByDate.get(selectedDay.format("YYYY-MM-DD")) ?? [])
+		? (activitiesByDate.get(format(selectedDay, "yyyy-MM-dd")) ?? [])
 		: [];
 
-	const handleDayClick = useCallback((day: Dayjs) => {
+	const handleDayClick = useCallback((day: Date) => {
 		setSelectedDay(day);
 	}, []);
 
@@ -76,18 +82,18 @@ const CalendarView = () => {
 	}, [selectedDay]);
 
 	const goToPreviousMonth = () => {
-		setCurrentMonth((prev) => prev.subtract(1, "month"));
+		setCurrentMonth((prev) => subMonths(prev, 1));
 	};
 
 	const goToNextMonth = () => {
-		setCurrentMonth((prev) => prev.add(1, "month"));
+		setCurrentMonth((prev) => addMonths(prev, 1));
 	};
 
 	const goToToday = () => {
-		setCurrentMonth(dayjs().startOf("month"));
+		setCurrentMonth(startOfMonth(new Date()));
 	};
 
-	const isCurrentMonth = currentMonth.isSame(dayjs(), "month");
+	const isCurrentMonth = isSameMonth(currentMonth, new Date());
 	const isMonthView = viewMode === "calendar";
 
 	return (
@@ -96,7 +102,7 @@ const CalendarView = () => {
 				<div className="flex items-center gap-2">
 					{isMonthView && (
 						<h1 className="text-xl font-semibold sm:text-2xl">
-							{currentMonth.format("MMMM YYYY")}
+							{format(currentMonth, "MMMM yyyy")}
 						</h1>
 					)}
 				</div>
@@ -154,7 +160,7 @@ const CalendarView = () => {
 
 			<MultiActivityForm
 				key={quickAddDay?.toISOString() ?? "closed"}
-				date={quickAddDay?.toDate() ?? null}
+				date={quickAddDay ?? null}
 				open={quickAddDay !== null}
 				onOpenChange={(open) => {
 					if (!open) setQuickAddDay(null);

@@ -9,7 +9,24 @@ const eslintConfig = defineConfig([
 	prettier,
 	{
 		rules: {
-			"@typescript-eslint/no-require-imports": "off"
+			"@typescript-eslint/no-require-imports": "off",
+			"no-restricted-imports": [
+				"error",
+				{
+					paths: [
+						{
+							name: "dayjs",
+							message: "Use date-fns (+ @date-fns/tz for UTC) instead of dayjs."
+						}
+					],
+					patterns: [
+						{
+							group: ["dayjs/*"],
+							message: "Use date-fns (+ @date-fns/tz for UTC) instead of dayjs."
+						}
+					]
+				}
+			]
 		}
 	},
 	// Override default ignores of eslint-config-next.

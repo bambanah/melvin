@@ -15,7 +15,8 @@ import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogPanel, Transition } from "@headlessui/react";
 import { InvoiceStatus } from "@/generated/browser";
-import dayjs from "dayjs";
+import { utcDate } from "@/lib/date-utils";
+import { format } from "date-fns";
 import {
 	ChevronDown,
 	Clock,
@@ -31,8 +32,6 @@ import {
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Fragment, useState } from "react";
-
-dayjs.extend(require("dayjs/plugin/utc"));
 
 const PdfPreview = dynamic(() => import("@/components/invoices/pdf-preview"), {
 	ssr: false
@@ -270,7 +269,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 						</div>
 						{invoice.sentAt && (
 							<div className="text-foreground/80 flex flex-col gap-1">
-								<p>Sent on: {dayjs.utc(invoice.sentAt).format("DD/MM/YYYY")}</p>
+								<p>Sent on: {format(utcDate(invoice.sentAt), "dd/MM/yyyy")}</p>
 							</div>
 						)}
 					</div>
@@ -288,9 +287,9 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 							<div>
 								<p className="font-semibold">{version.displayInvoiceNo}</p>
 								<p className="text-foreground/60 text-sm">
-									Sent {dayjs.utc(version.sentAt).format("DD/MM/YYYY")}
+									Sent {format(utcDate(version.sentAt), "dd/MM/yyyy")}
 									{version.paidAt &&
-										` · Paid ${dayjs.utc(version.paidAt).format("DD/MM/YYYY")}`}
+										` · Paid ${format(utcDate(version.paidAt), "dd/MM/yyyy")}`}
 									{version.backfilled && " · Backfilled"}
 								</p>
 							</div>
@@ -333,7 +332,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					<p className="font-semibold">Info</p>
 					<div className="flex items-center gap-4 p-2">
 						<Clock className="h-4 w-4" />
-						<p>{dayjs.utc(invoice.date).format("DD/MM/YYYY")}</p>
+						<p>{format(utcDate(invoice.date), "dd/MM/yyyy")}</p>
 					</div>
 					<Link
 						className="text-fg hover:bg-foreground/15 flex w-full items-center gap-4 rounded-md p-2 text-left"
@@ -352,7 +351,7 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 					{invoice.paidAt && (
 						<div className="flex items-center gap-4 p-2">
 							<DollarSign className="h-4 w-4" />
-							<p>Paid {dayjs.utc(invoice.paidAt).format("DD/MM/YYYY")}</p>
+							<p>Paid {format(utcDate(invoice.paidAt), "dd/MM/yyyy")}</p>
 						</div>
 					)}
 				</div>
