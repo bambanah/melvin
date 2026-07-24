@@ -87,7 +87,7 @@ export function MultiActivityForm({
 		append(newRow);
 	};
 
-	const onSubmit = (data: MultiActivityFormModel) => {
+	const onSubmit = async (data: MultiActivityFormModel) => {
 		const payload = buildBulkAddPayload(data.activities, data.date, {
 			defaultSupportItemId: defaultSupportItemId ?? undefined,
 			defaultGroupSupportItemId: defaultGroupSupportItemId ?? undefined
@@ -98,30 +98,29 @@ export function MultiActivityForm({
 			return;
 		}
 
-		return bulkAddMutation
-			.mutateAsync(payload)
-			.then((result) => {
-				trpcUtils.activity.byDateRange.invalidate();
-				trpcUtils.activity.list.invalidate();
-				trpcUtils.activity.pending.invalidate();
+		try {
+			const result = await bulkAddMutation.mutateAsync(payload);
 
-				const tripMessage = result.tripId ? " · Linked as trip" : "";
-				toast.success(
-					`${result.activities.length} ${result.activities.length === 1 ? "activity" : "activities"} saved${tripMessage}`
-				);
+			await trpcUtils.activity.byDateRange.invalidate();
+			trpcUtils.activity.list.invalidate();
+			trpcUtils.activity.pending.invalidate();
 
-				onSuccess?.();
-				onOpenChange(false);
+			const tripMessage = result.tripId ? " · Linked as trip" : "";
+			toast.success(
+				`${result.activities.length} ${result.activities.length === 1 ? "activity" : "activities"} saved${tripMessage}`
+			);
 
-				// Reset rows, keeping the selected date
-				form.reset({
-					date: form.getValues("date"),
-					activities: [createEmptyRow()]
-				});
-			})
-			.catch(() => {
-				toast.error("Failed to save activities");
+			onSuccess?.();
+			onOpenChange(false);
+
+			// Reset rows, keeping the selected date
+			form.reset({
+				date: form.getValues("date"),
+				activities: [createEmptyRow()]
 			});
+		} catch {
+			toast.error("Failed to save activities");
+		}
 	};
 
 	const onInvalid = () => {
