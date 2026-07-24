@@ -52,10 +52,6 @@ export const formatDuration = (duration: number) => {
 	return durationString;
 };
 
-export const getTotalInvoiceHours = () => {
-	return 69;
-};
-
 // TODO: Implement dynamic holidays
 // (e.g. Easter occurs on the Sunday after the first full moon following the vernal equinox)
 const HOLIDAYS = new Set([

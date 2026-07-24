@@ -1,21 +1,5 @@
-import { floorToCent, pickRandomFrom, round } from "@/lib/generic-utils";
+import { floorToCent, round } from "@/lib/generic-utils";
 import { expect, test } from "vitest";
-
-const testArr = ["first", "second", "third", "fourth", "fifth"];
-
-test("should correctly pick random from array", () => {
-	const random = pickRandomFrom(testArr);
-
-	expect(testArr).toContain(random);
-});
-
-test("should correctly avoid specified item when picking random from array", () => {
-	for (let i = 0; i < 20; i++) {
-		const random = pickRandomFrom(testArr, "first");
-
-		expect(random === "first").toBeFalsy();
-	}
-});
 
 test("Should round correctly", () => {
 	expect(round(10, 2)).toEqual(10);
