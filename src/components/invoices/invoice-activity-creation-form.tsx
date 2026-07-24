@@ -1,4 +1,5 @@
 import ClientSelect from "@/components/forms/client-select";
+import { GroupParticipantsEditor } from "@/components/forms/group-participants-editor";
 import SupportItemSelect from "@/components/forms/support-item-select";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -18,15 +19,7 @@ import {
 import { stripTimezone } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
-import {
-	appendParticipant,
-	removeParticipantAt,
-	setParticipantAt
-} from "@/lib/group-participants";
-import {
-	InvoiceSchema,
-	MAX_ADDITIONAL_GROUP_PARTICIPANTS
-} from "@/schema/invoice-schema";
+import { InvoiceSchema } from "@/schema/invoice-schema";
 import { format } from "date-fns";
 import {
 	ArrowRight,
@@ -156,41 +149,6 @@ const InvoiceActivityCreationForm = ({
 			groupClientIds
 		);
 
-	const currentGroupClientIds = (activityIndex: number): string[] =>
-		getValues().activitiesToCreate[activityIndex].groupClientIds ?? [];
-
-	const updateGroupClientId = (
-		activityIndex: number,
-		participantIndex: number,
-		clientId: string
-	) =>
-		setGroupClientIds(
-			activityIndex,
-			setParticipantAt(
-				currentGroupClientIds(activityIndex),
-				participantIndex,
-				clientId
-			)
-		);
-
-	const addGroupParticipant = (activityIndex: number) =>
-		setGroupClientIds(
-			activityIndex,
-			appendParticipant(currentGroupClientIds(activityIndex))
-		);
-
-	const removeGroupParticipant = (
-		activityIndex: number,
-		participantIndex: number
-	) =>
-		setGroupClientIds(
-			activityIndex,
-			removeParticipantAt(
-				currentGroupClientIds(activityIndex),
-				participantIndex
-			)
-		);
-
 	return (
 		<div className="flex flex-col gap-4">
 			<Heading size="xsmall">Create Activities</Heading>
@@ -226,62 +184,35 @@ const InvoiceActivityCreationForm = ({
 							{isGroupSupportItem(
 								watch("activitiesToCreate")[index].supportItemId
 							) && (
-								<div className="mb-2 flex flex-col gap-2">
-									{(
-										watch(`activitiesToCreate.${index}.groupClientIds`) ?? []
-									).map((groupClientId, participantIndex) => (
-										<div
-											key={participantIndex}
-											className="flex items-center gap-2"
-										>
-											<div className="shrink grow basis-1/2">
-												<ClientSelect
-													excludeClientId={watch("clientId")}
-													excludeClientIds={(
-														watch(
-															`activitiesToCreate.${index}.groupClientIds`
-														) ?? []
-													).filter((_, i) => i !== participantIndex)}
-													onValueChange={(clientId) =>
-														updateGroupClientId(
-															index,
-															participantIndex,
-															clientId
-														)
-													}
-													value={groupClientId}
-												/>
-											</div>
-											<Button
-												variant="ghost"
-												size="icon"
-												onClick={() =>
-													removeGroupParticipant(index, participantIndex)
-												}
-												type="button"
-											>
-												<X className="h-6 w-6" />
-											</Button>
-										</div>
-									))}
-									{(watch(`activitiesToCreate.${index}.groupClientIds`) ?? [])
-										.length < MAX_ADDITIONAL_GROUP_PARTICIPANTS && (
-										<Button
-											onClick={() => addGroupParticipant(index)}
-											className="mr-auto"
-											variant="outline"
-											size="sm"
-											type="button"
-										>
-											+ Add Participant
-										</Button>
-									)}
-									{(watch(`activitiesToCreate.${index}.groupClientIds`) ?? [])
-										.length === 0 && (
-										<p className="text-destructive text-sm">
-											At least one other participant is required
-										</p>
-									)}
+								<div className="mb-2">
+									<GroupParticipantsEditor
+										value={
+											watch(`activitiesToCreate.${index}.groupClientIds`) ?? []
+										}
+										onChange={(ids) => setGroupClientIds(index, ids)}
+										excludeClientId={watch("clientId")}
+										error={
+											(
+												watch(`activitiesToCreate.${index}.groupClientIds`) ??
+												[]
+											).length === 0
+												? "At least one other participant is required"
+												: undefined
+										}
+										renderClientSelect={({
+											value,
+											onChange,
+											excludeClientId,
+											excludeClientIds
+										}) => (
+											<ClientSelect
+												value={value}
+												onValueChange={onChange}
+												excludeClientId={excludeClientId}
+												excludeClientIds={excludeClientIds}
+											/>
+										)}
+									/>
 								</div>
 							)}
 
