@@ -12,4 +12,4 @@ Run typechecking regularly, single test files regularly, and the full test suite
 
 Once done, use /code-review to review the work.
 
-Commit your work to the current branch.
+If the current checked out branch is main, create a new branch for the work and commit. Otherwise, commit to the current branch.
