@@ -73,44 +73,47 @@ export const userRouter = router({
 			});
 		}
 
-		// Deleting client will cascade delete invoices and activities
-		await ctx.prisma.client.deleteMany({
-			where: {
-				ownerId: userId
-			}
-		});
+		// A reset is a deliberate, confirmed "remove all my data" action, so it
+		// is the sanctioned exception to ADR-0004's InvoiceVersion onDelete:
+		// Restrict (which exists to block *accidental* cascade deletes). Delete
+		// the frozen versions explicitly first, otherwise the client cascade
+		// into Invoice would hit the Restrict and roll the whole wipe back.
+		// The sequence runs in a transaction so a mid-way failure can't leave
+		// financial records half-destroyed.
+		await ctx.prisma.$transaction([
+			ctx.prisma.invoiceVersion.deleteMany({
+				where: { invoice: { ownerId: userId } }
+			}),
 
-		// In case there are any orphaned invoices or activities, delete those too
-		await ctx.prisma.invoice.deleteMany({
-			where: {
-				ownerId: userId
-			}
-		});
+			// Deleting client will cascade delete invoices and activities
+			ctx.prisma.client.deleteMany({
+				where: { ownerId: userId }
+			}),
 
-		await ctx.prisma.activity.deleteMany({
-			where: {
-				ownerId: userId
-			}
-		});
+			// In case there are any orphaned invoices or activities, delete those too
+			ctx.prisma.invoice.deleteMany({
+				where: { ownerId: userId }
+			}),
 
-		await ctx.prisma.supportItem.deleteMany({
-			where: {
-				ownerId: userId
-			}
-		});
+			ctx.prisma.activity.deleteMany({
+				where: { ownerId: userId }
+			}),
 
-		await ctx.prisma.user.update({
-			where: {
-				id: userId
-			},
-			data: {
-				abn: null,
-				name: null,
-				bankName: null,
-				bankNumber: null,
-				bsb: null
-			}
-		});
+			ctx.prisma.supportItem.deleteMany({
+				where: { ownerId: userId }
+			}),
+
+			ctx.prisma.user.update({
+				where: { id: userId },
+				data: {
+					abn: null,
+					name: null,
+					bankName: null,
+					bankNumber: null,
+					bsb: null
+				}
+			})
+		]);
 	})
 });
 

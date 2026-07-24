@@ -145,14 +145,12 @@ test("reset clears all owned data and nulls the profile, leaving other users unt
 	);
 });
 
-// Characterization (see issue #408): a sent invoice makes reset's first
-// `client.deleteMany` cascade into Invoice and hit the ADR-0004
-// `InvoiceVersion` onDelete: Restrict. That single Postgres DELETE statement
-// rolls back whole, so nothing is deleted - not even the unrelated clean
-// client - and the profile-nulling never runs. It's a safe atomic no-op, but
-// it leaks a raw Prisma FK error to the caller (follow-up: return a clear
-// TRPCError instead).
-test("reset atomically no-ops when a sent invoice exists (fails on the first deleteMany, nothing is deleted)", async () => {
+// A confirmed account reset is the sanctioned exception to ADR-0004's
+// InvoiceVersion onDelete: Restrict (see issue #445): it deletes the frozen
+// versions explicitly first, so a sent invoice no longer blocks the wipe. The
+// whole account - including the sent invoice and its version - is cleared and
+// the profile nulled.
+test("reset wipes everything including a sent invoice and its frozen version", async () => {
 	const owner = await createTestUser();
 	const caller = callerFor(owner);
 	await caller.user.update({ user: PROFILE });
@@ -197,28 +195,40 @@ test("reset atomically no-ops when a sent invoice exists (fails on the first del
 		}
 	});
 
-	await expect(caller.user.reset()).rejects.toThrow();
+	// Sending froze a version - the record ADR-0004 restricts.
+	expect(
+		await prisma.invoiceVersion.count({
+			where: { invoice: { ownerId: owner.id } }
+		})
+	).toBe(1);
 
-	// Nothing deleted.
-	expect(await prisma.client.count({ where: { ownerId: owner.id } })).toBe(2);
+	await caller.user.reset();
+
+	// Everything is gone, including the sent invoice and its frozen version.
+	expect(await prisma.client.count({ where: { ownerId: owner.id } })).toBe(0);
 	expect(
 		await prisma.invoice.findUnique({ where: { id: sentInvoice.id } })
-	).not.toBeNull();
-	expect(await prisma.activity.count({ where: { ownerId: owner.id } })).toBe(2);
+	).toBeNull();
+	expect(await prisma.activity.count({ where: { ownerId: owner.id } })).toBe(0);
 	expect(
 		await prisma.activity.findUnique({ where: { id: cleanActivity.id } })
-	).not.toBeNull();
+	).toBeNull();
 	expect(await prisma.supportItem.count({ where: { ownerId: owner.id } })).toBe(
-		2
+		0
 	);
+	expect(
+		await prisma.invoiceVersion.count({
+			where: { invoice: { ownerId: owner.id } }
+		})
+	).toBe(0);
 
-	// Profile fields all unchanged (the nulling never ran).
-	const unchanged = await prisma.user.findUniqueOrThrow({
+	// Profile fields all nulled.
+	const nulled = await prisma.user.findUniqueOrThrow({
 		where: { id: owner.id }
 	});
-	expect(Number(unchanged.abn)).toBe(PROFILE.abn);
-	expect(unchanged.name).toBe(PROFILE.name);
-	expect(unchanged.bankName).toBe(PROFILE.bankName);
-	expect(Number(unchanged.bankNumber)).toBe(PROFILE.bankNumber);
-	expect(unchanged.bsb).toBe(PROFILE.bsb);
+	expect(nulled.abn).toBeNull();
+	expect(nulled.name).toBeNull();
+	expect(nulled.bankName).toBeNull();
+	expect(nulled.bankNumber).toBeNull();
+	expect(nulled.bsb).toBeNull();
 });
