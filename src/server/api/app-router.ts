@@ -2,6 +2,7 @@ import { router } from "@/server/api/trpc";
 import { activityRouter } from "./routers/activity-router";
 import { clientRouter } from "./routers/client-router";
 import { invoiceRouter } from "./routers/invoice-router";
+import { logRouter } from "./routers/log-router";
 import { pdfRouter } from "./routers/pdf-router";
 import { supportItemRouter } from "./routers/support-item-router";
 import { tripRouter } from "./routers/trip-router";
@@ -14,7 +15,8 @@ export const appRouter = router({
 	supportItem: supportItemRouter,
 	clients: clientRouter,
 	pdf: pdfRouter,
-	trip: tripRouter
+	trip: tripRouter,
+	log: logRouter
 });
 
 export type AppRouter = typeof appRouter;

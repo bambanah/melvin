@@ -199,13 +199,41 @@ function ownedSupportItemRates(prisma: PrismaClient, ownerId: string) {
 	};
 }
 
+function ownedWorkSession(prisma: PrismaClient, ownerId: string) {
+	const model = prisma.workSession;
+
+	return {
+		findMany<T extends Prisma.WorkSessionFindManyArgs>(args?: T) {
+			return model.findMany({
+				...args,
+				where: { ...args?.where, ownerId }
+			} as Prisma.SelectSubset<T, Prisma.WorkSessionFindManyArgs>);
+		},
+		findFirst<T extends Prisma.WorkSessionFindFirstArgs>(args?: T) {
+			return model.findFirst({
+				...args,
+				where: { ...args?.where, ownerId }
+			} as Prisma.SelectSubset<T, Prisma.WorkSessionFindFirstArgs>);
+		},
+		async assert(id: string) {
+			const record = await model.findFirst({
+				where: { id, ownerId },
+				select: { id: true }
+			});
+			if (!record) notFound();
+			return record;
+		}
+	};
+}
+
 export function ownedDb(prisma: PrismaClient, ownerId: string) {
 	return {
 		client: ownedClient(prisma, ownerId),
 		invoice: ownedInvoice(prisma, ownerId),
 		activity: ownedActivity(prisma, ownerId),
 		supportItem: ownedSupportItem(prisma, ownerId),
-		supportItemRates: ownedSupportItemRates(prisma, ownerId)
+		supportItemRates: ownedSupportItemRates(prisma, ownerId),
+		workSession: ownedWorkSession(prisma, ownerId)
 	};
 }
 
