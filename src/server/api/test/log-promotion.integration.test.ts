@@ -9,7 +9,7 @@ beforeEach(async () => {
 const DAY = new Date("2024-01-01");
 
 // A Provider with default solo/group Support Items and two Clients with
-// stored home distances — the standing setup Promotion draws on.
+// stored home distances - the standing setup Promotion draws on.
 async function createProviderFixture() {
 	const owner = await createTestUser();
 

@@ -272,7 +272,7 @@ enum HandoverType {
   IN_PLACE
 }
 
-// Domain term "Session" — the code name avoids the NextAuth Session table.
+// Domain term "Session" - the code name avoids the NextAuth Session table.
 // A captured unit of field work: ephemeral, deleted when a day is promoted
 // into Activities. `id` is client-generated (a cuid minted on-device) so
 // offline creates have stable identity across sync replays.
@@ -290,7 +290,7 @@ model WorkSession {
   // Handover fields live on the *later* Session. A TRAVEL handover carries the
   // driven distance (required) and an optional entered duration (defaulted
   // from the gap at Promotion when null); an IN_PLACE handover records no
-  // driving — it marks a participant composition change at the pivot instant.
+  // driving - it marks a participant composition change at the pivot instant.
   precededByWorkSessionId String?       @unique
   precededBy              WorkSession?  @relation("WorkSessionHandover", fields: [precededByWorkSessionId], references: [id], onDelete: SetNull)
   followedBy              WorkSession?  @relation("WorkSessionHandover")
@@ -306,7 +306,7 @@ model WorkSession {
 }
 
 // One row = solo; N rows = group (groupSize derives from the count).
-// Composition is fixed for a Session's whole life — add/remove participant
+// Composition is fixed for a Session's whole life - add/remove participant
 // splits into a new Session via an in-place Handover.
 model WorkSessionParticipant {
   workSessionId String
