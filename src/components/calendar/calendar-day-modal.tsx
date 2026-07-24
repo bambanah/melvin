@@ -19,6 +19,7 @@ import utc from "dayjs/plugin/utc";
 import { Car, Clock, Link2, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import ActivitySubLines from "./activity-sub-lines";
 
 dayjs.extend(utc);
 
@@ -192,6 +193,8 @@ const ActivityRow = ({ activity, rateContext }: ActivityRowProps) => {
 						Invoice #{activity.invoice.invoiceNo}
 					</span>
 				)}
+
+				<ActivitySubLines activity={activity} rateContext={rateContext} />
 			</div>
 
 			<span className="text-sm font-medium whitespace-nowrap">
