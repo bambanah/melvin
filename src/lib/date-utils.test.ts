@@ -1,9 +1,11 @@
 import {
 	formatActivityDuration,
 	formatDuration,
-	getDuration
+	getDuration,
+	stripTimezone
 } from "@/lib/date-utils";
 
+import { TZDate } from "@date-fns/tz";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { expect, test } from "vitest";
@@ -79,4 +81,51 @@ test("Should get pretty duration", () => {
 	expect(
 		formatDuration(getDuration(dateFromTime("09:00"), dateFromTime("09:14")))
 	).toEqual("14 mins");
+});
+
+// stripTimezone reads a Date's *local* calendar components and re-anchors them
+// at 00:00:00 UTC. Building inputs as `TZDate` instances in an explicit zone
+// (via @date-fns/tz) makes each assertion deterministic on any runner without
+// mutating global TZ state. `reinterpret` re-reads an instant in a given zone,
+// which is how a second stripTimezone pass sees its own (UTC-midnight) output.
+const reinterpret = (date: Date, tz: string) => new TZDate(date.getTime(), tz);
+
+test("stripTimezone maps a local date's calendar day to UTC midnight", () => {
+	// 23:30 on the 15th in UTC+10 -> the 15th at 00:00 UTC (time-of-day discarded).
+	const local = new TZDate(2024, 0, 15, 23, 30, "Australia/Brisbane");
+	expect(stripTimezone(local).toISOString()).toBe("2024-01-15T00:00:00.000Z");
+});
+
+test("stripTimezone always resets the time-of-day to UTC midnight", () => {
+	const result = stripTimezone(
+		new TZDate(2024, 5, 30, 17, 45, 12, 500, "Australia/Brisbane")
+	);
+	expect(result.getUTCHours()).toBe(0);
+	expect(result.getUTCMinutes()).toBe(0);
+	expect(result.getUTCSeconds()).toBe(0);
+	expect(result.getUTCMilliseconds()).toBe(0);
+});
+
+test("stripTimezone is idempotent in a non-negative UTC offset", () => {
+	// UTC+10: the first result (UTC midnight) reads back as the same local day,
+	// so a second application is a fixed point.
+	const once = stripTimezone(
+		new TZDate(2024, 0, 15, 23, 30, "Australia/Brisbane")
+	);
+	const twice = stripTimezone(reinterpret(once, "Australia/Brisbane"));
+	expect(twice.toISOString()).toBe(once.toISOString());
+});
+
+test("stripTimezone anchors on the local calendar day of a UTC-negative zone", () => {
+	// stripTimezone is defined by the *local* calendar day: a fresh picker date
+	// converts correctly in any zone (first assertion). It is only non-idempotent
+	// in UTC-negative zones because its own output (UTC midnight) reads back as
+	// the previous local day there. Melvin runs in UTC+10, so this never bites in
+	// practice; the test documents the semantics rather than a defect.
+	const once = stripTimezone(
+		new TZDate(2024, 0, 15, 23, 30, "America/New_York")
+	);
+	const twice = stripTimezone(reinterpret(once, "America/New_York"));
+	expect(once.toISOString()).toBe("2024-01-15T00:00:00.000Z");
+	expect(twice.toISOString()).toBe("2024-01-14T00:00:00.000Z");
 });
