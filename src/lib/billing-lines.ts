@@ -64,7 +64,7 @@ export interface TransitRateContext {
 	userTransitRatePerKm?: number;
 }
 
-const DEFAULT_TRANSIT_RATE = 0.99;
+export const DEFAULT_TRANSIT_RATE = 0.99;
 
 export const DEFAULT_ACTIVITY_TRANSPORT_RATE = 0.99;
 

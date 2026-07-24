@@ -1,5 +1,8 @@
+import { getTotalCostOfActivities } from "@/lib/activity-utils";
+import { DEFAULT_TRANSIT_RATE } from "@/lib/billing-lines";
 import { checkActivityOverlap, formatOverlapError } from "@/lib/overlap-utils";
 import { baseListQueryInput } from "@/lib/trpc";
+import type { Prisma } from "@/generated/client";
 import { activitySchema } from "@/schema/activity-schema";
 import { paginate } from "@/server/api/owned";
 import { authedProcedure, router } from "@/server/api/trpc";
@@ -7,7 +10,10 @@ import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { z } from "zod";
 
 import dayjs from "dayjs";
-import { DEFAULT_LIST_LIMIT } from "./router.constants";
+import {
+	DEFAULT_LIST_LIMIT,
+	DEFAULT_UNBILLED_PAGE_SIZE
+} from "./router.constants";
 dayjs.extend(require("dayjs/plugin/utc"));
 dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
@@ -100,6 +106,30 @@ const byIdActivitySelect = {
 	}
 };
 
+// "Unbilled" = work that still needs to be invoiced: either never attached to
+// an invoice, or attached to a draft still in status CREATED (never-sent drafts
+// and re-opened amendments). Sent (SENT) and paid (PAID) work is billed and
+// excluded. Deliberately broader than `activity.pending` (unattached only) and
+// deliberately NOT changing it — pick-up still means unattached.
+const unbilledActivityWhere = {
+	OR: [{ invoiceId: null }, { invoice: { status: "CREATED" } }]
+} satisfies Prisma.ActivityWhereInput;
+
+// List/summary need groupSize for correct group apportionment and the invoice
+// status to badge draft-attached rows, on top of the shared lean select.
+const unbilledActivitySelect = {
+	...defaultActivitySelect,
+	groupSize: true,
+	invoiceId: true,
+	invoice: {
+		select: {
+			invoiceNo: true,
+			id: true,
+			status: true
+		}
+	}
+};
+
 function getInvoiceIdWhereCondition(invoiceIdAssigned?: boolean) {
 	if (invoiceIdAssigned === undefined) return;
 
@@ -152,6 +182,54 @@ export const activityRouter = router({
 				nextCursor
 			};
 		}),
+	// The dashboard "Unbilled" list: all-time, oldest-first, infinite-scrolled.
+	unbilledList: authedProcedure
+		.input(baseListQueryInput)
+		.query(async ({ ctx, input }) => {
+			const limit = input.limit ?? DEFAULT_UNBILLED_PAGE_SIZE;
+
+			const { items: activities, nextCursor } = await paginate({
+				limit,
+				cursor: input.cursor,
+				query: ({ take, cursor }) =>
+					ctx.owned.activity.findMany({
+						select: unbilledActivitySelect,
+						take,
+						cursor,
+						where: unbilledActivityWhere,
+						orderBy: [{ date: "asc" }, { startTime: "asc" }]
+					})
+			});
+
+			return { activities, nextCursor };
+		}),
+	// Count + grand total for the whole unbilled set, computed by running every
+	// unbilled activity through the single billing path — never summed from the
+	// loaded pages, so the header stays correct regardless of how far the user
+	// has scrolled.
+	unbilledSummary: authedProcedure.query(async ({ ctx }) => {
+		const activities = await ctx.owned.activity.findMany({
+			select: { ...defaultActivitySelect, groupSize: true },
+			where: unbilledActivityWhere
+		});
+
+		const user = await ctx.prisma.user.findUnique({
+			where: { id: ctx.session.user.id },
+			select: { transitRatePerKm: true }
+		});
+
+		const rateContext = {
+			userTransitRatePerKm: Number(
+				user?.transitRatePerKm ?? DEFAULT_TRANSIT_RATE
+			)
+		};
+
+		const total = getTotalCostOfActivities(activities, rateContext, {
+			forDisplay: true
+		});
+
+		return { count: activities.length, total };
+	}),
 	pending: authedProcedure.query(async ({ ctx }) => {
 		const activities = await ctx.owned.activity.findMany({
 			select: defaultActivitySelect,
@@ -562,3 +640,7 @@ export type ActivityByIdOutput = inferRouterOutputs<
 export type ActivityByDateRangeOutput = inferRouterOutputs<
 	typeof activityRouter
 >["byDateRange"];
+
+export type ActivityUnbilledListOutput = inferRouterOutputs<
+	typeof activityRouter
+>["unbilledList"];

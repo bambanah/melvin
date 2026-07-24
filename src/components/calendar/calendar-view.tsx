@@ -13,11 +13,26 @@ import { MultiActivityForm } from "@/components/activities/multi-activity-form";
 
 type ViewMode = "calendar" | "list";
 
+const VIEW_MODE_KEY = "calendar-view-mode";
+
+function getStoredViewMode(): ViewMode {
+	if (typeof window === "undefined") return "calendar";
+	return localStorage.getItem(VIEW_MODE_KEY) === "list" ? "list" : "calendar";
+}
+
 const CalendarView = () => {
 	const [currentMonth, setCurrentMonth] = useState(() =>
 		dayjs().startOf("month")
 	);
-	const [viewMode, setViewMode] = useState<ViewMode>("calendar");
+	// Safe to read localStorage in the initializer: `Layout` renders a skeleton
+	// (not this view) until the session resolves client-side, so CalendarView
+	// never renders during SSR and there is no server markup to mismatch.
+	const [viewMode, setViewMode] = useState<ViewMode>(getStoredViewMode);
+
+	const handleViewModeChange = useCallback((mode: ViewMode) => {
+		setViewMode(mode);
+		localStorage.setItem(VIEW_MODE_KEY, mode);
+	}, []);
 	const [selectedDay, setSelectedDay] = useState<Dayjs | null>(null);
 	const [quickAddDay, setQuickAddDay] = useState<Dayjs | null>(null);
 
@@ -73,39 +88,49 @@ const CalendarView = () => {
 	};
 
 	const isCurrentMonth = currentMonth.isSame(dayjs(), "month");
+	const isMonthView = viewMode === "calendar";
 
 	return (
 		<Layout className="mx-auto w-full max-w-7xl gap-4 px-2 sm:px-4">
 			<div className="flex items-center justify-between pb-4">
 				<div className="flex items-center gap-2">
-					<h1 className="text-xl font-semibold sm:text-2xl">
-						{currentMonth.format("MMMM YYYY")}
-					</h1>
+					{isMonthView && (
+						<h1 className="text-xl font-semibold sm:text-2xl">
+							{currentMonth.format("MMMM YYYY")}
+						</h1>
+					)}
 				</div>
 
 				<div className="flex items-center gap-1">
-					<ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+					<ViewToggle
+						viewMode={viewMode}
+						onViewModeChange={handleViewModeChange}
+					/>
 
-					<div className="bg-border mx-1 h-6 w-px" />
+					{isMonthView && (
+						<>
+							<div className="bg-border mx-1 h-6 w-px" />
 
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={goToToday}
-						disabled={isCurrentMonth}
-					>
-						Today
-					</Button>
-					<Button variant="ghost" size="icon" onClick={goToPreviousMonth}>
-						<ChevronLeft className="h-4 w-4" />
-					</Button>
-					<Button variant="ghost" size="icon" onClick={goToNextMonth}>
-						<ChevronRight className="h-4 w-4" />
-					</Button>
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={goToToday}
+								disabled={isCurrentMonth}
+							>
+								Today
+							</Button>
+							<Button variant="ghost" size="icon" onClick={goToPreviousMonth}>
+								<ChevronLeft className="h-4 w-4" />
+							</Button>
+							<Button variant="ghost" size="icon" onClick={goToNextMonth}>
+								<ChevronRight className="h-4 w-4" />
+							</Button>
+						</>
+					)}
 				</div>
 			</div>
 
-			{viewMode === "calendar" ? (
+			{isMonthView ? (
 				<CalendarMonth
 					currentMonth={currentMonth}
 					activities={activities ?? []}
@@ -113,11 +138,7 @@ const CalendarView = () => {
 					onDayClick={handleDayClick}
 				/>
 			) : (
-				<CalendarAgenda
-					currentMonth={currentMonth}
-					activities={activities ?? []}
-					isLoading={isLoading}
-				/>
+				<CalendarAgenda />
 			)}
 
 			<CalendarDayModal
