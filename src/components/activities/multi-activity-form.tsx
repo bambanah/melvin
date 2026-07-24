@@ -1,10 +1,8 @@
 import { ClientQuickSelect } from "@/components/forms/client-quick-select";
+import { GroupParticipantsEditor } from "@/components/forms/group-participants-editor";
 import { SummingDistanceInput } from "@/components/forms/summing-distance-input";
-import {
-	TimeRangeInput,
-	TimeRangeValue,
-	validateTimeRange
-} from "@/components/forms/time-range-input";
+import { TimeRangeInput } from "@/components/forms/time-range-input";
+import { TransportItemsEditor } from "@/components/forms/transport-items-editor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import DatePicker from "@/components/ui/date-picker";
@@ -15,24 +13,10 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { stripTimezone } from "@/lib/date-utils";
-import {
-	appendParticipant,
-	removeParticipantAt,
-	setParticipantAt
-} from "@/lib/group-participants";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
-import type {
-	ActivitySchema,
-	ActivityTransportItemSchema
-} from "@/schema/activity-schema";
-import {
-	MAX_ADDITIONAL_GROUP_PARTICIPANTS,
-	totalGroupSize
-} from "@/schema/invoice-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	ChevronDown,
 	ChevronUp,
@@ -43,39 +27,19 @@ import {
 	Users
 } from "lucide-react";
 import { useState } from "react";
+import {
+	Controller,
+	useFieldArray,
+	useForm,
+	type UseFormReturn
+} from "react-hook-form";
 import { toast } from "react-toastify";
-
-interface ActivityRowData {
-	id: string;
-	clientId: string;
-	isGroup: boolean;
-	groupClientIds: string[];
-	timeRange: TimeRangeValue;
-	transportKm: number | undefined;
-	transportItems: ActivityTransportItemSchema[];
-	supportItemId: string;
-	showAdvanced: boolean;
-	errors: {
-		client?: string;
-		groupClient?: string;
-		timeRange?: string;
-	};
-}
-
-function createEmptyRow(): ActivityRowData {
-	return {
-		id: crypto.randomUUID(),
-		clientId: "",
-		isGroup: false,
-		groupClientIds: [],
-		timeRange: { startTime: "", endTime: "" },
-		transportKm: undefined,
-		transportItems: [],
-		supportItemId: "",
-		showAdvanced: false,
-		errors: {}
-	};
-}
+import {
+	buildBulkAddPayload,
+	createEmptyRow,
+	multiActivityFormSchema,
+	type MultiActivityFormModel
+} from "./multi-activity-form-model";
 
 interface Props {
 	date: Date | null;
@@ -90,21 +54,28 @@ export function MultiActivityForm({
 	onOpenChange,
 	onSuccess
 }: Props) {
-	const [date, setDate] = useState<Date>(initialDate ?? new Date());
-	const [rows, setRows] = useState<ActivityRowData[]>([createEmptyRow()]);
-
 	const trpcUtils = trpc.useUtils();
 	const { data: { defaultSupportItemId, defaultGroupSupportItemId } = {} } =
 		trpc.user.fetch.useQuery();
 	const bulkAddMutation = trpc.activity.bulkAdd.useMutation();
 
-	const updateRow = (id: string, updates: Partial<ActivityRowData>) => {
-		setRows((prev) =>
-			prev.map((row) => (row.id === id ? { ...row, ...updates } : row))
-		);
-	};
+	const form = useForm<MultiActivityFormModel>({
+		resolver: zodResolver(multiActivityFormSchema),
+		mode: "onSubmit",
+		reValidateMode: "onChange",
+		defaultValues: {
+			date: initialDate ?? new Date(),
+			activities: [createEmptyRow()]
+		}
+	});
+
+	const { fields, append, remove } = useFieldArray({
+		control: form.control,
+		name: "activities"
+	});
 
 	const addRow = () => {
+		const rows = form.getValues("activities");
 		const lastRow = rows[rows.length - 1];
 		const newRow = createEmptyRow();
 
@@ -113,172 +84,48 @@ export function MultiActivityForm({
 			newRow.timeRange.startTime = lastRow.timeRange.endTime;
 		}
 
-		setRows((prev) => [...prev, newRow]);
+		append(newRow);
 	};
 
-	const removeRow = (id: string) => {
-		if (rows.length <= 1) return;
-		setRows((prev) => prev.filter((row) => row.id !== id));
-	};
-
-	const addTransportItem = (rowId: string) => {
-		updateRow(rowId, {
-			transportItems: [
-				...rows.find((r) => r.id === rowId)!.transportItems,
-				{ type: "PARKING", amount: 0, note: "" }
-			]
-		});
-	};
-
-	const updateTransportItem = (
-		rowId: string,
-		index: number,
-		updates: Partial<ActivityTransportItemSchema>
-	) => {
-		const row = rows.find((r) => r.id === rowId);
-		if (!row) return;
-
-		const items = [...row.transportItems];
-		items[index] = { ...items[index], ...updates };
-		updateRow(rowId, { transportItems: items });
-	};
-
-	const removeTransportItem = (rowId: string, index: number) => {
-		const row = rows.find((r) => r.id === rowId);
-		if (!row) return;
-
-		updateRow(rowId, {
-			transportItems: row.transportItems.filter((_, i) => i !== index)
-		});
-	};
-
-	const validateRows = (): boolean => {
-		let isValid = true;
-		const newRows = rows.map((row) => {
-			const errors: ActivityRowData["errors"] = {};
-
-			if (!row.clientId) {
-				errors.client = "Client is required";
-				isValid = false;
-			}
-
-			if (row.isGroup && row.groupClientIds.length === 0) {
-				errors.groupClient = "At least one other participant is required";
-				isValid = false;
-			}
-
-			const timeError = validateTimeRange(row.timeRange);
-			if (timeError) {
-				errors.timeRange = timeError;
-				isValid = false;
-			}
-
-			return { ...row, errors };
+	const onSubmit = (data: MultiActivityFormModel) => {
+		const payload = buildBulkAddPayload(data.activities, data.date, {
+			defaultSupportItemId: defaultSupportItemId ?? undefined,
+			defaultGroupSupportItemId: defaultGroupSupportItemId ?? undefined
 		});
 
-		setRows(newRows);
-		return isValid;
-	};
-
-	const handleSubmit = async () => {
-		// Filter out completely empty rows
-		const nonEmptyRows = rows.filter(
-			(row) => row.clientId || row.timeRange.startTime || row.timeRange.endTime
-		);
-
-		if (nonEmptyRows.length === 0) {
+		if (payload.activities.length === 0) {
 			toast.error("Add at least one activity");
 			return;
 		}
 
-		// Validate remaining rows
-		setRows(nonEmptyRows.length === 0 ? [createEmptyRow()] : nonEmptyRows);
+		return bulkAddMutation
+			.mutateAsync(payload)
+			.then((result) => {
+				trpcUtils.activity.byDateRange.invalidate();
+				trpcUtils.activity.list.invalidate();
+				trpcUtils.activity.pending.invalidate();
 
-		if (!validateRows()) {
-			toast.error("Please fix the errors before saving");
-			return;
-		}
+				const tripMessage = result.tripId ? " · Linked as trip" : "";
+				toast.success(
+					`${result.activities.length} ${result.activities.length === 1 ? "activity" : "activities"} saved${tripMessage}`
+				);
 
-		const activities: ActivitySchema[] = [];
-		let hasGroupActivities = false;
+				onSuccess?.();
+				onOpenChange(false);
 
-		nonEmptyRows.forEach((row) => {
-			const transportItems: ActivityTransportItemSchema[] = [];
-
-			// Add distance transport item if specified
-			if (row.transportKm && row.transportKm > 0) {
-				transportItems.push({
-					type: "DISTANCE",
-					amount: row.transportKm
+				// Reset rows, keeping the selected date
+				form.reset({
+					date: form.getValues("date"),
+					activities: [createEmptyRow()]
 				});
-			}
-
-			// Add other transport items (parking, toll, etc)
-			transportItems.push(
-				...row.transportItems.filter((item) => item.amount > 0)
-			);
-
-			// Use group support item for group activities, otherwise use default
-			const supportItemId = row.isGroup
-				? row.supportItemId || defaultGroupSupportItemId || ""
-				: row.supportItemId || defaultSupportItemId || "";
-
-			const groupSize =
-				row.isGroup && row.groupClientIds.length > 0
-					? totalGroupSize(row.groupClientIds)
-					: undefined;
-
-			// Primary client activity (always created)
-			activities.push({
-				clientId: row.clientId,
-				date: stripTimezone(date),
-				startTime: row.timeRange.startTime,
-				endTime: row.timeRange.endTime,
-				supportItemId,
-				groupSize,
-				transportItems: transportItems.length > 0 ? transportItems : undefined
+			})
+			.catch(() => {
+				toast.error("Failed to save activities");
 			});
+	};
 
-			// Other participants' activities (only for group activities)
-			if (row.isGroup && row.groupClientIds.length > 0) {
-				hasGroupActivities = true;
-				for (const groupClientId of row.groupClientIds) {
-					activities.push({
-						clientId: groupClientId,
-						date: stripTimezone(date),
-						startTime: row.timeRange.startTime,
-						endTime: row.timeRange.endTime,
-						supportItemId,
-						groupSize
-						// No transport items for other participants
-					});
-				}
-			}
-		});
-
-		try {
-			const result = await bulkAddMutation.mutateAsync({
-				activities,
-				autoCreateTrip: !hasGroupActivities
-			});
-
-			await trpcUtils.activity.byDateRange.invalidate();
-			trpcUtils.activity.list.invalidate();
-			trpcUtils.activity.pending.invalidate();
-
-			const tripMessage = result.tripId ? " · Linked as trip" : "";
-			toast.success(
-				`${result.activities.length} ${result.activities.length === 1 ? "activity" : "activities"} saved${tripMessage}`
-			);
-
-			onSuccess?.();
-			onOpenChange(false);
-
-			// Reset form
-			setRows([createEmptyRow()]);
-		} catch (error) {
-			toast.error("Failed to save activities");
-		}
+	const onInvalid = () => {
+		toast.error("Please fix the errors before saving");
 	};
 
 	if (!open) return null;
@@ -290,124 +137,107 @@ export function MultiActivityForm({
 					<DialogTitle>Add Activities</DialogTitle>
 				</DialogHeader>
 
-				<div className="flex flex-col gap-6">
-					<div className="flex items-center gap-4">
-						<Label className="w-12">Date</Label>
-						<DatePicker date={date} setDate={(d) => d && setDate(d)} />
-					</div>
-
-					<div className="flex flex-col gap-4">
-						{rows.map((row, index) => (
-							<ActivityRow
-								key={row.id}
-								row={row}
-								index={index}
-								defaultSupportItemId={defaultSupportItemId ?? undefined}
-								defaultGroupSupportItemId={
-									defaultGroupSupportItemId ?? undefined
-								}
-								onUpdate={(updates) => updateRow(row.id, updates)}
-								onRemove={() => removeRow(row.id)}
-								onAddTransportItem={() => addTransportItem(row.id)}
-								onUpdateTransportItem={(idx, updates) =>
-									updateTransportItem(row.id, idx, updates)
-								}
-								onRemoveTransportItem={(idx) =>
-									removeTransportItem(row.id, idx)
-								}
-								canRemove={rows.length > 1}
+				<form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
+					<div className="flex flex-col gap-6">
+						<div className="flex items-center gap-4">
+							<Label className="w-12">Date</Label>
+							<Controller
+								control={form.control}
+								name="date"
+								render={({ field }) => (
+									<DatePicker
+										date={field.value}
+										setDate={(d) => d && field.onChange(d)}
+									/>
+								)}
 							/>
-						))}
+						</div>
+
+						<div className="flex flex-col gap-4">
+							{fields.map((field, index) => (
+								<ActivityRow
+									key={field.id}
+									form={form}
+									index={index}
+									defaultSupportItemId={defaultSupportItemId ?? undefined}
+									onRemove={() => remove(index)}
+									canRemove={fields.length > 1}
+								/>
+							))}
+						</div>
+
+						<Button
+							type="button"
+							variant="outline"
+							onClick={addRow}
+							className="w-full"
+						>
+							<Plus className="mr-2 h-4 w-4" />
+							Add activity
+						</Button>
 					</div>
 
-					<Button
-						type="button"
-						variant="outline"
-						onClick={addRow}
-						className="w-full"
-					>
-						<Plus className="mr-2 h-4 w-4" />
-						Add activity
-					</Button>
-				</div>
-
-				<DialogFooter>
-					<Button
-						type="button"
-						variant="outline"
-						onClick={() => onOpenChange(false)}
-					>
-						Cancel
-					</Button>
-					<Button onClick={handleSubmit} disabled={bulkAddMutation.isPending}>
-						{bulkAddMutation.isPending ? (
-							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-								Saving...
-							</>
-						) : (
-							"Save all"
-						)}
-					</Button>
-				</DialogFooter>
+					<DialogFooter className="mt-6">
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => onOpenChange(false)}
+						>
+							Cancel
+						</Button>
+						<Button type="submit" disabled={bulkAddMutation.isPending}>
+							{bulkAddMutation.isPending ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									Saving...
+								</>
+							) : (
+								"Save all"
+							)}
+						</Button>
+					</DialogFooter>
+				</form>
 			</DialogContent>
 		</Dialog>
 	);
 }
 
 interface ActivityRowProps {
-	row: ActivityRowData;
+	form: UseFormReturn<MultiActivityFormModel>;
 	index: number;
 	defaultSupportItemId?: string;
-	defaultGroupSupportItemId?: string;
-	onUpdate: (updates: Partial<ActivityRowData>) => void;
 	onRemove: () => void;
-	onAddTransportItem: () => void;
-	onUpdateTransportItem: (
-		index: number,
-		updates: Partial<ActivityTransportItemSchema>
-	) => void;
-	onRemoveTransportItem: (index: number) => void;
 	canRemove: boolean;
 }
 
 function ActivityRow({
-	row,
+	form,
 	index,
 	defaultSupportItemId,
-	defaultGroupSupportItemId,
-	onUpdate,
 	onRemove,
-	onAddTransportItem,
-	onUpdateTransportItem,
-	onRemoveTransportItem,
 	canRemove
 }: ActivityRowProps) {
+	const [showAdvanced, setShowAdvanced] = useState(false);
+
+	const { control, watch, setValue, clearErrors, formState } = form;
+	const rowErrors = formState.errors.activities?.[index];
+
+	const isGroup = watch(`activities.${index}.isGroup`);
+	const startTime = watch(`activities.${index}.timeRange.startTime`);
+	const clientId = watch(`activities.${index}.clientId`);
+	const supportItemId = watch(`activities.${index}.supportItemId`);
+
 	// Check if this activity is contiguous with a potential previous one
-	const isContiguous = row.timeRange.startTime !== "";
+	const isContiguous = startTime !== "";
 
 	const handleGroupToggle = () => {
-		onUpdate({
-			isGroup: !row.isGroup,
-			groupClientIds: !row.isGroup ? [] : row.groupClientIds,
-			errors: { ...row.errors, groupClient: undefined }
-		});
+		setValue(`activities.${index}.isGroup`, !isGroup);
+		// Enabling group starts the participant list fresh
+		if (!isGroup) {
+			setValue(`activities.${index}.groupClientIds`, []);
+		}
+		clearErrors(`activities.${index}.groupClientIds`);
 	};
-
-	const setGroupClientIds = (groupClientIds: string[]) =>
-		onUpdate({
-			groupClientIds,
-			errors: { ...row.errors, groupClient: undefined }
-		});
-
-	const updateGroupClientId = (index: number, clientId: string) =>
-		setGroupClientIds(setParticipantAt(row.groupClientIds, index, clientId));
-
-	const addGroupParticipant = () =>
-		setGroupClientIds(appendParticipant(row.groupClientIds));
-
-	const removeGroupParticipant = (index: number) =>
-		setGroupClientIds(removeParticipantAt(row.groupClientIds, index));
 
 	return (
 		<div className="bg-muted/30 relative rounded-lg border p-4">
@@ -421,7 +251,7 @@ function ActivityRow({
 						onClick={handleGroupToggle}
 						className={cn(
 							"flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors",
-							row.isGroup
+							isGroup
 								? "bg-primary text-primary-foreground"
 								: "bg-muted text-muted-foreground hover:bg-muted/80"
 						)}
@@ -431,7 +261,7 @@ function ActivityRow({
 					</button>
 				</div>
 				<div className="flex items-center gap-2">
-					{isContiguous && index > 0 && !row.isGroup && (
+					{isContiguous && index > 0 && !isGroup && (
 						<Badge variant="outline" className="text-xs">
 							<Link2 className="mr-1 h-3 w-3" />
 							Back-to-back
@@ -453,170 +283,118 @@ function ActivityRow({
 
 			<div className="flex flex-col gap-4">
 				<div>
-					<Label className={cn(row.errors.client && "text-destructive")}>
-						{row.isGroup ? "First participant" : "Client"}
+					<Label className={cn(rowErrors?.clientId && "text-destructive")}>
+						{isGroup ? "First participant" : "Client"}
 					</Label>
-					<ClientQuickSelect
-						value={row.clientId}
-						onChange={(clientId) =>
-							onUpdate({
-								clientId,
-								errors: { ...row.errors, client: undefined }
-							})
-						}
+					<Controller
+						control={control}
+						name={`activities.${index}.clientId`}
+						render={({ field }) => (
+							<ClientQuickSelect
+								value={field.value}
+								onChange={field.onChange}
+							/>
+						)}
 					/>
-					{row.errors.client && (
-						<p className="text-destructive mt-1 text-sm">{row.errors.client}</p>
+					{rowErrors?.clientId && (
+						<p className="text-destructive mt-1 text-sm">
+							{rowErrors.clientId.message}
+						</p>
 					)}
 				</div>
 
-				{row.isGroup && (
+				{isGroup && (
 					<div>
-						<Label className={cn(row.errors.groupClient && "text-destructive")}>
+						<Label
+							className={cn(rowErrors?.groupClientIds && "text-destructive")}
+						>
 							Other participants
 						</Label>
-						<div className="flex flex-col gap-2">
-							{row.groupClientIds.map((groupClientId, participantIndex) => (
-								<div key={participantIndex} className="flex items-center gap-2">
-									<div className="flex-1">
+						<Controller
+							control={control}
+							name={`activities.${index}.groupClientIds`}
+							render={({ field }) => (
+								<GroupParticipantsEditor
+									value={field.value}
+									onChange={field.onChange}
+									excludeClientId={clientId}
+									error={rowErrors?.groupClientIds?.message}
+									renderClientSelect={({
+										value,
+										onChange,
+										excludeClientId,
+										excludeClientIds
+									}) => (
 										<ClientQuickSelect
-											value={groupClientId}
-											onChange={(clientId) =>
-												updateGroupClientId(participantIndex, clientId)
-											}
-											excludeClientId={row.clientId}
-											excludeClientIds={row.groupClientIds.filter(
-												(_, i) => i !== participantIndex
-											)}
+											value={value}
+											onChange={onChange}
+											excludeClientId={excludeClientId}
+											excludeClientIds={excludeClientIds}
 										/>
-									</div>
-									<Button
-										type="button"
-										variant="ghost"
-										size="sm"
-										onClick={() => removeGroupParticipant(participantIndex)}
-										className="text-destructive hover:text-destructive h-8 w-8 p-0"
-									>
-										<Trash2 className="h-4 w-4" />
-									</Button>
-								</div>
-							))}
-						</div>
-						{row.groupClientIds.length < MAX_ADDITIONAL_GROUP_PARTICIPANTS && (
-							<button
-								type="button"
-								onClick={addGroupParticipant}
-								className="text-muted-foreground hover:text-foreground mt-2 text-left text-sm underline-offset-4 hover:underline"
-							>
-								+ add participant
-							</button>
-						)}
-						{row.errors.groupClient && (
-							<p className="text-destructive mt-1 text-sm">
-								{row.errors.groupClient}
-							</p>
-						)}
+									)}
+								/>
+							)}
+						/>
 					</div>
 				)}
 
 				<div className="grid grid-cols-2 gap-4">
 					<div>
-						<Label className={cn(row.errors.timeRange && "text-destructive")}>
+						<Label className={cn(rowErrors?.timeRange && "text-destructive")}>
 							Time
 						</Label>
-						<TimeRangeInput
-							value={row.timeRange}
-							onChange={(timeRange) =>
-								onUpdate({
-									timeRange,
-									errors: { ...row.errors, timeRange: undefined }
-								})
-							}
-							error={row.errors.timeRange}
+						<Controller
+							control={control}
+							name={`activities.${index}.timeRange`}
+							render={({ field }) => (
+								<TimeRangeInput
+									value={field.value}
+									onChange={field.onChange}
+									error={rowErrors?.timeRange?.message}
+								/>
+							)}
 						/>
-						{row.errors.timeRange && (
+						{rowErrors?.timeRange && (
 							<p className="text-destructive mt-1 text-sm">
-								{row.errors.timeRange}
+								{rowErrors.timeRange.message}
 							</p>
 						)}
 					</div>
 
 					<div>
 						<Label>Transport (km)</Label>
-						<SummingDistanceInput
-							value={row.transportKm}
-							onChange={(transportKm) => onUpdate({ transportKm })}
+						<Controller
+							control={control}
+							name={`activities.${index}.transportKm`}
+							render={({ field }) => (
+								<SummingDistanceInput
+									value={field.value}
+									onChange={field.onChange}
+								/>
+							)}
 						/>
 					</div>
 				</div>
 
-				{/* Parking/Tolls */}
-				{row.transportItems.length > 0 && (
-					<div className="flex flex-col gap-2">
-						{row.transportItems.map((item, idx) => (
-							<div key={idx} className="flex items-center gap-2">
-								<select
-									value={item.type}
-									onChange={(e) =>
-										onUpdateTransportItem(idx, {
-											type: e.target
-												.value as ActivityTransportItemSchema["type"]
-										})
-									}
-									className="border-input bg-background h-10 rounded-md border px-3 text-sm"
-								>
-									<option value="PARKING">Parking</option>
-									<option value="TOLL">Toll</option>
-									<option value="OTHER">Other</option>
-								</select>
-								<div className="relative flex-1">
-									<span className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm">
-										$
-									</span>
-									<Input
-										type="number"
-										step="0.01"
-										min="0"
-										value={item.amount || ""}
-										onChange={(e) =>
-											onUpdateTransportItem(idx, {
-												amount: parseFloat(e.target.value) || 0
-											})
-										}
-										className="pl-7"
-										placeholder="0.00"
-									/>
-								</div>
-								<Button
-									type="button"
-									variant="ghost"
-									size="sm"
-									onClick={() => onRemoveTransportItem(idx)}
-									className="text-destructive hover:text-destructive h-8 w-8 p-0"
-								>
-									<Trash2 className="h-4 w-4" />
-								</Button>
-							</div>
-						))}
-					</div>
-				)}
-
-				<button
-					type="button"
-					onClick={onAddTransportItem}
-					className="text-muted-foreground hover:text-foreground text-left text-sm underline-offset-4 hover:underline"
-				>
-					+ parking / tolls
-				</button>
+				<Controller
+					control={control}
+					name={`activities.${index}.transportItems`}
+					render={({ field }) => (
+						<TransportItemsEditor
+							value={field.value}
+							onChange={field.onChange}
+						/>
+					)}
+				/>
 
 				{/* Advanced (Support Item override) */}
 				<div>
 					<button
 						type="button"
-						onClick={() => onUpdate({ showAdvanced: !row.showAdvanced })}
+						onClick={() => setShowAdvanced(!showAdvanced)}
 						className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-sm"
 					>
-						{row.showAdvanced ? (
+						{showAdvanced ? (
 							<ChevronUp className="h-4 w-4" />
 						) : (
 							<ChevronDown className="h-4 w-4" />
@@ -624,11 +402,11 @@ function ActivityRow({
 						Advanced
 					</button>
 
-					{row.showAdvanced && (
+					{showAdvanced && (
 						<div className="mt-2">
 							<Label>Support Item</Label>
 							<p className="text-muted-foreground text-xs">
-								{row.supportItemId || defaultSupportItemId
+								{supportItemId || defaultSupportItemId
 									? "Using custom support item"
 									: "Using default support item"}
 							</p>
