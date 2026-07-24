@@ -50,11 +50,13 @@ export const getHighestInvoiceNo = (
 	}
 
 	const highest = invoiceNumbers.reduce((previous, current) => {
-		if (getNumber(current) === null) return previous;
+		const currentNumber = getNumber(current);
+		const previousNumber = getNumber(previous);
 
-		return (getNumber(previous) || 0) > (getNumber(current) || 0)
-			? previous
-			: current;
+		if (currentNumber === undefined) return previous;
+		if (previousNumber === undefined) return current;
+
+		return previousNumber >= currentNumber ? previous : current;
 	});
 
 	return getNumber(highest) ? highest : undefined;

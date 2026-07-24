@@ -17,6 +17,20 @@ test("Should get latest invoice number", () => {
 	expect(getHighestInvoiceNo(["Sample", "string"])).toEqual(undefined);
 });
 
+test("Should pick the highest numeric suffix regardless of order", () => {
+	expect(getHighestInvoiceNo(["INV-001", "INV-003", "INV-002"])).toEqual(
+		"INV-003"
+	);
+});
+
+test("Should skip non-numeric entries when finding the highest", () => {
+	// Non-numeric entry must be ignored even when it seeds the reduce
+	expect(getHighestInvoiceNo(["DRAFT", "INV-002"])).toEqual("INV-002");
+	expect(getHighestInvoiceNo(["INV-002", "DRAFT"])).toEqual("INV-002");
+	// All non-numeric → nothing to compare
+	expect(getHighestInvoiceNo(["DRAFT", "FINAL"])).toEqual(undefined);
+});
+
 test("Should get next invoice number", () => {
 	expect(
 		getNextInvoiceNo(["Sample1", "Sample2", "Sample3"]).nextInvoiceNo
@@ -32,6 +46,7 @@ test("Should get next invoice number", () => {
 	expect(getNextInvoiceNo(["Sample01", "Sample02"]).nextInvoiceNo).toEqual(
 		"Sample03"
 	);
+	expect(getNextInvoiceNo(["A-08", "A-09"]).nextInvoiceNo).toEqual("A-10");
 });
 
 test("Should find single invoice matching payment amount", () => {
