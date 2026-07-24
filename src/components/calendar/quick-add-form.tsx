@@ -22,13 +22,13 @@ import { trpc } from "@/lib/trpc";
 import { type ActivitySchema, activitySchema } from "@/schema/activity-schema";
 import type { SupportItemListOutput } from "@/server/api/routers/support-item-router";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Dayjs } from "dayjs";
+import { endOfDay, format, startOfDay } from "date-fns";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 interface Props {
-	day: Dayjs | null;
+	day: Date | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onSuggestTrip?: () => void;
@@ -45,7 +45,7 @@ const QuickAddForm = ({ day, open, onOpenChange, onSuggestTrip }: Props) => {
 		resolver: zodResolver(activitySchema),
 		mode: "onBlur",
 		defaultValues: {
-			date: day ? stripTimezone(day.toDate()) : stripTimezone(new Date()),
+			date: day ? stripTimezone(day) : stripTimezone(new Date()),
 			supportItemId: "",
 			clientId: "",
 			startTime: "",
@@ -60,7 +60,7 @@ const QuickAddForm = ({ day, open, onOpenChange, onSuggestTrip }: Props) => {
 	useEffect(() => {
 		if (open && day) {
 			form.reset({
-				date: stripTimezone(day.toDate()),
+				date: stripTimezone(day),
 				supportItemId: defaultSupportItemId ?? "",
 				clientId: "",
 				startTime: "",
@@ -115,8 +115,8 @@ const QuickAddForm = ({ day, open, onOpenChange, onSuggestTrip }: Props) => {
 		const hasTimes = data.startTime && data.endTime;
 		if (hasTimes && onSuggestTrip && day) {
 			const activities = await trpcUtils.activity.byDateRange.fetch({
-				startDate: day.startOf("day").toDate(),
-				endDate: day.endOf("day").toDate()
+				startDate: startOfDay(day),
+				endDate: endOfDay(day)
 			});
 			const eligibleCount = activities.filter(
 				(a) => a.startTime && a.endTime && !a.tripId
@@ -141,7 +141,7 @@ const QuickAddForm = ({ day, open, onOpenChange, onSuggestTrip }: Props) => {
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Add Activity — {day.format("ddd D MMM")}</DialogTitle>
+					<DialogTitle>Add Activity — {format(day, "EEE d MMM")}</DialogTitle>
 				</DialogHeader>
 
 				<Form {...form}>

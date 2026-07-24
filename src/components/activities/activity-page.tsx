@@ -30,8 +30,8 @@ import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { toast } from "react-toastify";
 
-import dayjs from "dayjs";
-dayjs.extend(require("dayjs/plugin/utc"));
+import { utcDate } from "@/lib/date-utils";
+import { differenceInMinutes, format } from "date-fns";
 
 const formatDuration = (minutes: number) => {
 	const hours = Math.floor(minutes / 60);
@@ -111,16 +111,20 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 
 	const hasTimes = Boolean(activity.startTime && activity.endTime);
 	const durationMinutes = hasTimes
-		? dayjs.utc(activity.endTime).diff(dayjs.utc(activity.startTime), "minute")
+		? differenceInMinutes(
+				activity.endTime ?? new Date(0),
+				activity.startTime ?? new Date(0)
+			)
 		: 0;
 
 	return (
 		<div className="flex flex-col items-center px-4 pb-24 md:pb-8">
 			<Head>
 				<title>
-					{`${activity.supportItem.description} - ${dayjs
-						.utc(activity.date)
-						.format("DD/MM")} | Melvin`}
+					{`${activity.supportItem.description} - ${format(
+						utcDate(activity.date),
+						"dd/MM"
+					)} | Melvin`}
 				</title>
 			</Head>
 			<div className="flex w-full max-w-3xl flex-col gap-6">
@@ -128,7 +132,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 					<div className="flex items-start justify-between gap-3">
 						<div className="flex min-w-0 flex-col gap-1">
 							<p className="text-primary text-xs font-medium">
-								{dayjs.utc(activity.date).format("dddd, D MMMM YYYY")}
+								{format(utcDate(activity.date), "EEEE, d MMMM yyyy")}
 							</p>
 							<h1 className="text-lg font-semibold tracking-tight text-balance md:text-xl">
 								{activity.supportItem.description}
@@ -184,8 +188,8 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 					<dl className="bg-card grid grid-cols-1 divide-y overflow-hidden rounded-xl border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
 						{hasTimes ? (
 							<Fact icon={Clock} label="Time">
-								{dayjs.utc(activity.startTime).format("h:mma")} -{" "}
-								{dayjs.utc(activity.endTime).format("h:mma")}
+								{format(utcDate(activity.startTime ?? new Date(0)), "h:mmaaa")}{" "}
+								- {format(utcDate(activity.endTime ?? new Date(0)), "h:mmaaa")}
 								<span className="text-foreground/50 font-normal">
 									{" "}
 									· {formatDuration(durationMinutes)}

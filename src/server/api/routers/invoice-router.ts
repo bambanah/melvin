@@ -20,8 +20,9 @@ import {
 	PrismaClient,
 	type Prisma
 } from "@/generated/client";
+import { parseUtcTime, utcDate } from "@/lib/date-utils";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
-import dayjs from "dayjs";
+import { format } from "date-fns";
 import { z } from "zod";
 import { DEFAULT_LIST_LIMIT } from "./router.constants";
 
@@ -95,7 +96,7 @@ export function parseInvoice<
 
 	return {
 		...rest,
-		date: dayjs(invoice.date).format("YYYY-MM-DD"),
+		date: format(new Date(invoice.date ?? Date.now()), "yyyy-MM-dd"),
 		...(versions && {
 			versions: versions
 				.slice()
@@ -118,8 +119,8 @@ const generateNestedWriteForActivities = (
 			return activities.map((activity) => ({
 				...activity,
 				date: activity.date,
-				startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
-				endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
+				startTime: parseUtcTime(activity.startTime),
+				endTime: parseUtcTime(activity.endTime),
 				clientId: client.id,
 				transitDistance: client.distanceToClient ?? undefined,
 				transitDuration: client.travelTimeToClient ?? undefined,
@@ -147,8 +148,8 @@ const generateNestedWriteForGroupActivities = (
 					...activity,
 					supportItemId,
 					date: activity.date,
-					startTime: dayjs.utc(activity.startTime, "HH:mm").toDate(),
-					endTime: dayjs.utc(activity.endTime, "HH:mm").toDate(),
+					startTime: parseUtcTime(activity.startTime),
+					endTime: parseUtcTime(activity.endTime),
 					clientId: groupClientId,
 					transitDistance: client?.distanceToClient ?? undefined,
 					transitDuration: client?.travelTimeToClient ?? undefined,
@@ -582,9 +583,7 @@ export const invoiceRouter = router({
 						invoiceNo: inputInvoice.invoiceNo,
 						billTo: inputInvoice.billTo,
 						clientId: inputInvoice.clientId,
-						date: inputInvoice.date
-							? dayjs.utc(inputInvoice.date).toDate()
-							: new Date(),
+						date: inputInvoice.date ? utcDate(inputInvoice.date) : new Date(),
 						activities: {
 							connect: inputInvoice.activityIds?.map((id) => ({ id })),
 							createMany: inputInvoice.activitiesToCreate

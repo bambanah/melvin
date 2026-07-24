@@ -19,8 +19,8 @@ import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import type { ActivityByDateRangeOutput } from "@/server/api/routers/activity-router";
 import type { TripRouterOutput } from "@/server/api/routers/trip-router";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
+import { utcDate } from "@/lib/date-utils";
+import { format, getHours, getMinutes } from "date-fns";
 import {
 	AlertTriangle,
 	ArrowRight,
@@ -31,8 +31,6 @@ import {
 } from "lucide-react";
 import { startTransition, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-
-dayjs.extend(utc);
 
 type Trip = NonNullable<TripRouterOutput["getByDate"]>;
 
@@ -67,10 +65,10 @@ const getGapWarning = (
 ): string | null => {
 	if (!from.endTime || !to.startTime) return null;
 
-	const endMinutes =
-		dayjs.utc(from.endTime).hour() * 60 + dayjs.utc(from.endTime).minute();
-	const startMinutes =
-		dayjs.utc(to.startTime).hour() * 60 + dayjs.utc(to.startTime).minute();
+	const fromEnd = utcDate(from.endTime);
+	const toStart = utcDate(to.startTime);
+	const endMinutes = getHours(fromEnd) * 60 + getMinutes(fromEnd);
+	const startMinutes = getHours(toStart) * 60 + getMinutes(toStart);
 	const gapMinutes = startMinutes - endMinutes;
 
 	if (gapMinutes > 120) {
@@ -412,8 +410,15 @@ const TripEditorModal = (props: Props) => {
 													{activity.client?.name ?? "Unknown Client"}
 												</p>
 												<p className="text-muted-foreground text-xs">
-													{dayjs.utc(activity.startTime).format("H:mm")} -{" "}
-													{dayjs.utc(activity.endTime).format("H:mm")}
+													{format(
+														utcDate(activity.startTime ?? new Date(0)),
+														"H:mm"
+													)}{" "}
+													-{" "}
+													{format(
+														utcDate(activity.endTime ?? new Date(0)),
+														"H:mm"
+													)}
 												</p>
 											</div>
 											{selectedIds.has(activity.id) && (
@@ -450,8 +455,15 @@ const TripEditorModal = (props: Props) => {
 												</p>
 											</div>
 											<p className="text-muted-foreground ml-7 text-xs">
-												{dayjs.utc(activity.startTime).format("H:mm")} -{" "}
-												{dayjs.utc(activity.endTime).format("H:mm")}
+												{format(
+													utcDate(activity.startTime ?? new Date(0)),
+													"H:mm"
+												)}{" "}
+												-{" "}
+												{format(
+													utcDate(activity.endTime ?? new Date(0)),
+													"H:mm"
+												)}
 											</p>
 										</div>
 										{sortedActivities.length > 2 && (

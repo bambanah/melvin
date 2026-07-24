@@ -13,7 +13,8 @@ import { Input } from "@/components/ui/input";
 import { debounce } from "@/lib/generic-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
-import dayjs from "dayjs";
+import { utcDate } from "@/lib/date-utils";
+import { format } from "date-fns";
 import { Plus, Wallet } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -108,7 +109,7 @@ const LogPaymentDialog = () => {
 						})}
 					</p>
 					<p className="text-neutral-600">
-						{dayjs.utc(invoice.date).format("DD/MM/YY")}
+						{format(utcDate(invoice.date), "dd/MM/yy")}
 					</p>
 				</div>
 			</label>

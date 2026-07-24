@@ -12,9 +12,7 @@ import { round } from "./generic-utils";
 import { displayInvoiceNo } from "./invoice-utils";
 import type { InvoicePdfData } from "./pdf-generation";
 
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-dayjs.extend(utc);
+import { utcDate } from "./date-utils";
 
 const groupDigits = (value: string, separator: string) =>
 	value.replaceAll(/\B(?=(\d{3})+(?!\d))/g, separator);
@@ -72,7 +70,7 @@ export function buildInvoiceVersionContent(
 					kind: line.kind,
 					description: line.description,
 					supportItemCode: line.supportItemCode,
-					serviceDate: dayjs.utc(line.serviceDate).toISOString(),
+					serviceDate: utcDate(line.serviceDate).toISOString(),
 					quantity: line.quantity,
 					unit: line.unit,
 					unitPrice: line.unitPrice,
@@ -95,7 +93,7 @@ export function buildInvoiceVersionContent(
 		header: {
 			invoiceNo: invoice.invoiceNo,
 			displayInvoiceNo: displayInvoiceNo(invoice.invoiceNo, versionNumber),
-			date: dayjs.utc(invoice.date).toISOString(),
+			date: utcDate(invoice.date).toISOString(),
 			participantName: invoice.client?.name ?? "",
 			...(invoice.client?.number
 				? { participantNumber: invoice.client.number }

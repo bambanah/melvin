@@ -6,12 +6,9 @@ import {
 } from "@/lib/date-utils";
 
 import { TZDate } from "@date-fns/tz";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import { expect, test } from "vitest";
-dayjs.extend(utc);
 
-const dateFromTime = (time: string) => dayjs.utc(`1970-01-01T${time}`).toDate();
+const dateFromTime = (time: string) => new Date(`1970-01-01T${time}Z`);
 
 test("Should get duration", () => {
 	expect(getDuration(dateFromTime("12:00"), dateFromTime("13:00"))).toEqual(1);

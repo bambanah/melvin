@@ -2,7 +2,7 @@ import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import prisma from "@/server/prisma";
 import { Page } from "@playwright/test";
 import { randomUUID } from "crypto";
-import dayjs from "dayjs";
+import { addMonths } from "date-fns";
 import { randomClient } from "./random/random-client";
 import { randomSupportItem } from "./random/random-support-item";
 
@@ -18,7 +18,7 @@ export const testUser = {
 	bankNumber: BigInt("987654321"),
 	sessions: {
 		create: {
-			expires: dayjs().add(1, "month").toDate(),
+			expires: addMonths(new Date(), 1),
 			sessionToken: randomUUID()
 		}
 	},

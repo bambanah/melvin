@@ -5,10 +5,9 @@ import {
 } from "@/lib/trip-utils";
 import type { ActivityByIdOutput } from "@/server/api/routers/activity-router";
 import { cn } from "@/lib/utils";
-import dayjs from "dayjs";
+import { utcDate } from "@/lib/date-utils";
+import { format } from "date-fns";
 import Link from "next/link";
-
-dayjs.extend(require("dayjs/plugin/utc"));
 
 type Trip = NonNullable<ActivityByIdOutput["trip"]>;
 type Leg = Trip["activities"][number];
@@ -23,9 +22,10 @@ const positionLabel = (index: number, count: number) => {
 
 const timeSpan = (leg: Leg) =>
 	leg.startTime && leg.endTime
-		? `${dayjs.utc(leg.startTime).format("h:mma")} - ${dayjs
-				.utc(leg.endTime)
-				.format("h:mma")}`
+		? `${format(utcDate(leg.startTime), "h:mmaaa")} - ${format(
+				utcDate(leg.endTime),
+				"h:mmaaa"
+			)}`
 		: null;
 
 function LegRow({

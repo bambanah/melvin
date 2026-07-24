@@ -11,20 +11,17 @@ import {
 } from "@/components/ui/dialog";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { trpc } from "@/lib/trpc";
-import { formatActivityDuration, isHoliday } from "@/lib/date-utils";
+import { formatActivityDuration, isHoliday, utcDate } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import type { ActivityByDateRangeOutput } from "@/server/api/routers/activity-router";
-import dayjs, { type Dayjs } from "dayjs";
-import utc from "dayjs/plugin/utc";
+import { format } from "date-fns";
 import { Car, Clock, Link2, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import ActivitySubLines from "./activity-sub-lines";
 
-dayjs.extend(utc);
-
 interface Props {
-	day: Dayjs | null;
+	day: Date | null;
 	activities: ActivityByDateRangeOutput;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -46,13 +43,13 @@ const CalendarDayModal = ({
 
 	const existingTripId = activities.find((a) => a.tripId)?.tripId;
 	const { data: existingTrip } = trpc.trip.getByDate.useQuery(
-		{ date: day?.toDate() ?? new Date() },
+		{ date: day ?? new Date() },
 		{ enabled: !!day && !!existingTripId }
 	);
 
 	if (!day) return null;
 
-	const holiday = isHoliday(day.toDate());
+	const holiday = isHoliday(day);
 
 	const eligibleForTrip = activities.filter(
 		(a) => a.startTime && a.endTime && !a.tripId
@@ -65,7 +62,7 @@ const CalendarDayModal = ({
 			<DialogContent className="max-h-[100dvh] overflow-y-auto max-sm:h-full max-sm:max-w-full max-sm:rounded-none sm:max-h-[80vh] sm:max-w-lg">
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">
-						{day.format("dddd D MMMM")}
+						{format(day, "EEEE d MMMM")}
 						{holiday && <Badge variant="success">Holiday</Badge>}
 					</DialogTitle>
 				</DialogHeader>
@@ -116,7 +113,7 @@ const CalendarDayModal = ({
 
 			<TripEditorModal
 				mode="create"
-				date={day.toDate()}
+				date={day}
 				activities={activities}
 				open={tripBuilderOpen}
 				onOpenChange={setTripBuilderOpen}
@@ -181,8 +178,8 @@ const ActivityRow = ({ activity, rateContext }: ActivityRowProps) => {
 					) : activity.startTime && activity.endTime ? (
 						<span className="flex items-center gap-1">
 							<Clock className="h-3 w-3" />
-							{dayjs.utc(activity.startTime).format("H:mm")} -{" "}
-							{dayjs.utc(activity.endTime).format("H:mm")} (
+							{format(utcDate(activity.startTime), "H:mm")} -{" "}
+							{format(utcDate(activity.endTime), "H:mm")} (
 							{formatActivityDuration(activity.startTime, activity.endTime)})
 						</span>
 					) : null}

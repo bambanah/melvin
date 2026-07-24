@@ -6,12 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import {
 	formatActivityDuration,
-	isHoliday as isDateHoliday
+	isHoliday as isDateHoliday,
+	utcDate
 } from "@/lib/date-utils";
 import { groupBy } from "@/lib/generic-utils";
 import { trpc } from "@/lib/trpc";
 import { ActivityListOutput } from "@/server/api/routers/activity-router";
-import dayjs from "dayjs";
+import { format } from "date-fns";
 import { Car, CircleDollarSign, Clock, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -27,7 +28,7 @@ const groupActivitiesByDate = (
 	activities?: ActivityListOutput["activities"]
 ) =>
 	activities
-		? groupBy(activities, (activity) => dayjs(activity.date).toString())
+		? groupBy(activities, (activity) => new Date(activity.date).toUTCString())
 		: {};
 
 function ActivityList({
@@ -75,7 +76,7 @@ function ActivityList({
 						([date, groupedActivities]) => (
 							<div key={date} className="mb-4 overflow-hidden">
 								<div className="flex w-full items-center gap-2 px-4 py-2 text-left">
-									{dayjs(date).format("dddd D MMM.")}
+									{format(new Date(date), "EEEE d MMM.")}
 									{isDateHoliday(date) && (
 										<Badge variant="success">Holiday</Badge>
 									)}
@@ -101,10 +102,15 @@ function ActivityList({
 												) : (
 													<div className="text-foreground/80 flex items-center gap-2 whitespace-nowrap">
 														<Clock className="h-4 w-4" />
-														{dayjs
-															.utc(activity.startTime)
-															.format("HH:mm")} -{" "}
-														{dayjs.utc(activity.endTime).format("HH:mm")}
+														{format(
+															utcDate(activity.startTime ?? new Date(0)),
+															"HH:mm"
+														)}{" "}
+														-{" "}
+														{format(
+															utcDate(activity.endTime ?? new Date(0)),
+															"HH:mm"
+														)}
 														<span className="hidden md:inline">
 															(
 															{activity.startTime &&

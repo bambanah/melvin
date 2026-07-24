@@ -2,17 +2,14 @@ import InfiniteList from "@/components/shared/infinite-list";
 import { useRateContext } from "@/components/shared/use-rate-context";
 import { Badge } from "@/components/ui/badge";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
-import { formatActivityDuration, isHoliday } from "@/lib/date-utils";
+import { formatActivityDuration, isHoliday, utcDate } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
 import type { TransitRateContext } from "@/lib/billing-lines";
 import type { ActivityUnbilledListOutput } from "@/server/api/routers/activity-router";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
+import { format, parse } from "date-fns";
 import { Car, CheckCircle2, Clock } from "lucide-react";
 import Link from "next/link";
 import ActivitySubLines from "./activity-sub-lines";
-
-dayjs.extend(utc);
 
 type UnbilledActivities = ActivityUnbilledListOutput["activities"];
 type UnbilledActivity = UnbilledActivities[number];
@@ -29,7 +26,7 @@ function groupByDate(activities: UnbilledActivities) {
 	const map = new Map<string, UnbilledActivities>();
 
 	for (const activity of activities) {
-		const key = dayjs(activity.date).format("YYYY-MM-DD");
+		const key = format(new Date(activity.date), "yyyy-MM-dd");
 		const existing = map.get(key);
 		if (existing) {
 			existing.push(activity);
@@ -76,8 +73,8 @@ const CalendarAgenda = () => {
 					{(activities) =>
 						groupByDate(activities).map(
 							({ date, activities: dayActivities }) => {
-								const day = dayjs(date);
-								const holiday = isHoliday(day.toDate());
+								const day = parse(date, "yyyy-MM-dd", new Date());
+								const holiday = isHoliday(day);
 								const dayCost = getTotalCostOfActivities(
 									dayActivities,
 									rateContext,
@@ -89,7 +86,7 @@ const CalendarAgenda = () => {
 										<div className="flex items-center justify-between px-2 pb-2">
 											<div className="flex items-center gap-2">
 												<span className="text-sm font-semibold">
-													{day.format("ddd D MMM YYYY")}
+													{format(day, "EEE d MMM yyyy")}
 												</span>
 												{holiday && <Badge variant="success">Holiday</Badge>}
 											</div>
@@ -159,8 +156,8 @@ const AgendaRow = ({ activity, rateContext }: AgendaRowProps) => {
 					) : activity.startTime && activity.endTime ? (
 						<span className="flex items-center gap-1">
 							<Clock className="h-3 w-3" />
-							{dayjs.utc(activity.startTime).format("H:mm")} -{" "}
-							{dayjs.utc(activity.endTime).format("H:mm")} (
+							{format(utcDate(activity.startTime), "H:mm")} -{" "}
+							{format(utcDate(activity.endTime), "H:mm")} (
 							{formatActivityDuration(activity.startTime, activity.endTime)})
 						</span>
 					) : null}

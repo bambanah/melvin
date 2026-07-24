@@ -9,16 +9,14 @@ import type {
 	SupportItemRates
 } from "@/generated/client";
 import type { UnitPriceSuffix } from "@/schema/invoice-version-schema";
-import { formatDuration, getDuration } from "./date-utils";
+import { formatDuration, getDuration, utcDate } from "./date-utils";
 import { floorToCent, round } from "./generic-utils";
 import {
 	getActivityBasedTransportCode,
 	getNonLabourTravelCode
 } from "./support-item-utils";
 
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-dayjs.extend(utc);
+import { format, getDay, getHours } from "date-fns";
 
 interface TransportItem {
 	type: ActivityTransportType;
@@ -107,7 +105,7 @@ export const getRateForActivity = (
 ): [code: string, rate: number] => {
 	// Saturday
 	if (
-		dayjs.utc(activity.date).day() === 6 &&
+		getDay(utcDate(activity.date)) === 6 &&
 		activity.supportItem.saturdayCode?.length
 	) {
 		const rate = getRateForDay(
@@ -123,7 +121,7 @@ export const getRateForActivity = (
 
 	// Sunday
 	if (
-		dayjs.utc(activity.date).day() === 0 &&
+		getDay(utcDate(activity.date)) === 0 &&
 		activity.supportItem.sundayCode?.length
 	) {
 		const rate = getRateForDay(
@@ -139,7 +137,7 @@ export const getRateForActivity = (
 
 	if (
 		activity.endTime &&
-		dayjs.utc(activity.endTime).hour() >= 20 &&
+		getHours(utcDate(activity.endTime)) >= 20 &&
 		activity.supportItem.weeknightCode?.length &&
 		activity.supportItem.weeknightRate
 	) {
@@ -419,11 +417,12 @@ export function lineDetailsText(
 	switch (line.kind) {
 		case "SUPPORT": {
 			if (line.unit === "HOUR") {
-				return `${dayjs
-					.utc(activity.startTime ?? undefined)
-					.format("HH:mm")}-${dayjs
-					.utc(activity.endTime ?? undefined)
-					.format("HH:mm")} (${formatDuration(line.quantity)})`;
+				const start = format(
+					utcDate(activity.startTime ?? new Date(0)),
+					"HH:mm"
+				);
+				const end = format(utcDate(activity.endTime ?? new Date(0)), "HH:mm");
+				return `${start}-${end} (${formatDuration(line.quantity)})`;
 			}
 
 			return `${line.quantity} km`;

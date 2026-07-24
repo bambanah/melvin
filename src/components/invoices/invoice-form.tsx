@@ -17,7 +17,7 @@ import {
 	PopoverContent,
 	PopoverTrigger
 } from "@/components/ui/popover";
-import { stripTimezone } from "@/lib/date-utils";
+import { stripTimezone, utcDate } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { InvoiceSchema, invoiceSchema } from "@/schema/invoice-schema";
@@ -30,11 +30,6 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import InvoiceActivityCreationForm from "./invoice-activity-creation-form";
 import UnassignedActivities from "./unnassigned-activities";
-
-import dayjs from "dayjs";
-dayjs.extend(require("dayjs/plugin/utc"));
-dayjs.extend(require("dayjs/plugin/localizedFormat"));
-dayjs.extend(require("dayjs/plugin/customParseFormat"));
 
 interface Props {
 	onSubmit: (invoiceData: InvoiceSchema) => void;
@@ -50,7 +45,7 @@ const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 			...existingInvoice,
 			clientId: existingInvoice?.clientId ?? "",
 			date: existingInvoice?.date
-				? dayjs.utc(existingInvoice?.date, "YYYY-MM-DD").toDate()
+				? utcDate(existingInvoice.date)
 				: stripTimezone(new Date()),
 			invoiceNo: existingInvoice?.invoiceNo ?? "",
 			billTo: existingInvoice?.billTo ?? "",
