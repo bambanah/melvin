@@ -47,6 +47,20 @@ One Activity within a Trip. Legs are ordered by start time; a leg is the first, 
 **Support Item**
 An NDIS line item with a code, description, and rates. Activities are billed against a Support Item. Carries a Rate Type and up to four Day Rates.
 
+## Field Capture
+
+**Log**
+The phone-first scratchpad where a Provider records work as it happens, before any billing structure exists. Organised as persistent per-Client sections, each holding that Client's running list of Sessions not yet turned into Activities. Mirrors the notes-app habit it replaces; a Client section is kept even when empty, as standing scaffolding.
+
+**Session**
+One dated, single-composition, continuous span of active-with-client work captured in the Log - the pre-Activity unit. Carries a date, a start and end time (an Open Session has a start but no end yet), the Client or group it was delivered to, and any in-session Activity Based Transport (trip km and costs) logged during it. Start and end are active-with-client times only; Provider Travel is never counted inside them. A Session later promotes into one Activity per participant.
+
+**Handover**
+The transition that closes one Session and opens the next at the same instant, keeping billable time contiguous. A **Travel Handover** is a move between locations (finish one Client, drive to the next) and captures the Inter-Client Transit distance driven; an **In-Place Handover** is a composition change at the same spot (a participant joins or leaves, flipping solo↔group) and captures no driving. Composition never changes within a Session - only across a Handover.
+
+**Promotion**
+Converting a day's captured Sessions into billable Activities. Day-atomic: it operates on every Session of a chosen date at once (because Trips are day-scoped and an inter-client leg needs both endpoint Activities to exist), assigns the Provider's default solo/group Support Item to each, mirrors group Sessions into one Activity per participant, and assembles the Trip from that day's Handover links. Consumes the Sessions - they leave the Log and the resulting Pending Activities become the single source of truth. Blocked while any Session that day is still Open.
+
 ## Rates & Billing Lines
 
 **Day Rate**
