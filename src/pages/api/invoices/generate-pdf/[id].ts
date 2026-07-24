@@ -1,3 +1,4 @@
+import { inlinePdfContentDisposition } from "@/lib/content-disposition";
 import generatePDF from "@/lib/pdf-generation";
 import { getServerAuthSession } from "@/server/auth";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -25,7 +26,7 @@ const request = async (request: NextApiRequest, response: NextApiResponse) => {
 		}
 	);
 
-	if (!pdfString) {
+	if (!pdfString || !fileName) {
 		return response.status(404).send("Can't find PDF");
 	}
 
@@ -33,7 +34,7 @@ const request = async (request: NextApiRequest, response: NextApiResponse) => {
 		return response
 			.status(200)
 			.setHeader("Content-Type", "application/pdf")
-			.setHeader("Content-Disposition", `inline; filename="${fileName}"`)
+			.setHeader("Content-Disposition", inlinePdfContentDisposition(fileName))
 			.send(pdfString);
 	}
 
@@ -42,7 +43,7 @@ const request = async (request: NextApiRequest, response: NextApiResponse) => {
 	response.writeHead(200, {
 		"Content-Type": "application/pdf",
 		"Content-Length": pdfContent.length,
-		"Content-Disposition": `inline; filename="${fileName}"`
+		"Content-Disposition": inlinePdfContentDisposition(fileName)
 	});
 
 	response.end(pdfContent);
