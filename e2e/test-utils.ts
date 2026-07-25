@@ -67,35 +67,35 @@ export async function waitForAlert(page: Page, text: string) {
 		.click();
 }
 
-export async function createRandomSupportItem() {
+export async function createRandomSupportItem(ownerId = testUser.id) {
 	const supportItem = randomSupportItem();
 
 	return await prisma.supportItem.create({
 		data: {
 			...supportItem,
-			ownerId: testUser.id
+			ownerId
 		}
 	});
 }
 
-export async function createDefaultSupportItem() {
-	const supportItem = await createRandomSupportItem();
+export async function createDefaultSupportItem(ownerId = testUser.id) {
+	const supportItem = await createRandomSupportItem(ownerId);
 
 	await prisma.user.update({
-		where: { id: testUser.id },
+		where: { id: ownerId },
 		data: { defaultSupportItemId: supportItem.id }
 	});
 
 	return supportItem;
 }
 
-export async function createRandomClient() {
+export async function createRandomClient(ownerId = testUser.id) {
 	const client = randomClient();
 
 	const createdClient = await prisma.client.create({
 		data: {
 			...client,
-			ownerId: testUser.id
+			ownerId
 		}
 	});
 

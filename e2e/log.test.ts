@@ -1,0 +1,202 @@
+import prisma from "@/server/prisma";
+import { expect, test } from "@playwright/test";
+import { randomUUID } from "crypto";
+import { addMonths, getUnixTime } from "date-fns";
+import { createDefaultSupportItem, createRandomClient } from "./test-utils";
+
+// The Log is per-Provider global state: an Open Session puts a banner on
+// every dashboard screen, and only one can be open at a time. Running these
+// tests as the shared testUser would leak that banner into unrelated e2e
+// files running in parallel - so this file gets its own authenticated user.
+const logUser = {
+	id: "log-e2e-user",
+	name: "Log Test User",
+	email: "log-e2e@user.com",
+	sessionToken: randomUUID()
+};
+
+test.beforeAll(async () => {
+	await prisma.user.deleteMany({ where: { email: logUser.email } });
+	await prisma.user.create({
+		data: {
+			id: logUser.id,
+			name: logUser.name,
+			email: logUser.email,
+			sessions: {
+				create: {
+					expires: addMonths(new Date(), 1),
+					sessionToken: logUser.sessionToken
+				}
+			}
+		}
+	});
+});
+
+test.afterAll(async () => {
+	await prisma.user.deleteMany({ where: { email: logUser.email } });
+});
+
+test.beforeEach(async ({ page }) => {
+	// Same session-cookie bypass as authenticateAsTestUser, for logUser -
+	// overwrites the storage-state cookie by name/domain/path.
+	await page.context().addCookies([
+		{
+			name: "next-auth.session-token",
+			value: logUser.sessionToken,
+			domain: "localhost",
+			path: "/",
+			httpOnly: true,
+			sameSite: "Lax",
+			expires: getUnixTime(addMonths(new Date(), 1))
+		}
+	]);
+	// One Open Session per Provider - start each test from an empty Log.
+	await prisma.workSession.deleteMany({ where: { ownerId: logUser.id } });
+});
+
+test("Captures a day of sessions and promotes it to Activities and a Trip", async ({
+	page
+}) => {
+	const clientA = await createRandomClient(logUser.id);
+	const clientB = await createRandomClient(logUser.id);
+	await createDefaultSupportItem(logUser.id);
+
+	await page.goto("/dashboard/log");
+
+	// Start the day with client A.
+	await page.getByRole("button", { name: "Start a session" }).click();
+	await page.getByRole("checkbox", { name: clientA.name }).click();
+	await page.getByLabel("Started at").fill("09:00");
+	await page.getByRole("button", { name: "Start", exact: true }).click();
+	await expect(page.getByText("Session in progress")).toBeVisible();
+
+	// Drive the client around during the Session - Activity Based Transport.
+	await page.getByRole("button", { name: /\+ Trip km/ }).click();
+	await page.getByLabel("Drove (km)").fill("8");
+	await page.getByRole("button", { name: "Log trip" }).click();
+	await expect(page.getByText("8 km logged")).toBeVisible();
+
+	// End for A, with more clients to come.
+	await page.getByRole("button", { name: "End session" }).click();
+	await page.getByLabel("Finished at").fill("10:00");
+	await page.getByRole("button", { name: "More clients to come" }).click();
+
+	// Starting the next client captures the drive between them: the gap
+	// (10:00 → 10:20) pre-fills the travel duration.
+	await page.getByRole("button", { name: "Start a session" }).click();
+	await page.getByRole("checkbox", { name: clientB.name }).click();
+	await page.getByLabel("Started at").fill("10:20");
+	await page.getByRole("button", { name: "Start", exact: true }).click();
+
+	await expect(page.getByText("How did you get here?")).toBeVisible();
+	await expect(page.getByLabel("Took (min)")).toHaveValue("20");
+	await page.getByLabel("Drove (km)").fill("12");
+	await page.getByRole("button", { name: "Log the drive" }).click();
+
+	// Done for the day.
+	await page.getByRole("button", { name: "End session" }).click();
+	await page.getByLabel("Finished at").fill("11:00");
+	await page.getByRole("button", { name: "Done for the day" }).click();
+
+	// The whole day promotes in one action.
+	await expect(page.getByText("2 sessions ·")).toBeVisible();
+	await page.getByRole("button", { name: "Promote", exact: true }).click();
+	await page.getByRole("button", { name: "Promote day" }).click();
+	await expect(
+		page.getByText("Created 2 Activities and a Trip.")
+	).toBeVisible();
+
+	// Promoted Sessions leave the Log...
+	await page.getByRole("dialog").press("Escape");
+	await expect(page.getByText("Nothing captured yet today.")).toBeVisible();
+	expect(
+		await prisma.workSession.count({ where: { ownerId: logUser.id } })
+	).toBe(0);
+
+	// ...and the Activity/Trip world now holds the day: two Pending
+	// Activities, the in-session trip on A's Activity, and a Trip whose
+	// inter-client leg bills the captured 12 km over the 20 minute gap.
+	const activities = await prisma.activity.findMany({
+		where: { clientId: { in: [clientA.id, clientB.id] } },
+		include: { transportItems: true },
+		orderBy: { startTime: "asc" }
+	});
+	expect(activities).toHaveLength(2);
+	expect(activities[0].clientId).toBe(clientA.id);
+	expect(activities[0].transportItems).toHaveLength(1);
+	expect(Number(activities[0].transportItems[0].amount)).toBe(8);
+
+	const trip = await prisma.trip.findFirst({
+		where: { activities: { some: { clientId: clientA.id } } },
+		include: { interClientLegs: true }
+	});
+	expect(trip).not.toBeNull();
+	expect(trip?.interClientLegs).toHaveLength(1);
+	expect(Number(trip?.interClientLegs[0].distance)).toBe(12);
+	expect(Number(trip?.interClientLegs[0].duration)).toBe(20);
+});
+
+test("Capture works offline and syncs when signal returns", async ({
+	page,
+	context
+}) => {
+	const client = await createRandomClient(logUser.id);
+
+	await page.goto("/dashboard/log");
+
+	// Open the Start flow and wait for the Client list - proof the initial
+	// pull has landed on-device - before dropping the connection.
+	await page.getByRole("button", { name: "Start a session" }).click();
+	await expect(page.getByRole("checkbox", { name: client.name })).toBeVisible();
+	await context.setOffline(true);
+
+	await page.getByRole("checkbox", { name: client.name }).click();
+	await page.getByLabel("Started at").fill("13:00");
+	await page.getByRole("button", { name: "Start", exact: true }).click();
+
+	// The tap landed locally, stamped at capture time - and nothing has
+	// reached the server yet.
+	await expect(page.getByText("Session in progress")).toBeVisible();
+	await expect(page.getByText(/Offline - captures are saved/)).toBeVisible();
+	await expect(page.getByText(/1 waiting to sync/)).toBeVisible();
+	expect(
+		await prisma.workSession.count({ where: { ownerId: logUser.id } })
+	).toBe(0);
+
+	// Signal returns: the queued capture replays without any user action.
+	await context.setOffline(false);
+	await expect
+		.poll(() => prisma.workSession.count({ where: { ownerId: logUser.id } }), {
+			timeout: 15_000
+		})
+		.toBe(1);
+	await expect(page.getByText(/Offline - captures are saved/)).toBeHidden();
+
+	const session = await prisma.workSession.findFirstOrThrow({
+		where: { ownerId: logUser.id },
+		include: { participants: true }
+	});
+	expect(session.endTime).toBeNull();
+	expect(session.participants.map((p) => p.clientId)).toEqual([client.id]);
+});
+
+test("Open Session banner follows the Provider to other screens", async ({
+	page
+}) => {
+	const client = await createRandomClient(logUser.id);
+
+	await page.goto("/dashboard/log");
+	await page.getByRole("button", { name: "Start a session" }).click();
+	await page.getByRole("checkbox", { name: client.name }).click();
+	await page.getByLabel("Started at").fill("09:00");
+	await page.getByRole("button", { name: "Start", exact: true }).click();
+	await expect(page.getByText("Session in progress")).toBeVisible();
+
+	// The banner carries the open Session to every dashboard screen.
+	await page.goto("/dashboard/invoices");
+	await expect(page.getByText(client.name)).toBeVisible();
+	await page.getByRole("button", { name: "End", exact: true }).click();
+	await page.getByLabel("Finished at").fill("17:00");
+	await page.getByRole("button", { name: "Done for the day" }).click();
+	await expect(page.getByText(client.name)).toBeHidden();
+});
