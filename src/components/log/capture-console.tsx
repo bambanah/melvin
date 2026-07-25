@@ -86,12 +86,23 @@ function Console({ flows, session }: { flows: LogFlows; session: LogSession }) {
 						</div>
 					</div>
 				</div>
+				{/* Sessions left Open past their day close automatically at 23:59;
+				    the one shape that can't (started in the day's final minute)
+				    needs the edit sheet, so hand over rather than dead-ending. */}
 				{stale && (
-					<p className="mt-3 flex items-center justify-center gap-2 text-sm text-amber-600 dark:text-amber-500">
-						<TriangleAlert className="size-4 shrink-0" />
-						Still open from {session.date} - Sessions can&apos;t cross midnight.
-						End it with the time you actually finished.
-					</p>
+					<div className="mt-3 flex flex-col items-center gap-2">
+						<p className="flex items-center justify-center gap-2 text-sm text-amber-600 dark:text-amber-500">
+							<TriangleAlert className="size-4 shrink-0" />
+							Still open from {session.date} - Sessions can&apos;t cross
+							midnight.
+						</p>
+						<button
+							className="border-border bg-card hover:bg-accent cursor-pointer rounded-lg border px-3 py-1.5 text-sm font-medium"
+							onClick={() => flows.editSession(session)}
+						>
+							Edit session
+						</button>
+					</div>
 				)}
 			</div>
 

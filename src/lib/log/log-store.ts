@@ -167,6 +167,25 @@ export function startSession(input: {
 	return { session, previous };
 }
 
+const END_OF_DAY = "23:59";
+
+/**
+ * Sessions can't cross midnight and overnights aren't supported: a Session
+ * still Open after its day ended closes automatically at end-of-day, so the
+ * day becomes promotable and the next morning starts clean. The end time is
+ * editable afterwards like any other capture. Runs wherever the store wakes
+ * up (hydration, reconnect, the heartbeat, a pull that delivers a stale Open
+ * Session from another device) - with or without signal.
+ */
+function closeOverdueSessions() {
+	const open = openSessionOf(state.sessions);
+	if (!open || open.date >= todayKey()) return;
+	// A Session started in the day's final minute can't fit an end after its
+	// start - the console offers an edit escape hatch for that one.
+	if (open.startTime >= END_OF_DAY) return;
+	endSession(open.id, END_OF_DAY);
+}
+
 export function endSession(id: string, endTime: string) {
 	const session = mustFind(id);
 	if (hhmmToMinutes(endTime) <= hhmmToMinutes(session.startTime)) {
@@ -513,25 +532,34 @@ async function drainAndPull() {
 	}
 	setState({ online: true, syncing: true });
 	try {
-		while (state.queue.length > 0) {
-			const op = state.queue[0];
-			try {
-				await send(op);
-			} catch (error) {
-				if (!isServerRejection(error)) return; // offline again - retry later
-				// The server refused this capture; dropping it and re-pulling
-				// converges local state, and the message tells the Provider why.
-				commit({ queue: state.queue.slice(1), lastSyncError: error.message });
-				continue;
+		// Loop until local and server state converge: taps can land while a
+		// pull is in flight, and the pull itself can enqueue work (auto-closing
+		// a stale Open Session another device left behind) - both drain in the
+		// next round rather than waiting for the heartbeat. Each round only
+		// recurs when the queue grew, so this can't spin.
+		for (;;) {
+			while (state.queue.length > 0) {
+				const op = state.queue[0];
+				try {
+					await send(op);
+				} catch (error) {
+					if (!isServerRejection(error)) return; // offline again - retry later
+					// The server refused this capture; dropping it and re-pulling
+					// converges local state, and the message tells the Provider why.
+					commit({ queue: state.queue.slice(1), lastSyncError: error.message });
+					continue;
+				}
+				commit({ queue: state.queue.slice(1) });
 			}
-			commit({ queue: state.queue.slice(1) });
-		}
 
-		const rows = await api().log.listByClient.query();
-		// New taps landed while the pull was in flight - reconcile next round
-		// rather than clobbering them with a pre-tap snapshot.
-		if (state.queue.length > 0) return;
-		commit(fromServer(rows));
+			const rows = await api().log.listByClient.query();
+			// New taps landed while the pull was in flight - drain them before
+			// reconciling rather than clobbering them with a pre-tap snapshot.
+			if (state.queue.length > 0) continue;
+			commit(fromServer(rows));
+			closeOverdueSessions();
+			if (state.queue.length === 0) return;
+		}
 	} catch {
 		// Transient network failure mid-sync; the queue is intact.
 	} finally {
@@ -601,18 +629,27 @@ function start() {
 		} else {
 			setState({ hydrated: true });
 		}
+		closeOverdueSessions();
 		void syncLog();
 	});
 
 	window.addEventListener("online", () => {
 		setState({ online: true });
+		closeOverdueSessions();
 		void syncLog();
 	});
 	window.addEventListener("offline", () => setState({ online: false }));
 	document.addEventListener("visibilitychange", () => {
-		if (document.visibilityState === "visible") void syncLog();
+		if (document.visibilityState === "visible") {
+			closeOverdueSessions();
+			void syncLog();
+		}
 	});
 	// Captures sync on the spot; this heartbeat catches missed edges (a
-	// flapping connection, another device promoting the day).
-	setInterval(() => void syncLog(), 60_000);
+	// flapping connection, another device promoting the day) and the midnight
+	// rollover of a Session left running on-screen.
+	setInterval(() => {
+		closeOverdueSessions();
+		void syncLog();
+	}, 60_000);
 }
