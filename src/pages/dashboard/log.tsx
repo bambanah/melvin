@@ -7,11 +7,11 @@ import { CaptureConsole, ClientDot } from "@/components/log/capture-console";
 import { useLogFlows, type LogFlows } from "@/components/log/log-flows";
 import { SessionMeta } from "@/components/log/session-meta";
 import Layout from "@/components/shared/layout";
-import { clearSyncError } from "@/lib/log/log-store";
+import { clearSyncError, dismissAutoEnded } from "@/lib/log/log-store";
 import { formatDayKey, minutesBetween, todayKey } from "@/lib/log/log-time";
 import type { LogSession } from "@/lib/log/log-types";
 import { useLog } from "@/lib/log/use-log";
-import { CloudOff, RefreshCw } from "lucide-react";
+import { CloudOff, RefreshCw, TriangleAlert } from "lucide-react";
 import Head from "next/head";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
@@ -19,10 +19,13 @@ import { toast } from "react-toastify";
 const sessionMinutes = (session: LogSession) =>
 	session.endTime ? minutesBetween(session.startTime, session.endTime) : 0;
 
+const formatHours = (minutes: number) =>
+	(minutes / 60).toFixed(1).replace(/\.0$/, "");
+
 const dayHours = (sessions: LogSession[]) =>
-	(sessions.reduce((sum, session) => sum + sessionMinutes(session), 0) / 60)
-		.toFixed(1)
-		.replace(/\.0$/, "");
+	formatHours(
+		sessions.reduce((sum, session) => sum + sessionMinutes(session), 0)
+	);
 
 function SyncStatus({ online, pending }: { online: boolean; pending: number }) {
 	if (online && pending === 0) return null;
@@ -40,6 +43,53 @@ function SyncStatus({ online, pending }: { online: boolean; pending: number }) {
 						pending > 0 ? ` (${pending} waiting to sync)` : ""
 					} and sync when you're back in signal.`}
 		</p>
+	);
+}
+
+// Story: nudge when a Session was left Open - the store ended it at 23:59
+// (the day-boundary rule, not when the Provider actually stopped), so keep
+// asking until the end time is fixed or confirmed.
+function AutoEndNudge({ flows }: { flows: LogFlows }) {
+	const { log } = flows;
+	const nudged = log.sessions.filter((session) =>
+		log.autoEnded.includes(session.id)
+	);
+	if (nudged.length === 0) return null;
+
+	return (
+		<section className="mt-4 space-y-2.5">
+			{nudged.map((session) => (
+				<div
+					key={session.id}
+					className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4"
+				>
+					<p className="flex items-start gap-2 text-sm">
+						<TriangleAlert className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-500" />
+						<span>
+							<span className="font-medium">
+								{log.participantNames(session)}
+							</span>{" "}
+							was left open on {formatDayKey(session.date)} and ended for you at
+							23:59 - is that when you finished?
+						</span>
+					</p>
+					<div className="mt-3 flex gap-2">
+						<button
+							className="border-border bg-card hover:bg-accent flex-1 cursor-pointer rounded-lg border px-3 py-1.5 text-sm font-medium"
+							onClick={() => flows.editSession(session)}
+						>
+							Fix end time
+						</button>
+						<button
+							className="text-muted-foreground hover:bg-accent flex-1 cursor-pointer rounded-lg px-3 py-1.5 text-sm"
+							onClick={() => dismissAutoEnded(session.id)}
+						>
+							23:59 is right
+						</button>
+					</div>
+				</div>
+			))}
+		</section>
 	);
 }
 
@@ -82,10 +132,7 @@ function EarlierToday({ flows }: { flows: LogFlows }) {
 										</div>
 									</div>
 									<span className="text-muted-foreground text-xs tabular-nums">
-										{(sessionMinutes(session) / 60)
-											.toFixed(1)
-											.replace(/\.0$/, "")}
-										h
+										{formatHours(sessionMinutes(session))}h
 									</span>
 								</button>
 							</li>
@@ -193,6 +240,7 @@ function LogPage() {
 			<div className="mx-auto w-full max-w-md pb-24">
 				<SyncStatus online={log.online} pending={log.queue.length} />
 				{log.hydrated && <CaptureConsole flows={flows} />}
+				<AutoEndNudge flows={flows} />
 				<EarlierToday flows={flows} />
 				<WaitingToPromote flows={flows} />
 				<button

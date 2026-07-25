@@ -349,6 +349,51 @@ describe("log.edit", () => {
 			})
 		).rejects.toThrow(/after/i);
 	});
+
+	test("rejects an edit that would leave a second Session Open", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const [first, second] = await createClients(owner, 2);
+
+		await caller.log.start({
+			date: DAY,
+			startTime: "09:00",
+			clientIds: [first.id]
+		});
+
+		await expect(
+			caller.log.edit({
+				id: "backfilled-open",
+				date: DAY,
+				startTime: "07:00",
+				endTime: null,
+				clientIds: [second.id]
+			})
+		).rejects.toThrow(/already open/i);
+	});
+
+	test("an edit may leave its own Session Open", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const [client] = await createClients(owner, 1);
+
+		const session = await caller.log.start({
+			date: DAY,
+			startTime: "09:00",
+			clientIds: [client.id]
+		});
+		await caller.log.edit({
+			id: session.id,
+			date: DAY,
+			startTime: "09:15",
+			endTime: null,
+			clientIds: [client.id]
+		});
+
+		const [persisted] = await caller.log.listByDay({ date: DAY });
+		expect(persisted.startTime).toEqual(new Date("1970-01-01T09:15:00Z"));
+		expect(persisted.endTime).toBeNull();
+	});
 });
 
 describe("log.addParticipant / log.removeParticipant", () => {
@@ -469,6 +514,41 @@ describe("log.addParticipant / log.removeParticipant", () => {
 				at: "09:30"
 			})
 		).rejects.toThrow(/open/i);
+	});
+
+	test("last write wins - a stale split replay never clobbers a newer edit", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const [alice, bob] = await createClients(owner, 2);
+
+		const solo = await caller.log.start({
+			date: DAY,
+			startTime: "09:00",
+			clientIds: [alice.id],
+			updatedAt: new Date("2024-01-01T09:00:00Z")
+		});
+		await caller.log.edit({
+			id: solo.id,
+			date: DAY,
+			startTime: "09:15",
+			endTime: null,
+			clientIds: [alice.id],
+			updatedAt: new Date("2024-01-01T12:00:00Z")
+		});
+
+		// A stale offline split replay stamped before the edit above.
+		const replayed = await caller.log.addParticipant({
+			workSessionId: solo.id,
+			clientId: bob.id,
+			at: "10:00",
+			newWorkSessionId: "stale-split",
+			updatedAt: new Date("2024-01-01T10:00:00Z")
+		});
+
+		expect(replayed.id).toBe(solo.id);
+		const sessions = await caller.log.listByDay({ date: DAY });
+		expect(sessions).toHaveLength(1);
+		expect(sessions[0].endTime).toBeNull();
 	});
 
 	test("replaying an addParticipant with the same new-Session id does not split twice", async () => {
@@ -638,6 +718,53 @@ describe("log.captureHandover", () => {
 		const sessions = await caller.log.listByDay({ date: DAY });
 		const linked = sessions.find((s) => s.id === afternoon.id);
 		expect(Number(linked?.interClientDuration)).toBe(45);
+	});
+
+	test("last write wins - a stale handover replay never clobbers a newer edit", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const [first, second] = await createClients(owner, 2);
+
+		const morning = await caller.log.start({
+			date: DAY,
+			startTime: "09:00",
+			clientIds: [first.id],
+			updatedAt: new Date("2024-01-01T09:00:00Z")
+		});
+		await caller.log.end({
+			id: morning.id,
+			endTime: "11:00",
+			updatedAt: new Date("2024-01-01T11:00:00Z")
+		});
+		const afternoon = await caller.log.start({
+			date: DAY,
+			startTime: "11:20",
+			clientIds: [second.id],
+			updatedAt: new Date("2024-01-01T11:20:00Z")
+		});
+		await caller.log.edit({
+			id: afternoon.id,
+			date: DAY,
+			startTime: "11:30",
+			endTime: "13:00",
+			clientIds: [second.id],
+			updatedAt: new Date("2024-01-01T12:00:00Z")
+		});
+
+		// A stale offline handover replay stamped before the edit above.
+		const result = await caller.log.captureHandover({
+			workSessionId: afternoon.id,
+			precededByWorkSessionId: morning.id,
+			handoverType: "TRAVEL",
+			interClientDistance: 14,
+			updatedAt: new Date("2024-01-01T11:20:00Z")
+		});
+
+		expect(result.workSession.handoverType).toBeNull();
+		const sessions = await caller.log.listByDay({ date: DAY });
+		const linked = sessions.find((s) => s.id === afternoon.id);
+		expect(linked?.precededByWorkSessionId).toBeNull();
+		expect(linked?.interClientDistance).toBeNull();
 	});
 
 	test("rejects a travel Handover without a distance", async () => {

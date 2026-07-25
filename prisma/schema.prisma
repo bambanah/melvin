@@ -274,8 +274,8 @@ enum HandoverType {
 
 // Domain term "Session" - the code name avoids the NextAuth Session table.
 // A captured unit of field work: ephemeral, deleted when a day is promoted
-// into Activities. `id` is client-generated (a cuid minted on-device) so
-// offline creates have stable identity across sync replays.
+// into Activities. `id` is client-generated (minted on-device, a UUID in
+// practice) so offline creates have stable identity across sync replays.
 model WorkSession {
   id        String    @id @default(cuid())
   createdAt DateTime  @default(now())

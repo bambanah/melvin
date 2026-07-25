@@ -3,8 +3,7 @@
 // lets the Provider log a trip, log a travel cost, or end it without
 // hunting for the Log tab. Hidden on the Log tab itself, where the capture
 // console is the banner.
-import { hhmmToMinutes, nowHHmm, todayKey } from "@/lib/log/log-time";
-import { formatMinutes } from "@/lib/log/log-time";
+import { formatMinutes, minutesSince, todayKey } from "@/lib/log/log-time";
 import { useLog, useNowTick } from "@/lib/log/use-log";
 import { Car, CircleDollarSign } from "lucide-react";
 import Link from "next/link";
@@ -23,9 +22,7 @@ export function OpenSessionBanner() {
 	const stale = session.date !== todayKey();
 	const elapsed = stale
 		? `since ${session.date}`
-		: formatMinutes(
-				Math.max(hhmmToMinutes(nowHHmm()) - hhmmToMinutes(session.startTime), 0)
-			);
+		: formatMinutes(minutesSince(session.startTime));
 
 	return (
 		<>

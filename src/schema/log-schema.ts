@@ -4,6 +4,13 @@ export const timeOfDaySchema = z
 	.string()
 	.regex(/^\d{2}:\d{2}$/, "Time must be HH:mm");
 
+// Rule messages shared by the router and the on-device store, which mirrors
+// the router's guards at tap time - one wording for both rejections.
+export const END_AFTER_START_MESSAGE =
+	"End time must be after start time - Sessions can't cross midnight";
+export const OPEN_SESSION_EDIT_MESSAGE =
+	"Another Session is already Open - end it before leaving this one Open";
+
 // Mirrors ActivityTransportItem: a logged trip is a DISTANCE item (km),
 // parking/toll/other are flat Transport Expenses (dollars).
 export const workSessionTransportItemSchema = z.object({
@@ -13,8 +20,9 @@ export const workSessionTransportItemSchema = z.object({
 	note: z.string().optional()
 });
 
-// All Log writes accept a client-generated id (a cuid minted on-device) so
-// offline captures have stable identity when the sync client replays them.
+// All Log writes accept a client-generated id (minted on-device, a UUID in
+// practice) so offline captures have stable identity when the sync client
+// replays them.
 export const workSessionStartSchema = z.object({
 	id: z.string().optional(),
 	date: z.date({ required_error: "Date is required" }),
@@ -44,8 +52,7 @@ export const workSessionEditSchema = workSessionStartSchema
 		transportItems: z.array(workSessionTransportItemSchema).optional()
 	})
 	.refine((data) => !data.endTime || data.startTime < data.endTime, {
-		message:
-			"End time must be after start time - Sessions can't cross midnight",
+		message: END_AFTER_START_MESSAGE,
 		path: ["endTime"]
 	});
 export type WorkSessionEditSchema = z.infer<typeof workSessionEditSchema>;

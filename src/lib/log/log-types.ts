@@ -36,6 +36,21 @@ export interface LogClient {
 	name: string;
 }
 
+/** The Session's logged trips (DISTANCE items, in km). */
+export const tripsOf = (session: LogSession) =>
+	session.transportItems.filter((item) => item.type === "DISTANCE");
+
+/** The Session's flat travel costs (parking, tolls, other; in dollars). */
+export const costsOf = (session: LogSession) =>
+	session.transportItems.filter((item) => item.type !== "DISTANCE");
+
+export const sumAmounts = (items: LogTransportItem[]) =>
+	items.reduce((sum, item) => sum + item.amount, 0);
+
+/** More than one participant - mirrors the server's groupSize derivation. */
+export const isGroupSession = (session: Pick<LogSession, "clientIds">) =>
+	session.clientIds.length > 1;
+
 // One queued log-router mutation. Inputs mirror the router contract; ids are
 // minted on-device so replays are idempotent upserts, and `updatedAt` carries
 // the tap time so a delayed upload never distorts the recorded day.
@@ -130,6 +145,12 @@ export interface LogState {
 	 * Provider should see why a capture didn't stick.
 	 */
 	lastSyncError: string | null;
+	/**
+	 * Sessions this device auto-ended at 23:59 (left Open past their day) that
+	 * the Provider hasn't reviewed yet - the Log tab nudges until the end time
+	 * is confirmed or fixed.
+	 */
+	autoEnded: string[];
 }
 
 export const EMPTY_LOG_STATE: LogState = {
@@ -139,5 +160,6 @@ export const EMPTY_LOG_STATE: LogState = {
 	queue: [],
 	online: true,
 	syncing: false,
-	lastSyncError: null
+	lastSyncError: null,
+	autoEnded: []
 };

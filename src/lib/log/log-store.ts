@@ -11,6 +11,10 @@
 // end-after-start, pivot-after-start) so a capture that would be rejected at
 // sync time is rejected at tap time instead, while there's still a thumb on
 // the screen to fix it.
+import {
+	END_AFTER_START_MESSAGE,
+	OPEN_SESSION_EDIT_MESSAGE
+} from "@/schema/log-schema";
 import type { AppRouter } from "@/server/api/app-router";
 import type { LogRouterOutput } from "@/server/api/routers/log-router";
 import { TRPCClientError, createTRPCClient, httpBatchLink } from "@trpc/client";
@@ -53,10 +57,17 @@ function setState(patch: Partial<LogState>) {
 /** setState + persist - for changes that must survive the tab closing. */
 function commit(patch: Partial<LogState>) {
 	setState(patch);
+	// An auto-end nudge only outlives its Session while the Session exists -
+	// promoting or deleting it takes the nudge with it.
+	const autoEnded = state.autoEnded.filter((id) =>
+		state.sessions.some((session) => session.id === id)
+	);
+	if (autoEnded.length !== state.autoEnded.length) setState({ autoEnded });
 	void savePersistedLog({
 		sessions: state.sessions,
 		clients: state.clients,
-		queue: state.queue
+		queue: state.queue,
+		autoEnded: state.autoEnded
 	});
 }
 
@@ -184,14 +195,20 @@ function closeOverdueSessions() {
 	// start - the console offers an edit escape hatch for that one.
 	if (open.startTime >= END_OF_DAY) return;
 	endSession(open.id, END_OF_DAY);
+	// 23:59 is the day-boundary rule, not when the Provider actually stopped -
+	// nudge until the end time is confirmed or fixed.
+	commit({ autoEnded: [...new Set([...state.autoEnded, open.id])] });
+}
+
+/** The Provider confirmed (or fixed) an auto-ended Session's end time. */
+export function dismissAutoEnded(id: string) {
+	commit({ autoEnded: state.autoEnded.filter((ended) => ended !== id) });
 }
 
 export function endSession(id: string, endTime: string) {
 	const session = mustFind(id);
 	if (hhmmToMinutes(endTime) <= hhmmToMinutes(session.startTime)) {
-		throw new Error(
-			"End time must be after start time - Sessions can't cross midnight"
-		);
+		throw new Error(END_AFTER_START_MESSAGE);
 	}
 
 	const stamp = nowStamp();
@@ -217,9 +234,17 @@ export function editSession(input: {
 		input.endTime !== null &&
 		hhmmToMinutes(input.endTime) <= hhmmToMinutes(input.startTime)
 	) {
-		throw new Error(
-			"End time must be after start time - Sessions can't cross midnight"
-		);
+		throw new Error(END_AFTER_START_MESSAGE);
+	}
+
+	// At most one Open Session: an edit that leaves this Session Open (or
+	// backfills a new Open one) must not create a second - the same guard the
+	// router applies on replay.
+	if (input.endTime === null) {
+		const open = openSessionOf(state.sessions);
+		if (open && open.id !== input.id) {
+			throw new Error(OPEN_SESSION_EDIT_MESSAGE);
+		}
 	}
 
 	const stamp = nowStamp();
@@ -257,6 +282,9 @@ export function editSession(input: {
 			updatedAt: stamp
 		}
 	});
+
+	// Saving an edit is exactly the review the auto-end nudge asks for.
+	if (state.autoEnded.includes(session.id)) dismissAutoEnded(session.id);
 }
 
 export function deleteSession(id: string) {
@@ -625,7 +653,8 @@ function start() {
 		// Captures made in the instant before hydration completed win over the
 		// persisted snapshot; the pull below re-converges everything anyway.
 		if (persisted && state.queue.length === 0 && state.sessions.length === 0) {
-			setState({ ...persisted, hydrated: true });
+			// `autoEnded` postdates the first persisted records - default it in.
+			setState({ autoEnded: [], ...persisted, hydrated: true });
 		} else {
 			setState({ hydrated: true });
 		}

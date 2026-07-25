@@ -1,10 +1,6 @@
-import {
-	standaloneTransitUpdates,
-	tripTransitUpdates,
-	type TransitUpdate
-} from "@/lib/trip-utils";
+import { standaloneTransitUpdates, tripTransitUpdates } from "@/lib/trip-utils";
+import { applyTransitUpdates } from "@/server/api/transit";
 import { authedProcedure, router } from "@/server/api/trpc";
-import type { Prisma } from "@/generated/client";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { z } from "zod";
 
@@ -38,21 +34,6 @@ const tripActivitySelect = {
 		}
 	}
 };
-
-export async function applyTransitUpdates(
-	tx: Prisma.TransactionClient,
-	updates: TransitUpdate[]
-) {
-	for (const update of updates) {
-		await tx.activity.update({
-			where: { id: update.activityId },
-			data: {
-				transitDistance: update.transitDistance,
-				transitDuration: update.transitDuration
-			}
-		});
-	}
-}
 
 export const tripRouter = router({
 	create: authedProcedure

@@ -12,6 +12,8 @@ export interface PersistedLog {
 	sessions: LogSession[];
 	clients: LogClient[];
 	queue: LogOp[];
+	/** Absent in records persisted before the auto-end nudge existed. */
+	autoEnded?: string[];
 }
 
 function openDb(): Promise<IDBDatabase> {

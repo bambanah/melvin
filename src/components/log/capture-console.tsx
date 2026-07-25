@@ -4,9 +4,15 @@
 // a single Start fills the same slot. The prototype's literal warm-paper hex
 // tokens are translated to the theme system here (card/border/primary), so
 // the console follows light and dark mode like the rest of the app.
-import { hhmmToMinutes, nowHHmm, todayKey } from "@/lib/log/log-time";
-import type { LogSession } from "@/lib/log/log-types";
-import { useNowTick, type Log } from "@/lib/log/use-log";
+import { minutesSince, todayKey } from "@/lib/log/log-time";
+import {
+	costsOf,
+	isGroupSession,
+	sumAmounts,
+	tripsOf,
+	type LogSession
+} from "@/lib/log/log-types";
+import { useNowTick } from "@/lib/log/use-log";
 import { TriangleAlert } from "lucide-react";
 import type { LogFlows } from "./log-flows";
 
@@ -51,14 +57,10 @@ function Console({ flows, session }: { flows: LogFlows; session: LogSession }) {
 	const { log } = flows;
 
 	const stale = session.date !== todayKey();
-	const minutes = stale
-		? null
-		: Math.max(hhmmToMinutes(nowHHmm()) - hhmmToMinutes(session.startTime), 0);
-	const trips = session.transportItems.filter((i) => i.type === "DISTANCE");
-	const costs = session.transportItems.filter((i) => i.type !== "DISTANCE");
-	const km = trips.reduce((sum, trip) => sum + trip.amount, 0);
-	const dollars = costs.reduce((sum, cost) => sum + cost.amount, 0);
-	const isGroup = session.clientIds.length > 1;
+	const minutes = stale ? null : minutesSince(session.startTime);
+	const km = sumAmounts(tripsOf(session));
+	const dollars = sumAmounts(costsOf(session));
+	const isGroup = isGroupSession(session);
 	const names = log.participantNames(session);
 
 	return (
