@@ -6,6 +6,7 @@
 import { hhmmToMinutes, nowHHmm, todayKey } from "@/lib/log/log-time";
 import { formatMinutes } from "@/lib/log/log-time";
 import { useLog, useNowTick } from "@/lib/log/use-log";
+import { Car, CircleDollarSign } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useLogFlows } from "./log-flows";
@@ -37,20 +38,26 @@ export function OpenSessionBanner() {
 					>
 						<span className="font-medium">{log.participantNames(session)}</span>{" "}
 						<span className="text-muted-foreground tabular-nums">
-							· {session.startTime} · {elapsed}
+							· {elapsed}
 						</span>
 					</Link>
+					{/* Icon-only on phones so the Client and elapsed time stay
+					    readable; the dialogs they open are fully labelled. */}
 					<button
-						className="text-primary hover:bg-primary/20 cursor-pointer rounded-md px-2 py-1 text-xs font-medium"
+						aria-label="Log trip km"
+						className="text-primary hover:bg-primary/20 flex shrink-0 cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-xs font-medium"
 						onClick={() => flows.logTrip(session)}
 					>
-						+ Trip km
+						<Car className="size-4" />
+						<span className="hidden sm:inline">+ Trip km</span>
 					</button>
 					<button
-						className="text-primary hover:bg-primary/20 cursor-pointer rounded-md px-2 py-1 text-xs font-medium"
+						aria-label="Log travel cost"
+						className="text-primary hover:bg-primary/20 flex shrink-0 cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-xs font-medium"
 						onClick={() => flows.logCost(session)}
 					>
-						+ Travel cost
+						<CircleDollarSign className="size-4" />
+						<span className="hidden sm:inline">+ Travel cost</span>
 					</button>
 					<button
 						className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-md px-2.5 py-1 text-xs font-semibold"
