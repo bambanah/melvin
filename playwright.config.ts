@@ -1,10 +1,15 @@
 import { defineConfig } from "@playwright/test";
 
+// E2E_PORT moves the whole suite off :3000 - parallel worktrees each run
+// their own dev server, and reuseExistingServer would otherwise silently
+// test against whichever checkout grabbed the default port first.
+const port = Number(process.env.E2E_PORT ?? 3000);
+
 export default defineConfig({
 	globalSetup: require.resolve("./e2e/setup/global.setup.ts"),
 	use: {
 		headless: true,
-		baseURL: "http://localhost:3000/dashboard",
+		baseURL: `http://localhost:${port}/dashboard`,
 		storageState: "./e2e/setup/storage-state.json",
 		screenshot: "only-on-failure",
 		trace: "retain-on-failure"
@@ -23,8 +28,8 @@ export default defineConfig({
 		// local and CI runs unchanged.
 		command:
 			process.env.E2E_WEB_SERVER_COMMAND ??
-			(process.env.CI ? "pnpm start" : "pnpm dev:next"),
-		url: "http://localhost:3000",
+			(process.env.CI ? `pnpm start -p ${port}` : `pnpm dev:next -p ${port}`),
+		url: `http://localhost:${port}`,
 		reuseExistingServer: !process.env.CI
 	}
 });
