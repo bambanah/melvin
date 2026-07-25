@@ -23,6 +23,10 @@ export const hhmmToMinutes = (hhmm: string) => {
 	return hours * 60 + minutes;
 };
 
+/** Minutes elapsed since an "HH:mm" time earlier today, clamped at zero. */
+export const minutesSince = (startHHmm: string) =>
+	Math.max(hhmmToMinutes(nowHHmm()) - hhmmToMinutes(startHHmm), 0);
+
 export const minutesBetween = (fromHHmm: string, toHHmm: string) =>
 	hhmmToMinutes(toHHmm) - hhmmToMinutes(fromHHmm);
 

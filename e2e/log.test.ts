@@ -239,4 +239,10 @@ test("A Session left open past its day is ended automatically at 23:59", async (
 			{ timeout: 15_000 }
 		)
 		.toBe("1970-01-01T23:59:00.000Z");
+
+	// 23:59 is a guess at the real finish time, so the Provider is nudged to
+	// review it rather than silently billing to midnight.
+	await expect(page.getByText(/ended for you at 23:59/)).toBeVisible();
+	await page.getByRole("button", { name: "23:59 is right" }).click();
+	await expect(page.getByText(/ended for you at 23:59/)).toBeHidden();
 });

@@ -11,8 +11,10 @@ import {
 	tripTransitUpdates,
 	type TransitUpdate
 } from "@/lib/trip-utils";
-import { applyTransitUpdates } from "@/server/api/routers/trip-router";
+import { applyTransitUpdates } from "@/server/api/transit";
 import {
+	END_AFTER_START_MESSAGE,
+	OPEN_SESSION_EDIT_MESSAGE,
 	captureHandoverSchema,
 	timeOfDaySchema,
 	workSessionEditSchema,
@@ -49,6 +51,11 @@ type LogContext = {
 const participantsCreate = (clientIds: string[]) => ({
 	create: clientIds.map((clientId) => ({ clientId }))
 });
+
+// One participant row = solo, N rows = group; the composition picks the
+// default Support Item and gives the mirrored Activities their groupSize.
+const isGroupSession = (session: { participants: unknown[] }) =>
+	session.participants.length > 1;
 
 // What promoteDay needs back from each created Activity: identity for the
 // Trip, and the TripActivity shape trip-utils' transit allocation reads.
@@ -143,10 +150,23 @@ async function splitAtPivot(
 			startTime: true,
 			endTime: true,
 			ownerId: true,
+			updatedAt: true,
 			participants: { select: { clientId: true } }
 		}
 	});
 	if (!session) throw new TRPCError({ code: "NOT_FOUND" });
+
+	// Last-write-wins: a delayed offline split replay never clobbers a newer
+	// edit of the Session it would close.
+	if (input.updatedAt && session.updatedAt > input.updatedAt) {
+		const current = await ctx.owned.workSession.findFirst({
+			where: { id: session.id },
+			select: workSessionSelect
+		});
+		if (!current) throw new TRPCError({ code: "NOT_FOUND" });
+		return current;
+	}
+
 	if (session.endTime) {
 		throw new TRPCError({
 			code: "CONFLICT",
@@ -280,8 +300,7 @@ export const logRouter = router({
 			if (endTime <= session.startTime) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
-					message:
-						"End time must be after start time - Sessions can't cross midnight"
+					message: END_AFTER_START_MESSAGE
 				});
 			}
 
@@ -316,6 +335,21 @@ export const logRouter = router({
 					where: { id: input.id },
 					select: workSessionSelect
 				});
+			}
+
+			// At most one Open Session per Provider: an edit that leaves this
+			// Session Open (or backfills a new Open one) must not create a second.
+			if (!input.endTime) {
+				const open = await ctx.owned.workSession.findFirst({
+					where: { endTime: null, id: { not: input.id } },
+					select: { id: true }
+				});
+				if (open) {
+					throw new TRPCError({
+						code: "CONFLICT",
+						message: OPEN_SESSION_EDIT_MESSAGE
+					});
+				}
 			}
 
 			const data = {
@@ -417,7 +451,7 @@ export const logRouter = router({
 		.mutation(async ({ ctx, input }) => {
 			const session = await ctx.owned.workSession.findFirst({
 				where: { id: input.workSessionId },
-				select: { id: true, date: true, startTime: true }
+				select: { id: true, date: true, startTime: true, updatedAt: true }
 			});
 			const preceding = await ctx.owned.workSession.findFirst({
 				where: { id: input.precededByWorkSessionId },
@@ -444,29 +478,42 @@ export const logRouter = router({
 			}
 
 			const isTravel = input.handoverType === "TRAVEL";
-			const workSession = await ctx.prisma.workSession.update({
-				where: { id: session.id },
-				data: {
-					precededByWorkSessionId: preceding.id,
-					handoverType: input.handoverType,
-					interClientDistance: isTravel ? input.interClientDistance : null,
-					interClientDuration: isTravel
-						? (input.interClientDuration ?? null)
-						: null,
-					updatedAt: input.updatedAt
-				},
-				select: workSessionSelect
-			});
+
+			// Last-write-wins: a delayed offline handover replay never clobbers a
+			// newer edit of the same Session.
+			const stale = input.updatedAt && session.updatedAt > input.updatedAt;
+			const workSession = stale
+				? await ctx.owned.workSession.findFirst({
+						where: { id: session.id },
+						select: workSessionSelect
+					})
+				: await ctx.prisma.workSession.update({
+						where: { id: session.id },
+						data: {
+							precededByWorkSessionId: preceding.id,
+							handoverType: input.handoverType,
+							interClientDistance: isTravel ? input.interClientDistance : null,
+							interClientDuration: isTravel
+								? (input.interClientDuration ?? null)
+								: null,
+							updatedAt: input.updatedAt
+						},
+						select: workSessionSelect
+					});
+			if (!workSession) throw new TRPCError({ code: "NOT_FOUND" });
 
 			// The gap between the two stamped times is known here, so surface the
 			// pre-fill and the fits-the-gap warning to the capture UI. Warn, never
-			// block - the billable clamp is applied at Promotion.
+			// block - the billable clamp is applied at Promotion. Computed from the
+			// row as stored, so a dropped stale replay reports what actually won.
 			const gapMinutes = differenceInMinutes(
 				session.startTime,
 				preceding.endTime
 			);
 			const { exceedsGap } = billableTravelDuration(
-				isTravel ? (input.interClientDuration ?? null) : null,
+				workSession.interClientDuration === null
+					? null
+					: Number(workSession.interClientDuration),
 				gapMinutes
 			);
 
@@ -566,7 +613,7 @@ export const logRouter = router({
 			const overrides = input.supportItemOverrides ?? {};
 			const supportItemIdBySession = new Map<string, string>();
 			for (const session of sessions) {
-				const isGroup = session.participants.length > 1;
+				const isGroup = isGroupSession(session);
 				const supportItemId =
 					overrides[session.id] ??
 					(isGroup
@@ -596,7 +643,7 @@ export const logRouter = router({
 				);
 				if (!item) throw new TRPCError({ code: "NOT_FOUND" });
 
-				const isGroup = session.participants.length > 1;
+				const isGroup = isGroupSession(session);
 				if (isGroup !== (item.isGroup === true)) {
 					throw new TRPCError({
 						code: "BAD_REQUEST",
@@ -650,10 +697,9 @@ export const logRouter = router({
 				const primaryBySessionId = new Map<string, PromotedActivity>();
 
 				for (const session of sessions) {
-					const groupSize =
-						session.participants.length > 1
-							? session.participants.length
-							: undefined;
+					const groupSize = isGroupSession(session)
+						? session.participants.length
+						: undefined;
 
 					const supportItemId = supportItemIdBySession.get(session.id);
 					if (!supportItemId) continue; // unreachable: seeded above

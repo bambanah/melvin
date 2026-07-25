@@ -21,15 +21,13 @@ import {
 } from "@/components/ui/select";
 import { dropDay } from "@/lib/log/log-store";
 import { formatDayKey } from "@/lib/log/log-time";
-import type { LogSession } from "@/lib/log/log-types";
+import { isGroupSession, type LogSession } from "@/lib/log/log-types";
 import type { Log } from "@/lib/log/use-log";
 import { trpc } from "@/lib/trpc";
 import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { SessionMeta } from "./session-meta";
-
-const isGroupSession = (session: LogSession) => session.clientIds.length > 1;
 
 export function PromoteDialog({
 	log,
