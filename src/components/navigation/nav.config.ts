@@ -1,5 +1,9 @@
 export const navConfig: { title: string; href: string }[] = [
 	{
+		title: "Log",
+		href: "/dashboard/log"
+	},
+	{
 		title: "Invoices",
 		href: "/dashboard/invoices"
 	},

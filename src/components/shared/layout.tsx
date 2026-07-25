@@ -1,5 +1,6 @@
-import Navbar from "@/components/navigation/navbar";
 import { QuickAddFab } from "@/components/activities/quick-add-fab";
+import { OpenSessionBanner } from "@/components/log/open-session-banner";
+import Navbar from "@/components/navigation/navbar";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -30,6 +31,7 @@ const Layout = ({ children, isLoading, className }: Props) => {
 	return (
 		<div className="flex h-full min-h-screen w-full flex-col">
 			<Navbar />
+			{session.status === "authenticated" && <OpenSessionBanner />}
 
 			<div
 				className={cn("flex flex-auto flex-col px-2 py-8 sm:px-12", className)}
@@ -37,7 +39,10 @@ const Layout = ({ children, isLoading, className }: Props) => {
 				{content}
 			</div>
 
-			{session.status === "authenticated" && <QuickAddFab />}
+			{/* The Log tab has its own capture affordances - the Activities FAB
+			    would overlap the console's bottom actions on a phone. */}
+			{session.status === "authenticated" &&
+				router.pathname !== "/dashboard/log" && <QuickAddFab />}
 		</div>
 	);
 };
