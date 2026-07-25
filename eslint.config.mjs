@@ -36,7 +36,10 @@ const eslintConfig = defineConfig([
 		"out/**",
 		"build/**",
 		"public/**",
-		"next-env.d.ts"
+		"next-env.d.ts",
+		// Playwright artifacts (bundled report/trace JS trips dozens of rules):
+		"playwright-report/**",
+		"test-results/**"
 	])
 ]);
 
