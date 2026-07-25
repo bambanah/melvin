@@ -80,6 +80,7 @@ export type LogOp =
 				clientId: string;
 				at: string;
 				newWorkSessionId: string;
+				updatedAt: string;
 			};
 	  }
 	| {
@@ -109,6 +110,7 @@ export type LogOp =
 				handoverType: HandoverType;
 				interClientDistance?: number;
 				interClientDuration?: number;
+				updatedAt: string;
 			};
 	  };
 

@@ -764,3 +764,103 @@ describe("log.delete", () => {
 		expect(await callerFor(owner).log.listByDay({ date: DAY })).toHaveLength(1);
 	});
 });
+
+// The offline sync client replays taps in order, each stamped with its tap
+// time. Any write that lets @updatedAt default to sync-arrival time would
+// make the row look newer than every later-queued tap, and last-write-wins
+// would silently drop those replays - so every WorkSession-touching mutation
+// must carry the stamp through.
+describe("tap-time stamping across queued replays", () => {
+	test("a stamped end still applies after captureHandover synced before it", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const [first, second] = await createClients(owner, 2);
+
+		const morning = await caller.log.start({
+			date: DAY,
+			startTime: "09:00",
+			clientIds: [first.id],
+			updatedAt: new Date("2024-01-01T09:00:00Z")
+		});
+		await caller.log.end({
+			id: morning.id,
+			endTime: "10:00",
+			updatedAt: new Date("2024-01-01T10:00:00Z")
+		});
+		const next = await caller.log.start({
+			date: DAY,
+			startTime: "10:20",
+			clientIds: [second.id],
+			updatedAt: new Date("2024-01-01T10:20:00Z")
+		});
+		await caller.log.captureHandover({
+			workSessionId: next.id,
+			precededByWorkSessionId: morning.id,
+			handoverType: "TRAVEL",
+			interClientDistance: 12,
+			interClientDuration: 20,
+			updatedAt: new Date("2024-01-01T10:20:30Z")
+		});
+
+		// The end was tapped after the handover, so its stamp is newer than
+		// the handover's - it must never be dropped as stale.
+		await caller.log.end({
+			id: next.id,
+			endTime: "11:00",
+			updatedAt: new Date("2024-01-01T11:00:00Z")
+		});
+
+		const sessions = await caller.log.listByDay({ date: DAY });
+		expect(sessions[1].endTime).toEqual(new Date("1970-01-01T11:00:00Z"));
+	});
+
+	test("stamped writes still apply after an auto-close and a participant split", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const [first, second, third] = await createClients(owner, 3);
+
+		const morning = await caller.log.start({
+			date: DAY,
+			startTime: "09:00",
+			clientIds: [first.id],
+			updatedAt: new Date("2024-01-01T09:00:00Z")
+		});
+		// Auto-closes the morning Session - stamped with this tap's time.
+		await caller.log.start({
+			date: DAY,
+			startTime: "10:00",
+			clientIds: [second.id],
+			updatedAt: new Date("2024-01-01T10:00:00Z")
+		});
+
+		// A later-stamped correction of the auto-closed Session must apply.
+		await caller.log.edit({
+			id: morning.id,
+			date: DAY,
+			startTime: "09:15",
+			endTime: "10:00",
+			clientIds: [first.id],
+			updatedAt: new Date("2024-01-01T10:05:00Z")
+		});
+
+		const open = await caller.log.listByDay({ date: DAY });
+		const grown = await caller.log.addParticipant({
+			workSessionId: open[1].id,
+			clientId: third.id,
+			at: "10:30",
+			newWorkSessionId: undefined,
+			updatedAt: new Date("2024-01-01T10:30:00Z")
+		});
+
+		// Ending the Session the split opened, stamped after the split.
+		await caller.log.end({
+			id: grown.id,
+			endTime: "11:00",
+			updatedAt: new Date("2024-01-01T11:00:00Z")
+		});
+
+		const sessions = await caller.log.listByDay({ date: DAY });
+		expect(sessions[0].startTime).toEqual(new Date("1970-01-01T09:15:00Z"));
+		expect(sessions[2].endTime).toEqual(new Date("1970-01-01T11:00:00Z"));
+	});
+});

@@ -113,7 +113,9 @@ const participantChangeSchema = z.object({
 	at: timeOfDaySchema,
 	// Client-generated id for the Session opened at the pivot, so an offline
 	// replay of the same composition change never splits twice.
-	newWorkSessionId: z.string().optional()
+	newWorkSessionId: z.string().optional(),
+	// Tap-time stamp for both touched rows - see captureHandoverSchema.
+	updatedAt: z.date().optional()
 });
 
 // A composition change is an In-Place Handover: the current Session closes at
@@ -168,7 +170,7 @@ async function splitAtPivot(
 	return ctx.prisma.$transaction(async (tx) => {
 		await tx.workSession.update({
 			where: { id: session.id },
-			data: { endTime: pivot }
+			data: { endTime: pivot, updatedAt: input.updatedAt }
 		});
 
 		return tx.workSession.create({
@@ -179,6 +181,7 @@ async function splitAtPivot(
 				startTime: pivot,
 				precededByWorkSessionId: session.id,
 				handoverType: "IN_PLACE",
+				updatedAt: input.updatedAt,
 				participants: participantsCreate(clientIds)
 			},
 			select: workSessionSelect
@@ -228,7 +231,10 @@ export const logRouter = router({
 				if (open) {
 					await tx.workSession.update({
 						where: { id: open.id },
-						data: { endTime: startTime }
+						// Stamped with the new Session's tap time so a later-queued
+						// stamped write to the auto-closed Session isn't dropped as
+						// stale by last-write-wins.
+						data: { endTime: startTime, updatedAt: input.updatedAt }
 					});
 				}
 
@@ -446,7 +452,8 @@ export const logRouter = router({
 					interClientDistance: isTravel ? input.interClientDistance : null,
 					interClientDuration: isTravel
 						? (input.interClientDuration ?? null)
-						: null
+						: null,
+					updatedAt: input.updatedAt
 				},
 				select: workSessionSelect
 			});
