@@ -1,7 +1,7 @@
 import prisma from "@/server/prisma";
 import { expect, test } from "@playwright/test";
 import { randomUUID } from "crypto";
-import { addMonths, getUnixTime } from "date-fns";
+import { addMonths, format, getUnixTime, subDays } from "date-fns";
 import { createDefaultSupportItem, createRandomClient } from "./test-utils";
 
 // The Log is per-Provider global state: an Open Session puts a banner on
@@ -199,4 +199,44 @@ test("Open Session banner follows the Provider to other screens", async ({
 	await page.getByLabel("Finished at").fill("17:00");
 	await page.getByRole("button", { name: "Done for the day" }).click();
 	await expect(page.getByText(client.name)).toBeHidden();
+});
+
+test("A Session left open past its day is ended automatically at 23:59", async ({
+	page
+}) => {
+	const client = await createRandomClient(logUser.id);
+
+	// Yesterday's capture that was never ended - e.g. the phone stayed in the
+	// glovebox overnight. Overnights are unsupported, so the store closes it
+	// at end-of-day the moment it wakes up.
+	const yesterday = format(subDays(new Date(), 1), "yyyy-MM-dd");
+	await prisma.workSession.create({
+		data: {
+			ownerId: logUser.id,
+			date: new Date(yesterday),
+			startTime: new Date("1970-01-01T18:00:00Z"),
+			participants: { create: [{ clientId: client.id }] }
+		}
+	});
+
+	await page.goto("/dashboard/log");
+
+	// The console is free for a new day, and yesterday (18:00-23:59, 6h)
+	// joins the promote stack instead of blocking it.
+	await expect(
+		page.getByRole("button", { name: "Start a session" })
+	).toBeVisible();
+	await expect(page.getByText("1 session · 6h")).toBeVisible();
+
+	await expect
+		.poll(
+			async () => {
+				const session = await prisma.workSession.findFirst({
+					where: { ownerId: logUser.id }
+				});
+				return session?.endTime?.toISOString() ?? null;
+			},
+			{ timeout: 15_000 }
+		)
+		.toBe("1970-01-01T23:59:00.000Z");
 });
