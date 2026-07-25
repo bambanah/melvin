@@ -364,7 +364,8 @@ export function changeParticipants(input: {
 				workSessionId: session.id,
 				clientId: input.clientId,
 				at: input.at,
-				newWorkSessionId: opened.id
+				newWorkSessionId: opened.id,
+				updatedAt: stamp
 			}
 		}
 	);
@@ -388,6 +389,7 @@ export function captureHandover(input: {
 		throw new Error("Distance is required for a travel Handover");
 	}
 
+	const stamp = nowStamp();
 	enqueue(
 		state.sessions.map((s) =>
 			s.id === input.workSessionId
@@ -401,11 +403,11 @@ export function captureHandover(input: {
 						interClientDuration: isTravel
 							? (input.interClientDuration ?? null)
 							: null,
-						updatedAt: nowStamp()
+						updatedAt: stamp
 					}
 				: s
 		),
-		{ kind: "captureHandover", input }
+		{ kind: "captureHandover", input: { ...input, updatedAt: stamp } }
 	);
 }
 
@@ -455,16 +457,31 @@ function send(op: LogOp) {
 		}
 		case "delete":
 			return log.delete.mutate(op.input);
-		case "addParticipant":
-			return log.addParticipant.mutate(op.input);
-		case "removeParticipant":
-			return log.removeParticipant.mutate(op.input);
+		case "addParticipant": {
+			const { updatedAt, ...rest } = op.input;
+			return log.addParticipant.mutate({
+				...rest,
+				updatedAt: new Date(updatedAt)
+			});
+		}
+		case "removeParticipant": {
+			const { updatedAt, ...rest } = op.input;
+			return log.removeParticipant.mutate({
+				...rest,
+				updatedAt: new Date(updatedAt)
+			});
+		}
 		case "recordTrip":
 			return log.recordTrip.mutate(op.input);
 		case "recordCost":
 			return log.recordCost.mutate(op.input);
-		case "captureHandover":
-			return log.captureHandover.mutate(op.input);
+		case "captureHandover": {
+			const { updatedAt, ...rest } = op.input;
+			return log.captureHandover.mutate({
+				...rest,
+				updatedAt: new Date(updatedAt)
+			});
+		}
 	}
 }
 

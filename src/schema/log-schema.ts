@@ -60,7 +60,12 @@ export const captureHandoverSchema = z
 		precededByWorkSessionId: z.string(),
 		handoverType: z.enum(["TRAVEL", "IN_PLACE"]),
 		interClientDistance: z.number().positive().optional(),
-		interClientDuration: z.number().min(0).nullish()
+		interClientDuration: z.number().min(0).nullish(),
+		// Tap-time stamp. Every write that touches a WorkSession row must carry
+		// it: letting @updatedAt default to sync-arrival time would make any
+		// later-queued op with an earlier tap stamp look stale and be dropped
+		// by last-write-wins.
+		updatedAt: z.date().optional()
 	})
 	.refine(
 		(data) =>
