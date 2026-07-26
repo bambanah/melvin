@@ -108,7 +108,7 @@ function EarlierToday({ flows }: { flows: LogFlows }) {
 					{dayHours(earlier)}h so far
 				</span>
 			</div>
-			<div className="border-border bg-card rounded-xl border shadow-sm">
+			<div className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
 				{earlier.length === 0 ? (
 					<p className="text-muted-foreground px-4 py-3 text-sm italic">
 						Nothing captured yet today.

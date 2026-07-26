@@ -6,12 +6,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle
-} from "@/components/ui/dialog";
+	ResponsiveDialog,
+	ResponsiveDialogContent,
+	ResponsiveDialogDescription,
+	ResponsiveDialogHeader,
+	ResponsiveDialogTitle
+} from "@/components/ui/responsive-dialog";
 import {
 	Select,
 	SelectContent,
@@ -93,15 +93,17 @@ export function PromoteDialog({
 	};
 
 	return (
-		<Dialog open onOpenChange={(open) => !open && onClose()}>
-			<DialogContent className="max-w-sm">
-				<DialogHeader>
-					<DialogTitle>Promote {formatDayKey(dateKey)}</DialogTitle>
-					<DialogDescription>
+		<ResponsiveDialog open onOpenChange={(open) => !open && onClose()}>
+			<ResponsiveDialogContent>
+				<ResponsiveDialogHeader>
+					<ResponsiveDialogTitle>
+						Promote {formatDayKey(dateKey)}
+					</ResponsiveDialogTitle>
+					<ResponsiveDialogDescription>
 						Every Session becomes a Pending Activity and the day&apos;s drives
 						become a Trip. The Log entries are consumed.
-					</DialogDescription>
-				</DialogHeader>
+					</ResponsiveDialogDescription>
+				</ResponsiveDialogHeader>
 				{result ? (
 					<div className="flex flex-col gap-3">
 						<p className="text-sm">
@@ -125,8 +127,8 @@ export function PromoteDialog({
 										key={session.id}
 										className="border-border flex flex-col gap-2 rounded-md border px-3 py-2 text-sm"
 									>
-										<div className="flex items-center justify-between gap-2">
-											<span className="font-medium">
+										<div className="flex items-start justify-between gap-2">
+											<span className="min-w-0 font-medium break-words">
 												{log.participantNames(session)}
 											</span>
 											<span className="text-muted-foreground shrink-0 font-mono text-xs">
@@ -185,7 +187,7 @@ export function PromoteDialog({
 						</Button>
 					</>
 				)}
-			</DialogContent>
-		</Dialog>
+			</ResponsiveDialogContent>
+		</ResponsiveDialog>
 	);
 }
