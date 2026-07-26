@@ -1,8 +1,20 @@
 import prisma from "@/server/prisma";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "crypto";
 import { addMonths, format, getUnixTime, subDays } from "date-fns";
 import { createDefaultSupportItem, createRandomClient } from "./test-utils";
+
+/** A Client's section of the Log, located by its heading. */
+const logSection = (page: Page, clientName: string) =>
+	page
+		.locator("[data-slot=log-client-section]")
+		.filter({ has: page.getByRole("heading", { name: clientName }) });
+
+/** The stack of days waiting to promote, which summarises Sessions too. */
+const promoteStack = (page: Page) =>
+	page.locator("section").filter({
+		has: page.getByRole("heading", { name: "Waiting to promote" })
+	});
 
 // The Log is per-Provider global state: an Open Session puts a banner on
 // every dashboard screen, and only one can be open at a time. Running these
@@ -64,7 +76,7 @@ test("Captures a day of sessions and promotes it to Activities and a Trip", asyn
 	await page.goto("/dashboard/log");
 
 	// Start the day with client A.
-	await page.getByRole("button", { name: "Start a session" }).click();
+	await page.getByRole("button", { name: "Start a Session" }).click();
 	await page.getByRole("checkbox", { name: clientA.name }).click();
 	await page.getByLabel("Started at").fill("09:00");
 	await page.getByRole("button", { name: "Start", exact: true }).click();
@@ -77,29 +89,37 @@ test("Captures a day of sessions and promotes it to Activities and a Trip", asyn
 	await expect(page.getByText("8 km logged")).toBeVisible();
 
 	// End for A, with more clients to come.
-	await page.getByRole("button", { name: "End session" }).click();
+	await page.getByRole("button", { name: "End Session" }).click();
 	await page.getByLabel("Finished at").fill("10:00");
 	await page.getByRole("button", { name: "More clients to come" }).click();
 
-	// Starting the next client captures the drive between them: the gap
-	// (10:00 → 10:20) pre-fills the travel duration.
-	await page.getByRole("button", { name: "Start a session" }).click();
+	// "More clients to come" chains straight into the Start flow - no extra
+	// navigation - and starting the next client captures the drive between
+	// them: the gap (10:00 → 10:20) pre-fills the travel duration.
+	await expect(
+		page.getByRole("heading", { name: "Start a Session" })
+	).toBeVisible();
 	await page.getByRole("checkbox", { name: clientB.name }).click();
 	await page.getByLabel("Started at").fill("10:20");
 	await page.getByRole("button", { name: "Start", exact: true }).click();
 
 	await expect(page.getByText("How did you get here?")).toBeVisible();
+	// The question can only be answered, never dismissed - a skipped gap
+	// would silently bill no travel.
+	await page.getByRole("dialog").press("Escape");
+	await expect(page.getByText("How did you get here?")).toBeVisible();
+	await expect(page.getByRole("button", { name: "Close" })).toHaveCount(0);
 	await expect(page.getByLabel("Took (min)")).toHaveValue("20");
 	await page.getByLabel("Drove (km)").fill("12");
 	await page.getByRole("button", { name: "Log the drive" }).click();
 
 	// Done for the day.
-	await page.getByRole("button", { name: "End session" }).click();
+	await page.getByRole("button", { name: "End Session" }).click();
 	await page.getByLabel("Finished at").fill("11:00");
 	await page.getByRole("button", { name: "Done for the day" }).click();
 
 	// The whole day promotes in one action.
-	await expect(page.getByText("2 sessions ·")).toBeVisible();
+	await expect(promoteStack(page).getByText("2 Sessions ·")).toBeVisible();
 	await page.getByRole("button", { name: "Promote", exact: true }).click();
 	await page.getByRole("button", { name: "Promote day" }).click();
 	await expect(
@@ -108,7 +128,10 @@ test("Captures a day of sessions and promotes it to Activities and a Trip", asyn
 
 	// Promoted Sessions leave the Log...
 	await page.getByRole("dialog").press("Escape");
-	await expect(page.getByText("Nothing captured yet today.")).toBeVisible();
+	await expect(promoteStack(page).getByText("2 Sessions ·")).toBeHidden();
+	await expect(
+		logSection(page, clientA.name).getByText("no Sessions")
+	).toBeVisible();
 	expect(
 		await prisma.workSession.count({ where: { ownerId: logUser.id } })
 	).toBe(0);
@@ -136,6 +159,35 @@ test("Captures a day of sessions and promotes it to Activities and a Trip", asyn
 	expect(Number(trip?.interClientLegs[0].duration)).toBe(20);
 });
 
+test("Every Client keeps a Log section, even with nothing captured", async ({
+	page
+}) => {
+	const captured = await createRandomClient(logUser.id);
+	const untouched = await createRandomClient(logUser.id);
+
+	await page.goto("/dashboard/log");
+	await page.getByRole("button", { name: "Start a Session" }).click();
+	await page.getByRole("checkbox", { name: captured.name }).click();
+	await page.getByLabel("Started at").fill("09:00");
+	await page.getByRole("button", { name: "Start", exact: true }).click();
+	await expect(page.getByText("Session in progress")).toBeVisible();
+
+	// The Log mirrors the notes-app habit: a section per Client, holding that
+	// Client's running list of Sessions.
+	await expect(
+		logSection(page, captured.name).getByText("1 Session")
+	).toBeVisible();
+	await expect(
+		logSection(page, captured.name).getByText("09:00 - open")
+	).toBeVisible();
+
+	// A Client with nothing captured keeps their section as standing
+	// scaffolding rather than disappearing from the Log.
+	await expect(
+		logSection(page, untouched.name).getByText("no Sessions")
+	).toBeVisible();
+});
+
 test("Capture works offline and syncs when signal returns", async ({
 	page,
 	context
@@ -146,7 +198,7 @@ test("Capture works offline and syncs when signal returns", async ({
 
 	// Open the Start flow and wait for the Client list - proof the initial
 	// pull has landed on-device - before dropping the connection.
-	await page.getByRole("button", { name: "Start a session" }).click();
+	await page.getByRole("button", { name: "Start a Session" }).click();
 	await expect(page.getByRole("checkbox", { name: client.name })).toBeVisible();
 	await context.setOffline(true);
 
@@ -186,7 +238,7 @@ test("Open Session banner follows the Provider to other screens", async ({
 	const client = await createRandomClient(logUser.id);
 
 	await page.goto("/dashboard/log");
-	await page.getByRole("button", { name: "Start a session" }).click();
+	await page.getByRole("button", { name: "Start a Session" }).click();
 	await page.getByRole("checkbox", { name: client.name }).click();
 	await page.getByLabel("Started at").fill("09:00");
 	await page.getByRole("button", { name: "Start", exact: true }).click();
@@ -224,9 +276,9 @@ test("A Session left open past its day is ended automatically at 23:59", async (
 	// The console is free for a new day, and yesterday (18:00-23:59, 6h)
 	// joins the promote stack instead of blocking it.
 	await expect(
-		page.getByRole("button", { name: "Start a session" })
+		page.getByRole("button", { name: "Start a Session" })
 	).toBeVisible();
-	await expect(page.getByText("1 session · 6h")).toBeVisible();
+	await expect(promoteStack(page).getByText("1 Session · 6h")).toBeVisible();
 
 	await expect
 		.poll(
@@ -256,7 +308,7 @@ test("Capture flows come up as a drawer on a phone and a dialog on a laptop", as
 	// the bottom edge.
 	await page.setViewportSize({ width: 390, height: 844 });
 	await page.goto("/dashboard/log");
-	await page.getByRole("button", { name: "Start a session" }).click();
+	await page.getByRole("button", { name: "Start a Session" }).click();
 
 	const drawer = page.locator("[data-slot=drawer-popup]");
 	await expect(drawer).toBeVisible();
@@ -271,14 +323,14 @@ test("Capture flows come up as a drawer on a phone and a dialog on a laptop", as
 	await page.getByRole("button", { name: "Start", exact: true }).click();
 	await expect(page.getByText("Session in progress")).toBeVisible();
 
-	await page.getByRole("button", { name: "End session" }).click();
+	await page.getByRole("button", { name: "End Session" }).click();
 	await expect(drawer).toBeVisible();
 	await page.getByRole("dialog").press("Escape");
 	await expect(page.getByRole("dialog")).toHaveCount(0);
 
 	// Laptop: the same flow is a centred dialog, no drawer in the tree.
 	await page.setViewportSize({ width: 1280, height: 900 });
-	await page.getByRole("button", { name: "End session" }).click();
+	await page.getByRole("button", { name: "End Session" }).click();
 	await expect(
 		page.getByRole("heading", { name: "End Session" })
 	).toBeVisible();

@@ -22,12 +22,12 @@ import {
 import { dropDay } from "@/lib/log/log-store";
 import { formatDayKey } from "@/lib/log/log-time";
 import { isGroupSession, type LogSession } from "@/lib/log/log-types";
-import type { Log } from "@/lib/log/use-log";
+import type { Log } from "@/hooks/use-log";
 import { trpc } from "@/lib/trpc";
-import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { SessionMeta } from "./session-meta";
+import { WarningNote } from "./warning-note";
 
 export function PromoteDialog({
 	log,
@@ -132,7 +132,7 @@ export function PromoteDialog({
 												{log.participantNames(session)}
 											</span>
 											<span className="text-muted-foreground shrink-0 font-mono text-xs">
-												{session.startTime}–
+												{session.startTime} -{" "}
 												{session.endTime ?? (
 													<Badge variant="destructive">open</Badge>
 												)}
@@ -168,12 +168,7 @@ export function PromoteDialog({
 								);
 							})}
 						</div>
-						{blocker && (
-							<p className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-500">
-								<TriangleAlert className="size-4 shrink-0" />
-								{blocker}
-							</p>
-						)}
+						{blocker && <WarningNote>{blocker}</WarningNote>}
 						{promote.error && (
 							<p className="text-destructive text-sm">
 								{promote.error.message}

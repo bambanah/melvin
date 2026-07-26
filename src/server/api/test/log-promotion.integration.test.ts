@@ -168,6 +168,49 @@ describe("log.promoteDay", () => {
 		expect(mirror?.transitDistance).toBeNull();
 	});
 
+	test("the primary participant of a group Session does not depend on capture order", async () => {
+		const { owner } = await createProviderFixture();
+		const caller = callerFor(owner);
+
+		// Explicit ids so the participant order the router pins is knowable: the
+		// Session is captured with the participants the other way round, and
+		// Promotion still bills the transport on the id-ordered first one rather
+		// than on whichever row the database happens to hand back.
+		const [early, late] = await Promise.all(
+			[
+				{ id: "client-aaa", name: "Zoe" },
+				{ id: "client-zzz", name: "Adam" }
+			].map((data) =>
+				prisma.client.create({
+					data: { ...data, ownerId: owner.id, distanceToClient: 3 }
+				})
+			)
+		);
+
+		const group = await caller.log.start({
+			date: DAY,
+			startTime: "09:00",
+			clientIds: [late.id, early.id]
+		});
+		await caller.log.recordTrip({ workSessionId: group.id, distance: 5 });
+		await caller.log.end({ id: group.id, endTime: "11:00" });
+
+		await caller.log.promoteDay({ date: DAY });
+
+		const activities = await prisma.activity.findMany({
+			where: { ownerId: owner.id },
+			include: { transportItems: true }
+		});
+		const withTransport = activities.filter((a) => a.transportItems.length > 0);
+		expect(withTransport).toHaveLength(1);
+		expect(withTransport[0].clientId).toBe(early.id);
+		// Home travel bills once, on that same Activity.
+		expect(Number(withTransport[0].transitDistance)).toBe(6);
+		expect(
+			activities.find((a) => a.clientId === late.id)?.transitDistance
+		).toBeNull();
+	});
+
 	test("an add-participant day splits per composition and the pivot boundary promotes cleanly with no invented leg", async () => {
 		const { owner, soloItem, groupItem, clients } =
 			await createProviderFixture();

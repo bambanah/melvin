@@ -1,18 +1,20 @@
-// The Log tab: the field-capture console on top, today's captured Sessions
-// below it, and the stack of days waiting to promote - the phone-first
-// mirror of the notes-app habit (issue #464 stage 3, shaped by the stage-2
-// prototype verdict). Everything renders from the on-device store, so this
-// page works identically with and without signal.
+// The Log tab: the field-capture console on top, the per-Client sections that
+// mirror the notes-app habit below it, and the stack of days waiting to
+// promote - the phone-first shape of issue #464 stage 3, shaped by the stage-2
+// prototype verdict. Everything renders from the on-device store, so this page
+// works identically with and without signal.
 import { CaptureConsole } from "@/components/log/capture-console";
 import { ClientAvatars } from "@/components/log/client-avatars";
 import { useLogFlows, type LogFlows } from "@/components/log/log-flows";
 import { SessionMeta } from "@/components/log/session-meta";
+import { WarningNote } from "@/components/log/warning-note";
 import Layout from "@/components/shared/layout";
+import { Button } from "@/components/ui/button";
 import { clearSyncError, dismissAutoEnded } from "@/lib/log/log-store";
 import { formatDayKey, minutesBetween, todayKey } from "@/lib/log/log-time";
 import type { LogSession } from "@/lib/log/log-types";
-import { useLog } from "@/lib/log/use-log";
-import { CloudOff, RefreshCw, TriangleAlert } from "lucide-react";
+import { useLog, type ClientSection } from "@/hooks/use-log";
+import { CloudOff, RefreshCw } from "lucide-react";
 import Head from "next/head";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
@@ -28,6 +30,9 @@ const dayHours = (sessions: LogSession[]) =>
 		sessions.reduce((sum, session) => sum + sessionMinutes(session), 0)
 	);
 
+const plural = (count: number, word: string) =>
+	`${count} ${word}${count === 1 ? "" : "s"}`;
+
 function SyncStatus({ online, pending }: { online: boolean; pending: number }) {
 	if (online && pending === 0) return null;
 
@@ -39,7 +44,7 @@ function SyncStatus({ online, pending }: { online: boolean; pending: number }) {
 				<CloudOff className="size-3.5 shrink-0" />
 			)}
 			{online
-				? `Syncing ${pending} capture${pending === 1 ? "" : "s"}...`
+				? `Syncing ${plural(pending, "capture")}...`
 				: `Offline - captures are saved on this device${
 						pending > 0 ? ` (${pending} waiting to sync)` : ""
 					} and sync when you're back in signal.`}
@@ -64,29 +69,28 @@ function AutoEndNudge({ flows }: { flows: LogFlows }) {
 					key={session.id}
 					className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4"
 				>
-					<p className="flex items-start gap-2 text-sm">
-						<TriangleAlert className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-500" />
-						<span>
-							<span className="font-medium">
-								{log.participantNames(session)}
-							</span>{" "}
-							was left open on {formatDayKey(session.date)} and ended for you at
-							23:59 - is that when you finished?
-						</span>
-					</p>
+					<WarningNote>
+						<span className="font-medium">{log.participantNames(session)}</span>{" "}
+						was left open on {formatDayKey(session.date)} and ended for you at
+						23:59 - is that when you finished?
+					</WarningNote>
 					<div className="mt-3 flex gap-2">
-						<button
-							className="border-border bg-card hover:bg-accent flex-1 cursor-pointer rounded-lg border px-3 py-1.5 text-sm font-medium"
+						<Button
+							variant="outline"
+							size="sm"
+							className="bg-card flex-1"
 							onClick={() => flows.editSession(session)}
 						>
 							Fix end time
-						</button>
-						<button
-							className="text-muted-foreground hover:bg-accent flex-1 cursor-pointer rounded-lg px-3 py-1.5 text-sm"
+						</Button>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="text-muted-foreground flex-1"
 							onClick={() => dismissAutoEnded(session.id)}
 						>
 							23:59 is right
-						</button>
+						</Button>
 					</div>
 				</div>
 			))}
@@ -94,54 +98,98 @@ function AutoEndNudge({ flows }: { flows: LogFlows }) {
 	);
 }
 
-function EarlierToday({ flows }: { flows: LogFlows }) {
-	const { log } = flows;
-	const earlier = (log.sessionsByDay.get(todayKey()) ?? []).filter(
-		(session) => session.endTime !== null
-	);
+/**
+ * The Log's per-Client sections: one for every Client, holding that Client's
+ * Sessions not yet turned into Activities. A section stays even when it is
+ * empty - standing scaffolding for the Clients a Provider works with
+ * regularly - and a group Session appears under each of its participants.
+ */
+function ClientSections({ flows }: { flows: LogFlows }) {
+	const sections = flows.log.sessionsByClient;
 
 	return (
 		<section className="mt-8">
-			<div className="mb-3 flex items-baseline justify-between">
-				<h2 className="text-sm font-semibold">Earlier today</h2>
-				<span className="text-muted-foreground text-xs">
-					{dayHours(earlier)}h so far
+			<h2 className="mb-3 text-sm font-semibold">Sessions by Client</h2>
+			{sections.length === 0 ? (
+				<p className="text-muted-foreground border-border bg-card rounded-xl border px-4 py-3 text-sm italic shadow-sm">
+					No Clients yet - add one under Clients and their section appears here.
+				</p>
+			) : (
+				<div className="space-y-2.5">
+					{sections.map((section) => (
+						<ClientCard
+							key={section.client.id}
+							flows={flows}
+							section={section}
+						/>
+					))}
+				</div>
+			)}
+		</section>
+	);
+}
+
+function ClientCard({
+	flows,
+	section
+}: {
+	flows: LogFlows;
+	section: ClientSection;
+}) {
+	const { log } = flows;
+	const { client, sessions } = section;
+	// A Session still running has no hours yet - report the count alone rather
+	// than a misleading "0h".
+	const hours = dayHours(sessions);
+
+	return (
+		<div
+			data-slot="log-client-section"
+			className="border-border bg-card overflow-hidden rounded-xl border shadow-sm"
+		>
+			<div className="flex items-baseline justify-between gap-2 px-4 py-3">
+				<h3 className="min-w-0 truncate text-sm font-semibold">
+					{client.name}
+				</h3>
+				<span className="text-muted-foreground shrink-0 text-xs tabular-nums">
+					{sessions.length === 0
+						? "no Sessions"
+						: `${plural(sessions.length, "Session")}${
+								hours === "0" ? "" : ` · ${hours}h`
+							}`}
 				</span>
 			</div>
-			<div className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
-				{earlier.length === 0 ? (
-					<p className="text-muted-foreground px-4 py-3 text-sm italic">
-						Nothing captured yet today.
-					</p>
-				) : (
-					<ul className="divide-border divide-y">
-						{earlier.map((session) => (
-							<li key={session.id}>
-								<button
-									className="hover:bg-accent flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left"
-									onClick={() => flows.editSession(session)}
-								>
-									<ClientAvatars names={log.participantNameList(session)} />
-									<div className="min-w-0 flex-1">
-										<div className="truncate text-sm font-medium">
-											{log.participantNames(session)}
-										</div>
-										<div className="text-muted-foreground text-xs tabular-nums">
-											{session.startTime} - {session.endTime}
-											{session.handoverType === "TRAVEL" &&
-												` · drove ${session.interClientDistance} km`}
-										</div>
+			{sessions.length > 0 && (
+				<ul className="divide-border border-border divide-y border-t">
+					{sessions.map((session) => (
+						<li key={session.id}>
+							<Button
+								variant="ghost"
+								className="h-auto w-full justify-start gap-3 rounded-none px-4 py-3 text-left font-normal"
+								onClick={() => flows.editSession(session)}
+							>
+								<ClientAvatars names={log.participantNameList(session)} />
+								<div className="min-w-0 flex-1">
+									<div className="truncate text-sm font-medium">
+										{formatDayKey(session.date, "EEE d MMM")}
 									</div>
-									<span className="text-muted-foreground text-xs tabular-nums">
-										{formatHours(sessionMinutes(session))}h
-									</span>
-								</button>
-							</li>
-						))}
-					</ul>
-				)}
-			</div>
-		</section>
+									<div className="text-muted-foreground text-xs tabular-nums">
+										{session.startTime} - {session.endTime ?? "open"}
+										{session.handoverType === "TRAVEL" &&
+											` · drove ${session.interClientDistance} km`}
+									</div>
+								</div>
+								<span className="text-muted-foreground shrink-0 text-xs tabular-nums">
+									{session.endTime
+										? `${formatHours(sessionMinutes(session))}h`
+										: "running"}
+								</span>
+							</Button>
+						</li>
+					))}
+				</ul>
+			)}
+		</div>
 	);
 }
 
@@ -180,7 +228,7 @@ function WaitingToPromote({ flows }: { flows: LogFlows }) {
 			</div>
 			{log.openSession && (
 				<p className="text-muted-foreground mt-3 text-xs">
-					Today promotes once its open session ends - promotion is day-atomic.
+					Today promotes once its open Session ends - promotion is day-atomic.
 				</p>
 			)}
 		</section>
@@ -203,19 +251,20 @@ function PromoteDayCard({
 			<div className="min-w-0 flex-1">
 				<div className="text-sm font-medium">{label}</div>
 				<div className="text-muted-foreground truncate text-xs">
-					{sessions.length} session{sessions.length === 1 ? "" : "s"} ·{" "}
-					{dayHours(sessions)}h
+					{plural(sessions.length, "Session")} · {dayHours(sessions)}h
 				</div>
 				{sessions.map((session) => (
 					<SessionMeta key={session.id} session={session} />
 				))}
 			</div>
-			<button
-				className="border-border bg-card text-secondary-foreground hover:bg-accent cursor-pointer rounded-lg border px-3 py-1.5 text-sm font-medium"
+			<Button
+				variant="outline"
+				size="sm"
+				className="bg-card text-secondary-foreground"
 				onClick={() => flows.promoteDay(dateKey)}
 			>
 				Promote
-			</button>
+			</Button>
 		</div>
 	);
 }
@@ -242,14 +291,15 @@ function LogPage() {
 				<SyncStatus online={log.online} pending={log.queue.length} />
 				{log.hydrated && <CaptureConsole flows={flows} />}
 				<AutoEndNudge flows={flows} />
-				<EarlierToday flows={flows} />
+				<ClientSections flows={flows} />
 				<WaitingToPromote flows={flows} />
-				<button
-					className="text-muted-foreground hover:bg-accent mt-8 w-full cursor-pointer rounded-lg px-3 py-2 text-sm"
+				<Button
+					variant="ghost"
+					className="text-muted-foreground mt-8 w-full"
 					onClick={() => flows.editSession(null)}
 				>
-					+ Add a past session
-				</button>
+					+ Add a past Session
+				</Button>
 			</div>
 			{flows.dialogs}
 		</Layout>

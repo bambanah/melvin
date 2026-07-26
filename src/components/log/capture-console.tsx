@@ -4,6 +4,7 @@
 // a single Start fills the same slot. The prototype's literal warm-paper hex
 // tokens are translated to the theme system here (card/border/primary), so
 // the console follows light and dark mode like the rest of the app.
+import { Button } from "@/components/ui/button";
 import { minutesSince, todayKey } from "@/lib/log/log-time";
 import {
 	costsOf,
@@ -12,10 +13,57 @@ import {
 	tripsOf,
 	type LogSession
 } from "@/lib/log/log-types";
-import { useNowTick } from "@/lib/log/use-log";
-import { TriangleAlert } from "lucide-react";
+import { useNowTick } from "@/hooks/use-log";
+import { cn } from "@/lib/utils";
+import type { ReactNode } from "react";
 import { ClientAvatars } from "./client-avatars";
 import type { LogFlows } from "./log-flows";
+import { WarningNote } from "./warning-note";
+
+/**
+ * A two-line capture tile: what it captures on top, what has been captured (or
+ * a hint) underneath. Wider than a Button's own shape - left-aligned, wrapping,
+ * its own height - but built on it so focus, hover, and disabled behave like
+ * every other button in the app.
+ */
+function CaptureTile({
+	tone = "plain",
+	label,
+	hint,
+	onClick
+}: {
+	tone?: "plain" | "primary";
+	label: ReactNode;
+	hint: ReactNode;
+	onClick: () => void;
+}) {
+	const primary = tone === "primary";
+
+	return (
+		<Button
+			variant="outline"
+			className={cn(
+				// justify-start so a tile whose hint wraps to two lines still lines
+				// its label up with the tile beside it.
+				"h-auto flex-col items-start justify-start gap-0.5 px-3 py-2.5 text-left whitespace-normal",
+				primary
+					? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary"
+					: "bg-card"
+			)}
+			onClick={onClick}
+		>
+			<span className="text-sm font-medium">{label}</span>
+			<span
+				className={cn(
+					"text-xs font-normal",
+					primary ? "text-primary/70" : "text-muted-foreground"
+				)}
+			>
+				{hint}
+			</span>
+		</Button>
+	);
+}
 
 export function CaptureConsole({ flows }: { flows: LogFlows }) {
 	const open = flows.log.openSession;
@@ -25,14 +73,15 @@ export function CaptureConsole({ flows }: { flows: LogFlows }) {
 			<div className="border-primary/40 bg-card overflow-hidden rounded-xl border shadow-sm">
 				<div className="from-primary/10 to-card bg-gradient-to-br p-5 text-center">
 					<div className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-						No session running
+						No Session running
 					</div>
-					<button
-						className="bg-primary text-primary-foreground hover:bg-primary/90 mt-4 w-full cursor-pointer rounded-lg px-3 py-3 text-sm font-semibold"
+					<Button
+						size="lg"
+						className="mt-4 w-full font-semibold"
 						onClick={() => flows.startSession()}
 					>
-						Start a session
-					</button>
+						Start a Session
+					</Button>
 				</div>
 			</div>
 		);
@@ -88,40 +137,35 @@ function Console({ flows, session }: { flows: LogFlows; session: LogSession }) {
 				    needs the edit sheet, so hand over rather than dead-ending. */}
 				{stale && (
 					<div className="mt-3 flex flex-col items-center gap-2">
-						<p className="flex items-center justify-center gap-2 text-sm text-amber-600 dark:text-amber-500">
-							<TriangleAlert className="size-4 shrink-0" />
+						<WarningNote>
 							Still open from {session.date} - Sessions can&apos;t cross
 							midnight.
-						</p>
-						<button
-							className="border-border bg-card hover:bg-accent cursor-pointer rounded-lg border px-3 py-1.5 text-sm font-medium"
+						</WarningNote>
+						<Button
+							variant="outline"
+							size="sm"
+							className="bg-card"
 							onClick={() => flows.editSession(session)}
 						>
-							Edit session
-						</button>
+							Edit Session
+						</Button>
 					</div>
 				)}
 			</div>
 
 			<div className="border-border grid grid-cols-2 gap-2 border-t p-3">
-				<button
-					className="border-border bg-card hover:bg-accent cursor-pointer rounded-lg border px-3 py-2.5 text-left"
+				<CaptureTile
+					label="+ Trip km"
+					hint={km > 0 ? `${km} km logged` : "driving the client around"}
 					onClick={() => flows.logTrip(session)}
-				>
-					<div className="text-sm font-medium">+ Trip km</div>
-					<div className="text-muted-foreground text-xs">
-						{km > 0 ? `${km} km logged` : "driving the client around"}
-					</div>
-				</button>
-				<button
-					className="border-border bg-card hover:bg-accent cursor-pointer rounded-lg border px-3 py-2.5 text-left"
+				/>
+				<CaptureTile
+					label="+ Travel cost"
+					hint={
+						dollars > 0 ? `$${dollars.toFixed(2)} logged` : "parking, tolls..."
+					}
 					onClick={() => flows.logCost(session)}
-				>
-					<div className="text-sm font-medium">+ Travel cost</div>
-					<div className="text-muted-foreground text-xs">
-						{dollars > 0 ? `$${dollars.toFixed(2)} logged` : "parking, tolls…"}
-					</div>
-				</button>
+				/>
 			</div>
 
 			<div className="border-border space-y-2 border-t p-3">
@@ -130,31 +174,26 @@ function Console({ flows, session }: { flows: LogFlows; session: LogSession }) {
 				    change is the other In-Place shape: a join/leave split of the
 				    running Session. */}
 				<div className="grid grid-cols-2 gap-2">
-					<button
-						className="border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer rounded-lg border px-3 py-2.5 text-left"
+					<CaptureTile
+						tone="primary"
+						label="⇢ Handover"
+						hint="next Client - add km if you drove"
 						onClick={() => flows.startSession()}
-					>
-						<div className="text-sm font-medium">⇢ Handover</div>
-						<div className="text-primary/70 text-xs">
-							next Client - add km if you drove
-						</div>
-					</button>
-					<button
-						className="border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer rounded-lg border px-3 py-2.5 text-left"
+					/>
+					<CaptureTile
+						tone="primary"
+						label="⇄ Group change"
+						hint="someone joins or leaves"
 						onClick={() => flows.changeParticipants(session)}
-					>
-						<div className="text-sm font-medium">⇄ Group change</div>
-						<div className="text-primary/70 text-xs">
-							someone joins or leaves
-						</div>
-					</button>
+					/>
 				</div>
-				<button
-					className="bg-primary text-primary-foreground hover:bg-primary/90 w-full cursor-pointer rounded-lg px-3 py-3 text-sm font-semibold"
+				<Button
+					size="lg"
+					className="w-full font-semibold"
 					onClick={() => flows.endSession(session)}
 				>
-					End session
-				</button>
+					End Session
+				</Button>
 			</div>
 		</div>
 	);

@@ -57,8 +57,12 @@ const DrawerSwipeHandle = ({
 const DrawerContent = ({
 	className,
 	children,
+	showHandle = true,
 	...props
-}: DrawerPrimitive.Popup.Props) => (
+}: DrawerPrimitive.Popup.Props & {
+	/** Hide the grab handle for drawers that must be answered, not swiped away. */
+	showHandle?: boolean;
+}) => (
 	<DrawerPrimitive.Portal data-slot="drawer-portal">
 		<DrawerOverlay />
 		<DrawerPrimitive.Viewport
@@ -80,7 +84,7 @@ const DrawerContent = ({
 				)}
 				{...props}
 			>
-				<DrawerSwipeHandle />
+				{showHandle ? <DrawerSwipeHandle /> : <div className="pt-2" />}
 				<DrawerPrimitive.Content
 					data-slot="drawer-content"
 					className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-6 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))] select-text"

@@ -71,7 +71,19 @@ function commit(patch: Partial<LogState>) {
 	});
 }
 
+// A client-generated id so an offline create has stable identity and its
+// replay is an idempotent upsert. The column is a plain string, so this is a
+// UUID rather than the cuid Prisma mints server-side - same guarantee, no
+// extra dependency to generate one on-device.
 const newId = () => crypto.randomUUID();
+
+/**
+ * Participants are deduped and ordered by id, the same order the server reads
+ * them back in. Promotion treats the first as the Session's primary
+ * participant, so both sides have to agree on who that is.
+ */
+const participantIds = (clientIds: string[]) =>
+	[...new Set(clientIds)].sort((a, b) => a.localeCompare(b));
 
 const sortSessions = (sessions: LogSession[]) =>
 	[...sessions].sort(
@@ -110,7 +122,7 @@ export function startSession(input: {
 	startTime: string;
 }): StartResult {
 	const date = todayKey();
-	const clientIds = [...new Set(input.clientIds)];
+	const clientIds = participantIds(input.clientIds);
 	if (clientIds.length === 0) throw new Error("Pick at least one Client");
 
 	const open = openSessionOf(state.sessions);
@@ -228,7 +240,7 @@ export function editSession(input: {
 	clientIds: string[];
 	transportItems?: LogSession["transportItems"];
 }) {
-	const clientIds = [...new Set(input.clientIds)];
+	const clientIds = participantIds(input.clientIds);
 	if (clientIds.length === 0) throw new Error("Pick at least one Client");
 	if (
 		input.endTime !== null &&
@@ -370,7 +382,7 @@ export function changeParticipants(input: {
 		if (session.clientIds.includes(input.clientId)) {
 			throw new Error("That Client is already in this Session");
 		}
-		clientIds = [...session.clientIds, input.clientId];
+		clientIds = participantIds([...session.clientIds, input.clientId]);
 	} else {
 		clientIds = session.clientIds.filter((id) => id !== input.clientId);
 		if (clientIds.length === session.clientIds.length) {
