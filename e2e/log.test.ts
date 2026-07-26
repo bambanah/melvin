@@ -246,3 +246,41 @@ test("A Session left open past its day is ended automatically at 23:59", async (
 	await page.getByRole("button", { name: "23:59 is right" }).click();
 	await expect(page.getByText(/ended for you at 23:59/)).toBeHidden();
 });
+
+test("Capture flows come up as a drawer on a phone and a dialog on a laptop", async ({
+	page
+}) => {
+	const client = await createRandomClient(logUser.id);
+
+	// Phone: every flow is a bottom drawer, within thumb reach and flush to
+	// the bottom edge.
+	await page.setViewportSize({ width: 390, height: 844 });
+	await page.goto("/dashboard/log");
+	await page.getByRole("button", { name: "Start a session" }).click();
+
+	const drawer = page.locator("[data-slot=drawer-popup]");
+	await expect(drawer).toBeVisible();
+	await expect(page.locator("[data-slot=drawer-swipe-handle]")).toBeVisible();
+	const box = await drawer.boundingBox();
+	expect(box?.x).toBe(0);
+	expect(box?.width).toBe(390);
+	expect(Math.round((box?.y ?? 0) + (box?.height ?? 0))).toBe(844);
+
+	await page.getByRole("checkbox", { name: client.name }).click();
+	await page.getByLabel("Started at").fill("09:00");
+	await page.getByRole("button", { name: "Start", exact: true }).click();
+	await expect(page.getByText("Session in progress")).toBeVisible();
+
+	await page.getByRole("button", { name: "End session" }).click();
+	await expect(drawer).toBeVisible();
+	await page.getByRole("dialog").press("Escape");
+	await expect(page.getByRole("dialog")).toHaveCount(0);
+
+	// Laptop: the same flow is a centred dialog, no drawer in the tree.
+	await page.setViewportSize({ width: 1280, height: 900 });
+	await page.getByRole("button", { name: "End session" }).click();
+	await expect(
+		page.getByRole("heading", { name: "End Session" })
+	).toBeVisible();
+	await expect(drawer).toHaveCount(0);
+});

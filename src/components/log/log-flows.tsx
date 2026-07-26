@@ -5,15 +5,15 @@
 // enforces the router's rules at tap time; dialogs surface its message inline.
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+	ResponsiveDialog,
+	ResponsiveDialogContent,
+	ResponsiveDialogDescription,
+	ResponsiveDialogHeader,
+	ResponsiveDialogTitle
+} from "@/components/ui/responsive-dialog";
 import {
 	Select,
 	SelectContent,
@@ -21,12 +21,6 @@ import {
 	SelectTrigger,
 	SelectValue
 } from "@/components/ui/select";
-import {
-	Sheet,
-	SheetContent,
-	SheetHeader,
-	SheetTitle
-} from "@/components/ui/sheet";
 import { defaultTravelDuration } from "@/lib/log-utils";
 import {
 	captureHandover,
@@ -116,7 +110,7 @@ export function useLogFlows(log: Log) {
 					/>
 				)}
 				{editState && (
-					<EditSheet
+					<EditDialog
 						log={log}
 						session={editState.session}
 						onClose={() => setEditState(null)}
@@ -220,14 +214,14 @@ function StartDialog({
 	};
 
 	return (
-		<Dialog open onOpenChange={(open) => !open && onClose()}>
-			<DialogContent className="max-w-sm">
-				<DialogHeader>
-					<DialogTitle>Start a Session</DialogTitle>
-					<DialogDescription>
+		<ResponsiveDialog open onOpenChange={(open) => !open && onClose()}>
+			<ResponsiveDialogContent>
+				<ResponsiveDialogHeader>
+					<ResponsiveDialogTitle>Start a Session</ResponsiveDialogTitle>
+					<ResponsiveDialogDescription>
 						Who are you with? Times stamp active-with-client time only.
-					</DialogDescription>
-				</DialogHeader>
+					</ResponsiveDialogDescription>
+				</ResponsiveDialogHeader>
 				<ClientPicker log={log} value={clientIds} onChange={setClientIds} />
 				<div className="flex items-center gap-3">
 					<Label htmlFor="start-time" className="shrink-0">
@@ -253,8 +247,8 @@ function StartDialog({
 				<Button disabled={clientIds.length === 0} onClick={submit}>
 					Start
 				</Button>
-			</DialogContent>
-		</Dialog>
+			</ResponsiveDialogContent>
+		</ResponsiveDialog>
 	);
 }
 
@@ -278,15 +272,15 @@ function EndDialog({
 	};
 
 	return (
-		<Dialog open onOpenChange={(open) => !open && onClose()}>
-			<DialogContent className="max-w-sm">
-				<DialogHeader>
-					<DialogTitle>End Session</DialogTitle>
-					<DialogDescription>
+		<ResponsiveDialog open onOpenChange={(open) => !open && onClose()}>
+			<ResponsiveDialogContent>
+				<ResponsiveDialogHeader>
+					<ResponsiveDialogTitle>End Session</ResponsiveDialogTitle>
+					<ResponsiveDialogDescription>
 						Started {session.startTime}
 						{session.date !== todayKey() && ` on ${session.date}`}.
-					</DialogDescription>
-				</DialogHeader>
+					</ResponsiveDialogDescription>
+				</ResponsiveDialogHeader>
 				<div className="flex items-center gap-3">
 					<Label htmlFor="end-time" className="shrink-0">
 						Finished at
@@ -308,8 +302,8 @@ function EndDialog({
 				<p className="text-muted-foreground text-xs">
 					More to come? Starting the next Client will ask how far you drove.
 				</p>
-			</DialogContent>
-		</Dialog>
+			</ResponsiveDialogContent>
+		</ResponsiveDialog>
 	);
 }
 
@@ -347,14 +341,14 @@ function HandoverDialog({
 	};
 
 	return (
-		<Dialog open onOpenChange={(open) => !open && onClose()}>
-			<DialogContent className="max-w-sm">
-				<DialogHeader>
-					<DialogTitle>How did you get here?</DialogTitle>
-					<DialogDescription>
+		<ResponsiveDialog open onOpenChange={(open) => !open && onClose()}>
+			<ResponsiveDialogContent>
+				<ResponsiveDialogHeader>
+					<ResponsiveDialogTitle>How did you get here?</ResponsiveDialogTitle>
+					<ResponsiveDialogDescription>
 						{state.prevNames} → {state.newNames} · {state.gapMinutes} min gap
-					</DialogDescription>
-				</DialogHeader>
+					</ResponsiveDialogDescription>
+				</ResponsiveDialogHeader>
 				<div className="flex items-center gap-3">
 					<Label htmlFor="handover-km" className="w-24 shrink-0">
 						Drove (km)
@@ -401,8 +395,8 @@ function HandoverDialog({
 						Skip
 					</Button>
 				</div>
-			</DialogContent>
-		</Dialog>
+			</ResponsiveDialogContent>
+		</ResponsiveDialog>
 	);
 }
 
@@ -433,14 +427,14 @@ function TripDialog({
 	};
 
 	return (
-		<Dialog open onOpenChange={(open) => !open && onClose()}>
-			<DialogContent className="max-w-sm">
-				<DialogHeader>
-					<DialogTitle>Log a trip</DialogTitle>
-					<DialogDescription>
+		<ResponsiveDialog open onOpenChange={(open) => !open && onClose()}>
+			<ResponsiveDialogContent>
+				<ResponsiveDialogHeader>
+					<ResponsiveDialogTitle>Log a trip</ResponsiveDialogTitle>
+					<ResponsiveDialogDescription>
 						Driving {log.participantNames(session)} around during the Session.
-					</DialogDescription>
-				</DialogHeader>
+					</ResponsiveDialogDescription>
+				</ResponsiveDialogHeader>
 				<div className="flex items-center gap-3">
 					<Label htmlFor="trip-km" className="w-20 shrink-0">
 						Drove (km)
@@ -464,8 +458,8 @@ function TripDialog({
 				<Button disabled={!distance} onClick={submit}>
 					<Car /> Log trip
 				</Button>
-			</DialogContent>
-		</Dialog>
+			</ResponsiveDialogContent>
+		</ResponsiveDialog>
 	);
 }
 
@@ -496,14 +490,14 @@ function CostDialog({
 	};
 
 	return (
-		<Dialog open onOpenChange={(open) => !open && onClose()}>
-			<DialogContent className="max-w-sm">
-				<DialogHeader>
-					<DialogTitle>Log a travel cost</DialogTitle>
-					<DialogDescription>
+		<ResponsiveDialog open onOpenChange={(open) => !open && onClose()}>
+			<ResponsiveDialogContent>
+				<ResponsiveDialogHeader>
+					<ResponsiveDialogTitle>Log a travel cost</ResponsiveDialogTitle>
+					<ResponsiveDialogDescription>
 						Parking, a toll, or another travel-related expense.
-					</DialogDescription>
-				</DialogHeader>
+					</ResponsiveDialogDescription>
+				</ResponsiveDialogHeader>
 				<Select
 					value={type}
 					onValueChange={(value) => setType(value as typeof type)}
@@ -540,8 +534,8 @@ function CostDialog({
 				<Button disabled={!amount} onClick={submit}>
 					<CircleDollarSign /> Log travel cost
 				</Button>
-			</DialogContent>
-		</Dialog>
+			</ResponsiveDialogContent>
+		</ResponsiveDialog>
 	);
 }
 
@@ -576,15 +570,15 @@ function ParticipantDialog({
 	};
 
 	return (
-		<Dialog open onOpenChange={(open) => !open && onClose()}>
-			<DialogContent className="max-w-sm">
-				<DialogHeader>
-					<DialogTitle>Who joined or left?</DialogTitle>
-					<DialogDescription>
+		<ResponsiveDialog open onOpenChange={(open) => !open && onClose()}>
+			<ResponsiveDialogContent>
+				<ResponsiveDialogHeader>
+					<ResponsiveDialogTitle>Who joined or left?</ResponsiveDialogTitle>
+					<ResponsiveDialogDescription>
 						The Session splits at this moment so each composition bills
 						correctly.
-					</DialogDescription>
-				</DialogHeader>
+					</ResponsiveDialogDescription>
+				</ResponsiveDialogHeader>
 				<div className="flex items-center gap-3">
 					<Label htmlFor="pivot-time" className="shrink-0">
 						At
@@ -600,12 +594,13 @@ function ParticipantDialog({
 					{session.clientIds.map((clientId) => (
 						<div
 							key={clientId}
-							className="flex items-center justify-between rounded-md px-2 py-1"
+							className="flex items-center justify-between gap-2 rounded-md px-2 py-1"
 						>
-							<span>
+							<span className="min-w-0 break-words">
 								{log.participantNames({ ...session, clientIds: [clientId] })}
 							</span>
 							<Button
+								className="shrink-0"
 								variant="outline"
 								size="sm"
 								disabled={session.clientIds.length <= 1}
@@ -640,12 +635,12 @@ function ParticipantDialog({
 					</div>
 				)}
 				<ErrorNote message={error} />
-			</DialogContent>
-		</Dialog>
+			</ResponsiveDialogContent>
+		</ResponsiveDialog>
 	);
 }
 
-function EditSheet({
+function EditDialog({
 	log,
 	session,
 	onClose
@@ -696,13 +691,13 @@ function EditSheet({
 	};
 
 	return (
-		<Sheet open onOpenChange={(open) => !open && onClose()}>
-			<SheetContent side="bottom" className="flex flex-col gap-4">
-				<SheetHeader>
-					<SheetTitle>
+		<ResponsiveDialog open onOpenChange={(open) => !open && onClose()}>
+			<ResponsiveDialogContent>
+				<ResponsiveDialogHeader>
+					<ResponsiveDialogTitle>
 						{session ? "Edit Session" : "Backfill a Session"}
-					</SheetTitle>
-				</SheetHeader>
+					</ResponsiveDialogTitle>
+				</ResponsiveDialogHeader>
 				<div className="flex items-center gap-3">
 					<Label htmlFor="edit-date" className="w-16 shrink-0">
 						Date
@@ -714,6 +709,8 @@ function EditSheet({
 						onChange={(event) => setDate(event.target.value)}
 					/>
 				</div>
+				{/* Two time inputs plus their labels don't fit a phone row - one
+				    field per line, matching Date above. */}
 				<div className="flex items-center gap-3">
 					<Label htmlFor="edit-start" className="w-16 shrink-0">
 						Start
@@ -724,7 +721,9 @@ function EditSheet({
 						value={startTime}
 						onChange={(event) => setStartTime(event.target.value)}
 					/>
-					<Label htmlFor="edit-end" className="shrink-0">
+				</div>
+				<div className="flex items-center gap-3">
+					<Label htmlFor="edit-end" className="w-16 shrink-0">
 						End
 					</Label>
 					<Input
@@ -780,7 +779,7 @@ function EditSheet({
 						Save
 					</Button>
 				</div>
-			</SheetContent>
-		</Sheet>
+			</ResponsiveDialogContent>
+		</ResponsiveDialog>
 	);
 }
