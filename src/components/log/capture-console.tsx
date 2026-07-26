@@ -14,19 +14,8 @@ import {
 } from "@/lib/log/log-types";
 import { useNowTick } from "@/lib/log/use-log";
 import { TriangleAlert } from "lucide-react";
+import { ClientAvatars } from "./client-avatars";
 import type { LogFlows } from "./log-flows";
-
-export function ClientDot({ name }: { name: string }) {
-	const initials = name
-		.split(" ")
-		.map((part) => part[0])
-		.join("");
-	return (
-		<span className="bg-muted text-muted-foreground ring-border grid size-7 shrink-0 place-items-center rounded-full text-[10px] font-semibold ring-1">
-			{initials}
-		</span>
-	);
-}
 
 export function CaptureConsole({ flows }: { flows: LogFlows }) {
 	const open = flows.log.openSession;
@@ -61,7 +50,7 @@ function Console({ flows, session }: { flows: LogFlows; session: LogSession }) {
 	const km = sumAmounts(tripsOf(session));
 	const dollars = sumAmounts(costsOf(session));
 	const isGroup = isGroupSession(session);
-	const names = log.participantNames(session);
+	const names = log.participantNameList(session);
 
 	return (
 		<div className="border-primary/40 bg-card overflow-hidden rounded-xl border shadow-sm">
@@ -78,10 +67,16 @@ function Console({ flows, session }: { flows: LogFlows; session: LogSession }) {
 						<div className="text-muted-foreground mt-1 text-xs">elapsed</div>
 					</>
 				)}
-				<div className="mt-4 flex items-center justify-center gap-2.5">
-					<ClientDot name={names} />
-					<div className="text-left">
-						<div className="text-base font-semibold">{names}</div>
+				{/* Avatars above the names rather than beside them: a group's
+				    names wrap to several lines, and a wrapped block beside the
+				    avatars both spilled out of the centred row and left the
+				    avatars floating against the middle of the text. */}
+				<div className="mt-4 flex flex-col items-center gap-1.5">
+					<ClientAvatars names={names} />
+					<div className="min-w-0">
+						<div className="text-base font-semibold break-words">
+							{names.join(" + ")}
+						</div>
 						<div className="text-muted-foreground text-xs">
 							{isGroup ? `Group of ${session.clientIds.length}` : "Solo"} ·
 							started {session.startTime}
@@ -130,18 +125,28 @@ function Console({ flows, session }: { flows: LogFlows; session: LogSession }) {
 			</div>
 
 			<div className="border-border space-y-2 border-t p-3">
+				{/* Handover starts the next Session; its follow-up dialog asks
+				    whether there was a drive (Travel) or not (In-Place). Group
+				    change is the other In-Place shape: a join/leave split of the
+				    running Session. */}
 				<div className="grid grid-cols-2 gap-2">
 					<button
-						className="border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer rounded-lg border px-3 py-2.5 text-sm font-medium"
+						className="border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer rounded-lg border px-3 py-2.5 text-left"
 						onClick={() => flows.startSession()}
 					>
-						⇢ Travel handover
+						<div className="text-sm font-medium">⇢ Handover</div>
+						<div className="text-primary/70 text-xs">
+							next Client - add km if you drove
+						</div>
 					</button>
 					<button
-						className="border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer rounded-lg border px-3 py-2.5 text-sm font-medium"
+						className="border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer rounded-lg border px-3 py-2.5 text-left"
 						onClick={() => flows.changeParticipants(session)}
 					>
-						⇄ In-place handover
+						<div className="text-sm font-medium">⇄ Group change</div>
+						<div className="text-primary/70 text-xs">
+							someone joins or leaves
+						</div>
 					</button>
 				</div>
 				<button

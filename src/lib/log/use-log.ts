@@ -23,15 +23,17 @@ export function useLog() {
 			]);
 		}
 
+		const participantNameList = (session: LogSession) =>
+			session.clientIds.map((id) => clientNameById.get(id) ?? "A Client");
+
 		return {
 			...state,
 			openSession:
 				state.sessions.find((session) => session.endTime === null) ?? null,
 			sessionsByDay,
+			participantNameList,
 			participantNames: (session: LogSession) =>
-				session.clientIds
-					.map((id) => clientNameById.get(id) ?? "A Client")
-					.join(" + ")
+				participantNameList(session).join(" + ")
 		};
 	}, [state]);
 }
