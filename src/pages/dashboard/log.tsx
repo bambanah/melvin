@@ -3,7 +3,8 @@
 // mirror of the notes-app habit (issue #464 stage 3, shaped by the stage-2
 // prototype verdict). Everything renders from the on-device store, so this
 // page works identically with and without signal.
-import { CaptureConsole, ClientDot } from "@/components/log/capture-console";
+import { CaptureConsole } from "@/components/log/capture-console";
+import { ClientAvatars } from "@/components/log/client-avatars";
 import { useLogFlows, type LogFlows } from "@/components/log/log-flows";
 import { SessionMeta } from "@/components/log/session-meta";
 import Layout from "@/components/shared/layout";
@@ -120,7 +121,7 @@ function EarlierToday({ flows }: { flows: LogFlows }) {
 									className="hover:bg-accent flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left"
 									onClick={() => flows.editSession(session)}
 								>
-									<ClientDot name={log.participantNames(session)} />
+									<ClientAvatars names={log.participantNameList(session)} />
 									<div className="min-w-0 flex-1">
 										<div className="truncate text-sm font-medium">
 											{log.participantNames(session)}
