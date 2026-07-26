@@ -4,6 +4,10 @@ import { checkActivityOverlap, formatOverlapError } from "@/lib/overlap-utils";
 import { baseListQueryInput } from "@/lib/trpc";
 import type { Prisma } from "@/generated/client";
 import { activitySchema } from "@/schema/activity-schema";
+import {
+	createActivityBatch,
+	type ActivityDraft
+} from "@/server/api/activity-creation";
 import { paginate } from "@/server/api/owned";
 import { authedProcedure, router } from "@/server/api/trpc";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
@@ -514,19 +518,23 @@ export const activityRouter = router({
 			}
 
 			// Parse and validate all activities
-			const parsedActivities = inputActivities.map((activity) => {
-				const { transportItems, ...activityData } = activity;
-				return {
-					...activityData,
-					startTime: activityData.startTime
-						? parseUtcTime(activityData.startTime)
+			const parsedActivities: ActivityDraft[] = inputActivities.map(
+				(activity) => ({
+					clientId: activity.clientId,
+					supportItemId: activity.supportItemId,
+					date: activity.date,
+					startTime: activity.startTime
+						? parseUtcTime(activity.startTime)
 						: undefined,
-					endTime: activityData.endTime
-						? parseUtcTime(activityData.endTime)
+					endTime: activity.endTime
+						? parseUtcTime(activity.endTime)
 						: undefined,
-					transportItems
-				};
-			});
+					groupSize: activity.groupSize,
+					transitDistance: activity.transitDistance || undefined,
+					transitDuration: activity.transitDuration || undefined,
+					transportItems: activity.transportItems
+				})
+			);
 
 			// Sort by start time for contiguity check
 			const sorted = [...parsedActivities].sort((a, b) => {
@@ -534,97 +542,49 @@ export const activityRouter = router({
 				return a.startTime.getTime() - b.startTime.getTime();
 			});
 
-			// Create all activities in a transaction
-			const createdActivities = await ctx.prisma.$transaction(
-				sorted.map((activity) =>
-					ctx.prisma.activity.create({
-						data: {
-							clientId: activity.clientId,
-							date: activity.date,
-							startTime: activity.startTime,
-							endTime: activity.endTime,
-							supportItemId: activity.supportItemId,
-							transitDistance: activity.transitDistance || undefined,
-							transitDuration: activity.transitDuration || undefined,
-							groupSize: activity.groupSize,
-							ownerId: ctx.session.user.id,
-							transportItems:
-								activity.transportItems && activity.transportItems.length > 0
-									? {
-											create: activity.transportItems.map((item) => ({
-												type: item.type,
-												amount: item.amount,
-												note: item.note
-											}))
-										}
-									: undefined
-						},
-						include: {
-							transportItems: true,
-							client: {
-								select: {
-									distanceToClient: true,
-									travelTimeToClient: true
-								}
-							}
-						}
-					})
-				)
-			);
+			const { activities, tripId } = await ctx.prisma.$transaction((tx) =>
+				createActivityBatch(tx, ctx.session.user.id, sorted, (created) => {
+					// A manually entered day only becomes a Trip when its Activities
+					// run back to back (end time equals the next start time); anything
+					// else keeps the transit that was entered by hand.
+					if (
+						!autoCreateTrip ||
+						created.length < 2 ||
+						!created.every((a) => a.startTime && a.endTime)
+					) {
+						return null;
+					}
 
-			// Check if activities are contiguous (end time equals next start time)
-			let tripId: string | null = null;
-			if (
-				autoCreateTrip &&
-				createdActivities.length >= 2 &&
-				createdActivities.every((a) => a.startTime && a.endTime)
-			) {
-				const isContiguous = createdActivities.every((activity, index) => {
-					if (index === 0) return true;
-					const prevActivity = createdActivities[index - 1];
-					if (!prevActivity.endTime || !activity.startTime) return false;
-					// Check if end time of previous equals start time of current
-					return (
-						format(utcDate(prevActivity.endTime), "HH:mm") ===
-						format(utcDate(activity.startTime), "HH:mm")
-					);
-				});
+					const isContiguous = created.every((activity, index) => {
+						if (index === 0) return true;
+						const prevActivity = created[index - 1];
+						if (!prevActivity.endTime || !activity.startTime) return false;
+						// Check if end time of previous equals start time of current
+						return (
+							format(utcDate(prevActivity.endTime), "HH:mm") ===
+							format(utcDate(activity.startTime), "HH:mm")
+						);
+					});
+					if (!isContiguous) return null;
 
-				if (isContiguous) {
-					// Create trip with inter-client legs
-					const interClientLegs = [];
-					for (let i = 0; i < createdActivities.length - 1; i++) {
-						const fromActivity = createdActivities[i];
-						const toActivity = createdActivities[i + 1];
-						interClientLegs.push({
-							fromActivityId: fromActivity.id,
+					// Inter-client legs of a manually entered day derive from each
+					// Client's stored distance - see ADR 0002.
+					const legs = [];
+					for (let i = 0; i < created.length - 1; i++) {
+						const toActivity = created[i + 1];
+						legs.push({
+							fromActivityId: created[i].id,
 							toActivityId: toActivity.id,
 							distance: Number(toActivity.client?.distanceToClient ?? 0),
 							duration: Number(toActivity.client?.travelTimeToClient ?? 0)
 						});
 					}
 
-					const trip = await ctx.prisma.trip.create({
-						data: {
-							date: createdActivities[0].date,
-							ownerId: ctx.session.user.id,
-							activities: {
-								connect: createdActivities.map((a) => ({ id: a.id }))
-							},
-							interClientLegs: {
-								create: interClientLegs
-							}
-						}
-					});
+					return { activities: created, legs };
+				})
+			);
 
-					tripId = trip.id;
-				}
-			}
-
-			return {
-				activities: createdActivities,
-				tripId
-			};
+			return { activities, tripId };
 		})
 });
 

@@ -28,16 +28,18 @@ import {
 	deleteSession,
 	editSession,
 	endSession,
+	getLogState,
 	recordCost,
 	recordTrip,
 	startSession
 } from "@/lib/log/log-store";
 import { minutesBetween, nowHHmm, todayKey } from "@/lib/log/log-time";
 import type { LogSession, LogTransportItem } from "@/lib/log/log-types";
-import type { Log } from "@/lib/log/use-log";
-import { Car, CircleDollarSign, TriangleAlert, X } from "lucide-react";
+import type { Log } from "@/hooks/use-log";
+import { Car, CircleDollarSign, X } from "lucide-react";
 import { useState } from "react";
 import { PromoteDialog } from "./promote-dialog";
+import { WarningNote } from "./warning-note";
 
 const errorMessage = (error: unknown) =>
 	error instanceof Error ? error.message : "Something went wrong";
@@ -84,7 +86,11 @@ export function useLogFlows(log: Log) {
 					/>
 				)}
 				{endState && (
-					<EndDialog session={endState} onClose={() => setEndState(null)} />
+					<EndDialog
+						session={endState}
+						onClose={() => setEndState(null)}
+						onMoreToCome={() => setStartState(true)}
+					/>
 				)}
 				{handoverState && (
 					<HandoverDialog
@@ -254,18 +260,23 @@ function StartDialog({
 
 function EndDialog({
 	session,
-	onClose
+	onClose,
+	onMoreToCome
 }: {
 	session: LogSession;
 	onClose: () => void;
+	onMoreToCome: () => void;
 }) {
 	const [time, setTime] = useState(nowHHmm());
 	const [error, setError] = useState<string | null>(null);
 
-	const submit = () => {
+	const submit = (moreToCome: boolean) => {
 		try {
 			endSession(session.id, time);
 			onClose();
+			// "More to come" chains straight into starting the next Client, whose
+			// Start captures the handover drive - no extra navigation (story 8).
+			if (moreToCome) onMoreToCome();
 		} catch (submitError) {
 			setError(errorMessage(submitError));
 		}
@@ -294,13 +305,14 @@ function EndDialog({
 				</div>
 				<ErrorNote message={error} />
 				<div className="flex flex-col gap-2">
-					<Button onClick={submit}>More clients to come</Button>
-					<Button variant="secondary" onClick={submit}>
+					<Button onClick={() => submit(true)}>More clients to come</Button>
+					<Button variant="secondary" onClick={() => submit(false)}>
 						Done for the day
 					</Button>
 				</div>
 				<p className="text-muted-foreground text-xs">
-					More to come? Starting the next Client will ask how far you drove.
+					More to come? You&apos;ll pick the next Client straight away, and
+					starting them asks how far you drove.
 				</p>
 			</ResponsiveDialogContent>
 		</ResponsiveDialog>
@@ -336,12 +348,26 @@ function HandoverDialog({
 			});
 			onClose();
 		} catch (submitError) {
+			// The dialog can't be dismissed, so the one unanswerable failure -
+			// the Session vanished mid-prompt (a concurrent delete syncing in) -
+			// must let go rather than trap the Provider behind a dead error.
+			if (
+				!getLogState().sessions.some(
+					(session) => session.id === state.sessionId
+				)
+			) {
+				onClose();
+				return;
+			}
 			setError(errorMessage(submitError));
 		}
 	};
 
 	return (
-		<ResponsiveDialog open onOpenChange={(open) => !open && onClose()}>
+		// Not dismissible: whether you drove is exactly what Promotion bills, so
+		// the question can't be swiped away - it never comes back (the prompt
+		// only fires at next-Start) and a silent gap would just underbill.
+		<ResponsiveDialog open dismissible={false}>
 			<ResponsiveDialogContent>
 				<ResponsiveDialogHeader>
 					<ResponsiveDialogTitle>How did you get here?</ResponsiveDialogTitle>
@@ -377,11 +403,10 @@ function HandoverDialog({
 					/>
 				</div>
 				{exceedsGap && (
-					<p className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-500">
-						<TriangleAlert className="size-4 shrink-0" />
+					<WarningNote>
 						Longer than the {state.gapMinutes} min gap - only what fits will
 						bill.
-					</p>
+					</WarningNote>
 				)}
 				<ErrorNote message={error} />
 				<div className="flex flex-col gap-2">
@@ -390,9 +415,6 @@ function HandoverDialog({
 					</Button>
 					<Button variant="secondary" onClick={() => submit("IN_PLACE")}>
 						We stayed in place
-					</Button>
-					<Button variant="ghost" onClick={onClose}>
-						Skip
 					</Button>
 				</div>
 			</ResponsiveDialogContent>
@@ -597,7 +619,7 @@ function ParticipantDialog({
 							className="flex items-center justify-between gap-2 rounded-md px-2 py-1"
 						>
 							<span className="min-w-0 break-words">
-								{log.participantNames({ ...session, clientIds: [clientId] })}
+								{log.clientName(clientId)}
 							</span>
 							<Button
 								className="shrink-0"

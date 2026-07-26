@@ -23,35 +23,74 @@ import {
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { cn } from "@/lib/utils";
-import { createContext, useContext, type ReactNode } from "react";
+import {
+	createContext,
+	useContext,
+	type ComponentType,
+	type ReactNode
+} from "react";
 
-// Which primitive the surrounding root chose. The parts read it rather than
-// calling useIsMobile again so a resize mid-flow can never split a single
-// modal across both primitives.
-const DrawerVariant = createContext(false);
-
-const useDrawerVariant = () => useContext(DrawerVariant);
+// Which primitive the surrounding root chose, and whether the modal can be
+// light-dismissed. The parts read it rather than calling useIsMobile again so
+// a resize mid-flow can never split a single modal across both primitives.
+const Variant = createContext({ drawer: false, dismissible: true });
 
 type Part = { className?: string; children?: ReactNode };
+
+/**
+ * One part of the modal, in both flavours. `dialogClassName` carries whatever
+ * the desktop primitive needs on top of its own defaults; the caller's own
+ * className always lands last.
+ */
+function responsivePart(
+	DrawerPart: ComponentType<Part>,
+	DialogPart: ComponentType<Part>,
+	dialogClassName?: string
+) {
+	const ResponsivePart = ({ className, children }: Part) =>
+		useContext(Variant).drawer ? (
+			<DrawerPart className={className}>{children}</DrawerPart>
+		) : (
+			<DialogPart className={cn(dialogClassName, className)}>
+				{children}
+			</DialogPart>
+		);
+	ResponsivePart.displayName = `Responsive${DialogPart.displayName ?? DialogPart.name}`;
+	return ResponsivePart;
+}
 
 function ResponsiveDialog({
 	open,
 	onOpenChange,
+	dismissible = true,
 	children
 }: {
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
+	/**
+	 * `false` removes every light-dismiss route - Escape, outside press, the
+	 * dialog's corner X, the drawer's swipe - so the modal only closes through
+	 * one of its own actions. For questions that must be answered.
+	 */
+	dismissible?: boolean;
 	children?: ReactNode;
 }) {
 	const isMobile = useIsMobile();
 	// Radix hands the callback one argument, Base UI two - normalise to the
-	// boolean both agree on.
-	const change = (next: boolean) => onOpenChange?.(next);
+	// boolean both agree on. Both primitives are controlled by `open`, so a
+	// non-dismissible modal simply never forwards their close requests.
+	const change = dismissible
+		? (next: boolean) => onOpenChange?.(next)
+		: undefined;
 
 	return (
-		<DrawerVariant.Provider value={isMobile}>
+		<Variant.Provider value={{ drawer: isMobile, dismissible }}>
 			{isMobile ? (
-				<Drawer open={open} onOpenChange={change}>
+				<Drawer
+					open={open}
+					onOpenChange={change}
+					disablePointerDismissal={!dismissible}
+				>
 					{children}
 				</Drawer>
 			) : (
@@ -59,69 +98,36 @@ function ResponsiveDialog({
 					{children}
 				</Dialog>
 			)}
-		</DrawerVariant.Provider>
+		</Variant.Provider>
 	);
 }
 
-function ResponsiveDialogContent({ className, children }: Part) {
-	const isDrawer = useDrawerVariant();
-
-	if (isDrawer) {
-		return <DrawerContent className={className}>{children}</DrawerContent>;
-	}
-
-	// Capture flows are a phone-shaped column of one or two fields; the desktop
-	// dialog holds that width instead of stretching to Dialog's default.
-	return (
-		<DialogContent className={cn("max-w-sm", className)}>
+// Capture flows are a phone-shaped column of one or two fields; the desktop
+// dialog holds that width instead of stretching to Dialog's default. Content
+// is hand-rolled rather than a responsivePart because it also hides the
+// close affordances (corner X, swipe handle) when the root is non-dismissible.
+const ResponsiveDialogContent = ({ className, children }: Part) => {
+	const { drawer, dismissible } = useContext(Variant);
+	return drawer ? (
+		<DrawerContent className={className} showHandle={dismissible}>
+			{children}
+		</DrawerContent>
+	) : (
+		<DialogContent
+			className={cn("max-w-sm", className)}
+			showCloseButton={dismissible}
+		>
 			{children}
 		</DialogContent>
 	);
-}
-
-function ResponsiveDialogHeader({ className, children }: Part) {
-	const isDrawer = useDrawerVariant();
-
-	if (isDrawer) {
-		return <DrawerHeader className={className}>{children}</DrawerHeader>;
-	}
-
-	return <DialogHeader className={className}>{children}</DialogHeader>;
-}
-
-function ResponsiveDialogFooter({ className, children }: Part) {
-	const isDrawer = useDrawerVariant();
-
-	if (isDrawer) {
-		return <DrawerFooter className={className}>{children}</DrawerFooter>;
-	}
-
-	return <DialogFooter className={className}>{children}</DialogFooter>;
-}
-
-function ResponsiveDialogTitle({ className, children }: Part) {
-	const isDrawer = useDrawerVariant();
-
-	if (isDrawer) {
-		return <DrawerTitle className={className}>{children}</DrawerTitle>;
-	}
-
-	return <DialogTitle className={className}>{children}</DialogTitle>;
-}
-
-function ResponsiveDialogDescription({ className, children }: Part) {
-	const isDrawer = useDrawerVariant();
-
-	if (isDrawer) {
-		return (
-			<DrawerDescription className={className}>{children}</DrawerDescription>
-		);
-	}
-
-	return (
-		<DialogDescription className={className}>{children}</DialogDescription>
-	);
-}
+};
+const ResponsiveDialogHeader = responsivePart(DrawerHeader, DialogHeader);
+const ResponsiveDialogFooter = responsivePart(DrawerFooter, DialogFooter);
+const ResponsiveDialogTitle = responsivePart(DrawerTitle, DialogTitle);
+const ResponsiveDialogDescription = responsivePart(
+	DrawerDescription,
+	DialogDescription
+);
 
 export {
 	ResponsiveDialog,

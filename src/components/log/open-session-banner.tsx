@@ -3,8 +3,9 @@
 // lets the Provider log a trip, log a travel cost, or end it without
 // hunting for the Log tab. Hidden on the Log tab itself, where the capture
 // console is the banner.
+import { Button } from "@/components/ui/button";
 import { formatMinutes, minutesSince, todayKey } from "@/lib/log/log-time";
-import { useLog, useNowTick } from "@/lib/log/use-log";
+import { useLog, useNowTick } from "@/hooks/use-log";
 import { Car, CircleDollarSign } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -40,28 +41,30 @@ export function OpenSessionBanner() {
 					</Link>
 					{/* Icon-only on phones so the Client and elapsed time stay
 					    readable; the dialogs they open are fully labelled. */}
-					<button
+					<Button
+						variant="ghost"
 						aria-label="Log trip km"
-						className="text-primary hover:bg-primary/20 flex shrink-0 cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-xs font-medium"
+						className="text-primary hover:bg-primary/20 hover:text-primary h-7 shrink-0 gap-1 px-2 text-xs"
 						onClick={() => flows.logTrip(session)}
 					>
-						<Car className="size-4" />
+						<Car />
 						<span className="hidden sm:inline">+ Trip km</span>
-					</button>
-					<button
+					</Button>
+					<Button
+						variant="ghost"
 						aria-label="Log travel cost"
-						className="text-primary hover:bg-primary/20 flex shrink-0 cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-xs font-medium"
+						className="text-primary hover:bg-primary/20 hover:text-primary h-7 shrink-0 gap-1 px-2 text-xs"
 						onClick={() => flows.logCost(session)}
 					>
-						<CircleDollarSign className="size-4" />
+						<CircleDollarSign />
 						<span className="hidden sm:inline">+ Travel cost</span>
-					</button>
-					<button
-						className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-md px-2.5 py-1 text-xs font-semibold"
+					</Button>
+					<Button
+						className="h-7 shrink-0 px-2.5 text-xs font-semibold"
 						onClick={() => flows.endSession(session)}
 					>
 						End
-					</button>
+					</Button>
 				</div>
 			</div>
 			{flows.dialogs}

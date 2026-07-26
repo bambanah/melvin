@@ -215,3 +215,116 @@ describe("trip.delete", () => {
 		expect(await prisma.trip.findUnique({ where: { id: trip.id } })).toBeNull();
 	});
 });
+
+// bulkAdd is the other path that assembles a Trip - the manual multi-activity
+// form. It shares Promotion's creation path, so a day it links as a Trip has
+// its Provider Travel allocated by the same engine as trip.create.
+describe("activity.bulkAdd", () => {
+	test("a contiguous day linked as a Trip allocates transit onto its Activities", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const { supportItem, clients } = await createTripFixture(owner);
+		const [first, second] = clients;
+
+		const { tripId, activities } = await caller.activity.bulkAdd({
+			activities: [
+				{
+					clientId: first.id,
+					supportItemId: supportItem.id,
+					date: new Date("2024-02-01"),
+					startTime: "09:00",
+					endTime: "10:00"
+				},
+				{
+					clientId: second.id,
+					supportItemId: supportItem.id,
+					date: new Date("2024-02-01"),
+					startTime: "10:00",
+					endTime: "11:00"
+				}
+			],
+			autoCreateTrip: true
+		});
+
+		expect(tripId).not.toBeNull();
+
+		// Legs of a manually entered day derive from each Client's stored
+		// distance: 8 km / 15 min out to the second Client.
+		const trip = await prisma.trip.findUniqueOrThrow({
+			where: { id: tripId as string },
+			include: { interClientLegs: true }
+		});
+		expect(trip.interClientLegs).toHaveLength(1);
+		expect(Number(trip.interClientLegs[0].distance)).toBe(8);
+
+		const persisted = await fetchTripActivities(activities.map((a) => a.id));
+		const expected = calculateTripTransit(
+			persisted.map((activity) => ({
+				...activity,
+				transitDistance: null,
+				transitDuration: null
+			})),
+			trip.interClientLegs
+		);
+		for (const activity of persisted) {
+			expect(Number(activity.transitDistance)).toBe(
+				expected.get(activity.id)?.transitDistance
+			);
+			expect(Number(activity.transitDuration)).toBe(
+				expected.get(activity.id)?.transitDuration
+			);
+		}
+		// The first Client's drive out, the second's leg in plus the drive home -
+		// not the zeroes an unallocated Trip would leave behind.
+		const byClient = new Map(
+			(
+				await prisma.activity.findMany({
+					where: { id: { in: activities.map((a) => a.id) } },
+					select: { clientId: true, transitDistance: true }
+				})
+			).map((a) => [a.clientId, Number(a.transitDistance)])
+		);
+		expect(byClient.get(first.id)).toBe(5);
+		expect(byClient.get(second.id)).toBe(8 + 8);
+	});
+
+	test("a non-contiguous day forms no Trip and keeps hand-entered transit", async () => {
+		const owner = await createTestUser();
+		const caller = callerFor(owner);
+		const { supportItem, clients } = await createTripFixture(owner);
+
+		const { tripId, activities } = await caller.activity.bulkAdd({
+			activities: [
+				{
+					clientId: clients[0].id,
+					supportItemId: supportItem.id,
+					date: new Date("2024-02-01"),
+					startTime: "09:00",
+					endTime: "10:00",
+					transitDistance: "42",
+					transitDuration: "17"
+				},
+				{
+					clientId: clients[1].id,
+					supportItemId: supportItem.id,
+					date: new Date("2024-02-01"),
+					startTime: "13:00",
+					endTime: "14:00"
+				}
+			],
+			autoCreateTrip: true
+		});
+
+		expect(tripId).toBeNull();
+		expect(await prisma.trip.count({ where: { ownerId: owner.id } })).toBe(0);
+
+		const entered = await prisma.activity.findFirstOrThrow({
+			where: {
+				id: { in: activities.map((a) => a.id) },
+				clientId: clients[0].id
+			}
+		});
+		expect(Number(entered.transitDistance)).toBe(42);
+		expect(Number(entered.transitDuration)).toBe(17);
+	});
+});

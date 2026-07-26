@@ -1,17 +1,12 @@
 import { parseUtcTime } from "@/lib/date-utils";
-import type {
-	ActivityTransportType,
-	Prisma,
-	PrismaClient
-} from "@/generated/client";
+import type { ActivityTransportType, PrismaClient } from "@/generated/client";
 import { ownedDb } from "@/server/api/owned";
 import { billableTravelDuration, defaultTravelDuration } from "@/lib/log-utils";
 import {
-	standaloneTransitUpdates,
-	tripTransitUpdates,
-	type TransitUpdate
-} from "@/lib/trip-utils";
-import { applyTransitUpdates } from "@/server/api/transit";
+	createActivityBatch,
+	type ActivityDraft,
+	type CreatedActivity
+} from "@/server/api/activity-creation";
 import {
 	END_AFTER_START_MESSAGE,
 	OPEN_SESSION_EDIT_MESSAGE,
@@ -25,6 +20,16 @@ import { authedProcedure, router } from "@/server/api/trpc";
 import { TRPCError, inferRouterOutputs } from "@trpc/server";
 import { z } from "zod";
 
+// A Session's participants have no natural order - the join table is keyed by
+// (Session, Client) - so every read orders them by clientId. Promotion treats
+// the first as the Session's primary participant (the Activity that carries
+// the captured transport and joins the Trip), and that choice has to be the
+// same on every read of the same Session.
+const participantsOrdered = {
+	select: { clientId: true, client: { select: { name: true } } },
+	orderBy: { clientId: "asc" as const }
+};
+
 const workSessionSelect = {
 	id: true,
 	date: true,
@@ -35,9 +40,7 @@ const workSessionSelect = {
 	interClientDistance: true,
 	interClientDuration: true,
 	updatedAt: true,
-	participants: {
-		select: { clientId: true, client: { select: { name: true } } }
-	},
+	participants: participantsOrdered,
 	transportItems: {
 		select: { id: true, type: true, amount: true, note: true }
 	}
@@ -46,43 +49,42 @@ const workSessionSelect = {
 type LogContext = {
 	prisma: PrismaClient;
 	owned: ReturnType<typeof ownedDb>;
+	session: { user: { id: string } };
 };
 
 const participantsCreate = (clientIds: string[]) => ({
 	create: clientIds.map((clientId) => ({ clientId }))
 });
 
+/**
+ * Last-write-wins on `updatedAt`: a capture that was tapped before the version
+ * already stored is a delayed offline replay, and applying it would undo a
+ * newer edit of the same Session. Every stamped write checks this and hands
+ * back the row as it actually stands instead of failing - the tap is simply
+ * the older one.
+ */
+const isStale = (session: { updatedAt: Date }, tappedAt: Date | undefined) =>
+	tappedAt !== undefined && session.updatedAt > tappedAt;
+
+/** The Session as it currently stands - what a dropped stale write returns. */
+async function readBack(ctx: LogContext, id: string) {
+	const current = await ctx.owned.workSession.findFirst({
+		where: { id },
+		select: workSessionSelect
+	});
+	if (!current) throw new TRPCError({ code: "NOT_FOUND" });
+	return current;
+}
+
 // One participant row = solo, N rows = group; the composition picks the
 // default Support Item and gives the mirrored Activities their groupSize.
 const isGroupSession = (session: { participants: unknown[] }) =>
 	session.participants.length > 1;
 
-// What promoteDay needs back from each created Activity: identity for the
-// Trip, and the TripActivity shape trip-utils' transit allocation reads.
-const promotedActivitySelect = {
-	id: true,
-	startTime: true,
-	endTime: true,
-	transitDistance: true,
-	transitDuration: true,
-	client: {
-		select: {
-			distanceToClient: true,
-			travelTimeToClient: true,
-			transitRatePerKm: true
-		}
-	}
-} satisfies Prisma.ActivitySelect;
-
-type PromotedActivity = Prisma.ActivityGetPayload<{
-	select: typeof promotedActivitySelect;
-}>;
-
 // Shared by recordTrip (a DISTANCE item in km) and recordCost (flat Transport
 // Expenses). Idempotent on the client-generated item id for offline replays.
 async function createTransportItem(
 	ctx: LogContext,
-	ownerId: string,
 	item: {
 		id?: string;
 		workSessionId: string;
@@ -95,7 +97,7 @@ async function createTransportItem(
 
 	if (item.id) {
 		const existing = await ctx.prisma.workSessionTransportItem.findFirst({
-			where: { id: item.id, workSession: { ownerId } },
+			where: { id: item.id, workSession: { ownerId: ctx.session.user.id } },
 			select: { id: true, type: true, amount: true, note: true }
 		});
 		// A replayed capture that already synced is a no-op, never a duplicate.
@@ -151,21 +153,12 @@ async function splitAtPivot(
 			endTime: true,
 			ownerId: true,
 			updatedAt: true,
-			participants: { select: { clientId: true } }
+			participants: participantsOrdered
 		}
 	});
 	if (!session) throw new TRPCError({ code: "NOT_FOUND" });
 
-	// Last-write-wins: a delayed offline split replay never clobbers a newer
-	// edit of the Session it would close.
-	if (input.updatedAt && session.updatedAt > input.updatedAt) {
-		const current = await ctx.owned.workSession.findFirst({
-			where: { id: session.id },
-			select: workSessionSelect
-		});
-		if (!current) throw new TRPCError({ code: "NOT_FOUND" });
-		return current;
-	}
+	if (isStale(session, input.updatedAt)) return readBack(ctx, session.id);
 
 	if (session.endTime) {
 		throw new TRPCError({
@@ -287,14 +280,7 @@ export const logRouter = router({
 			});
 			if (!session) throw new TRPCError({ code: "NOT_FOUND" });
 
-			// Last-write-wins: a delayed offline end replay never clobbers a
-			// newer edit of the same Session.
-			if (input.updatedAt && session.updatedAt > input.updatedAt) {
-				return ctx.owned.workSession.findFirst({
-					where: { id: input.id },
-					select: workSessionSelect
-				});
-			}
+			if (isStale(session, input.updatedAt)) return readBack(ctx, input.id);
 
 			const endTime = parseUtcTime(input.endTime);
 			if (endTime <= session.startTime) {
@@ -329,12 +315,8 @@ export const logRouter = router({
 				throw new TRPCError({ code: "NOT_FOUND" });
 			}
 
-			// Last-write-wins: a stale offline replay never clobbers a newer edit.
-			if (existing && input.updatedAt && existing.updatedAt > input.updatedAt) {
-				return ctx.owned.workSession.findFirst({
-					where: { id: input.id },
-					select: workSessionSelect
-				});
+			if (existing && isStale(existing, input.updatedAt)) {
+				return readBack(ctx, input.id);
 			}
 
 			// At most one Open Session per Provider: an edit that leaves this
@@ -479,14 +461,8 @@ export const logRouter = router({
 
 			const isTravel = input.handoverType === "TRAVEL";
 
-			// Last-write-wins: a delayed offline handover replay never clobbers a
-			// newer edit of the same Session.
-			const stale = input.updatedAt && session.updatedAt > input.updatedAt;
-			const workSession = stale
-				? await ctx.owned.workSession.findFirst({
-						where: { id: session.id },
-						select: workSessionSelect
-					})
+			const workSession = isStale(session, input.updatedAt)
+				? await readBack(ctx, session.id)
 				: await ctx.prisma.workSession.update({
 						where: { id: session.id },
 						data: {
@@ -500,7 +476,6 @@ export const logRouter = router({
 						},
 						select: workSessionSelect
 					});
-			if (!workSession) throw new TRPCError({ code: "NOT_FOUND" });
 
 			// The gap between the two stamped times is known here, so surface the
 			// pre-fill and the fits-the-gap warning to the capture UI. Warn, never
@@ -535,7 +510,7 @@ export const logRouter = router({
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
-			return createTransportItem(ctx, ctx.session.user.id, {
+			return createTransportItem(ctx, {
 				id: input.id,
 				workSessionId: input.workSessionId,
 				type: "DISTANCE",
@@ -555,7 +530,7 @@ export const logRouter = router({
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
-			return createTransportItem(ctx, ctx.session.user.id, input);
+			return createTransportItem(ctx, input);
 		}),
 
 	// Day-atomic Promotion: every captured Session becomes a Pending Activity
@@ -584,7 +559,7 @@ export const logRouter = router({
 					handoverType: true,
 					interClientDistance: true,
 					interClientDuration: true,
-					participants: { select: { clientId: true } },
+					participants: participantsOrdered,
 					transportItems: {
 						select: { type: true, amount: true, note: true }
 					}
@@ -692,96 +667,75 @@ export const logRouter = router({
 				});
 			}
 
-			return ctx.prisma.$transaction(async (tx) => {
-				const activityIds: string[] = [];
-				const primaryBySessionId = new Map<string, PromotedActivity>();
+			// One Activity per participant, in Session order. The primary
+			// participant - the first by the deterministic participant order - is
+			// the one that carries the Session's transport and joins the Trip.
+			const drafts: ActivityDraft[] = [];
+			const primarySessionIdByDraft = new Map<number, string>();
+			for (const session of sessions) {
+				const groupSize = isGroupSession(session)
+					? session.participants.length
+					: undefined;
+				const supportItemId = supportItemIdBySession.get(session.id);
+				if (!supportItemId) continue; // unreachable: seeded above
 
-				for (const session of sessions) {
-					const groupSize = isGroupSession(session)
-						? session.participants.length
-						: undefined;
-
-					const supportItemId = supportItemIdBySession.get(session.id);
-					if (!supportItemId) continue; // unreachable: seeded above
-
-					for (const [index, participant] of session.participants.entries()) {
-						const isPrimary = index === 0;
-						const activity = await tx.activity.create({
-							data: {
-								ownerId: ctx.session.user.id,
-								clientId: participant.clientId,
-								supportItemId,
-								date: input.date,
-								startTime: session.startTime,
-								endTime: session.endTime,
-								groupSize,
-								// The Session's trips and costs bill once, on the
-								// primary participant's Activity - mirrors share the
-								// support time, not the transport.
-								transportItems:
-									isPrimary && session.transportItems.length > 0
-										? {
-												create: session.transportItems.map((item) => ({
-													type: item.type,
-													amount: item.amount,
-													note: item.note
-												}))
-											}
-										: undefined
-							},
-							select: promotedActivitySelect
-						});
-						activityIds.push(activity.id);
-						if (isPrimary) primaryBySessionId.set(session.id, activity);
-					}
+				for (const [index, participant] of session.participants.entries()) {
+					const isPrimary = index === 0;
+					if (isPrimary) primarySessionIdByDraft.set(drafts.length, session.id);
+					drafts.push({
+						clientId: participant.clientId,
+						supportItemId,
+						date: input.date,
+						startTime: session.startTime,
+						endTime: session.endTime ?? undefined,
+						groupSize,
+						// The Session's trips and costs bill once, on the primary
+						// participant's Activity - mirrors share the support time, not
+						// the transport.
+						transportItems: isPrimary ? session.transportItems : undefined
+					});
 				}
+			}
 
-				const primaries = [...primaryBySessionId.values()];
-
+			return ctx.prisma.$transaction(async (tx) => {
 				// Provider Travel bills once per Session, on the primary Activity:
 				// mirrors never join the Trip. Home legs derive from the Clients'
 				// stored distances through the same allocation engine as manually
 				// assembled days.
-				let tripId: string | null = null;
-				let transitUpdates: TransitUpdate[];
-				if (primaries.length >= 2) {
-					const legs = legPlans.flatMap((leg) => {
-						const from = primaryBySessionId.get(leg.fromSessionId);
-						const to = primaryBySessionId.get(leg.toSessionId);
-						if (!from || !to) return []; // unreachable: legs link loaded sessions
-						return [
-							{
-								fromActivityId: from.id,
-								toActivityId: to.id,
-								distance: leg.distance,
-								duration: leg.duration
-							}
-						];
-					});
+				const { activities, tripId } = await createActivityBatch(
+					tx,
+					ctx.session.user.id,
+					drafts,
+					(created) => {
+						const primaryBySessionId = new Map<string, CreatedActivity>();
+						created.forEach((activity, index) => {
+							const sessionId = primarySessionIdByDraft.get(index);
+							if (sessionId) primaryBySessionId.set(sessionId, activity);
+						});
 
-					const trip = await tx.trip.create({
-						data: {
-							date: input.date,
-							ownerId: ctx.session.user.id,
-							activities: {
-								connect: primaries.map((activity) => ({ id: activity.id }))
-							},
-							interClientLegs: { create: legs }
-						}
-					});
-					tripId = trip.id;
-					transitUpdates = tripTransitUpdates(primaries, legs);
-				} else {
-					transitUpdates = standaloneTransitUpdates(primaries);
-				}
+						const legs = legPlans.flatMap((leg) => {
+							const from = primaryBySessionId.get(leg.fromSessionId);
+							const to = primaryBySessionId.get(leg.toSessionId);
+							if (!from || !to) return []; // unreachable: legs link loaded sessions
+							return [
+								{
+									fromActivityId: from.id,
+									toActivityId: to.id,
+									distance: leg.distance,
+									duration: leg.duration
+								}
+							];
+						});
 
-				await applyTransitUpdates(tx, transitUpdates);
+						return { activities: [...primaryBySessionId.values()], legs };
+					}
+				);
 
 				await tx.workSession.deleteMany({
 					where: { id: { in: sessions.map((session) => session.id) } }
 				});
 
-				return { activityIds, tripId };
+				return { activityIds: activities.map((a) => a.id), tripId };
 			});
 		}),
 
