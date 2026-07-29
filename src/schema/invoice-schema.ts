@@ -41,3 +41,8 @@ export const invoiceSchema = z.object({
 	)
 });
 export type InvoiceSchema = z.infer<typeof invoiceSchema>;
+/**
+ * The form's field values: `groupClientIds` is filled in by its default, so the
+ * input shape differs from the parsed output.
+ */
+export type InvoiceFormValues = z.input<typeof invoiceSchema>;

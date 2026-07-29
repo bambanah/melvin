@@ -350,7 +350,7 @@ export const invoiceRouter = router({
 	list: authedProcedure
 		.input(
 			baseListQueryInput.extend({
-				status: z.nativeEnum(InvoiceStatus).array().optional(),
+				status: z.enum(InvoiceStatus).array().optional(),
 				clientId: z.string().optional(),
 				search: z.string().optional()
 			})

@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const loginFormSchema = z.object({
-	email: z.string().email()
+	email: z.email()
 });
 type LoginFormSchema = z.infer<typeof loginFormSchema>;
 

@@ -11,7 +11,7 @@ import {
 import Heading from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
-import { UserSchema, userSchema } from "@/schema/user-schema";
+import { UserFormValues, UserSchema, userSchema } from "@/schema/user-schema";
 import { UserFetchOutput } from "@/server/api/routers/user-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo } from "react";
@@ -41,7 +41,7 @@ const AccountForm = ({ existingUser }: Props) => {
 		[existingUser]
 	);
 
-	const form = useForm<UserSchema>({
+	const form = useForm<UserFormValues, unknown, UserSchema>({
 		mode: "onBlur",
 		resolver: zodResolver(userSchema),
 		defaultValues: existingUserWithDefaults

@@ -20,7 +20,11 @@ import {
 import { stripTimezone, utcDate } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
-import { InvoiceSchema, invoiceSchema } from "@/schema/invoice-schema";
+import {
+	InvoiceFormValues,
+	InvoiceSchema,
+	invoiceSchema
+} from "@/schema/invoice-schema";
 import { InvoiceByIdOutput } from "@/server/api/routers/invoice-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -39,7 +43,7 @@ interface Props {
 const InvoiceForm = ({ existingInvoice, onSubmit }: Props) => {
 	const router = useRouter();
 
-	const form = useForm<InvoiceSchema>({
+	const form = useForm<InvoiceFormValues, unknown, InvoiceSchema>({
 		resolver: zodResolver(invoiceSchema),
 		defaultValues: {
 			...existingInvoice,

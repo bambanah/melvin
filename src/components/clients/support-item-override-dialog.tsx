@@ -21,6 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { trpc } from "@/lib/trpc";
 import { decimalToCurrencyString } from "@/lib/utils";
 import {
+	SupportItemRatesFormValues,
 	SupportItemRatesSchema,
 	supportItemRatesSchema
 } from "@/schema/support-item-rates-schema";
@@ -37,7 +38,11 @@ interface Props {
 const SupportItemOverrideDialog = ({ clientId }: Props) => {
 	const [open, setOpen] = useState(false);
 
-	const form = useForm<SupportItemRatesSchema>({
+	const form = useForm<
+		SupportItemRatesFormValues,
+		unknown,
+		SupportItemRatesSchema
+	>({
 		resolver: zodResolver(supportItemRatesSchema),
 		defaultValues: {
 			supportItemId: ""

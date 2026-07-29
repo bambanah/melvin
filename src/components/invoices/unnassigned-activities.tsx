@@ -1,7 +1,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import Heading from "@/components/ui/heading";
 import { cn } from "@/lib/utils";
-import { InvoiceSchema } from "@/schema/invoice-schema";
+import { InvoiceFormValues } from "@/schema/invoice-schema";
 import { ActivityListOutput } from "@/server/api/routers/activity-router";
 import { utcDate } from "@/lib/date-utils";
 import { format } from "date-fns";
@@ -10,8 +10,8 @@ import { UseFormGetValues, UseFormSetValue } from "react-hook-form";
 
 interface Props {
 	activities: ActivityListOutput["activities"];
-	getValues: UseFormGetValues<InvoiceSchema>;
-	setValue: UseFormSetValue<InvoiceSchema>;
+	getValues: UseFormGetValues<InvoiceFormValues>;
+	setValue: UseFormSetValue<InvoiceFormValues>;
 }
 
 const UnassignedActivities = ({ activities, getValues, setValue }: Props) => {

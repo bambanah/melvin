@@ -1,3 +1,4 @@
+import { requiredDate } from "@/schema/fields";
 import { z } from "zod";
 
 export const activityTransportTypeEnum = z.enum([
@@ -23,7 +24,7 @@ export const activitySchema = z
 		id: z.string().optional(),
 		supportItemId: z.string(),
 		clientId: z.string().min(1, "Client is required"),
-		date: z.date({ required_error: "Date is required" }),
+		date: requiredDate("Date is required"),
 		startTime: z.string().min(1, "Start time is required"),
 		endTime: z.string().min(1, "End time is required"),
 		itemDistance: z.number(),
