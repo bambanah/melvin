@@ -9,13 +9,8 @@ import {
 	type BillableActivity,
 	type TransitRateContext
 } from "@/lib/billing-lines";
+import { formatCurrency } from "@/lib/utils";
 import { Info } from "lucide-react";
-
-const formatCurrency = (value: number) =>
-	value.toLocaleString(undefined, {
-		style: "currency",
-		currency: "AUD"
-	});
 
 const suffixLabel = (suffix?: string) => (suffix ? `/${suffix}` : "");
 

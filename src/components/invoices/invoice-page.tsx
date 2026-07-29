@@ -1,3 +1,8 @@
+import InvoiceActivities from "@/components/invoices/invoice-activities";
+import InvoiceDocument from "@/components/invoices/invoice-document";
+import InvoiceVersionHistory from "@/components/invoices/invoice-version-history";
+import { useInvalidateInvoice } from "@/components/invoices/use-invoice-actions";
+import { Fact, FactGrid } from "@/components/shared/fact";
 import { useRateContext } from "@/components/shared/use-rate-context";
 import { InvoiceStatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,41 +12,31 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
-import { getTotalCostOfActivities } from "@/lib/activity-utils";
-import { downloadOrSharePdf } from "@/lib/download-pdf";
-import { trpc } from "@/lib/trpc";
-import { cn } from "@/lib/utils";
-import { Dialog, DialogPanel, Transition } from "@headlessui/react";
 import { InvoiceStatus } from "@/generated/browser";
+import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import { utcDate } from "@/lib/date-utils";
+import { currentDisplayInvoiceNo } from "@/lib/invoice-utils";
+import { trpc } from "@/lib/trpc";
+import { formatCurrency } from "@/lib/utils";
 import { format } from "date-fns";
 import {
-	ChevronDown,
-	Clock,
 	DollarSign,
-	Download,
 	Dumbbell,
+	EllipsisVertical,
+	Pencil,
 	Plane,
-	Search,
 	Trash2,
 	Undo,
 	User
 } from "lucide-react";
-import dynamic from "next/dynamic";
+import Head from "next/head";
 import Link from "next/link";
-import { Fragment, useState } from "react";
-
-const PdfPreview = dynamic(() => import("@/components/invoices/pdf-preview"), {
-	ssr: false
-});
-const ActivityList = dynamic(
-	() => import("@/components/activities/activity-list")
-);
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 
 const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
-	const [isPdfPreviewExpanded, setIsPdfPreviewExpanded] = useState(false);
+	const router = useRouter();
 	const rateContext = useRateContext();
 
 	const trpcUtils = trpc.useUtils();
@@ -51,19 +46,22 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 	const sendMutation = trpc.invoice.send.useMutation();
 	const amendMutation = trpc.invoice.amend.useMutation();
 	const markPaidMutation = trpc.invoice.markPaid.useMutation();
-	const deleteVersionMutation = trpc.invoice.deleteVersion.useMutation();
-
-	const invalidateInvoice = () => {
-		trpcUtils.invoice.byId.invalidate({ id: invoiceId });
-		trpcUtils.invoice.list.invalidate();
-	};
+	const unmarkPaidMutation = trpc.invoice.unmarkPaid.useMutation();
+	const deleteMutation = trpc.invoice.delete.useMutation();
+	const invalidateInvoice = useInvalidateInvoice(invoiceId);
 
 	const sendInvoice = () => {
 		sendMutation.mutateAsync({ ids: [invoiceId] }).then(invalidateInvoice);
 	};
 
-	const markInvoiceAsPaid = () => {
+	const markAsPaid = () => {
 		markPaidMutation.mutateAsync({ ids: [invoiceId] }).then(invalidateInvoice);
+	};
+
+	const markAsUnpaid = () => {
+		unmarkPaidMutation
+			.mutateAsync({ ids: [invoiceId] })
+			.then(invalidateInvoice);
 	};
 
 	const amendInvoice = () => {
@@ -72,39 +70,20 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 		amendMutation.mutateAsync({ id: invoiceId }).then(invalidateInvoice);
 	};
 
-	const deleteVersion = (versionNumber: number, isOnly: boolean) => {
-		const message = isOnly
-			? "Delete this version? The invoice will return to draft, as if it was never sent."
-			: "Delete this version? It will be dropped and its number reused on the next send.";
-		if (!confirm(message)) return;
+	const deleteInvoice = () => {
+		if (!confirm("Delete this invoice? This can't be undone.")) return;
 
-		deleteVersionMutation
-			.mutateAsync({ id: invoiceId, versionNumber })
-			.then(invalidateInvoice);
-	};
-
-	// Draft downloads carry a DRAFT watermark; a sent
-	// invoice's download is the frozen version the server resolves.
-	const downloadInvoicePdf = async (versionNumber?: number) => {
-		const dataUrl = await trpcUtils.pdf.forInvoice.fetch({
-			invoiceId,
-			returnBase64: true,
-			versionNumber
-		});
-
-		const displayNo = versionNumber
-			? (invoice?.versions?.find((v) => v.versionNumber === versionNumber)
-					?.displayInvoiceNo ?? invoice?.invoiceNo)
-			: invoice?.invoiceNo;
-
-		await downloadOrSharePdf(dataUrl, `${displayNo}.pdf`);
-	};
-
-	const sendAndDownloadInvoice = () => {
-		sendMutation.mutateAsync({ ids: [invoiceId] }).then(() => {
-			invalidateInvoice();
-			downloadInvoicePdf();
-		});
+		deleteMutation
+			.mutateAsync({ id: invoiceId })
+			.then(() => {
+				// Only the list - the detail query would refetch a gone invoice.
+				trpcUtils.invoice.list.invalidate();
+				toast.success("Invoice deleted");
+				router.push("/dashboard/invoices");
+			})
+			.catch(() => {
+				toast.error("An error occurred. Please refresh and try again.");
+			});
 	};
 
 	if (error) {
@@ -113,256 +92,147 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 	}
 	if (!invoice) return <Loading />;
 
+	const isDraft = invoice.status === InvoiceStatus.CREATED;
+	const isSent = invoice.status === InvoiceStatus.SENT;
+	const isPaid = invoice.status === InvoiceStatus.PAID;
+	const hasVersions = (invoice.versions?.length ?? 0) > 0;
+
+	const displayNo = currentDisplayInvoiceNo(invoice);
+
+	// A draft's total tracks live rates; a locked invoice shows the latest
+	// version's frozen total, not a recompute.
+	const total = isDraft
+		? getTotalCostOfActivities(invoice.activities, rateContext, {
+				forDisplay: true
+			})
+		: (invoice.versions?.[0]?.total ?? 0);
+
 	return (
-		<div className="mx-auto flex w-full max-w-5xl flex-col">
-			<Transition
-				show={isPdfPreviewExpanded}
-				as={Fragment}
-				enter="ease-out duration-300"
-				enterFrom="opacity-0"
-				enterTo="opacity-100"
-				leave="ease-in duration-200"
-				leaveFrom="opacity-100"
-				leaveTo="opacity-0"
-			>
-				<Dialog
-					onClose={() => setIsPdfPreviewExpanded(false)}
-					className="relative z-50"
-				>
-					<div
-						className="fixed inset-0 bg-black/30"
-						aria-hidden="true"
-						onClick={() => setIsPdfPreviewExpanded(false)}
-					/>
-					<div className="fixed inset-0 box-border flex w-screen justify-center overflow-y-auto">
-						<DialogPanel className="box-border h-full w-full max-w-4xl">
-							<PdfPreview invoiceId={invoice.id} className="my-10" />
-						</DialogPanel>
-					</div>
-				</Dialog>
-			</Transition>
-
-			<div className="flex flex-col items-stretch justify-between md:h-[15rem] md:flex-row-reverse">
-				<div
-					className={cn([
-						"group relative h-full max-h-[12rem] min-h-[12rem] basis-1/2 overflow-hidden md:max-h-[15rem]",
-						invoice.activities.length > 0 &&
-							"bg-foreground/10 cursor-pointer shadow-inner"
-					])}
-				>
-					{invoice.activities.length > 0 ? (
-						<>
-							<div className="pointer-events-none absolute inset-0 flex justify-center overflow-hidden">
-								<div className="w-full">
-									<PdfPreview invoiceId={invoice.id} />
-								</div>
+		<div className="flex flex-col items-center px-4 pb-24 md:pb-8">
+			<Head>
+				<title>{`${displayNo} | Melvin`}</title>
+			</Head>
+			<div className="flex w-full max-w-3xl flex-col gap-6">
+				<header className="mt-2 flex flex-col gap-5">
+					<div className="flex items-start justify-between gap-3">
+						<div className="flex min-w-0 flex-col gap-1">
+							<p className="text-primary text-xs font-medium">
+								{format(utcDate(invoice.date), "EEEE, d MMMM yyyy")}
+							</p>
+							<div className="flex items-center gap-2.5">
+								<h1 className="text-lg font-semibold tracking-tight text-balance md:text-xl">
+									{displayNo}
+								</h1>
+								<InvoiceStatusBadge invoiceStatus={invoice.status} />
 							</div>
-							<div
-								className="absolute top-0 right-0 flex h-full w-full items-center justify-center"
-								onClick={() => setIsPdfPreviewExpanded(true)}
-								data-testid="pdf-preview-trigger"
-							>
-								<div className="flex items-center justify-center gap-2 rounded-md bg-zinc-900/80 px-4 py-3 text-zinc-50 transition-transform group-hover:scale-110 group-hover:bg-zinc-900 md:px-3 md:py-2 md:text-lg">
-									<Search className="h-4 w-4" />
-									Preview
-								</div>
-							</div>
-						</>
-					) : (
-						<div className="bg-foreground/10 flex h-full w-full items-center justify-center md:h-[15rem]">
-							<p className="text-foreground/50 text-4xl">DRAFT</p>
+							<p className="text-foreground/50 font-mono text-xs">
+								Bill to {invoice.billTo ?? invoice.client.name}
+							</p>
 						</div>
-					)}
-				</div>
-				<div className="mx-auto flex w-full basis-1/2 flex-col px-4 py-4 md:pt-0">
-					<div className="flex items-center justify-between md:mb-5">
-						<Heading className="py-3">
-							{invoice.versions?.[0]?.displayInvoiceNo ?? invoice.invoiceNo}
-						</Heading>
-						{invoice.status === InvoiceStatus.CREATED && (
-							<Link
-								href={`/dashboard/invoices/${invoice.id}/edit`}
-								className="px-4 py-3 text-sm"
-							>
-								EDIT
-							</Link>
-						)}
-					</div>
-					<p className="text-foreground/80 text-sm">Total</p>
-					<div className="flex items-center justify-between">
-						<p className="text-xl" data-testid="invoice-total">
-							{(invoice.status === InvoiceStatus.CREATED
-								? getTotalCostOfActivities(invoice.activities, rateContext, {
-										forDisplay: true
-									})
-								: (invoice.versions?.[0]?.total ?? 0)
-							).toLocaleString(undefined, {
-								style: "currency",
-								currency: "AUD"
-							})}
-						</p>
-						<InvoiceStatusBadge invoiceStatus={invoice.status} />
-					</div>
 
-					<div className="flex grow flex-col justify-start gap-4">
-						<div className="mt-5 flex justify-center gap-2">
-							{invoice.status === InvoiceStatus.CREATED &&
-								invoice.activities.length > 0 && (
-									<Button onClick={sendInvoice} className="w-1/2 grow">
-										<Plane className="mr-2 h-4 w-4" /> Mark as Sent
-									</Button>
-								)}
-							{invoice.status === InvoiceStatus.SENT && (
+						<div className="flex shrink-0 items-center gap-1.5">
+							{isDraft && (
 								<Button
-									onClick={markInvoiceAsPaid}
-									variant="secondary"
-									className="w-1/2 grow"
+									size="sm"
+									onClick={sendInvoice}
+									disabled={invoice.activities.length === 0}
 								>
-									<DollarSign className="mr-2 h-4 w-4" /> Mark as Paid
+									<Plane />
+									Mark as Sent
 								</Button>
 							)}
-							{(invoice.status === InvoiceStatus.SENT ||
-								invoice.status === InvoiceStatus.PAID) && (
-								<Button
-									onClick={amendInvoice}
-									className="w-1/2 grow"
-									variant="secondary"
-								>
-									<Undo className="mr-2 h-4 w-4" />
+							{isSent && (
+								<Button size="sm" onClick={markAsPaid}>
+									<DollarSign />
+									Mark as Paid
+								</Button>
+							)}
+							{isPaid && (
+								<Button size="sm" onClick={amendInvoice}>
+									<Undo />
 									Amend
 								</Button>
 							)}
-							{invoice.status === InvoiceStatus.CREATED &&
-							invoice.activities.length > 0 ? (
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<Button variant="secondary" className="w-1/2 grow">
-											<Download className="mr-2 h-4 w-4" />
-											Download
-											<ChevronDown className="ml-2 h-4 w-4" />
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent>
-										<DropdownMenuItem
-											className="cursor-pointer"
-											onClick={() => downloadInvoicePdf()}
-										>
-											Download draft
-										</DropdownMenuItem>
-										<DropdownMenuItem
-											className="cursor-pointer"
-											onClick={sendAndDownloadInvoice}
-										>
-											Send & download
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							) : (
-								<Button
-									className="w-1/2 grow"
-									onClick={() => downloadInvoicePdf()}
-								>
-									<Download className="mr-2 h-4 w-4" />
-									Download PDF
-								</Button>
-							)}
-						</div>
-						{invoice.sentAt && (
-							<div className="text-foreground/80 flex flex-col gap-1">
-								<p>Sent on: {format(utcDate(invoice.sentAt), "dd/MM/yyyy")}</p>
-							</div>
-						)}
-					</div>
-				</div>
-			</div>
 
-			{invoice.versions && invoice.versions.length > 0 && (
-				<div className="flex w-full flex-col gap-2 p-2 px-4">
-					<p className="font-semibold">Version history</p>
-					{invoice.versions.map((version, index) => (
-						<div
-							key={version.versionNumber}
-							className="flex items-center justify-between rounded-md border p-3"
-						>
-							<div>
-								<p className="font-semibold">{version.displayInvoiceNo}</p>
-								<p className="text-foreground/60 text-sm">
-									Sent {format(utcDate(version.sentAt), "dd/MM/yyyy")}
-									{version.paidAt &&
-										` · Paid ${format(utcDate(version.paidAt), "dd/MM/yyyy")}`}
-									{version.backfilled && " · Backfilled"}
-								</p>
-							</div>
-							<div className="flex items-center gap-3">
-								<p className="font-semibold">
-									{version.total.toLocaleString(undefined, {
-										style: "currency",
-										currency: "AUD"
-									})}
-								</p>
-								<Button
-									variant="ghost"
-									size="icon"
-									onClick={() => downloadInvoicePdf(version.versionNumber)}
-								>
-									<Download className="h-4 w-4" />
-								</Button>
-								{index === 0 && (
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
 									<Button
 										variant="ghost"
 										size="icon"
-										onClick={() =>
-											deleteVersion(
-												version.versionNumber,
-												invoice.versions!.length === 1
-											)
-										}
-										aria-label="Delete version"
+										aria-label="Invoice actions"
 									>
-										<Trash2 className="text-destructive h-4 w-4" />
+										<EllipsisVertical />
 									</Button>
-								)}
-							</div>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end">
+									{isDraft && (
+										<Link href={`/dashboard/invoices/${invoice.id}/edit`}>
+											<DropdownMenuItem className="cursor-pointer">
+												<Pencil className="mr-2 h-4 w-4" />
+												<span>Edit</span>
+											</DropdownMenuItem>
+										</Link>
+									)}
+									{isSent && (
+										<DropdownMenuItem
+											onClick={amendInvoice}
+											className="cursor-pointer"
+										>
+											<Undo className="mr-2 h-4 w-4" />
+											<span>Amend</span>
+										</DropdownMenuItem>
+									)}
+									{isPaid && (
+										<DropdownMenuItem
+											onClick={markAsUnpaid}
+											className="cursor-pointer"
+										>
+											<Undo className="mr-2 h-4 w-4" />
+											<span>Mark as unpaid</span>
+										</DropdownMenuItem>
+									)}
+									{isDraft && !hasVersions && (
+										<DropdownMenuItem
+											onClick={deleteInvoice}
+											className="text-destructive focus:text-destructive cursor-pointer"
+										>
+											<Trash2 className="mr-2 h-4 w-4" />
+											<span>Delete</span>
+										</DropdownMenuItem>
+									)}
+								</DropdownMenuContent>
+							</DropdownMenu>
 						</div>
-					))}
-				</div>
-			)}
-			<div className="flex w-full flex-col justify-between md:flex-row md:pt-6">
-				<div className="flex basis-1/2 flex-col gap-0 p-2 px-4">
-					<p className="font-semibold">Info</p>
-					<div className="flex items-center gap-4 p-2">
-						<Clock className="h-4 w-4" />
-						<p>{format(utcDate(invoice.date), "dd/MM/yyyy")}</p>
 					</div>
-					<Link
-						className="text-fg hover:bg-foreground/15 flex w-full items-center gap-4 rounded-md p-2 text-left"
-						href={`/dashboard/clients/${invoice.client.id}`}
-					>
-						<User className="h-4 w-4" />
-						{invoice.client.name}
-					</Link>
-					<div className="flex items-center gap-4 p-2">
-						<Dumbbell className="h-4 w-4" />
-						<p>
-							{invoice.activities.length} Activit
-							{invoice.activities.length > 1 ? "ies" : "y"}
-						</p>
-					</div>
-					{invoice.paidAt && (
-						<div className="flex items-center gap-4 p-2">
-							<DollarSign className="h-4 w-4" />
-							<p>Paid {format(utcDate(invoice.paidAt), "dd/MM/yyyy")}</p>
-						</div>
-					)}
-				</div>
-			</div>
 
-			<div className="hidden md:mt-8 md:block">
-				<ActivityList
-					groupByAssignedStatus={false}
-					invoiceId={invoice.id}
-					displayCreateButton={false}
-				/>
+					<FactGrid>
+						<Fact icon={DollarSign} label="Total">
+							<span
+								className="text-lg font-semibold tracking-tight tabular-nums"
+								data-testid="invoice-total"
+							>
+								{formatCurrency(total)}
+							</span>
+						</Fact>
+
+						<Fact icon={User} label="Client">
+							<Link
+								href={`/dashboard/clients/${invoice.client.id}`}
+								className="decoration-foreground/30 hover:decoration-foreground underline underline-offset-4 transition-colors"
+							>
+								{invoice.client.name}
+							</Link>
+						</Fact>
+
+						<Fact icon={Dumbbell} label="Activities">
+							{invoice.activities.length}
+						</Fact>
+					</FactGrid>
+				</header>
+
+				<InvoiceDocument invoice={invoice} />
+				<InvoiceVersionHistory invoice={invoice} />
+				<InvoiceActivities invoice={invoice} />
 			</div>
 		</div>
 	);

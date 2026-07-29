@@ -32,7 +32,7 @@ const SupportItemPage = ({ supportItemId }: { supportItemId: string }) => {
 					router.push("/dashboard/support-items");
 				})
 				.catch(() => {
-					toast.error("An error occured. Please refresh and try again.");
+					toast.error("An error occurred. Please refresh and try again.");
 				});
 	};
 

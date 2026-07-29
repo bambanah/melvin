@@ -68,7 +68,7 @@ test("Invoice versioning journey: draft → send → amend → edit → re-send 
 	await page.getByRole("button", { name: "Download" }).click();
 	await page.getByRole("menuitem", { name: "Send & download" }).click();
 
-	await expect(page.getByRole("button", { name: "Amend" })).toBeVisible({
+	await expect(page.getByRole("button", { name: "Mark as Paid" })).toBeVisible({
 		timeout: 10000
 	});
 	await expect(
@@ -86,11 +86,12 @@ test("Invoice versioning journey: draft → send → amend → edit → re-send 
 	expect(v1Text).not.toContain("DRAFT");
 	expect(v1Text).not.toContain("supersedes");
 
-	// --- Amend: confirm dialog, unlocks back to draft ---
+	// --- Amend (in the overflow menu): confirm dialog, unlocks back to draft ---
 	page.once("dialog", (dialog) => {
 		dialog.accept().catch(() => {});
 	});
-	await page.getByRole("button", { name: "Amend" }).click();
+	await page.getByRole("button", { name: "Invoice actions" }).click();
+	await page.getByRole("menuitem", { name: "Amend" }).click();
 	await expect(page.getByRole("button", { name: "Mark as Sent" })).toBeVisible({
 		timeout: 10000
 	});
@@ -110,7 +111,7 @@ test("Invoice versioning journey: draft → send → amend → edit → re-send 
 	// --- Re-send: freezes v2 with the supersedes line ---
 	await page.goto(`/dashboard/invoices/${invoiceId}`);
 	await page.getByRole("button", { name: "Mark as Sent" }).click();
-	await expect(page.getByRole("button", { name: "Amend" })).toBeVisible({
+	await expect(page.getByRole("button", { name: "Mark as Paid" })).toBeVisible({
 		timeout: 10000
 	});
 	await expect(
