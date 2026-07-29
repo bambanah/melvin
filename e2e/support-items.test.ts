@@ -57,3 +57,27 @@ test("Can create, update, and delete support items", async ({ page }) => {
 
 	await waitForAlert(page, "Support Item Deleted");
 });
+
+test("Support item form shows its own validation messages", async ({
+	page
+}) => {
+	await page.goto("/dashboard/support-items/create");
+
+	const weekdayCode = page.getByPlaceholder("XX_XXX_XXXX_X_X").first();
+	const weekdayRate = page.getByPlaceholder("rate").first();
+
+	// An untouched weekday rate never reaches the coercion.
+	await page.getByRole("button", { name: "Create" }).click();
+	await expect(page.getByText("Must be a number")).toBeVisible();
+
+	await weekdayCode.fill("nope");
+	await weekdayRate.fill("1.234");
+	await page.getByRole("button", { name: "Create" }).click();
+
+	await expect(
+		page.getByText("Must be in format XX_XXX_XXXX_X_X")
+	).toBeVisible();
+	await expect(
+		page.getByText("Can't be more than 2 decimal places (x.xx)")
+	).toBeVisible();
+});

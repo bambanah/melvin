@@ -19,7 +19,7 @@ import {
 import { stripTimezone } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
-import { InvoiceSchema } from "@/schema/invoice-schema";
+import { InvoiceFormValues } from "@/schema/invoice-schema";
 import { format } from "date-fns";
 import {
 	ArrowRight,
@@ -40,10 +40,10 @@ import {
 } from "react-hook-form";
 
 interface Props {
-	control: Control<InvoiceSchema>;
-	getValues: UseFormGetValues<InvoiceSchema>;
-	setValue: UseFormSetValue<InvoiceSchema>;
-	watch: UseFormWatch<InvoiceSchema>;
+	control: Control<InvoiceFormValues>;
+	getValues: UseFormGetValues<InvoiceFormValues>;
+	setValue: UseFormSetValue<InvoiceFormValues>;
+	watch: UseFormWatch<InvoiceFormValues>;
 }
 
 const InvoiceActivityCreationForm = ({

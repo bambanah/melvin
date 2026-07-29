@@ -1,3 +1,4 @@
+import { requiredDate } from "@/schema/fields";
 import { z } from "zod";
 
 export const timeOfDaySchema = z
@@ -25,7 +26,7 @@ export const workSessionTransportItemSchema = z.object({
 // replays them.
 export const workSessionStartSchema = z.object({
 	id: z.string().optional(),
-	date: z.date({ required_error: "Date is required" }),
+	date: requiredDate("Date is required"),
 	startTime: timeOfDaySchema,
 	// The client's tap-time stamp: offline captures are stamped when made, not
 	// when they sync, and last-write-wins compares these stamps.

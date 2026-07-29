@@ -36,7 +36,7 @@ export const activityRowSchema = z
 
 		if (!row.clientId) {
 			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
+				code: "custom",
 				message: "Client is required",
 				path: ["clientId"]
 			});
@@ -44,7 +44,7 @@ export const activityRowSchema = z
 
 		if (row.isGroup && row.groupClientIds.length === 0) {
 			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
+				code: "custom",
 				message: "At least one other participant is required",
 				path: ["groupClientIds"]
 			});
@@ -52,7 +52,7 @@ export const activityRowSchema = z
 
 		if (!row.timeRange.startTime || !row.timeRange.endTime) {
 			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
+				code: "custom",
 				message: "Time range is required",
 				path: ["timeRange"]
 			});
@@ -73,7 +73,7 @@ export const activityRowSchema = z
 				);
 				if (timeIssue) {
 					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
+						code: "custom",
 						message: timeIssue.message,
 						path: ["timeRange"]
 					});

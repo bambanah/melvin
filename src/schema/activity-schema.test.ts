@@ -44,3 +44,17 @@ test("accepts the distance-only shape with no times", () => {
 
 	expect(result.success).toBe(true);
 });
+
+test("reports a missing date with its own message", () => {
+	const result = activitySchema.safeParse({
+		supportItemId: base.supportItemId,
+		clientId: base.clientId,
+		startTime: "09:00",
+		endTime: "17:00"
+	});
+
+	expect(result.success).toBe(false);
+	if (!result.success) {
+		expect(result.error.issues[0]?.message).toBe("Date is required");
+	}
+});

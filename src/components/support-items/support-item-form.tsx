@@ -19,7 +19,10 @@ import {
 	SelectValue
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import type { SupportItemSchema } from "@/schema/support-item-schema";
+import type {
+	SupportItemFormValues,
+	SupportItemSchema
+} from "@/schema/support-item-schema";
 import { supportItemSchema } from "@/schema/support-item-schema";
 import { SupportItemByIdOutput } from "@/server/api/routers/support-item-router";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,7 +44,7 @@ const SupportItemForm = ({ existingSupportItem }: Props) => {
 	const createSupportItemMutation = trpc.supportItem.create.useMutation();
 	const updateSupportItemMutation = trpc.supportItem.update.useMutation();
 
-	const form = useForm<SupportItemSchema>({
+	const form = useForm<SupportItemFormValues, unknown, SupportItemSchema>({
 		resolver: zodResolver(supportItemSchema),
 		defaultValues: {
 			description: existingSupportItem?.description ?? "",
