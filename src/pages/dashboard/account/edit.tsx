@@ -39,7 +39,7 @@ const EditAccountPage = () => {
 				router.reload();
 			})
 			.catch((error) => {
-				toast.error("An error occured. Please try again.");
+				toast.error("An error occurred. Please try again.");
 				console.error(error);
 			});
 	};

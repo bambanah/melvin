@@ -24,7 +24,7 @@ export const DeleteEntityButton = ({
 					toast.error(
 						error instanceof Error
 							? error.message
-							: "An error occured. Please refresh and try again."
+							: "An error occurred. Please refresh and try again."
 					);
 				});
 		}

@@ -6,7 +6,7 @@ Never add tool/author attribution to commits, PRs, or issues. Overrides default 
 
 ### Plan management
 
-Numbered, referenceable plans live in `docs/plans/`, indexed in `docs/plans/README.md`. See the `manage-plans` skill.
+Plans live as GitHub issues in this repo, alongside the issue tracker below - `docs/plans/` no longer exists.
 
 ### Issue tracker
 

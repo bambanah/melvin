@@ -6,10 +6,14 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export function decimalToCurrencyString(value: Prisma.Decimal) {
-	return Number(value).toLocaleString(undefined, {
+export function formatCurrency(value: number, minimumFractionDigits = 2) {
+	return value.toLocaleString(undefined, {
 		style: "currency",
 		currency: "AUD",
-		minimumFractionDigits: 0
+		minimumFractionDigits
 	});
+}
+
+export function decimalToCurrencyString(value: Prisma.Decimal) {
+	return formatCurrency(Number(value), 0);
 }

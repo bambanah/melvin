@@ -83,6 +83,17 @@ export function displayInvoiceNo(
 	return `${invoiceNo}${invoiceVersionSuffix(versionNumber)}`;
 }
 
+/**
+ * The number an invoice currently trades under: its latest version's display
+ * number once sent, or the stored `invoiceNo` while it has never been sent.
+ */
+export function currentDisplayInvoiceNo(invoice: {
+	invoiceNo: string;
+	versions?: { displayInvoiceNo: string }[];
+}): string {
+	return invoice.versions?.[0]?.displayInvoiceNo ?? invoice.invoiceNo;
+}
+
 export function invoiceCandidatesFromPaymentAmount(
 	paymentAmount: number,
 	invoiceTotals: Map<number, string | string[]>

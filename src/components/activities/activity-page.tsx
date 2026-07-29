@@ -1,5 +1,6 @@
 import ActivityBreakdown from "@/components/activities/activity-breakdown";
 import ActivityTripSummary from "@/components/activities/activity-trip-summary";
+import { Fact, FactGrid } from "@/components/shared/fact";
 import { useRateContext } from "@/components/shared/use-rate-context";
 import { Badge, InvoiceStatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,8 +27,6 @@ import {
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
 import { toast } from "react-toastify";
 
 import { utcDate } from "@/lib/date-utils";
@@ -40,26 +39,6 @@ const formatDuration = (minutes: number) => {
 	if (mins === 0) return `${hours} hr`;
 	return `${hours} hr ${mins} min`;
 };
-
-function Fact({
-	icon: Icon,
-	label,
-	children
-}: {
-	icon: LucideIcon;
-	label: string;
-	children: ReactNode;
-}) {
-	return (
-		<div className="flex flex-col gap-1 px-4 py-3">
-			<dt className="text-foreground/50 flex items-center gap-1.5 text-xs font-medium tracking-wide uppercase">
-				<Icon className="h-3.5 w-3.5" />
-				{label}
-			</dt>
-			<dd className="text-sm font-medium">{children}</dd>
-		</div>
-	);
-}
 
 const ActivityPage = ({ activityId }: { activityId: string }) => {
 	const router = useRouter();
@@ -81,7 +60,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 					router.push("/dashboard/activities");
 				})
 				.catch(() => {
-					toast.error("An error occured. Please refresh and try again.");
+					toast.error("An error occurred. Please refresh and try again.");
 				});
 	};
 
@@ -185,7 +164,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 						</div>
 					</div>
 
-					<dl className="bg-card grid grid-cols-1 divide-y overflow-hidden rounded-xl border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+					<FactGrid>
 						{hasTimes ? (
 							<Fact icon={Clock} label="Time">
 								{format(utcDate(activity.startTime ?? new Date(0)), "h:mmaaa")}{" "}
@@ -225,7 +204,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 								<Badge variant="secondary">Pending</Badge>
 							)}
 						</Fact>
-					</dl>
+					</FactGrid>
 				</header>
 
 				<ActivityBreakdown
