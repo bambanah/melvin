@@ -1,3 +1,4 @@
+import { standaloneTravelDefaults } from "@/components/activities/activity-form-model";
 import ClientSelect from "@/components/forms/client-select";
 import SupportItemSelect from "@/components/forms/support-item-select";
 import { Button } from "@/components/ui/button";
@@ -85,12 +86,14 @@ const QuickAddForm = ({ day, open, onOpenChange, onSuggestTrip }: Props) => {
 			return;
 		}
 
-		if (client.distanceToClient) {
-			form.setValue("transitDistance", client.distanceToClient.toString());
+		// The return trip, matching what a standalone Activity is billed for.
+		const travel = standaloneTravelDefaults(client);
+		if (travel.transitDistance) {
+			form.setValue("transitDistance", travel.transitDistance);
 		}
 
-		if (client.travelTimeToClient) {
-			form.setValue("transitDuration", client.travelTimeToClient.toString());
+		if (travel.transitDuration) {
+			form.setValue("transitDuration", travel.transitDuration);
 		}
 	}, [client, form, isFetchingClient]);
 

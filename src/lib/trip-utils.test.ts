@@ -2,6 +2,7 @@ import {
 	calculateTripTransit,
 	sortActivitiesByTime,
 	standaloneTransit,
+	standaloneTransitFields,
 	standaloneTransitUpdates,
 	tripTransitUpdates,
 	type InterClientLeg,
@@ -230,6 +231,29 @@ test("standaloneTransit: null client yields zeros", () => {
 		transitDistance: 0,
 		transitDuration: 0,
 		durationCapped: false
+	});
+});
+
+test("standaloneTransitFields: the return trip, capped per leg", () => {
+	expect(
+		standaloneTransitFields({
+			distanceToClient: new Prisma.Decimal(5),
+			travelTimeToClient: new Prisma.Decimal(45)
+		})
+	).toEqual({ transitDistance: 10, transitDuration: 60 });
+});
+
+test("standaloneTransitFields: an unstored value is left unset, not billed as 0", () => {
+	expect(
+		standaloneTransitFields({
+			distanceToClient: null,
+			travelTimeToClient: new Prisma.Decimal(15)
+		})
+	).toEqual({ transitDistance: undefined, transitDuration: 30 });
+
+	expect(standaloneTransitFields(null)).toEqual({
+		transitDistance: undefined,
+		transitDuration: undefined
 	});
 });
 

@@ -2,6 +2,18 @@ import type { Prisma } from "@/generated/client";
 
 export const MAX_TRANSIT_DURATION_MINUTES = 30;
 
+/**
+ * A stored decimal as it can reach transit calculation: a Prisma Decimal on the
+ * server, or the string it serialises to over the wire.
+ */
+export type DecimalLike = Prisma.Decimal | string | number;
+
+/** The Client fields the home Transit Segments are derived from. */
+export interface TransitClient {
+	distanceToClient?: DecimalLike | null;
+	travelTimeToClient?: DecimalLike | null;
+}
+
 export interface TripActivity {
 	id: string;
 	startTime: Date | null;
@@ -107,12 +119,12 @@ export function calculateTripTransit(
 	return result;
 }
 
-export function standaloneTransit(
-	client: {
-		distanceToClient: Prisma.Decimal | null;
-		travelTimeToClient: Prisma.Decimal | null;
-	} | null
-): TransitValues {
+/**
+ * Provider Travel for an Activity that stands alone on its day: home → Client →
+ * home, so the Client's stored one-way distance and travel time each count
+ * twice, with the Travel Time Cap applied per leg.
+ */
+export function standaloneTransit(client: TransitClient | null): TransitValues {
 	const rawDuration = Number(client?.travelTimeToClient ?? 0);
 	const durationCapped = rawDuration > MAX_TRANSIT_DURATION_MINUTES;
 	const cappedDuration = Math.min(rawDuration, MAX_TRANSIT_DURATION_MINUTES);
@@ -121,6 +133,26 @@ export function standaloneTransit(
 		transitDistance: Number(client?.distanceToClient ?? 0) * 2,
 		transitDuration: cappedDuration * 2,
 		durationCapped
+	};
+}
+
+/**
+ * `standaloneTransit` as the transit fields of an Activity being created, or of
+ * a form prefilling them. A Client with no stored distance or travel time leaves
+ * the matching field unset rather than billing a 0 nobody entered - the single
+ * place that rule lives, so every creation path agrees on it.
+ */
+export function standaloneTransitFields(client: TransitClient | null): {
+	transitDistance?: number;
+	transitDuration?: number;
+} {
+	const transit = standaloneTransit(client);
+
+	return {
+		transitDistance:
+			client?.distanceToClient == null ? undefined : transit.transitDistance,
+		transitDuration:
+			client?.travelTimeToClient == null ? undefined : transit.transitDuration
 	};
 }
 

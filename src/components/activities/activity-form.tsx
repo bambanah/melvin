@@ -1,5 +1,6 @@
 import ClientSelect from "@/components/forms/client-select";
 import SupportItemSelect from "@/components/forms/support-item-select";
+import TransportItemsEditor from "@/components/forms/transport-items-editor";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -12,15 +13,24 @@ import {
 	FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger
 } from "@/components/ui/popover";
-import { stripTimezone, utcDate } from "@/lib/date-utils";
+import { stripTimezone } from "@/lib/date-utils";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { ActivitySchema, activitySchema } from "@/schema/activity-schema";
+import {
+	ABT_DISTANCE_FIELD,
+	activityFormDefaults,
+	mergeTransportItems,
+	otherTransportItems,
+	standaloneTravelDefaults,
+	toActivityPayload
+} from "@/components/activities/activity-form-model";
 import { ActivityByIdOutput } from "@/server/api/routers/activity-router";
 import { SupportItemListOutput } from "@/server/api/routers/support-item-router";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,8 +43,8 @@ import {
 	Unlink
 } from "lucide-react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 import { useSearchParams } from "next/navigation";
@@ -88,68 +98,59 @@ const ActivityForm = ({ existingActivity }: Props) => {
 	const form = useForm<ActivitySchema>({
 		resolver: zodResolver(activitySchema),
 		mode: "onBlur",
-		defaultValues: {
-			date: existingActivity?.date
-				? existingActivity.date
-				: stripTimezone(new Date()),
-			supportItemId: existingActivity?.supportItem?.id ?? "",
-			clientId: existingActivity?.client?.id ?? "",
-			startTime: existingActivity?.startTime
-				? format(utcDate(existingActivity.startTime), "HH:mm")
-				: "",
-			endTime: existingActivity?.endTime
-				? format(utcDate(existingActivity.endTime), "HH:mm")
-				: "",
-			itemDistance: existingActivity?.itemDistance ?? undefined,
-			transitDistance: existingActivity?.transitDistance
-				? existingActivity?.transitDistance.toString()
-				: "",
-			transitDuration: existingActivity?.transitDuration
-				? existingActivity?.transitDuration.toString()
-				: "",
-			transportItems: [{ type: "DISTANCE", amount: 0 }]
-		}
+		defaultValues: activityFormDefaults(existingActivity)
 	});
 
-	const { data: client, isFetching: isFetchingClient } =
-		trpc.clients.byId.useQuery(
-			{ id: form.watch("clientId") },
-			{ enabled: !!form.watch("clientId") }
-		);
+	const clientId = form.watch("clientId");
+	const supportItemId = form.watch("supportItemId");
 
+	// A per-km Support Item is billed by distance and an hourly one by its time
+	// span, so the rate type decides which fields the form shows and saves.
+	const selectedRateType = supportItems?.find(
+		(i) => i.id === supportItemId
+	)?.rateType;
+
+	const { data: client, isFetching: isFetchingClient } =
+		trpc.clients.byId.useQuery({ id: clientId }, { enabled: !!clientId });
+
+	// The Provider's default Support Item is a starting point for a new Activity
+	// only — never an override of the one an Activity is already billed under.
 	useEffect(() => {
-		if (defaultSupportItemId && supportItems) {
+		if (defaultSupportItemId && !form.getValues("supportItemId")) {
 			form.setValue("supportItemId", defaultSupportItemId);
 		}
-	}, [defaultSupportItemId, form, supportItems]);
+	}, [defaultSupportItemId, form]);
+
+	// Provider Travel auto-fills from the Client's stored distance as the return
+	// trip, once per Client change. Refilling on every render or refetch would
+	// overwrite both an existing Activity's saved travel and any manual override
+	// typed here.
+	const autoFilledClientId = useRef(existingActivity?.client?.id ?? null);
 
 	useEffect(() => {
-		if (!client || isFetchingClient) {
-			form.setValue("transitDistance", "");
-			form.setValue("transitDuration", "");
+		if (!clientId) {
+			if (autoFilledClientId.current !== null) {
+				autoFilledClientId.current = null;
+				form.setValue("transitDistance", "");
+				form.setValue("transitDuration", "");
+			}
 			return;
 		}
 
-		if (client.distanceToClient) {
-			form.setValue("transitDistance", client.distanceToClient.toString());
-		}
+		if (isFetchingClient || client?.id !== clientId) return;
+		if (autoFilledClientId.current === clientId) return;
 
-		if (client.travelTimeToClient) {
-			form.setValue("transitDuration", client.travelTimeToClient.toString());
-		}
-	}, [client, form, isFetchingClient]);
+		autoFilledClientId.current = clientId;
+		const travel = standaloneTravelDefaults(client);
+		form.setValue("transitDistance", travel.transitDistance);
+		form.setValue("transitDuration", travel.transitDuration);
+	}, [client, clientId, form, isFetchingClient]);
 
 	const onSubmit = (data: ActivitySchema) => {
-		const rateType = supportItems?.find(
-			(i) => i.id === data.supportItemId
-		)?.rateType;
-
-		const activityData: ActivitySchema = {
-			...data,
-			startTime: rateType === "KM" ? undefined : data.startTime,
-			endTime: rateType === "KM" ? undefined : data.endTime,
-			itemDistance: rateType === "KM" ? data.itemDistance : undefined
-		};
+		const activityData = toActivityPayload(
+			data,
+			supportItems?.find((i) => i.id === data.supportItemId)?.rateType
+		);
 
 		if (existingActivity?.id) {
 			modifyActivityMutation
@@ -272,8 +273,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 					/>
 				</div>
 
-				{supportItems?.find((i) => i.id === form.watch("supportItemId"))
-					?.rateType === "KM" ? (
+				{selectedRateType === "KM" ? (
 					<div className="flex w-full gap-4">
 						<FormField
 							name="itemDistance"
@@ -282,10 +282,23 @@ const ActivityForm = ({ existingActivity }: Props) => {
 								<FormItem className="">
 									<FormLabel required>Distance</FormLabel>
 									<FormControl>
-										<Input type="time" {...field} />
+										<Input
+											type="number"
+											step={1}
+											min={0}
+											{...field}
+											value={field.value ?? ""}
+											onChange={(e) =>
+												field.onChange(
+													e.target.value === ""
+														? undefined
+														: parseInt(e.target.value, 10)
+												)
+											}
+										/>
 									</FormControl>
 									<FormDescription>
-										Distance travelled with client
+										Distance travelled with client (in km)
 									</FormDescription>
 									<FormMessage />
 								</FormItem>
@@ -375,7 +388,9 @@ const ActivityForm = ({ existingActivity }: Props) => {
 											{...field}
 										/>
 									</FormControl>
-									<FormDescription>Distance to client (in km)</FormDescription>
+									<FormDescription>
+										Return trip to client (in km)
+									</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}
@@ -397,7 +412,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 										/>
 									</FormControl>
 									<FormDescription>
-										Duration of drive (in minutes)
+										Return drive time (in minutes)
 									</FormDescription>
 									<FormMessage />
 								</FormItem>
@@ -406,7 +421,7 @@ const ActivityForm = ({ existingActivity }: Props) => {
 					</div>
 
 					<FormField
-						name="transportItems.0.amount"
+						name={ABT_DISTANCE_FIELD}
 						control={form.control}
 						render={({ field }) => (
 							<FormItem className="w-full grow">
@@ -415,7 +430,10 @@ const ActivityForm = ({ existingActivity }: Props) => {
 									<Input
 										type="number"
 										step={0.1}
+										min={0}
 										{...field}
+										value={field.value ? field.value : ""}
+										placeholder="0"
 										onChange={(e) =>
 											field.onChange(parseFloat(e.target.value) || 0)
 										}
@@ -428,6 +446,22 @@ const ActivityForm = ({ existingActivity }: Props) => {
 							</FormItem>
 						)}
 					/>
+
+					<div className="flex w-full flex-col gap-2">
+						<Label>Parking, Tolls &amp; Other</Label>
+						<Controller
+							control={form.control}
+							name="transportItems"
+							render={({ field }) => (
+								<TransportItemsEditor
+									value={otherTransportItems(field.value)}
+									onChange={(items) =>
+										field.onChange(mergeTransportItems(field.value, items))
+									}
+								/>
+							)}
+						/>
+					</div>
 				</div>
 
 				<div className="mt-4 flex justify-center gap-4">

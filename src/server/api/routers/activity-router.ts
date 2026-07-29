@@ -429,8 +429,10 @@ export const activityRouter = router({
 					...activityData,
 					startTime,
 					endTime,
-					transitDistance: activityData.transitDistance || undefined,
-					transitDuration: activityData.transitDuration || undefined,
+					// Blanked out means the Activity has no Provider Travel, so clear it
+					// rather than leaving the previous value in place.
+					transitDistance: activityData.transitDistance || null,
+					transitDuration: activityData.transitDuration || null,
 					transportItems:
 						transportItems && transportItems.length > 0
 							? {
@@ -544,6 +546,19 @@ export const activityRouter = router({
 
 			const { activities, tripId } = await ctx.prisma.$transaction((tx) =>
 				createActivityBatch(tx, ctx.session.user.id, sorted, (created) => {
+					// A lone Activity forms no Trip but still drives home → Client →
+					// home, so it bills the standalone return trip - the same travel it
+					// would get from Promotion or from being dropped out of a Trip.
+					// Transit entered by hand stays untouched.
+					if (created.length === 1) {
+						const [only] = created;
+						const handEntered =
+							Number(only.transitDistance ?? 0) > 0 ||
+							Number(only.transitDuration ?? 0) > 0;
+
+						return handEntered ? null : { activities: created, legs: [] };
+					}
+
 					// A manually entered day only becomes a Trip when its Activities
 					// run back to back (end time equals the next start time); anything
 					// else keeps the transit that was entered by hand.
