@@ -1,5 +1,11 @@
+import {
+	activityFormDefaults,
+	toActivityPayload
+} from "@/components/activities/activity-form-model";
 import { Prisma } from "@/generated/client";
+import { utcDate } from "@/lib/date-utils";
 import prisma from "@/server/prisma";
+import { format } from "date-fns";
 import superjson from "superjson";
 import { beforeEach, expect, test } from "vitest";
 import { callerFor, createTestUser, resetDb } from "../test/harness";
@@ -105,4 +111,100 @@ test("activity.list serializes Decimal fields in the current on-the-wire shape",
 	expect(wire.json.transitDistance).toBe("12.5");
 	expect(wire.meta?.values ?? {}).not.toHaveProperty("transitDistance");
 	expect(wire.meta?.values).toHaveProperty("date");
+});
+
+// The edit form's round trip: byId -> form defaults -> submit payload -> modify.
+// Exercised end to end because the loss the form used to cause was invisible at
+// either end on its own - the payload looked valid, it just omitted fields.
+test("editing an activity through the form's transforms keeps its transport and travel", async () => {
+	const user = await createTestUser();
+	const caller = callerFor(user);
+
+	const client = await caller.clients.create({ client: { name: "Jane" } });
+	const supportItem = await createSupportItem(user.id);
+
+	const created = await caller.activity.add({
+		activity: {
+			clientId: client.id,
+			supportItemId: supportItem.id,
+			date: new Date("2024-01-01"),
+			startTime: "09:00",
+			endTime: "10:00",
+			itemDistance: 0,
+			transitDistance: "12.5",
+			transitDuration: "20",
+			transportItems: [
+				{ type: "DISTANCE", amount: 8.4 },
+				{ type: "PARKING", amount: 6.5, note: "carpark" }
+			]
+		}
+	});
+
+	const existing = await caller.activity.byId({ id: created.id });
+	const defaults = activityFormDefaults(existing);
+
+	// The worker only edits the end time; everything else must survive untouched.
+	await caller.activity.modify({
+		id: created.id,
+		activity: toActivityPayload({ ...defaults, endTime: "11:00" }, "HOUR")
+	});
+
+	const saved = await caller.activity.byId({ id: created.id });
+
+	expect(format(utcDate(saved.endTime!), "HH:mm")).toBe("11:00");
+	expect(saved.supportItem.id).toBe(supportItem.id);
+	expect(saved.transitDistance?.toString()).toBe("12.5");
+	expect(saved.transitDuration?.toString()).toBe("20");
+	expect(
+		saved.transportItems
+			.map((item) => ({ type: item.type, amount: Number(item.amount) }))
+			.sort((a, b) => a.type.localeCompare(b.type))
+	).toEqual([
+		{ type: "DISTANCE", amount: 8.4 },
+		{ type: "PARKING", amount: 6.5 }
+	]);
+});
+
+test("clearing an activity's provider travel and transport removes them", async () => {
+	const user = await createTestUser();
+	const caller = callerFor(user);
+
+	const client = await caller.clients.create({ client: { name: "Jane" } });
+	const supportItem = await createSupportItem(user.id);
+
+	const created = await caller.activity.add({
+		activity: {
+			clientId: client.id,
+			supportItemId: supportItem.id,
+			date: new Date("2024-01-01"),
+			startTime: "09:00",
+			endTime: "10:00",
+			itemDistance: 0,
+			transitDistance: "12.5",
+			transportItems: [{ type: "DISTANCE", amount: 8.4 }]
+		}
+	});
+
+	const defaults = activityFormDefaults(
+		await caller.activity.byId({ id: created.id })
+	);
+
+	await caller.activity.modify({
+		id: created.id,
+		activity: toActivityPayload(
+			{
+				...defaults,
+				transitDistance: "",
+				transitDuration: "",
+				transportItems: [{ type: "DISTANCE", amount: 0 }]
+			},
+			"HOUR"
+		)
+	});
+
+	const saved = await caller.activity.byId({ id: created.id });
+
+	expect(saved.transitDistance).toBeNull();
+	expect(saved.transitDuration).toBeNull();
+	expect(saved.transportItems).toEqual([]);
 });

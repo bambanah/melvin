@@ -5,6 +5,7 @@ import {
 import { buildInvoiceVersionContent } from "@/lib/invoice-version";
 import { loadInvoiceForPdf } from "@/lib/pdf-generation";
 import { baseListQueryInput } from "@/lib/trpc";
+import { standaloneTransitFields } from "@/lib/trip-utils";
 import { activitySchema } from "@/schema/activity-schema";
 import {
 	InvoiceSchema,
@@ -122,8 +123,10 @@ const generateNestedWriteForActivities = (
 				startTime: parseUtcTime(activity.startTime),
 				endTime: parseUtcTime(activity.endTime),
 				clientId: client.id,
-				transitDistance: client.distanceToClient ?? undefined,
-				transitDuration: client.travelTimeToClient ?? undefined,
+				// Each Activity created here stands alone - the invoice form builds no
+				// Trips - so its Provider Travel is the return trip home → Client →
+				// home, capped per leg.
+				...standaloneTransitFields(client),
 				supportItemId,
 				groupSize,
 				ownerId
@@ -151,8 +154,10 @@ const generateNestedWriteForGroupActivities = (
 					startTime: parseUtcTime(activity.startTime),
 					endTime: parseUtcTime(activity.endTime),
 					clientId: groupClientId,
-					transitDistance: client?.distanceToClient ?? undefined,
-					transitDuration: client?.travelTimeToClient ?? undefined,
+					// As above: the mirrored Activity bills its own participant's return
+					// trip. (Unlike a promoted group Session, where the day's travel
+					// bills once - see `createActivityBatch`.)
+					...standaloneTransitFields(client ?? null),
 					groupSize,
 					ownerId
 				}));

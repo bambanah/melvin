@@ -1,4 +1,5 @@
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
+import type { ActivityTransportType } from "@/schema/activity-schema";
 import prisma from "@/server/prisma";
 import { Page } from "@playwright/test";
 import { randomUUID } from "crypto";
@@ -378,7 +379,16 @@ export async function createRealisticInvoice() {
 export async function createRandomActivity(
 	clientId: string,
 	supportItemId: string,
-	times?: { startTime: string; endTime: string }
+	times?: { startTime: string; endTime: string },
+	billing?: {
+		transitDistance?: number;
+		transitDuration?: number;
+		transportItems?: {
+			type: ActivityTransportType;
+			amount: number;
+			note?: string;
+		}[];
+	}
 ) {
 	const startTime = times?.startTime ?? "09:15";
 	const endTime = times?.endTime ?? "10:00";
@@ -394,6 +404,11 @@ export async function createRandomActivity(
 			// AEST), which can wrap a same-day range into a reversed one.
 			startTime: new Date(`1970-01-01T${startTime}:00.000Z`),
 			endTime: new Date(`1970-01-01T${endTime}:00.000Z`),
+			transitDistance: billing?.transitDistance,
+			transitDuration: billing?.transitDuration,
+			transportItems: billing?.transportItems
+				? { create: billing.transportItems }
+				: undefined,
 			ownerId: testUser.id
 		}
 	});

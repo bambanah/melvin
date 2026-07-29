@@ -20,15 +20,16 @@ export const invoiceSchema = z.object({
 				.array(z.string())
 				.max(MAX_ADDITIONAL_GROUP_PARTICIPANTS)
 				.default([]),
+			// No transit fields: the Provider Travel of an Activity created here is
+			// derived from its Client's stored distance, never submitted - see
+			// `standaloneTransitFields` in the invoice router.
 			activities: z.array(
 				z
 					.object({
 						date: z.date(),
 						startTime: z.string(),
 						endTime: z.string(),
-						itemDistance: z.number(),
-						transitDistance: z.number().optional(),
-						transitDuration: z.number().optional()
+						itemDistance: z.number()
 					})
 					.partial({ startTime: true, endTime: true, itemDistance: true })
 					.refine(
