@@ -106,8 +106,16 @@ A non-distance Activity Based Transport cost — parking, a toll, or other — b
 **Total Owing**
 The amount outstanding across all Sent Invoices. Each Invoice contributes its latest Invoice Version's frozen total — never a live recompute — so later rate or catalogue edits can't move an amount already owed.
 
+**Total Billed**
+What the Provider has earned across a Financial Year. Each Sent or Paid Invoice contributes its latest Invoice Version's frozen total - never a live recompute, and never the sum of an Amendment's versions - attributed to the Financial Year containing the Invoice's date, the document date the Client sees. Drafts are excluded, the same rule that makes an Activity on a Draft Invoice an Unbilled Activity. Contrast **Total Owing**, which looks forward at what is outstanding now.
+
 **Payment Matching**
 Working backwards from a received payment amount to the combination(s) of Sent Invoices whose frozen totals sum exactly to it, so a lump-sum bank deposit can be resolved to the invoices it pays.
+
+## Reporting
+
+**Financial Year**
+The Australian tax year: 1 July to 30 June, labelled by the two calendar years it spans - `FY 25-26` opens on 1 July 2025. The only reporting period Melvin offers. The year currently in progress is always shown as partial ("to date"), so its short total does not read as a downturn beside complete years.
 
 ## NDIS Pricing
 

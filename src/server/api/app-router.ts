@@ -4,6 +4,7 @@ import { clientRouter } from "./routers/client-router";
 import { invoiceRouter } from "./routers/invoice-router";
 import { logRouter } from "./routers/log-router";
 import { pdfRouter } from "./routers/pdf-router";
+import { reportRouter } from "./routers/report-router";
 import { supportItemRouter } from "./routers/support-item-router";
 import { tripRouter } from "./routers/trip-router";
 import { userRouter } from "./routers/user-router";
@@ -16,7 +17,8 @@ export const appRouter = router({
 	clients: clientRouter,
 	pdf: pdfRouter,
 	trip: tripRouter,
-	log: logRouter
+	log: logRouter,
+	report: reportRouter
 });
 
 export type AppRouter = typeof appRouter;
