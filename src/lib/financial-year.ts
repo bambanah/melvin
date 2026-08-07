@@ -22,22 +22,9 @@ const twoDigit = (year: number) => String(year % 100).padStart(2, "0");
 export const financialYearLabel = (financialYear: FinancialYear): string =>
 	`FY ${twoDigit(financialYear)}-${twoDigit(financialYear + 1)}`;
 
-export const financialYearRange = (financialYear: FinancialYear) => ({
-	start: new Date(Date.UTC(financialYear, FY_START_MONTH, 1)),
-	endExclusive: new Date(Date.UTC(financialYear + 1, FY_START_MONTH, 1))
-});
-
 /** 0 for July through 11 for June. */
 export const monthIndexInFinancialYear = (date: Date | string): number =>
 	(utcDate(date).getMonth() - FY_START_MONTH + 12) % 12;
-
-export interface FinancialYearMonth {
-	/** e.g. "Jul 25" */
-	label: string;
-	year: number;
-	/** Zero-indexed calendar month. */
-	month: number;
-}
 
 const MONTH_NAMES = [
 	"Jan",
@@ -54,28 +41,13 @@ const MONTH_NAMES = [
 	"Dec"
 ];
 
-/** The twelve months of a Financial Year, in order from July. */
-export const financialYearMonths = (
+/** The twelve month labels of a Financial Year, in order from July. */
+export const financialYearMonthLabels = (
 	financialYear: FinancialYear
-): FinancialYearMonth[] =>
+): string[] =>
 	Array.from({ length: 12 }, (_, index) => {
 		const month = (FY_START_MONTH + index) % 12;
 		const year = financialYear + (month < FY_START_MONTH ? 1 : 0);
 
-		return { label: `${MONTH_NAMES[month]} ${twoDigit(year)}`, year, month };
+		return `${MONTH_NAMES[month]} ${twoDigit(year)}`;
 	});
-
-/**
- * Every Financial Year from the earliest to the latest given, gaps included -
- * a year with no Invoices still belongs on an axis that spans it.
- */
-export const financialYearsSpanning = (
-	financialYears: FinancialYear[]
-): FinancialYear[] => {
-	if (financialYears.length === 0) return [];
-
-	const first = Math.min(...financialYears);
-	const last = Math.max(...financialYears);
-
-	return Array.from({ length: last - first + 1 }, (_, index) => first + index);
-};

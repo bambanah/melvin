@@ -2,9 +2,8 @@ import type { InvoiceVersionContent } from "@/schema/invoice-version-schema";
 import { utcDate } from "./date-utils";
 import {
 	financialYearLabel,
-	financialYearMonths,
+	financialYearMonthLabels,
 	financialYearOf,
-	financialYearsSpanning,
 	monthIndexInFinancialYear,
 	type FinancialYear
 } from "./financial-year";
@@ -136,16 +135,25 @@ export function buildBillingReport(
 		);
 	}
 
-	const years = financialYearsSpanning([
-		...totalsByYear.keys(),
-		currentFinancialYear,
-		selectedFinancialYear
-	]).map((financialYear) => ({
-		financialYear,
-		label: financialYearLabel(financialYear),
-		total: money(totalsByYear.get(financialYear) ?? 0),
-		partial: financialYear === currentFinancialYear
-	}));
+	// Only years the Provider actually invoiced in, plus the year in progress
+	// (the default selection, which must be there to click even when empty) and
+	// whatever year is selected.
+	const years = [
+		...new Set([
+			...totalsByYear.keys(),
+			currentFinancialYear,
+			selectedFinancialYear
+		])
+	]
+		.sort((a, b) => a - b)
+		.map((financialYear) => ({
+			financialYear,
+			label: financialYearLabel(financialYear),
+			total: money(totalsByYear.get(financialYear) ?? 0),
+			// A year that has not finished cannot show a final total. Anything
+			// beyond the current year is unfinished too, not complete.
+			partial: financialYear >= currentFinancialYear
+		}));
 
 	const selected = dated.filter(
 		(invoice) => invoice.financialYear === selectedFinancialYear
@@ -215,8 +223,8 @@ function monthlyTotals(
 		totals[index] += invoice.content.total;
 	}
 
-	return financialYearMonths(financialYear).map((month, index) => ({
-		label: month.label,
+	return financialYearMonthLabels(financialYear).map((label, index) => ({
+		label,
 		total: money(totals[index] ?? 0)
 	}));
 }
@@ -255,27 +263,18 @@ function supportItemTotals(
 	invoices: DatedInvoice[],
 	totalBilled: number
 ): SupportItemTotal[] {
-	const byCode = new Map<
-		string,
-		{ description: string; describedAt: number; total: number }
-	>();
+	const byCode = new Map<string, { description: string; total: number }>();
 
 	for (const invoice of invoices) {
-		const invoicedAt = utcDate(invoice.date).getTime();
-
 		for (const line of invoice.content.lines) {
 			if (line.kind !== "SUPPORT") continue;
 
 			const existing = byCode.get(line.supportItemCode);
-			// The most recently invoiced description wins, so a renamed item reads
-			// under the name it was last billed as.
-			const describes = !existing || invoicedAt >= existing.describedAt;
 
 			byCode.set(line.supportItemCode, {
-				description: describes
-					? line.description
-					: (existing?.description ?? line.description),
-				describedAt: describes ? invoicedAt : (existing?.describedAt ?? 0),
+				// Labelled from the frozen line, never the live catalogue, so a code
+				// that has since been renamed or retired still renders.
+				description: existing?.description ?? line.description,
 				total: (existing?.total ?? 0) + line.total
 			});
 		}

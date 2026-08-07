@@ -1,15 +1,9 @@
 import type { ChartConfig } from "@/components/ui/chart";
 
 /**
- * The one series every chart on this page draws. `--report-series` already
- * resolves per theme, and unlike the `--color-total` this config produces it
- * is also readable outside a `ChartContainer` - the magnitude bars beside the
- * breakdown tables are plain divs.
- *
- * No chart on this page colours by category, so there is nothing for a
- * colour-vision deficiency to conflate: the year bars are one series, the
- * trend is one line, and the Client bars ramp by magnitude with the figure
- * printed alongside.
+ * The one series every chart on this page draws. Unlike the `--color-total`
+ * the config below produces, this reads outside a `ChartContainer` too - the
+ * magnitude bars beside the tables are plain divs.
  */
 export const REPORT_SERIES_COLOR = "var(--report-series)";
 
