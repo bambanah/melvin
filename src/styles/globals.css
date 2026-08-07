@@ -103,6 +103,10 @@
 	--chart-3: oklch(0.398 0.07 227.392);
 	--chart-4: oklch(0.828 0.189 84.429);
 	--chart-5: oklch(0.769 0.188 70.08);
+	/* The single series every Reports chart draws. Measured 4.6:1 against the
+	   light card; the dark override below is a different token because dark
+	   --chart-1 only reaches 1.9:1, under the 3:1 a filled shape needs. */
+	--report-series: var(--chart-1);
 	--sidebar: oklch(0.985 0 0);
 	--sidebar-foreground: oklch(0.145 0 0);
 	--sidebar-primary: oklch(0.205 0 0);
@@ -140,6 +144,8 @@
 	--chart-3: oklch(0.769 0.188 70.08);
 	--chart-4: oklch(0.627 0.265 303.9);
 	--chart-5: oklch(0.645 0.246 16.439);
+	/* 6.3:1 against the dark card. */
+	--report-series: var(--chart-3);
 	--sidebar: oklch(0.205 0 0);
 	--sidebar-foreground: oklch(0.985 0 0);
 	--sidebar-primary: oklch(0.488 0.243 264.376);

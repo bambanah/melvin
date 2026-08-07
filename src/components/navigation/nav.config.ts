@@ -14,5 +14,9 @@ export const navConfig: { title: string; href: string }[] = [
 	{
 		title: "Items",
 		href: "/dashboard/support-items"
+	},
+	{
+		title: "Reports",
+		href: "/dashboard/reports"
 	}
 ];
