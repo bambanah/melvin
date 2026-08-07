@@ -16,10 +16,10 @@ import {
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
-import { BreakdownList, BreakdownRow } from "./breakdown-rows";
 import { FinancialYearChart } from "./financial-year-chart";
 import { MonthlyTrendChart } from "./monthly-trend-chart";
 import { ReportSection } from "./report-section";
+import { ShareRow, ShareRows } from "./share-rows";
 import { TravelBreakdown } from "./travel-breakdown";
 
 /**
@@ -58,32 +58,26 @@ function TotalBilledFact({
 	const Trend = rising ? TrendingUp : TrendingDown;
 
 	return (
-		<div className="flex flex-col gap-1 px-4 py-3">
-			<dt className="text-foreground/50 flex items-center gap-1.5 text-xs font-medium tracking-wide uppercase">
-				<Wallet className="h-3.5 w-3.5" />
-				Total billed
-			</dt>
-			<dd className="flex flex-col gap-0.5">
-				<span className="text-2xl font-semibold tracking-tight tabular-nums">
-					{formatCurrency(report.totalBilled)}
+		<Fact icon={Wallet} label="Total billed">
+			<span className="block text-2xl font-semibold tracking-tight tabular-nums">
+				{formatCurrency(report.totalBilled)}
+			</span>
+			{change && (
+				<span className="text-foreground/50 flex items-center gap-1 text-xs font-normal">
+					<Trend className="h-3.5 w-3.5" />
+					{rising ? "+" : "−"}
+					{formatCurrency(Math.abs(change.change))}
+					{change.changeFraction !== undefined &&
+						` (${rising ? "+" : "−"}${Math.abs(
+							change.changeFraction * 100
+						).toFixed(0)}%)`}{" "}
+					vs {change.label}
+					{/* A part-finished year is not down on a finished one - say so,
+					    or the chart's "to date" hatch is undone by this line. */}
+					{partial && " so far"}
 				</span>
-				{change && (
-					<span className="text-foreground/50 flex items-center gap-1 text-xs">
-						<Trend className="h-3.5 w-3.5" />
-						{rising ? "+" : "−"}
-						{formatCurrency(Math.abs(change.change))}
-						{change.changeFraction !== undefined &&
-							` (${rising ? "+" : "−"}${Math.abs(
-								change.changeFraction * 100
-							).toFixed(0)}%)`}{" "}
-						vs {change.label}
-						{/* A part-finished year is not down on a finished one - say so,
-						    or the chart's "to date" hatch is undone by this line. */}
-						{partial && " so far"}
-					</span>
-				)}
-			</dd>
-		</div>
+			)}
+		</Fact>
 	);
 }
 
@@ -130,7 +124,6 @@ export default function ReportsPage() {
 			(year) => year.financialYear === report.selectedFinancialYear
 		)?.partial ?? false;
 	const maxClient = report.clients[0]?.total ?? 0;
-	const maxSupportItem = report.supportItems[0]?.total ?? 0;
 
 	return (
 		<ListPage>
@@ -180,9 +173,9 @@ export default function ReportsPage() {
 					</ReportSection>
 
 					<ReportSection title="Clients">
-						<BreakdownList>
+						<ShareRows>
 							{report.clients.map((client) => (
-								<BreakdownRow
+								<ShareRow
 									key={client.clientId}
 									label={client.clientName}
 									total={client.total}
@@ -191,22 +184,21 @@ export default function ReportsPage() {
 									href={`/dashboard/invoices?client=${client.clientId}`}
 								/>
 							))}
-						</BreakdownList>
+						</ShareRows>
 					</ReportSection>
 
 					<ReportSection title="Support items" caption="Support delivery only">
-						<BreakdownList>
+						<ShareRows>
 							{report.supportItems.map((item) => (
-								<BreakdownRow
+								<ShareRow
 									key={item.supportItemCode}
 									label={item.description}
 									sublabel={item.supportItemCode}
 									total={item.total}
 									share={item.share}
-									max={maxSupportItem}
 								/>
 							))}
-						</BreakdownList>
+						</ShareRows>
 					</ReportSection>
 
 					<TravelBreakdown travel={report.travel} />

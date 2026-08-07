@@ -6,10 +6,9 @@ import { rampOpacity, REPORT_SERIES_COLOR } from "./report-chart";
 const formatShare = (share: number) => `${(share * 100).toFixed(1)}%`;
 
 /**
- * A magnitude bar drawn beside the figure it restates. Length carries the
- * magnitude; the single-hue ramp reinforces it. Colour never encodes identity
- * here - a categorical palette would repaint the surviving rows every time the
- * selected Financial Year changed.
+ * Length carries the magnitude; the single-hue ramp reinforces it. Colour never
+ * encodes identity - a categorical palette would repaint the surviving rows
+ * every time the selected Financial Year changed.
  */
 function MagnitudeBar({ value, max }: { value: number; max: number }) {
 	return (
@@ -26,16 +25,17 @@ function MagnitudeBar({ value, max }: { value: number; max: number }) {
 	);
 }
 
-interface RowProps {
+interface ShareRowProps {
 	label: string;
 	sublabel?: string;
 	total: number;
 	share: number;
-	max: number;
+	/** The largest total in the list. Omit for a row with no magnitude bar. */
+	max?: number;
 	href?: string;
 }
 
-function RowBody({ label, sublabel, total, share, max }: RowProps) {
+function RowBody({ label, sublabel, total, share, max }: ShareRowProps) {
 	return (
 		<>
 			<div className="flex items-baseline justify-between gap-4">
@@ -54,32 +54,29 @@ function RowBody({ label, sublabel, total, share, max }: RowProps) {
 					</span>
 				</div>
 			</div>
-			<MagnitudeBar value={total} max={max} />
+			{max !== undefined && <MagnitudeBar value={total} max={max} />}
 		</>
 	);
 }
 
-export function BreakdownRow(props: RowProps) {
+/** One row of a sorted breakdown: what, how much, and what share of the total. */
+export function ShareRow(props: ShareRowProps) {
 	const className = "flex flex-col gap-2 px-5 py-3.5";
 
 	return props.href ? (
 		<Link
 			href={props.href}
 			className={`${className} hover:bg-muted/50 transition-colors`}
-			title={`${props.label} - ${formatCurrency(props.total)}`}
 		>
 			<RowBody {...props} />
 		</Link>
 	) : (
-		<div
-			className={className}
-			title={`${props.label} - ${formatCurrency(props.total)}`}
-		>
+		<div className={className}>
 			<RowBody {...props} />
 		</div>
 	);
 }
 
-export function BreakdownList({ children }: { children: ReactNode }) {
+export function ShareRows({ children }: { children: ReactNode }) {
 	return <div className="divide-y">{children}</div>;
 }

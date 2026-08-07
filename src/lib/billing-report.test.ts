@@ -103,7 +103,7 @@ describe("Total Billed", () => {
 });
 
 describe("Financial Year series", () => {
-	test("spans every year between the earliest invoice and the year in progress", () => {
+	test("offers only years with invoices, plus the year in progress", () => {
 		const result = report([
 			invoice("2023-08-01", "Alice", [line({ total: 100 })]),
 			invoice("2025-08-01", "Alice", [line({ total: 300 })])
@@ -111,7 +111,6 @@ describe("Financial Year series", () => {
 
 		expect(result.years).toEqual([
 			{ financialYear: 2023, label: "FY 23-24", total: 100, partial: false },
-			{ financialYear: 2024, label: "FY 24-25", total: 0, partial: false },
 			{ financialYear: 2025, label: "FY 25-26", total: 300, partial: true }
 		]);
 	});
@@ -133,13 +132,24 @@ describe("Financial Year series", () => {
 		);
 
 		expect(result.years.map((year) => year.financialYear)).toEqual([
-			2025, 2026, 2027
+			2025, 2027
 		]);
+	});
+
+	test("a year that has not finished is never shown as a final total", () => {
+		const result = report([
+			invoice("2024-08-01", "Alice", [line({ total: 100 })]),
+			invoice("2025-08-01", "Alice", [line({ total: 100 })]),
+			invoice("2026-08-01", "Alice", [line({ total: 100 })])
+		]);
+
 		expect(
-			result.years.every(
-				(year) => year.partial === (year.financialYear === 2025)
-			)
-		).toBe(true);
+			result.years.map((year) => [year.financialYear, year.partial])
+		).toEqual([
+			[2024, false],
+			[2025, true],
+			[2026, true]
+		]);
 	});
 });
 

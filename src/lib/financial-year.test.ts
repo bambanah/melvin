@@ -1,10 +1,8 @@
 import { describe, expect, test } from "vitest";
 import {
 	financialYearLabel,
-	financialYearMonths,
+	financialYearMonthLabels,
 	financialYearOf,
-	financialYearRange,
-	financialYearsSpanning,
 	monthIndexInFinancialYear
 } from "./financial-year";
 
@@ -36,15 +34,6 @@ describe("financialYearLabel", () => {
 	});
 });
 
-describe("financialYearRange", () => {
-	test("runs from 1 July to the following 1 July, exclusive", () => {
-		expect(financialYearRange(2025)).toEqual({
-			start: new Date("2025-07-01T00:00:00.000Z"),
-			endExclusive: new Date("2026-07-01T00:00:00.000Z")
-		});
-	});
-});
-
 describe("monthIndexInFinancialYear", () => {
 	test("July is the first month and June the last", () => {
 		expect(monthIndexInFinancialYear("2025-07-15T00:00:00.000Z")).toBe(0);
@@ -56,24 +45,12 @@ describe("monthIndexInFinancialYear", () => {
 	});
 });
 
-describe("financialYearMonths", () => {
+describe("financialYearMonthLabels", () => {
 	test("lists twelve months from July to June", () => {
-		const months = financialYearMonths(2025);
+		const months = financialYearMonthLabels(2025);
 
 		expect(months).toHaveLength(12);
-		expect(months[0]).toEqual({ label: "Jul 25", year: 2025, month: 6 });
-		expect(months[11]).toEqual({ label: "Jun 26", year: 2026, month: 5 });
-	});
-});
-
-describe("financialYearsSpanning", () => {
-	test("fills the gaps between the earliest and latest year", () => {
-		expect(financialYearsSpanning([2023, 2026, 2023])).toEqual([
-			2023, 2024, 2025, 2026
-		]);
-	});
-
-	test("is empty for no years at all", () => {
-		expect(financialYearsSpanning([])).toEqual([]);
+		expect(months[0]).toBe("Jul 25");
+		expect(months[11]).toBe("Jun 26");
 	});
 });
