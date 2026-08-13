@@ -132,7 +132,9 @@ test("reset clears all owned data and nulls the profile, leaving other users unt
 		where: { id: owner.id }
 	});
 	expect(nulled.abn).toBeNull();
-	expect(nulled.name).toBeNull();
+	// Name survives a reset - it is part of the auth identity (#418), not the
+	// billing profile.
+	expect(nulled.name).toBe(PROFILE.name);
 	expect(nulled.bankName).toBeNull();
 	expect(nulled.bankNumber).toBeNull();
 	expect(nulled.bsb).toBeNull();
@@ -222,12 +224,14 @@ test("reset wipes everything including a sent invoice and its frozen version", a
 		})
 	).toBe(0);
 
-	// Profile fields all nulled.
+	// Billing profile fields all nulled.
 	const nulled = await prisma.user.findUniqueOrThrow({
 		where: { id: owner.id }
 	});
 	expect(nulled.abn).toBeNull();
-	expect(nulled.name).toBeNull();
+	// Name survives a reset - it is part of the auth identity (#418), not the
+	// billing profile.
+	expect(nulled.name).toBe(PROFILE.name);
 	expect(nulled.bankName).toBeNull();
 	expect(nulled.bankNumber).toBeNull();
 	expect(nulled.bsb).toBeNull();

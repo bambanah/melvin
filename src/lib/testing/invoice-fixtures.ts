@@ -63,7 +63,7 @@ const makeUser = (
 	createdAt: FIXED_TIMESTAMP,
 	updatedAt: FIXED_TIMESTAMP,
 	name: "Marlee Provider",
-	emailVerified: null,
+	emailVerified: true,
 	image: null,
 	abn: BigInt("12345678901"),
 	bankName: "Sample Bank",

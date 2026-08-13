@@ -1,7 +1,8 @@
 import Heading from "@/components/ui/heading";
 import Logo from "@/components/ui/logo";
+import { auth } from "@/server/auth";
+import { fromNodeHeaders } from "better-auth/node";
 import { GetServerSideProps } from "next";
-import { getSession } from "next-auth/react";
 import Link from "next/link";
 
 const DashboardPage = () => {
@@ -27,7 +28,9 @@ const DashboardPage = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-	const session = await getSession(context);
+	const session = await auth.api.getSession({
+		headers: fromNodeHeaders(context.req.headers)
+	});
 
 	if (session) {
 		return {

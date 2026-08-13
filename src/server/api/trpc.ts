@@ -1,18 +1,5 @@
-import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-
 import { ownedDb } from "@/server/api/owned";
-import { getServerAuthSession } from "@/server/auth";
-import prisma from "@/server/prisma";
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const createContext = async ({ req, res }: CreateNextContextOptions) => {
-	const session = await getServerAuthSession({ req, res });
-
-	return {
-		prisma,
-		session
-	};
-};
+import type { createContext } from "@/server/api/context";
 
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";

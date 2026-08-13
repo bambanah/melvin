@@ -1,7 +1,6 @@
 import { ThemeProvider } from "@/components/theme-provider";
 import { trpc } from "@/lib/trpc";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { Inter, Noto_Serif, Patua_One, Roboto_Mono } from "next/font/google";
 import Head from "next/head";
@@ -30,7 +29,7 @@ const robotoMono = Roboto_Mono({
 	variable: "--font-roboto-mono"
 });
 
-function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+function App({ Component, pageProps }: AppProps) {
 	return (
 		<main className="min-h-screen antialiased">
 			<style jsx global>{`
@@ -42,15 +41,13 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 				}
 			`}</style>
 			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-				<SessionProvider session={session}>
-					<Head>
-						<title>Melvin</title>
-						<link rel="shortcut icon" type="image/png" href="/melvin.png" />
-					</Head>
-					<Component {...pageProps} />
+				<Head>
+					<title>Melvin</title>
+					<link rel="shortcut icon" type="image/png" href="/melvin.png" />
+				</Head>
+				<Component {...pageProps} />
 
-					<ToastContainer position="bottom-right" stacked={true} />
-				</SessionProvider>
+				<ToastContainer position="bottom-right" stacked={true} />
 
 				<SpeedInsights />
 			</ThemeProvider>

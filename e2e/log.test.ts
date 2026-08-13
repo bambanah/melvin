@@ -1,8 +1,12 @@
 import prisma from "@/server/prisma";
 import { expect, test, type Page } from "@playwright/test";
-import { randomUUID } from "crypto";
-import { addMonths, format, getUnixTime, subDays } from "date-fns";
-import { createDefaultSupportItem, createRandomClient } from "./test-utils";
+import { format, subDays } from "date-fns";
+import {
+	createDefaultSupportItem,
+	createRandomClient,
+	createSignInableUser,
+	signIn
+} from "./test-utils";
 
 /** A Client's section of the Log, located by its heading. */
 const logSection = (page: Page, clientName: string) =>
@@ -23,45 +27,22 @@ const promoteStack = (page: Page) =>
 const logUser = {
 	id: "log-e2e-user",
 	name: "Log Test User",
-	email: "log-e2e@user.com",
-	sessionToken: randomUUID()
+	email: "log-e2e@user.com"
 };
 
 test.beforeAll(async () => {
 	await prisma.user.deleteMany({ where: { email: logUser.email } });
-	await prisma.user.create({
-		data: {
-			id: logUser.id,
-			name: logUser.name,
-			email: logUser.email,
-			sessions: {
-				create: {
-					expires: addMonths(new Date(), 1),
-					sessionToken: logUser.sessionToken
-				}
-			}
-		}
-	});
+	await createSignInableUser(logUser);
 });
 
 test.afterAll(async () => {
 	await prisma.user.deleteMany({ where: { email: logUser.email } });
 });
 
-test.beforeEach(async ({ page }) => {
-	// Same session-cookie bypass as authenticateAsTestUser, for logUser -
-	// overwrites the storage-state cookie by name/domain/path.
-	await page.context().addCookies([
-		{
-			name: "next-auth.session-token",
-			value: logUser.sessionToken,
-			domain: "localhost",
-			path: "/",
-			httpOnly: true,
-			sameSite: "Lax",
-			expires: getUnixTime(addMonths(new Date(), 1))
-		}
-	]);
+test.beforeEach(async ({ page, baseURL }) => {
+	// Sign in as logUser, replacing the storage-state session testUser's
+	// cookie carries into this context.
+	await signIn(page, logUser.email, baseURL!);
 	// One Open Session per Provider - start each test from an empty Log.
 	await prisma.workSession.deleteMany({ where: { ownerId: logUser.id } });
 });

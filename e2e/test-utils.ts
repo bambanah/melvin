@@ -1,11 +1,14 @@
+import type { Prisma } from "@/generated/client";
 import { getTotalCostOfActivities } from "@/lib/activity-utils";
 import type { ActivityTransportType } from "@/schema/activity-schema";
 import prisma from "@/server/prisma";
 import { Page } from "@playwright/test";
-import { randomUUID } from "crypto";
-import { addMonths, getUnixTime } from "date-fns";
+import { hashPassword } from "better-auth/crypto";
 import { randomClient } from "./random/random-client";
 import { randomSupportItem } from "./random/random-support-item";
+
+/** Shared by every e2e user - there is nothing to protect in a test database. */
+export const TEST_PASSWORD = "e2e-test-password";
 
 export const testUser = {
 	id: "aa550280-2273-4e02-9a92-e0a99b3f67ba",
@@ -16,48 +19,60 @@ export const testUser = {
 	abn: BigInt("12345678901"),
 	bankName: "Test Bank",
 	bsb: 123456,
-	bankNumber: BigInt("987654321"),
-	sessions: {
-		create: {
-			expires: addMonths(new Date(), 1),
-			sessionToken: randomUUID()
-		}
-	},
-	account: {
-		create: {
-			type: "oauth",
-			provider: "google",
-			providerAccountId: randomUUID(),
-			access_token: "ggg_zZl1pWIvKkf3UDynZ09zLvuyZsm1yC0YoRPt",
-			token_type: "Bearer",
-			scope:
-				"https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile"
-		}
-	}
+	bankNumber: BigInt("987654321")
 };
 
 /**
- * Establishes an authenticated session for `testUser` on `page`.
- *
- * Today this injects a raw next-auth `session-token` cookie (the bypass the
- * app relied on before better-auth). #418 swaps the body for a real password
- * sign-in; keeping session establishment behind this single helper contains
- * that change to here rather than every test's setup.
+ * Creates a user who can sign in through the real email/password flow:
+ * pre-verified (`requireEmailVerification` would otherwise reject the sign-in)
+ * and carrying a better-auth `credential` account holding the hashed password.
  */
-export async function authenticateAsTestUser(page: Page, baseURL: string) {
-	await page.goto(baseURL);
+export async function createSignInableUser(user: Prisma.UserCreateInput) {
+	const created = await prisma.user.create({
+		data: { ...user, emailVerified: true }
+	});
 
-	await page.context().addCookies([
-		{
-			name: "next-auth.session-token",
-			value: testUser.sessions.create.sessionToken,
-			domain: "localhost",
-			path: "/",
-			httpOnly: true,
-			sameSite: "Lax",
-			expires: getUnixTime(addMonths(new Date(), 1))
+	await prisma.account.create({
+		data: {
+			userId: created.id,
+			// better-auth keys password accounts by provider "credential", with
+			// the user's own id as the account id.
+			providerId: "credential",
+			accountId: created.id,
+			password: await hashPassword(TEST_PASSWORD)
 		}
-	]);
+	});
+
+	return created;
+}
+
+/**
+ * Establishes an authenticated session on `page` by signing in for real.
+ *
+ * `page.request` shares the browser context's cookie jar, so the session
+ * cookie the endpoint sets is picked up by subsequent navigations and by
+ * `storageState()`. Keeping sign-in behind this single helper contains the
+ * mechanics to one place rather than every test's setup.
+ */
+export async function signIn(page: Page, email: string, baseURL: string) {
+	const { origin } = new URL(baseURL);
+
+	const response = await page.request.post(`${origin}/api/auth/sign-in/email`, {
+		// better-auth rejects requests with no Origin; Playwright's API client
+		// doesn't set one the way a browser fetch would.
+		headers: { origin },
+		data: { email, password: TEST_PASSWORD }
+	});
+
+	if (!response.ok()) {
+		throw new Error(
+			`Sign-in failed for ${email}: ${response.status()} ${await response.text()}`
+		);
+	}
+}
+
+export async function authenticateAsTestUser(page: Page, baseURL: string) {
+	await signIn(page, testUser.email, baseURL);
 }
 
 export async function waitForAlert(page: Page, text: string) {

@@ -25,7 +25,8 @@ async function main() {
 	});
 	const user = await prisma.user.create({
 		data: {
-			email: seedEmail
+			email: seedEmail,
+			name: seedEmail.split("@")[0]
 		}
 	});
 
