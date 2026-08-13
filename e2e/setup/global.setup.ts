@@ -1,11 +1,7 @@
 import "dotenv/config";
 import prisma from "@/server/prisma";
 import { FullConfig, chromium } from "@playwright/test";
-import {
-	authenticateAsTestUser,
-	createSignInableUser,
-	testUser
-} from "../test-utils";
+import { createSignInableUser, signIn, testUser } from "../test-utils";
 
 /**
  * `InvoiceVersion.invoiceId` is `onDelete: Restrict` (docs/adr/0004) — a
@@ -35,7 +31,7 @@ async function globalSetup(config: FullConfig) {
 	const browser = await chromium.launch();
 	const page = await browser.newPage();
 
-	await authenticateAsTestUser(page, baseURL!);
+	await signIn(page, testUser.email, baseURL!);
 
 	await page.context().storageState({ path: storageState as string });
 

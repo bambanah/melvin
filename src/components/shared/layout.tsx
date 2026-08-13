@@ -1,7 +1,7 @@
 import { QuickAddFab } from "@/components/activities/quick-add-fab";
 import { OpenSessionBanner } from "@/components/log/open-session-banner";
 import Navbar from "@/components/navigation/navbar";
-import { useSession } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const Layout = ({ children, isLoading, className }: Props) => {
-	const { data: session, isPending } = useSession();
+	const { data: session, isPending } = authClient.useSession();
 	const router = useRouter();
 
 	let content: ReactNode;

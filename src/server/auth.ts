@@ -1,5 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { fromNodeHeaders } from "better-auth/node";
+import type { IncomingMessage } from "node:http";
 import { sendMail } from "./email";
 import prisma from "./prisma";
 
@@ -42,3 +44,10 @@ export const auth = betterAuth({
 	// Auth rows carry `@default(cuid())` like the rest of the schema.
 	advanced: { database: { generateId: false } }
 });
+
+/**
+ * Reads the session for a Node request. The `fromNodeHeaders` bridge is
+ * throwaway Next glue - #419 deletes it - so it lives behind this one call.
+ */
+export const getServerAuthSession = (req: IncomingMessage) =>
+	auth.api.getSession({ headers: fromNodeHeaders(req.headers) });

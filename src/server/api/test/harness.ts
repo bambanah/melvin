@@ -21,10 +21,7 @@ export async function createTestUser(name = "Test User"): Promise<User> {
 export function callerFor(user: User) {
 	return createCaller({
 		prisma,
-		session: {
-			user: { id: user.id, email: user.email ?? "" },
-			expires: "2999-01-01T00:00:00.000Z"
-		}
+		session: { user: { id: user.id, email: user.email } }
 	});
 }
 

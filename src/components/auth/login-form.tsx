@@ -7,7 +7,7 @@ import {
 	FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signIn } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -31,7 +31,7 @@ const LoginForm = ({ callbackUrl }: Props) => {
 	});
 
 	const onSubmit = async (data: LoginFormSchema) => {
-		const { error } = await signIn.email({
+		const { error } = await authClient.signIn.email({
 			email: data.email,
 			password: data.password,
 			callbackURL: callbackUrl
