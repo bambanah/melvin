@@ -3,18 +3,10 @@ import LoginForm from "@/components/auth/login-form";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/ui/logo";
-import { BuiltInProviderType } from "next-auth/providers/index";
-import { ClientSafeProvider, LiteralUnion, signIn } from "next-auth/react";
+import { signIn } from "@/lib/auth-client";
 import { useRouter } from "next/router";
 
-interface LoginPageProps {
-	providers: Record<
-		LiteralUnion<BuiltInProviderType, string>,
-		ClientSafeProvider
-	>;
-}
-
-const LoginPage = ({ providers }: LoginPageProps) => {
+const LoginPage = () => {
 	const router = useRouter();
 
 	let callbackUrl = String(router.query.callbackUrl ?? "/dashboard");
@@ -26,28 +18,22 @@ const LoginPage = ({ providers }: LoginPageProps) => {
 			<Logo variant="MEDIUM">melvin</Logo>
 			<p>Sign in to continue</p>
 
-			<LoginForm />
+			<LoginForm callbackUrl={callbackUrl} />
 
-			{providers && (
-				<div className="text-foreground before:border-foreground/50 after:border-foreground/50 flex w-full flex-nowrap items-center justify-center gap-4 text-sm before:grow before:border-t before:content-[''] after:grow after:border-t after:content-['']">
-					OR
-				</div>
-			)}
+			<div className="text-foreground before:border-foreground/50 after:border-foreground/50 flex w-full flex-nowrap items-center justify-center gap-4 text-sm before:grow before:border-t before:content-[''] after:grow after:border-t after:content-['']">
+				OR
+			</div>
 
-			{providers &&
-				Object.values(providers)
-					.filter((provider) => provider.id !== "email")
-					.map((provider) => (
-						<Button
-							onClick={() => signIn(provider.id, { callbackUrl })}
-							key={provider.id}
-							variant="outline"
-							className="w-full"
-						>
-							<Icons.google className="mr-2 h-4 w-4 fill-current" />
-							Sign in with {provider.name}
-						</Button>
-					))}
+			<Button
+				onClick={() =>
+					signIn.social({ provider: "google", callbackURL: callbackUrl })
+				}
+				variant="outline"
+				className="w-full"
+			>
+				<Icons.google className="mr-2 h-4 w-4 fill-current" />
+				Sign in with Google
+			</Button>
 		</AuthModal>
 	);
 };

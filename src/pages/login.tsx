@@ -1,15 +1,16 @@
 import LoginPage from "@/components/auth/login-page";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { getProviders, getSession } from "next-auth/react";
+import { auth } from "@/server/auth";
+import { fromNodeHeaders } from "better-auth/node";
+import { GetServerSideProps } from "next";
 
-export default function Login({
-	providers
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
-	return <LoginPage providers={providers} />;
+export default function Login() {
+	return <LoginPage />;
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-	const session = await getSession(context);
+	const session = await auth.api.getSession({
+		headers: fromNodeHeaders(context.req.headers)
+	});
 
 	if (session) {
 		return {
@@ -20,11 +21,5 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		};
 	}
 
-	const providers = await getProviders();
-
-	return {
-		props: {
-			providers
-		}
-	};
+	return { props: {} };
 };

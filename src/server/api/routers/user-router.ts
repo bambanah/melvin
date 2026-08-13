@@ -105,9 +105,11 @@ export const userRouter = router({
 
 			ctx.prisma.user.update({
 				where: { id: userId },
+				// Name is part of the auth identity (NOT NULL since #418), so a
+				// reset clears the billing profile and leaves the sign-in
+				// details standing.
 				data: {
 					abn: null,
-					name: null,
 					bankName: null,
 					bankNumber: null,
 					bsb: null

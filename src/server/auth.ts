@@ -1,56 +1,44 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import type { GetServerSidePropsContext } from "next";
-import {
-	getServerSession,
-	type DefaultSession,
-	type NextAuthOptions
-} from "next-auth";
-import EmailProvider from "next-auth/providers/email";
-import GoogleProvider from "next-auth/providers/google";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { sendMail } from "./email";
 import prisma from "./prisma";
 
-declare module "next-auth" {
-	interface Session extends DefaultSession {
-		user: {
-			id: string;
-			email: string;
-		} & DefaultSession["user"];
-	}
-}
-
-export const authOptions: NextAuthOptions = {
-	adapter: PrismaAdapter(prisma),
-	callbacks: {
-		session({ session, user }) {
-			if (session.user) {
-				session.user.id = user.id;
-			}
-
-			return session;
-		}
-	},
-	providers: [
-		EmailProvider({
-			server: process.env.EMAIL_SERVER,
-			from: process.env.EMAIL_FROM
-		}),
-		GoogleProvider({
+export const auth = betterAuth({
+	database: prismaAdapter(prisma, { provider: "postgresql" }),
+	socialProviders: {
+		google: {
 			clientId: process.env.GOOGLE_ID || "",
 			clientSecret: process.env.GOOGLE_SECRET || ""
-		})
-	],
-	pages: {
-		signIn: "/login"
+		}
 	},
-	secret: process.env.NEXTAUTH_SECRET
-};
-
-export const getServerAuthSession = ({
-	req,
-	res
-}: {
-	req: GetServerSidePropsContext["req"];
-	res: GetServerSidePropsContext["res"];
-}) => {
-	return getServerSession(req, res, authOptions);
-};
+	emailAndPassword: {
+		enabled: true,
+		// A password signup that claims an existing email would otherwise take
+		// over that account through the trusted-provider link below. Do not relax.
+		requireEmailVerification: true,
+		sendResetPassword: async ({ user, url }) => {
+			await sendMail({
+				to: user.email,
+				subject: "Reset your Melvin password",
+				text: `Set a new password for Melvin: ${url}`
+			});
+		}
+	},
+	emailVerification: {
+		sendOnSignUp: true,
+		sendVerificationEmail: async ({ user, url }) => {
+			await sendMail({
+				to: user.email,
+				subject: "Verify your Melvin email address",
+				text: `Verify your email address for Melvin: ${url}`
+			});
+		}
+	},
+	account: {
+		// Google's email is verified at the source, so an existing account is
+		// re-linked on first sign-in rather than rejected as OAuthAccountNotLinked.
+		accountLinking: { trustedProviders: ["google"] }
+	},
+	// Auth rows carry `@default(cuid())` like the rest of the schema.
+	advanced: { database: { generateId: false } }
+});

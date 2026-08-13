@@ -1,6 +1,7 @@
 import { inlinePdfContentDisposition } from "@/lib/content-disposition";
 import generatePDF from "@/lib/pdf-generation";
-import { getServerAuthSession } from "@/server/auth";
+import { auth } from "@/server/auth";
+import { fromNodeHeaders } from "better-auth/node";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const request = async (request: NextApiRequest, response: NextApiResponse) => {
@@ -11,7 +12,9 @@ const request = async (request: NextApiRequest, response: NextApiResponse) => {
 			.send("Method Not Allowed");
 	}
 
-	const session = await getServerAuthSession({ req: request, res: response });
+	const session = await auth.api.getSession({
+		headers: fromNodeHeaders(request.headers)
+	});
 	if (!session?.user) {
 		return response.status(401).send("Unauthorized");
 	}

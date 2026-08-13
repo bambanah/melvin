@@ -9,49 +9,57 @@ datasource db {
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?
-  access_token       String?
-  session_state      String?
-  oauth_token_secret String?
-  oauth_token        String?
-  userId             String  @unique
-  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
-  @@unique([provider, providerAccountId])
+  @@unique([providerId, accountId])
+  @@index([userId])
 }
 
 model Session {
-  sessionToken String   @unique
-  expires      DateTime
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
 }
 
-model VerificationToken {
+model Verification {
+  id         String   @id @default(cuid())
   identifier String
-  token      String   @unique
-  expires    DateTime
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  @@unique([identifier, token])
+  @@index([identifier])
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String?   @unique
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
-  name          String?
-  emailVerified DateTime?
+  id            String   @id @default(cuid())
+  email         String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+  name          String
+  emailVerified Boolean  @default(false)
   image         String?
   abn           BigInt?
   bankName      String?
@@ -65,7 +73,7 @@ model User {
   defaultGroupSupportItemId String?
   defaultGroupSupportItem   SupportItem? @relation("defaultGroupSupportItem", fields: [defaultGroupSupportItemId], references: [id], onDelete: SetNull)
 
-  account          Account?
+  accounts         Account[]
   sessions         Session[]
   clients          Client[]
   invoices         Invoice[]

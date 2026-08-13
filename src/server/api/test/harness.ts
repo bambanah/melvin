@@ -42,7 +42,7 @@ const APP_TABLES = [
 	"Client",
 	"Session",
 	"Account",
-	"VerificationToken",
+	"Verification",
 	"User"
 ];
 
