@@ -8,13 +8,13 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { signOut, useSession } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 import { ExternalLink, File, LogOut, Settings, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 const NavAuth = () => {
-	const { data: session } = useSession();
+	const { data: session } = authClient.useSession();
 	const router = useRouter();
 
 	const user = session?.user;
@@ -48,7 +48,7 @@ const NavAuth = () => {
 				<DropdownMenuItem
 					className="cursor-pointer"
 					onClick={async () => {
-						await signOut();
+						await authClient.signOut();
 						router.push("/");
 					}}
 				>

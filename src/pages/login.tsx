@@ -1,6 +1,5 @@
 import LoginPage from "@/components/auth/login-page";
-import { auth } from "@/server/auth";
-import { fromNodeHeaders } from "better-auth/node";
+import { getServerAuthSession } from "@/server/auth";
 import { GetServerSideProps } from "next";
 
 export default function Login() {
@@ -8,9 +7,7 @@ export default function Login() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-	const session = await auth.api.getSession({
-		headers: fromNodeHeaders(context.req.headers)
-	});
+	const session = await getServerAuthSession(context.req);
 
 	if (session) {
 		return {

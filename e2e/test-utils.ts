@@ -71,10 +71,6 @@ export async function signIn(page: Page, email: string, baseURL: string) {
 	}
 }
 
-export async function authenticateAsTestUser(page: Page, baseURL: string) {
-	await signIn(page, testUser.email, baseURL);
-}
-
 export async function waitForAlert(page: Page, text: string) {
 	return await page
 		.locator(".Toastify__toast")

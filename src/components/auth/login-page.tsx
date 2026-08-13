@@ -3,7 +3,7 @@ import LoginForm from "@/components/auth/login-form";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/ui/logo";
-import { signIn } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/router";
 
 const LoginPage = () => {
@@ -26,7 +26,10 @@ const LoginPage = () => {
 
 			<Button
 				onClick={() =>
-					signIn.social({ provider: "google", callbackURL: callbackUrl })
+					authClient.signIn.social({
+						provider: "google",
+						callbackURL: callbackUrl
+					})
 				}
 				variant="outline"
 				className="w-full"

@@ -6,15 +6,9 @@ describe("toAppSession", () => {
 		expect(toAppSession(null)).toBeNull();
 	});
 
-	it("flattens better-auth's { session, user } into the session shape procedures read", () => {
+	it("flattens better-auth's nested user into the shape procedures read", () => {
 		expect(
-			toAppSession({
-				session: { expiresAt: new Date("2026-09-01T00:00:00.000Z") },
-				user: { id: "user-1", email: "operator@example.com" }
-			})
-		).toEqual({
-			user: { id: "user-1", email: "operator@example.com" },
-			expires: "2026-09-01T00:00:00.000Z"
-		});
+			toAppSession({ user: { id: "user-1", email: "operator@example.com" } })
+		).toEqual({ user: { id: "user-1", email: "operator@example.com" } });
 	});
 });

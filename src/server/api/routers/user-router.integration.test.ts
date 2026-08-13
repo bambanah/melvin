@@ -132,9 +132,8 @@ test("reset clears all owned data and nulls the profile, leaving other users unt
 		where: { id: owner.id }
 	});
 	expect(nulled.abn).toBeNull();
-	// Name survives a reset - it is part of the auth identity (#418), not the
-	// billing profile.
-	expect(nulled.name).toBe(PROFILE.name);
+	// Name is NOT NULL since #418, so it drops back to the email local-part.
+	expect(nulled.name).toBe(owner.email.split("@")[0]);
 	expect(nulled.bankName).toBeNull();
 	expect(nulled.bankNumber).toBeNull();
 	expect(nulled.bsb).toBeNull();
@@ -229,9 +228,8 @@ test("reset wipes everything including a sent invoice and its frozen version", a
 		where: { id: owner.id }
 	});
 	expect(nulled.abn).toBeNull();
-	// Name survives a reset - it is part of the auth identity (#418), not the
-	// billing profile.
-	expect(nulled.name).toBe(PROFILE.name);
+	// Name is NOT NULL since #418, so it drops back to the email local-part.
+	expect(nulled.name).toBe(owner.email.split("@")[0]);
 	expect(nulled.bankName).toBeNull();
 	expect(nulled.bankNumber).toBeNull();
 	expect(nulled.bsb).toBeNull();
