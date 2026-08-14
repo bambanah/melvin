@@ -1,12 +1,6 @@
+import AuthTextField from "@/components/auth/auth-text-field";
 import { Button } from "@/components/ui/button";
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormMessage
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -48,29 +42,16 @@ const LoginForm = ({ callbackUrl }: Props) => {
 				onSubmit={form.handleSubmit(onSubmit)}
 				className="flex w-full flex-col gap-4"
 			>
-				<FormField
+				<AuthTextField
 					control={form.control}
 					name="email"
-					render={({ field }) => (
-						<FormItem>
-							<FormControl>
-								<Input placeholder="Email Address" {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
+					placeholder="Email Address"
 				/>
-				<FormField
+				<AuthTextField
 					control={form.control}
 					name="password"
-					render={({ field }) => (
-						<FormItem>
-							<FormControl>
-								<Input type="password" placeholder="Password" {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
+					type="password"
+					placeholder="Password"
 				/>
 				<Button
 					type="submit"

@@ -1,3 +1,4 @@
+import { placeholderName } from "@/lib/placeholder-name";
 import { userSchema } from "@/schema/user-schema";
 import { authedProcedure, router } from "@/server/api/trpc";
 import { Prisma } from "@/generated/client";
@@ -105,12 +106,9 @@ export const userRouter = router({
 
 			ctx.prisma.user.update({
 				where: { id: userId },
-				// Name is NOT NULL since #418, so a reset drops back to the
-				// email local-part - the same placeholder the migration
-				// backfilled - rather than clearing it outright.
 				data: {
 					abn: null,
-					name: ctx.session.user.email.split("@")[0],
+					name: placeholderName(ctx.session.user.email),
 					bankName: null,
 					bankNumber: null,
 					bsb: null
