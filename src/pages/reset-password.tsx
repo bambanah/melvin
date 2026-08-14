@@ -1,14 +1,8 @@
 import AuthModal from "@/components/auth/auth-modal";
+import AuthTextField from "@/components/auth/auth-text-field";
 import { Button } from "@/components/ui/button";
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormMessage
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
-import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -30,8 +24,9 @@ type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPassword() {
 	const router = useRouter();
-	// better-auth's /reset-password/:token callback redirects here with the
-	// token on success and `error` when it has expired or already been used.
+	// better-auth's /reset-password/:token callback redirects here with a
+	// token query param on success; expired or already-used links arrive with
+	// an `error` param and no token, so the missing-token gate covers both.
 	const token = String(router.query.token ?? "");
 
 	const form = useForm<ResetPasswordSchema>({
@@ -80,37 +75,17 @@ export default function ResetPassword() {
 					onSubmit={form.handleSubmit(onSubmit)}
 					className="flex w-full flex-col gap-4"
 				>
-					<FormField
+					<AuthTextField
 						control={form.control}
 						name="password"
-						render={({ field }) => (
-							<FormItem>
-								<FormControl>
-									<Input
-										type="password"
-										placeholder="New password"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+						type="password"
+						placeholder="New password"
 					/>
-					<FormField
+					<AuthTextField
 						control={form.control}
 						name="confirmPassword"
-						render={({ field }) => (
-							<FormItem>
-								<FormControl>
-									<Input
-										type="password"
-										placeholder="Confirm new password"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+						type="password"
+						placeholder="Confirm new password"
 					/>
 					<Button
 						type="submit"

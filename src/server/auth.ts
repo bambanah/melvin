@@ -10,11 +10,17 @@ export const auth = betterAuth({
 	socialProviders: {
 		google: {
 			clientId: process.env.GOOGLE_ID || "",
-			clientSecret: process.env.GOOGLE_SECRET || ""
+			clientSecret: process.env.GOOGLE_SECRET || "",
+			// Single-operator app: Google sign-in only links to or signs in an
+			// existing User; first-time Google emails are rejected, not created.
+			disableSignUp: true
 		}
 	},
 	emailAndPassword: {
 		enabled: true,
+		// Single-operator app: no self-service registration. Blocks direct
+		// POSTs to /api/auth/sign-up/email (there is no sign-up UI).
+		disableSignUp: true,
 		// A password signup that claims an existing email would otherwise take
 		// over that account through the trusted-provider link below. Do not relax.
 		requireEmailVerification: true,

@@ -13,9 +13,6 @@ const DashboardPage = () => {
 					<li>
 						<Link href="/login">Log In</Link>
 					</li>
-					<li>
-						<Link href="/signup">Sign Up</Link>
-					</li>
 				</ul>
 			</nav>
 			<div className="flex flex-col items-center justify-center gap-8 pt-32">

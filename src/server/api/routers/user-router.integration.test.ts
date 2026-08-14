@@ -1,3 +1,4 @@
+import { placeholderName } from "@/lib/placeholder-name";
 import prisma from "@/server/prisma";
 import { beforeEach, expect, test } from "vitest";
 import { callerFor, createTestUser, resetDb } from "../test/harness";
@@ -132,8 +133,8 @@ test("reset clears all owned data and nulls the profile, leaving other users unt
 		where: { id: owner.id }
 	});
 	expect(nulled.abn).toBeNull();
-	// Name is NOT NULL since #418, so it drops back to the email local-part.
-	expect(nulled.name).toBe(owner.email.split("@")[0]);
+	// Name is NOT NULL since #418, so it drops back to the placeholder.
+	expect(nulled.name).toBe(placeholderName(owner.email));
 	expect(nulled.bankName).toBeNull();
 	expect(nulled.bankNumber).toBeNull();
 	expect(nulled.bsb).toBeNull();
@@ -228,8 +229,8 @@ test("reset wipes everything including a sent invoice and its frozen version", a
 		where: { id: owner.id }
 	});
 	expect(nulled.abn).toBeNull();
-	// Name is NOT NULL since #418, so it drops back to the email local-part.
-	expect(nulled.name).toBe(owner.email.split("@")[0]);
+	// Name is NOT NULL since #418, so it drops back to the placeholder.
+	expect(nulled.name).toBe(placeholderName(owner.email));
 	expect(nulled.bankName).toBeNull();
 	expect(nulled.bankNumber).toBeNull();
 	expect(nulled.bsb).toBeNull();

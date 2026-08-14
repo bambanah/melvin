@@ -1,5 +1,5 @@
 import prisma from "@/server/prisma";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Cookie, type Page } from "@playwright/test";
 import { format, subDays } from "date-fns";
 import {
 	createDefaultSupportItem,
@@ -30,19 +30,30 @@ const logUser = {
 	email: "log-e2e@user.com"
 };
 
-test.beforeAll(async () => {
+let logUserCookies: Cookie[];
+
+test.beforeAll(async ({ browser, baseURL }) => {
 	await prisma.user.deleteMany({ where: { email: logUser.email } });
 	await createSignInableUser(logUser);
+
+	// better-auth rate-limits /sign-in to 3 requests per 10s per IP (on by
+	// default in production, which is what CI builds), so sign in once here
+	// and replay the session cookie per test rather than once per test.
+	const context = await browser.newContext();
+	await signIn(await context.newPage(), logUser.email, baseURL!);
+	logUserCookies = await context.cookies();
+	await context.close();
 });
 
 test.afterAll(async () => {
 	await prisma.user.deleteMany({ where: { email: logUser.email } });
 });
 
-test.beforeEach(async ({ page, baseURL }) => {
-	// Sign in as logUser, replacing the storage-state session testUser's
-	// cookie carries into this context.
-	await signIn(page, logUser.email, baseURL!);
+test.beforeEach(async ({ page }) => {
+	// Replace the storage-state session testUser's cookie carries into this
+	// context with logUser's.
+	await page.context().clearCookies();
+	await page.context().addCookies(logUserCookies);
 	// One Open Session per Provider - start each test from an empty Log.
 	await prisma.workSession.deleteMany({ where: { ownerId: logUser.id } });
 });

@@ -1,14 +1,8 @@
 import AuthModal from "@/components/auth/auth-modal";
+import AuthTextField from "@/components/auth/auth-text-field";
 import { Button } from "@/components/ui/button";
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormMessage
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
-import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -55,17 +49,10 @@ export default function ForgotPassword() {
 						onSubmit={form.handleSubmit(onSubmit)}
 						className="flex w-full flex-col gap-4"
 					>
-						<FormField
+						<AuthTextField
 							control={form.control}
 							name="email"
-							render={({ field }) => (
-								<FormItem>
-									<FormControl>
-										<Input placeholder="Email Address" {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+							placeholder="Email Address"
 						/>
 						<Button
 							type="submit"

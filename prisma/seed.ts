@@ -1,14 +1,19 @@
 import { PrismaPg } from "@prisma/adapter-pg";
+import { hashPassword } from "better-auth/crypto";
 import { randomClient } from "../e2e/random/random-client";
 import { randomInvoice } from "../e2e/random/random-invoice";
 import { PrismaClient, InvoiceStatus } from "@/generated/client";
 import { parseUtcTime, utcDate } from "@/lib/date-utils";
+import { placeholderName } from "@/lib/placeholder-name";
 
 const adapter = new PrismaPg({
 	connectionString: process.env.DATABASE_URL
 });
 
 const prisma = new PrismaClient({ adapter });
+
+/** Local dev only - there is nothing to protect in a seeded database. */
+const SEED_PASSWORD = "password";
 
 async function main() {
 	const seedEmail = process.env.SEED_EMAIL;
@@ -26,7 +31,20 @@ async function main() {
 	const user = await prisma.user.create({
 		data: {
 			email: seedEmail,
-			name: seedEmail.split("@")[0]
+			name: placeholderName(seedEmail),
+			// `requireEmailVerification` would otherwise reject the sign-in.
+			emailVerified: true
+		}
+	});
+
+	await prisma.account.create({
+		data: {
+			userId: user.id,
+			// better-auth keys password accounts by provider "credential", with
+			// the user's own id as the account id.
+			providerId: "credential",
+			accountId: user.id,
+			password: await hashPassword(SEED_PASSWORD)
 		}
 	});
 
