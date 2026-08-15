@@ -16,6 +16,14 @@ export const getSupportCategories = () => [
 	...new Set(supportItems.map((item) => item.supportCategoryName))
 ];
 
+/**
+ * The catalogue's national price limit for a code. Undefined for a quotable
+ * support (no fixed price) or a code the catalogue doesn't carry.
+ */
+export const getPriceLimit = (supportItemCode: string) =>
+	supportItems.find((item) => item.supportItemNumber === supportItemCode)
+		?.national ?? undefined;
+
 const getGroupFromCode = (supportItemCode: string) => {
 	// Identical to regex in support-item-schema, except capturing the group number (third block)
 	const groupNumberMatch = supportItemCode.match(

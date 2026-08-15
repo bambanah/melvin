@@ -29,8 +29,7 @@ test("Can create, update, and delete support items", async ({ page }) => {
 		.first()
 		.click();
 
-	await page.getByRole("button", { name: "Support item actions" }).click();
-	await page.getByRole("menuitem", { name: "Edit", exact: true }).click();
+	await page.getByRole("link", { name: "Edit" }).click();
 
 	await page.getByLabel("Description").fill(newSupportItem.description);
 	await page.getByRole("button", { name: "Update" }).click();
@@ -39,7 +38,9 @@ test("Can create, update, and delete support items", async ({ page }) => {
 	await expect(page).toHaveURL("/dashboard/support-items");
 
 	await page
-		.getByRole("link", { name: newSupportItem.description, exact: true })
+		.getByRole("link")
+		.filter({ hasText: newSupportItem.description })
+		.first()
 		.click();
 	await page.getByRole("button", { name: "Support item actions" }).click();
 	page.once("dialog", (dialog) => {
