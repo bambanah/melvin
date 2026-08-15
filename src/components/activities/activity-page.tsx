@@ -1,5 +1,6 @@
 import ActivityBreakdown from "@/components/activities/activity-breakdown";
 import ActivityTripSummary from "@/components/activities/activity-trip-summary";
+import { DetailHeader, DetailPage } from "@/components/shared/detail-page";
 import { Fact, FactGrid } from "@/components/shared/fact";
 import { useRateContext } from "@/components/shared/use-rate-context";
 import { Badge, InvoiceStatusBadge } from "@/components/ui/badge";
@@ -97,7 +98,7 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 		: 0;
 
 	return (
-		<div className="flex flex-col items-center px-4 pb-24 md:pb-8">
+		<DetailPage>
 			<Head>
 				<title>
 					{`${activity.supportItem.description} - ${format(
@@ -106,122 +107,111 @@ const ActivityPage = ({ activityId }: { activityId: string }) => {
 					)} | Melvin`}
 				</title>
 			</Head>
-			<div className="flex w-full max-w-3xl flex-col gap-6">
-				<header className="mt-2 flex flex-col gap-5">
-					<div className="flex items-start justify-between gap-3">
-						<div className="flex min-w-0 flex-col gap-1">
-							<p className="text-primary text-xs font-medium">
-								{format(utcDate(activity.date), "EEEE, d MMMM yyyy")}
-							</p>
-							<h1 className="text-lg font-semibold tracking-tight text-balance md:text-xl">
-								{activity.supportItem.description}
-							</h1>
-							<p className="text-foreground/50 font-mono text-xs">
-								{supportItemCode}
-							</p>
-						</div>
-
-						<div className="flex shrink-0 items-center gap-1.5">
-							<Button
-								asChild
-								variant="outline"
-								size="sm"
-								className="hidden sm:inline-flex"
-							>
-								<Link href={`/dashboard/activities/${activity.id}/edit`}>
-									<Pencil />
-									Edit
-								</Link>
-							</Button>
-
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button
-										variant="ghost"
-										size="icon"
-										aria-label="Activity actions"
-									>
-										<EllipsisVertical />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end">
-									<Link href={`/dashboard/activities/${activity.id}/edit`}>
-										<DropdownMenuItem className="cursor-pointer sm:hidden">
-											<Pencil className="mr-2 h-4 w-4" />
-											<span>Edit</span>
-										</DropdownMenuItem>
-									</Link>
-
-									<DropdownMenuItem
-										onClick={() => deleteActivity()}
-										className="text-destructive focus:text-destructive cursor-pointer"
-									>
-										<Trash className="mr-2 h-4 w-4" />
-										<span>Delete</span>
-									</DropdownMenuItem>
-								</DropdownMenuContent>
-							</DropdownMenu>
-						</div>
-					</div>
-
-					<FactGrid>
-						{hasTimes ? (
-							<Fact icon={Clock} label="Time">
-								{format(utcDate(activity.startTime ?? new Date(0)), "h:mmaaa")}{" "}
-								- {format(utcDate(activity.endTime ?? new Date(0)), "h:mmaaa")}
-								<span className="text-foreground/50 font-normal">
-									{" "}
-									· {formatDuration(durationMinutes)}
-								</span>
-							</Fact>
-						) : (
-							<Fact icon={Car} label="Distance">
-								{activity.itemDistance} km
-							</Fact>
-						)}
-
-						<Fact icon={User} label="Client">
-							<Link
-								href={`/dashboard/clients/${activity.client?.id}`}
-								className="decoration-foreground/30 hover:decoration-foreground underline underline-offset-4 transition-colors"
-							>
-								{activity.client?.name}
+			<DetailHeader
+				eyebrow={format(utcDate(activity.date), "EEEE, d MMMM yyyy")}
+				title={activity.supportItem.description}
+				subline={supportItemCode}
+				actions={
+					<>
+						<Button
+							asChild
+							variant="outline"
+							size="sm"
+							className="hidden sm:inline-flex"
+						>
+							<Link href={`/dashboard/activities/${activity.id}/edit`}>
+								<Pencil />
+								Edit
 							</Link>
-						</Fact>
+						</Button>
 
-						<Fact icon={FileText} label="Invoice">
-							{activity.invoice ? (
-								<Link
-									href={`/dashboard/invoices/${activity.invoice.id}`}
-									className="flex items-center gap-2"
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button
+									variant="ghost"
+									size="icon"
+									aria-label="Activity actions"
 								>
-									<span className="decoration-foreground/30 hover:decoration-foreground underline underline-offset-4 transition-colors">
-										{activity.invoice.invoiceNo}
-									</span>
-									<InvoiceStatusBadge invoiceStatus={activity.invoice.status} />
+									<EllipsisVertical />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<Link href={`/dashboard/activities/${activity.id}/edit`}>
+									<DropdownMenuItem className="cursor-pointer sm:hidden">
+										<Pencil className="mr-2 h-4 w-4" />
+										<span>Edit</span>
+									</DropdownMenuItem>
 								</Link>
-							) : (
-								<Badge variant="secondary">Pending</Badge>
-							)}
+
+								<DropdownMenuItem
+									onClick={() => deleteActivity()}
+									className="text-destructive focus:text-destructive cursor-pointer"
+								>
+									<Trash className="mr-2 h-4 w-4" />
+									<span>Delete</span>
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</>
+				}
+			>
+				<FactGrid>
+					{hasTimes ? (
+						<Fact icon={Clock} label="Time">
+							{format(utcDate(activity.startTime ?? new Date(0)), "h:mmaaa")} -{" "}
+							{format(utcDate(activity.endTime ?? new Date(0)), "h:mmaaa")}
+							<span className="text-foreground/50 font-normal">
+								{" "}
+								· {formatDuration(durationMinutes)}
+							</span>
 						</Fact>
-					</FactGrid>
-				</header>
+					) : (
+						<Fact icon={Car} label="Distance">
+							{activity.itemDistance} km
+						</Fact>
+					)}
 
-				<ActivityBreakdown
-					activity={activity}
-					rateContext={rateContext}
-					travelTimeCapped={travelTimeCapped}
-					showLiveRatesCaveat={showLiveRatesCaveat}
+					<Fact icon={User} label="Client">
+						<Link
+							href={`/dashboard/clients/${activity.client?.id}`}
+							className="decoration-foreground/30 hover:decoration-foreground underline underline-offset-4 transition-colors"
+						>
+							{activity.client?.name}
+						</Link>
+					</Fact>
+
+					<Fact icon={FileText} label="Invoice">
+						{activity.invoice ? (
+							<Link
+								href={`/dashboard/invoices/${activity.invoice.id}`}
+								className="flex items-center gap-2"
+							>
+								<span className="decoration-foreground/30 hover:decoration-foreground underline underline-offset-4 transition-colors">
+									{activity.invoice.invoiceNo}
+								</span>
+								<InvoiceStatusBadge invoiceStatus={activity.invoice.status} />
+							</Link>
+						) : (
+							<Badge variant="secondary">Pending</Badge>
+						)}
+					</Fact>
+				</FactGrid>
+			</DetailHeader>
+
+			<ActivityBreakdown
+				activity={activity}
+				rateContext={rateContext}
+				travelTimeCapped={travelTimeCapped}
+				showLiveRatesCaveat={showLiveRatesCaveat}
+			/>
+
+			{activity.trip && (
+				<ActivityTripSummary
+					trip={activity.trip}
+					currentActivityId={activity.id}
 				/>
-
-				{activity.trip && (
-					<ActivityTripSummary
-						trip={activity.trip}
-						currentActivityId={activity.id}
-					/>
-				)}
-			</div>
-		</div>
+			)}
+		</DetailPage>
 	);
 };
 

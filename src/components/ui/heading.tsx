@@ -1,13 +1,11 @@
 import { cn } from "@/lib/utils";
 
-type Size = "xsmall" | "small" | "medium" | "large" | "xlarge";
+type Size = "xsmall" | "small" | "medium";
 
 const variantStyles: Record<Size, string> = {
 	xsmall: "text-base md:text-xl",
 	small: "text-lg md:text-2xl",
-	medium: "text-xl md:text-3xl",
-	large: "text-2xl md:text-4xl",
-	xlarge: "text-4xl md:text-6xl"
+	medium: "text-xl md:text-3xl"
 };
 
 interface Props {

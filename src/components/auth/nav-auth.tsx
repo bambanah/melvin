@@ -30,7 +30,7 @@ const NavAuth = () => {
 				{user?.email && <DropdownMenuLabel>{user.email}</DropdownMenuLabel>}
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
-					<Link href="/dashboard/account/edit">
+					<Link href="/dashboard/account">
 						<DropdownMenuItem className="cursor-pointer">
 							<Settings className="mr-2 h-4 w-4" />
 							<span>Settings</span>

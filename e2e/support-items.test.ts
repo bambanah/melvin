@@ -29,11 +29,7 @@ test("Can create, update, and delete support items", async ({ page }) => {
 		.first()
 		.click();
 
-	await page
-		.locator("div")
-		.filter({ hasText: new RegExp(`^${supportItem.description}$`) })
-		.getByRole("button")
-		.click();
+	await page.getByRole("button", { name: "Support item actions" }).click();
 	await page.getByRole("menuitem", { name: "Edit", exact: true }).click();
 
 	await page.getByLabel("Description").fill(newSupportItem.description);
@@ -45,11 +41,7 @@ test("Can create, update, and delete support items", async ({ page }) => {
 	await page
 		.getByRole("link", { name: newSupportItem.description, exact: true })
 		.click();
-	await page
-		.locator("div")
-		.filter({ hasText: new RegExp(`^${newSupportItem.description}$`) })
-		.getByRole("button")
-		.click();
+	await page.getByRole("button", { name: "Support item actions" }).click();
 	page.once("dialog", (dialog) => {
 		dialog.accept().catch(() => {});
 	});

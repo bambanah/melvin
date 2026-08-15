@@ -6,7 +6,7 @@ const CreateClient = () => {
 	return (
 		<Layout>
 			<Head>
-				<title>Create Invoice - Melvin</title>
+				<title>Create Client | Melvin</title>
 			</Head>
 			<ClientForm />
 		</Layout>

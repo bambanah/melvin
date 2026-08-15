@@ -53,7 +53,6 @@ import {
 
 interface Props {
 	clientId?: string;
-	groupByAssignedStatus?: boolean;
 }
 
 function useInvoiceFilters() {

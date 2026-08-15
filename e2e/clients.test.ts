@@ -23,11 +23,7 @@ test("Can create, edit, and delete clients", async ({ page }) => {
 
 	await page.getByRole("link").filter({ hasText: client.name }).click();
 
-	await page
-		.locator("div")
-		.filter({ hasText: new RegExp(`^${client.name}$`) })
-		.getByRole("button")
-		.click();
+	await page.getByRole("button", { name: "Client actions" }).click();
 
 	await page.getByRole("menuitem", { name: "Edit" }).click();
 
@@ -44,11 +40,7 @@ test("Can create, edit, and delete clients", async ({ page }) => {
 		.first()
 		.click();
 
-	await page
-		.locator("div")
-		.filter({ hasText: new RegExp(`^${updatedClient.name}$`) })
-		.getByRole("button")
-		.click();
+	await page.getByRole("button", { name: "Client actions" }).click();
 	page.once("dialog", (dialog) => {
 		dialog.accept().catch(() => {});
 	});

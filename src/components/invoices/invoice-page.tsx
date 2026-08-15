@@ -2,6 +2,7 @@ import InvoiceActivities from "@/components/invoices/invoice-activities";
 import InvoiceDocument from "@/components/invoices/invoice-document";
 import InvoiceVersionHistory from "@/components/invoices/invoice-version-history";
 import { useInvalidateInvoice } from "@/components/invoices/use-invoice-actions";
+import { DetailHeader, DetailPage } from "@/components/shared/detail-page";
 import { Fact, FactGrid } from "@/components/shared/fact";
 import { useRateContext } from "@/components/shared/use-rate-context";
 import { InvoiceStatusBadge } from "@/components/ui/badge";
@@ -108,133 +109,120 @@ const InvoicePage = ({ invoiceId }: { invoiceId: string }) => {
 		: (invoice.versions?.[0]?.total ?? 0);
 
 	return (
-		<div className="flex flex-col items-center px-4 pb-24 md:pb-8">
+		<DetailPage>
 			<Head>
 				<title>{`${displayNo} | Melvin`}</title>
 			</Head>
-			<div className="flex w-full max-w-3xl flex-col gap-6">
-				<header className="mt-2 flex flex-col gap-5">
-					<div className="flex items-start justify-between gap-3">
-						<div className="flex min-w-0 flex-col gap-1">
-							<p className="text-primary text-xs font-medium">
-								{format(utcDate(invoice.date), "EEEE, d MMMM yyyy")}
-							</p>
-							<div className="flex items-center gap-2.5">
-								<h1 className="text-lg font-semibold tracking-tight text-balance md:text-xl">
-									{displayNo}
-								</h1>
-								<InvoiceStatusBadge invoiceStatus={invoice.status} />
-							</div>
-							<p className="text-foreground/50 font-mono text-xs">
-								Bill to {invoice.billTo ?? invoice.client.name}
-							</p>
-						</div>
+			<DetailHeader
+				eyebrow={format(utcDate(invoice.date), "EEEE, d MMMM yyyy")}
+				title={displayNo}
+				badge={<InvoiceStatusBadge invoiceStatus={invoice.status} />}
+				subline={`Bill to ${invoice.billTo ?? invoice.client.name}`}
+				actions={
+					<>
+						{isDraft && (
+							<Button
+								size="sm"
+								onClick={sendInvoice}
+								disabled={invoice.activities.length === 0}
+							>
+								<Plane />
+								Mark as Sent
+							</Button>
+						)}
+						{isSent && (
+							<Button size="sm" onClick={markAsPaid}>
+								<DollarSign />
+								Mark as Paid
+							</Button>
+						)}
+						{isPaid && (
+							<Button size="sm" onClick={amendInvoice}>
+								<Undo />
+								Amend
+							</Button>
+						)}
 
-						<div className="flex shrink-0 items-center gap-1.5">
-							{isDraft && (
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
 								<Button
-									size="sm"
-									onClick={sendInvoice}
-									disabled={invoice.activities.length === 0}
+									variant="ghost"
+									size="icon"
+									aria-label="Invoice actions"
 								>
-									<Plane />
-									Mark as Sent
+									<EllipsisVertical />
 								</Button>
-							)}
-							{isSent && (
-								<Button size="sm" onClick={markAsPaid}>
-									<DollarSign />
-									Mark as Paid
-								</Button>
-							)}
-							{isPaid && (
-								<Button size="sm" onClick={amendInvoice}>
-									<Undo />
-									Amend
-								</Button>
-							)}
-
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button
-										variant="ghost"
-										size="icon"
-										aria-label="Invoice actions"
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								{isDraft && (
+									<Link href={`/dashboard/invoices/${invoice.id}/edit`}>
+										<DropdownMenuItem className="cursor-pointer">
+											<Pencil className="mr-2 h-4 w-4" />
+											<span>Edit</span>
+										</DropdownMenuItem>
+									</Link>
+								)}
+								{isSent && (
+									<DropdownMenuItem
+										onClick={amendInvoice}
+										className="cursor-pointer"
 									>
-										<EllipsisVertical />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end">
-									{isDraft && (
-										<Link href={`/dashboard/invoices/${invoice.id}/edit`}>
-											<DropdownMenuItem className="cursor-pointer">
-												<Pencil className="mr-2 h-4 w-4" />
-												<span>Edit</span>
-											</DropdownMenuItem>
-										</Link>
-									)}
-									{isSent && (
-										<DropdownMenuItem
-											onClick={amendInvoice}
-											className="cursor-pointer"
-										>
-											<Undo className="mr-2 h-4 w-4" />
-											<span>Amend</span>
-										</DropdownMenuItem>
-									)}
-									{isPaid && (
-										<DropdownMenuItem
-											onClick={markAsUnpaid}
-											className="cursor-pointer"
-										>
-											<Undo className="mr-2 h-4 w-4" />
-											<span>Mark as unpaid</span>
-										</DropdownMenuItem>
-									)}
-									{isDraft && !hasVersions && (
-										<DropdownMenuItem
-											onClick={deleteInvoice}
-											className="text-destructive focus:text-destructive cursor-pointer"
-										>
-											<Trash2 className="mr-2 h-4 w-4" />
-											<span>Delete</span>
-										</DropdownMenuItem>
-									)}
-								</DropdownMenuContent>
-							</DropdownMenu>
-						</div>
-					</div>
+										<Undo className="mr-2 h-4 w-4" />
+										<span>Amend</span>
+									</DropdownMenuItem>
+								)}
+								{isPaid && (
+									<DropdownMenuItem
+										onClick={markAsUnpaid}
+										className="cursor-pointer"
+									>
+										<Undo className="mr-2 h-4 w-4" />
+										<span>Mark as unpaid</span>
+									</DropdownMenuItem>
+								)}
+								{isDraft && !hasVersions && (
+									<DropdownMenuItem
+										onClick={deleteInvoice}
+										className="text-destructive focus:text-destructive cursor-pointer"
+									>
+										<Trash2 className="mr-2 h-4 w-4" />
+										<span>Delete</span>
+									</DropdownMenuItem>
+								)}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</>
+				}
+			>
+				<FactGrid>
+					<Fact icon={DollarSign} label="Total">
+						<span
+							className="text-lg font-semibold tracking-tight tabular-nums"
+							data-testid="invoice-total"
+						>
+							{formatCurrency(total)}
+						</span>
+					</Fact>
 
-					<FactGrid>
-						<Fact icon={DollarSign} label="Total">
-							<span
-								className="text-lg font-semibold tracking-tight tabular-nums"
-								data-testid="invoice-total"
-							>
-								{formatCurrency(total)}
-							</span>
-						</Fact>
+					<Fact icon={User} label="Client">
+						<Link
+							href={`/dashboard/clients/${invoice.client.id}`}
+							className="decoration-foreground/30 hover:decoration-foreground underline underline-offset-4 transition-colors"
+						>
+							{invoice.client.name}
+						</Link>
+					</Fact>
 
-						<Fact icon={User} label="Client">
-							<Link
-								href={`/dashboard/clients/${invoice.client.id}`}
-								className="decoration-foreground/30 hover:decoration-foreground underline underline-offset-4 transition-colors"
-							>
-								{invoice.client.name}
-							</Link>
-						</Fact>
+					<Fact icon={Dumbbell} label="Activities">
+						{invoice.activities.length}
+					</Fact>
+				</FactGrid>
+			</DetailHeader>
 
-						<Fact icon={Dumbbell} label="Activities">
-							{invoice.activities.length}
-						</Fact>
-					</FactGrid>
-				</header>
-
-				<InvoiceDocument invoice={invoice} />
-				<InvoiceVersionHistory invoice={invoice} />
-				<InvoiceActivities invoice={invoice} />
-			</div>
-		</div>
+			<InvoiceDocument invoice={invoice} />
+			<InvoiceVersionHistory invoice={invoice} />
+			<InvoiceActivities invoice={invoice} />
+		</DetailPage>
 	);
 };
 
