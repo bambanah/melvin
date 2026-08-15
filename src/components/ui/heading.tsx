@@ -18,7 +18,7 @@ const Heading = ({ children, className, size = "medium" }: Props) => {
 	return (
 		<h2
 			className={cn(
-				"text-fg m-0 font-semibold break-words",
+				"text-fg m-0 font-semibold wrap-break-word",
 				variantStyles[size],
 				className
 			)}
