@@ -19,7 +19,11 @@ const Header = ({
 	variant = "default"
 }: HeaderProps) => (
 	<div className="flex items-center justify-between gap-2 py-2">
-		{title && <h2 className="mr-auto text-2xl font-bold">{title}</h2>}
+		{title && (
+			<h2 className="mr-auto text-lg font-semibold tracking-tight md:text-xl">
+				{title}
+			</h2>
+		)}
 		{createNewHref && (
 			<>
 				{extraButtons}
@@ -34,7 +38,7 @@ const Header = ({
 
 		{variant === "skeleton" && (
 			<>
-				<h2 className="mr-auto w-32 text-3xl font-bold">
+				<h2 className="mr-auto w-32 text-lg font-semibold tracking-tight md:text-xl">
 					<Skeleton />
 				</h2>
 
@@ -54,7 +58,7 @@ const Item = ({
 	LinkProps) => (
 	<Link
 		className={cn([
-			"flex w-full justify-between gap-2 p-4 text-sm text-neutral-900 transition-colors duration-75 hover:bg-orange-100",
+			"hover:bg-accent flex w-full justify-between gap-2 p-4 text-sm transition-colors duration-75",
 			className
 		])}
 		{...rest}

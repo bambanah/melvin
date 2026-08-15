@@ -1,6 +1,17 @@
+import {
+	DetailHeader,
+	DetailPage,
+	DetailSection
+} from "@/components/shared/detail-page";
 import { Fact, FactGrid } from "@/components/shared/fact";
-import ListPage from "@/components/shared/list-page";
 import Loading from "@/components/ui/loading";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue
+} from "@/components/ui/select";
 import type { BillingReport } from "@/lib/billing-report";
 import { financialYearLabel } from "@/lib/financial-year";
 import { trpc } from "@/lib/trpc";
@@ -18,7 +29,6 @@ import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { FinancialYearChart } from "./financial-year-chart";
 import { MonthlyTrendChart } from "./monthly-trend-chart";
-import { ReportSection } from "./report-section";
 import { ShareRow, ShareRows } from "./share-rows";
 import { TravelBreakdown } from "./travel-breakdown";
 
@@ -126,39 +136,56 @@ export default function ReportsPage() {
 	const maxClient = report.clients[0]?.total ?? 0;
 
 	return (
-		<ListPage>
+		<DetailPage>
 			<Head>
 				<title>{`Reports - ${selectedLabel} | Melvin`}</title>
 			</Head>
 
-			<header className="flex flex-col gap-1 py-2">
-				<h1 className="text-2xl font-bold">Reports</h1>
-				<p className="text-foreground/50 text-sm">
-					Sent and paid invoices, counted in the financial year of their invoice
-					date.
-				</p>
-			</header>
+			<DetailHeader
+				eyebrow={selectedLabel}
+				title="Reports"
+				actions={
+					<Select
+						value={String(report.selectedFinancialYear)}
+						onValueChange={(value) => select(Number(value))}
+					>
+						<SelectTrigger className="h-9 w-36" aria-label="Financial year">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{report.years.map((year) => (
+								<SelectItem
+									key={year.financialYear}
+									value={String(year.financialYear)}
+								>
+									{financialYearLabel(year.financialYear)}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				}
+			>
+				<FactGrid>
+					<TotalBilledFact report={report} partial={selectedIsPartial} />
+					<Fact icon={FileText} label="Invoices">
+						{report.invoiceCount}
+					</Fact>
+					<Fact icon={Users} label="Clients billed">
+						{report.clientCount}
+					</Fact>
+				</FactGrid>
+			</DetailHeader>
 
-			<ReportSection
+			<DetailSection
 				title="Billed by financial year"
-				caption="Select a year to scope everything below"
+				caption="Sent and paid invoices, by invoice date - pick a year to scope everything below"
 			>
 				<FinancialYearChart
 					years={report.years}
 					selectedFinancialYear={report.selectedFinancialYear}
 					onSelect={select}
 				/>
-			</ReportSection>
-
-			<FactGrid>
-				<TotalBilledFact report={report} partial={selectedIsPartial} />
-				<Fact icon={FileText} label={`Invoices (${selectedLabel})`}>
-					{report.invoiceCount}
-				</Fact>
-				<Fact icon={Users} label="Clients billed">
-					{report.clientCount}
-				</Fact>
-			</FactGrid>
+			</DetailSection>
 
 			{report.backfilledCount > 0 && (
 				<BackfilledCaveat count={report.backfilledCount} />
@@ -168,11 +195,11 @@ export default function ReportsPage() {
 				<EmptyYear label={selectedLabel} />
 			) : (
 				<>
-					<ReportSection title="Monthly trend" caption="By invoice date">
+					<DetailSection title="Monthly trend" caption="By invoice date">
 						<MonthlyTrendChart months={report.months} />
-					</ReportSection>
+					</DetailSection>
 
-					<ReportSection title="Clients">
+					<DetailSection title="Clients">
 						<ShareRows>
 							{report.clients.map((client) => (
 								<ShareRow
@@ -185,9 +212,9 @@ export default function ReportsPage() {
 								/>
 							))}
 						</ShareRows>
-					</ReportSection>
+					</DetailSection>
 
-					<ReportSection title="Support items" caption="Support delivery only">
+					<DetailSection title="Support items" caption="Support delivery only">
 						<ShareRows>
 							{report.supportItems.map((item) => (
 								<ShareRow
@@ -199,11 +226,11 @@ export default function ReportsPage() {
 								/>
 							))}
 						</ShareRows>
-					</ReportSection>
+					</DetailSection>
 
 					<TravelBreakdown travel={report.travel} />
 				</>
 			)}
-		</ListPage>
+		</DetailPage>
 	);
 }

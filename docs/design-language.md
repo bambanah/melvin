@@ -11,30 +11,38 @@ mode.
 
 ## Detail grammar
 
-One entity, read-first, with its actions in the corner. Reference implementation:
-`src/components/activities/activity-page.tsx`.
+One entity, read-first, with its actions in the corner. The grammar is the components in
+`src/components/shared/detail-page.tsx` - `DetailPage`, `DetailHeader`, `DetailSection`;
+`src/components/activities/activity-page.tsx` is the reference caller.
 
 A detail page reads top to bottom as: **what this is** (header), **what you'd want at a
-glance** (facts), **the substance** (sections).
+glance** (facts), **the substance** (sections). Reports uses it too, with the selected
+financial year standing in for the entity - one subject, read-first, is the test, not a
+database row.
 
-- **Header.** An eyebrow line in the primary colour carrying the entity's date or context,
-  then the title, then a muted mono subline for the identifier-ish detail (support item
-  code, bill-to). A status badge sits inline with the title, not on its own row.
+- **Header.** `DetailHeader`: an eyebrow line in the primary colour carrying the entity's
+  date or context, then the title, then a muted mono subline for the identifier-ish detail
+  (support item code, bill-to). A status badge sits inline with the title, not on its own
+  row. Only the title is required - a client has no date to put in the eyebrow.
 - **Action cluster.** Right-aligned, sharing the header's top line. At most one primary
   action rendered as a button - the single thing you most likely came to do, which varies
   by state (a draft invoice offers "Mark as Sent", a paid one offers "Amend"). Everything
-  else lives in an overflow menu behind an `EllipsisVertical` trigger.
+  else lives in an overflow menu behind an `EllipsisVertical` trigger. Where a control
+  scopes the whole page rather than acting on it, it takes the cluster instead: Reports
+  puts its financial-year select there, and has no actions to compete with it.
 - **Facts.** A `FactGrid` of `Fact` cells (`src/components/shared/fact.tsx`): stacked on
   phones, three columns from `sm` up. Three facts, chosen as the things you would otherwise
   scroll to find. A page with fewer than three at-a-glance facts should omit the grid
-  rather than pad it.
-- **Sections.** Card-shaped blocks below the header, stacked in a single column.
+  rather than pad it - the support item page carries its one, its rate type, in the eyebrow.
+  `FactList` is the same three columns without the card, for facts inside a section.
+- **Sections.** `DetailSection`: card-shaped blocks below the header, stacked in a single
+  column, each with a title and an optional caption.
 
 ### Specifics that are easy to get wrong
 
-- The column is `max-w-3xl`, centred. Not `max-w-4xl` - that's the list grammar.
-- Bottom padding is `pb-24 md:pb-8`. The wider phone padding clears the floating quick-add
-  FAB, which would otherwise sit on top of the last section.
+- `DetailPage` owns the column (`max-w-3xl`, centred - not `max-w-4xl`, that's the list
+  grammar) and the `pb-24 md:pb-8` bottom padding, whose wider phone value clears the
+  floating quick-add FAB. Don't re-declare either on the page.
 - Edit collapses into the overflow menu on phones: the button is `hidden sm:inline-flex`
   and the menu item is `sm:hidden`. Both exist; neither is visible twice.
 - The overflow trigger needs an `aria-label` (`"Invoice actions"`), which is also what the
@@ -59,7 +67,10 @@ Index pages, via `src/components/shared/list-page.tsx`.
 
 - A wider centred column (`max-w-4xl`) than the detail grammar - rows want the room.
 - A title row with the create action right-aligned, then filters, then rows.
-- Rows are full-width links with hover feedback drawn from theme tokens.
+- Rows (`ListPage.Item`) are full-width links whose hover feedback is `hover:bg-accent`,
+  and which inherit their text colour - both so they follow the theme into dark mode.
+- The title is an `h2`, not an `h1`: `ListPage.Header` doubles as a section header when a
+  list is embedded in a detail page (the client page's invoices).
 
 ## Exceptions
 

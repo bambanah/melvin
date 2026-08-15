@@ -1,6 +1,6 @@
 import type { BillingReport } from "@/lib/billing-report";
 import { formatCurrency } from "@/lib/utils";
-import { ReportSection } from "./report-section";
+import { DetailSection } from "@/components/shared/detail-page";
 
 export function TravelBreakdown({
 	travel
@@ -8,7 +8,7 @@ export function TravelBreakdown({
 	travel: BillingReport["travel"];
 }) {
 	return (
-		<ReportSection
+		<DetailSection
 			title="Travel and transport"
 			caption="Excluded from the support items above"
 		>
@@ -37,6 +37,6 @@ export function TravelBreakdown({
 					{formatCurrency(travel.subtotal)}
 				</p>
 			</div>
-		</ReportSection>
+		</DetailSection>
 	);
 }

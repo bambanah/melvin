@@ -1,6 +1,12 @@
 import CustomRatesTable from "@/components/clients/custom-rates-table";
 import SupportItemOverrideDialog from "@/components/clients/support-item-override-dialog";
 import InvoiceList from "@/components/invoices/invoice-list";
+import {
+	DetailHeader,
+	DetailPage,
+	DetailSection
+} from "@/components/shared/detail-page";
+import { Fact, FactGrid, FactList } from "@/components/shared/fact";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,20 +15,27 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import Heading from "@/components/ui/heading";
 import Loading from "@/components/ui/loading";
 import { trpc } from "@/lib/trpc";
 import {
 	Archive,
 	ArchiveRestore,
+	Car,
 	EllipsisVertical,
 	ExternalLink,
+	Fingerprint,
 	Pencil,
+	Route,
 	Trash
 } from "lucide-react";
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
+
+const NotSet = ({ children = "Not set" }: { children?: string }) => (
+	<span className="text-foreground/50">{children}</span>
+);
 
 const ClientPage = ({ clientId }: { clientId: string }) => {
 	const router = useRouter();
@@ -87,21 +100,23 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 	if (!client) return <Loading />;
 
 	return (
-		<div className="mx-auto flex w-full max-w-4xl flex-col items-start justify-center p-4">
-			<div className="my-2 flex w-full flex-col gap-2 px-4 sm:my-8">
-				<div className="mb-2 flex items-center justify-between">
-					<div className="flex items-center gap-2">
-						<Heading>{client.name}</Heading>
-						{!client.active && <Badge variant="secondary">Inactive</Badge>}
-					</div>
+		<DetailPage>
+			<Head>
+				<title>{`${client.name} | Melvin`}</title>
+			</Head>
 
+			<DetailHeader
+				title={client.name}
+				badge={!client.active && <Badge variant="secondary">Inactive</Badge>}
+				subline={`Bill to ${client.billTo ?? client.name}`}
+				actions={
 					<DropdownMenu>
-						<DropdownMenuTrigger asChild className="grow-0">
-							<Button variant="ghost" size="icon">
+						<DropdownMenuTrigger asChild>
+							<Button variant="ghost" size="icon" aria-label="Client actions">
 								<EllipsisVertical />
 							</Button>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent>
+						<DropdownMenuContent align="end">
 							<Link href={`/dashboard/clients/${client.id}/edit`}>
 								<DropdownMenuItem className="cursor-pointer">
 									<Pencil className="mr-2 h-4 w-4" />
@@ -128,95 +143,87 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 
 							<DropdownMenuItem
 								onClick={() => deleteClient()}
-								className="cursor-pointer"
+								className="text-destructive focus:text-destructive cursor-pointer"
 							>
 								<Trash className="mr-2 h-4 w-4" />
 								<span>Delete</span>
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
-				</div>
+				}
+			>
+				<FactGrid>
+					<Fact icon={Fingerprint} label="Participant number">
+						{client.number ?? <NotSet />}
+					</Fact>
 
-				<div className="flex flex-col">
-					<h3 className="font-semibold">Participant Number</h3>
-					{client.number ? (
-						<p>{client.number}</p>
-					) : (
-						<p className="text-foreground/50">Not set</p>
-					)}
-				</div>
+					<Fact icon={Car} label="Distance">
+						{client.distanceToClient ? (
+							`${client.distanceToClient.toString()} km one-way`
+						) : (
+							<NotSet />
+						)}
+					</Fact>
 
-				<div className="flex flex-col">
-					<h3 className="font-semibold">Bill To</h3>
-					{client.billTo ? (
-						<p>{client.billTo}</p>
-					) : (
-						<p className="text-foreground/50">Not set</p>
-					)}
-				</div>
+					<Fact icon={Route} label="Transit rate">
+						{client.transitRatePerKm ? (
+							`$${client.transitRatePerKm.toString()}/km`
+						) : (
+							<NotSet>Using default</NotSet>
+						)}
+					</Fact>
+				</FactGrid>
+			</DetailHeader>
 
-				<div className="flex flex-col">
-					<h3 className="font-semibold">Invoice Prefix</h3>
-					{client.invoiceNumberPrefix ? (
-						<p>
-							{client.invoiceNumberPrefix}
-							<span className="text-foreground/50">##</span>
-						</p>
-					) : (
-						<p className="text-foreground/50">Not set</p>
-					)}
-				</div>
+			<DetailSection title="Details">
+				<FactList>
+					<Fact label="Invoice prefix">
+						{client.invoiceNumberPrefix ? (
+							<>
+								{client.invoiceNumberPrefix}
+								<span className="text-foreground/50">##</span>
+							</>
+						) : (
+							<NotSet />
+						)}
+					</Fact>
 
-				<div className="flex flex-col">
-					<h3 className="font-semibold">Distance to Client (one-way)</h3>
-					{client.distanceToClient ? (
-						<p>{client.distanceToClient.toString()} km</p>
-					) : (
-						<p className="text-foreground/50">Not set</p>
-					)}
-				</div>
+					<Fact label="Travel time">
+						{client.travelTimeToClient ? (
+							`${client.travelTimeToClient.toString()} min one-way`
+						) : (
+							<NotSet />
+						)}
+					</Fact>
 
-				<div className="flex flex-col">
-					<h3 className="font-semibold">Travel Time to Client (one-way)</h3>
-					{client.travelTimeToClient ? (
-						<p>{client.travelTimeToClient.toString()} min</p>
-					) : (
-						<p className="text-foreground/50">Not set</p>
-					)}
-				</div>
+					<Fact label="Invoice email">
+						{client.invoiceEmail ? (
+							<a
+								className="decoration-foreground/30 hover:decoration-foreground flex items-center gap-2 underline underline-offset-4 transition-colors"
+								href={`mailto:${client.invoiceEmail}`}
+							>
+								{client.invoiceEmail}
+								<ExternalLink className="h-4 w-4 shrink-0" />
+							</a>
+						) : (
+							<NotSet />
+						)}
+					</Fact>
+				</FactList>
+			</DetailSection>
 
-				<div className="flex flex-col">
-					<h3 className="font-semibold">Transit Rate</h3>
-					{client.transitRatePerKm ? (
-						<p>${client.transitRatePerKm.toString()}/km</p>
-					) : (
-						<p className="text-foreground/50">Using default</p>
-					)}
-				</div>
-
-				<div className="flex flex-col">
-					<h3 className="font-semibold">Invoice Email</h3>
-					{client.invoiceEmail ? (
-						<a
-							className="flex items-center gap-2 underline"
-							href={`mailto:${client.invoiceEmail}`}
-						>
-							{client.invoiceEmail}
-							<ExternalLink className="h-4 w-4" />
-						</a>
-					) : (
-						<p className="text-foreground/50">Not set</p>
-					)}
-				</div>
-				<div className="space-y-2">
-					<h3 className="font-semibold">Custom Rates</h3>
+			<DetailSection
+				title="Custom rates"
+				caption="Rates that override the support item's own"
+			>
+				<div className="flex flex-col items-start gap-2 px-5 py-4">
 					<CustomRatesTable clientId={client.id} />
 					<SupportItemOverrideDialog clientId={client.id} />
 				</div>
-			</div>
+			</DetailSection>
 
-			<InvoiceList clientId={client.id} groupByAssignedStatus={false} />
-		</div>
+			<InvoiceList clientId={client.id} />
+		</DetailPage>
 	);
 };
 

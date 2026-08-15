@@ -1,10 +1,14 @@
 import ActivityForm from "@/components/activities/activity-form";
 import Layout from "@/components/shared/layout";
 import Heading from "@/components/ui/heading";
+import Head from "next/head";
 
 const CreateActivity = () => {
 	return (
 		<Layout>
+			<Head>
+				<title>Log Activity | Melvin</title>
+			</Head>
 			<div className="mx-auto flex w-full max-w-md flex-col items-center gap-12">
 				<Heading>Log Activity</Heading>
 
