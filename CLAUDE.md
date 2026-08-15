@@ -16,6 +16,10 @@ Issues and PRDs live as GitHub issues in this repo. See `docs/agents/issue-track
 
 Single-context layout — `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
 
+### Design language
+
+Dashboard pages use one of three layout grammars - detail, form, list. See `docs/design-language.md`.
+
 ## Git conventions
 
 Auto-generated commits should have a concise title only — no description body or co-author information.
