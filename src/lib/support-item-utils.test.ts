@@ -1,6 +1,7 @@
 import {
 	getActivityBasedTransportCode,
 	getNonLabourTravelCode,
+	getPriceLimit,
 	getRegistrationGroups,
 	getSupportCategories,
 	getSupportItemDefs
@@ -52,6 +53,17 @@ test("Should return correct activity based transport code", () => {
 	expect(getActivityBasedTransportCode("not-a-code")).toEqual(undefined);
 	expect(getActivityBasedTransportCode("04_1044_0125_6_1")).toEqual(undefined);
 	expect(getActivityBasedTransportCode("")).toEqual(undefined);
+});
+
+test("should return the national price limit only for priced supports", () => {
+	expect(getPriceLimit("01_002_0107_1_1")).toEqual(82.57);
+
+	// Quotable support - no fixed price in the catalogue
+	expect(getPriceLimit("01_003_0107_1_1")).toEqual(undefined);
+
+	// A code the provider invented, absent from the catalogue
+	expect(getPriceLimit("01_001_9999_9_9")).toEqual(undefined);
+	expect(getPriceLimit("")).toEqual(undefined);
 });
 
 test("should get support categories", () => {

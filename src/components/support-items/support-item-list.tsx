@@ -1,36 +1,17 @@
 import InfiniteList from "@/components/shared/infinite-list";
 import ListPage from "@/components/shared/list-page";
-import type { Prisma } from "@/generated/client";
-import { RateType } from "@/generated/browser";
+import type { SupportItemListOutput } from "@/server/api/routers/support-item-router";
 import { trpc } from "@/lib/trpc";
-import { decimalToCurrencyString } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import { Users } from "lucide-react";
-import Link from "next/link";
 
-const ItemCode = ({
-	descriptor,
-	code,
-	rate,
-	rateType
-}: {
-	descriptor: string;
-	code: string | null;
-	rate: Prisma.Decimal | null;
-	rateType?: RateType;
-}) => {
-	if (!code) return null;
-	return (
-		<div className="flex flex-nowrap gap-1 whitespace-nowrap">
-			<p className="font-semibold">{descriptor}:</p> {code}{" "}
-			{rate && (
-				<>
-					<span className="text-foreground/40">{"// "}</span>
-					{decimalToCurrencyString(rate)}/{rateType === "KM" ? "km" : "hr"}
-				</>
-			)}
-		</div>
-	);
-};
+/** Day rates beyond the mandatory weekday pair - the detail page has them all. */
+const extraRateCount = (supportItem: SupportItemListOutput) =>
+	[
+		supportItem.weeknightCode,
+		supportItem.saturdayCode,
+		supportItem.sundayCode
+	].filter(Boolean).length;
 
 function SupportItemList() {
 	const queryResult = trpc.supportItem.list.useInfiniteQuery(
@@ -49,41 +30,40 @@ function SupportItemList() {
 
 			<InfiniteList queryResult={queryResult} dataKey="supportItems">
 				{(supportItems) =>
-					supportItems.map((supportItem) => (
-						<div key={supportItem.id} className="flex flex-col gap-4 p-4">
-							<Link
+					supportItems.map((supportItem) => {
+						const extraRates = extraRateCount(supportItem);
+
+						return (
+							<ListPage.Item
+								key={supportItem.id}
 								href={`/dashboard/support-items/${supportItem.id}`}
-								className="flex items-center gap-2 sm:text-lg"
 							>
-								{supportItem.description}
-								{supportItem.isGroup && <Users className="h-4 w-4" />}
-							</Link>
-							<ItemCode
-								descriptor="Base"
-								code={supportItem.weekdayCode}
-								rate={supportItem.weekdayRate}
-								rateType={supportItem.rateType}
-							/>
-							<ItemCode
-								descriptor="Weeknight"
-								code={supportItem.weeknightCode}
-								rate={supportItem.weeknightRate}
-								rateType={supportItem.rateType}
-							/>
-							<ItemCode
-								descriptor="Saturday"
-								code={supportItem.saturdayCode}
-								rate={supportItem.saturdayRate}
-								rateType={supportItem.rateType}
-							/>
-							<ItemCode
-								descriptor="Sunday"
-								code={supportItem.sundayCode}
-								rate={supportItem.sundayRate}
-								rateType={supportItem.rateType}
-							/>
-						</div>
-					))
+								<div className="flex min-w-0 flex-col gap-1">
+									<span className="flex items-center gap-2">
+										{supportItem.description}
+										{supportItem.isGroup && <Users className="h-4 w-4" />}
+									</span>
+									<span className="text-foreground/50 font-mono text-xs">
+										{supportItem.weekdayCode}
+									</span>
+								</div>
+
+								<div className="flex shrink-0 flex-col items-end gap-1 tabular-nums">
+									<span>
+										{formatCurrency(Number(supportItem.weekdayRate))}
+										<span className="text-foreground/50">
+											/{supportItem.rateType === "KM" ? "km" : "hr"}
+										</span>
+									</span>
+									{extraRates > 0 && (
+										<span className="text-foreground/50 text-xs">
+											+{extraRates} day {extraRates === 1 ? "rate" : "rates"}
+										</span>
+									)}
+								</div>
+							</ListPage.Item>
+						);
+					})
 				}
 			</InfiniteList>
 		</ListPage>

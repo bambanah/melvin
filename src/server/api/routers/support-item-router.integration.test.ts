@@ -45,6 +45,37 @@ test("addCustomRates then getCustomRatesForClient returns the rate with the supp
 	});
 });
 
+test("getCustomRatesForItem returns each overriding client, and rejects another user's item", async () => {
+	const user = await createTestUser();
+	const other = await createTestUser();
+	const caller = callerFor(user);
+
+	const supportItem = await createSupportItem(user.id);
+	const client = await caller.clients.create({ client: { name: "Jane" } });
+	await caller.supportItem.addCustomRates({
+		supportItemRates: {
+			supportItemId: supportItem.id,
+			clientId: client.id,
+			weekdayRate: 200
+		}
+	});
+	// A client-less override belongs to no client row on the page.
+	await caller.supportItem.addCustomRates({
+		supportItemRates: { supportItemId: supportItem.id, weekdayRate: 150 }
+	});
+
+	const rates = await caller.supportItem.getCustomRatesForItem({
+		id: supportItem.id
+	});
+	expect(rates).toHaveLength(1);
+	expect(rates[0].client).toEqual({ id: client.id, name: "Jane" });
+	expect(Number(rates[0].weekdayRate)).toBe(200);
+
+	await expect(
+		callerFor(other).supportItem.getCustomRatesForItem({ id: supportItem.id })
+	).rejects.toMatchObject({ code: "NOT_FOUND" });
+});
+
 test("updateCustomRate with a partial payload updates only the provided fields", async () => {
 	const user = await createTestUser();
 	const caller = callerFor(user);

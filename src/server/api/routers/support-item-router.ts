@@ -165,6 +165,27 @@ export const supportItemRouter = router({
 
 			return customRates;
 		}),
+	getCustomRatesForItem: authedProcedure
+		.input(z.object({ id: z.string() }))
+		.query(async ({ ctx, input }) => {
+			await ctx.owned.supportItem.assert(input.id);
+
+			return ctx.owned.supportItemRates.findMany({
+				where: {
+					supportItemId: input.id,
+					clientId: { not: null }
+				},
+				select: {
+					id: true,
+					weekdayRate: true,
+					weeknightRate: true,
+					saturdayRate: true,
+					sundayRate: true,
+					client: { select: { id: true, name: true } }
+				},
+				orderBy: { client: { name: "asc" } }
+			});
+		}),
 	updateCustomRate: authedProcedure
 		.input(
 			z.object({
