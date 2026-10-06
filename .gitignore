@@ -22,3 +22,6 @@ generated/
 .DS_Store
 
 .claude/worktrees
+
+# Sentry Config File
+.env.sentry-build-plugin
