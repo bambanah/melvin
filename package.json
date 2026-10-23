@@ -81,7 +81,7 @@
 		"react-toastify": "11.1.0",
 		"recharts": "3.8.0",
 		"superjson": "2.2.6",
-		"zod": "4.4.3"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "21.0.2",
