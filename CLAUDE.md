@@ -14,7 +14,7 @@ Issues and PRDs live as GitHub issues in this repo. See `docs/agents/issue-track
 
 ### Domain docs
 
-Single-context layout — `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+Single-context layout — `GLOSSARY.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
 
 ### Design language
 

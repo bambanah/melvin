@@ -19,7 +19,7 @@ export const supportItemSchema = z.object({
 	isGroup: z.boolean().optional(),
 
 	weekdayCode: zodItemCode.min(1, "Required"),
-	// The weekday pair is the only mandatory one - see CONTEXT.md, Day Rate.
+	// The weekday pair is the only mandatory one - see GLOSSARY.md, Day Rate.
 	weekdayRate: numberFromInput()
 		.min(0.01, "Required")
 		.multipleOf(0.01, TOO_MANY_DECIMALS_MESSAGE),
