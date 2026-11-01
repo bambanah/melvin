@@ -1,3 +1,13 @@
+import { PrototypeSwitcher } from "@/components/regular-time-prototype/prototype-switcher";
+import { useRegularTime } from "@/components/regular-time-prototype/store";
+import {
+	VariantDialogAction,
+	VariantDialogEyebrow
+} from "@/components/regular-time-prototype/variant-dialog";
+import { VariantFormFact } from "@/components/regular-time-prototype/variant-form";
+import { VariantSection } from "@/components/regular-time-prototype/variant-section";
+import { VariantSentence } from "@/components/regular-time-prototype/variant-sentence";
+import { VARIANTS } from "@/components/regular-time-prototype/variants";
 import CustomRatesTable from "@/components/clients/custom-rates-table";
 import SupportItemOverrideDialog from "@/components/clients/support-item-override-dialog";
 import InvoiceList from "@/components/invoices/invoice-list";
@@ -39,6 +49,9 @@ const NotSet = ({ children = "Not set" }: { children?: string }) => (
 
 const ClientPage = ({ clientId }: { clientId: string }) => {
 	const router = useRouter();
+	// PROTOTYPE (#502)
+	const variant = (router.query.variant as string) ?? "A";
+	const regularTime = useRegularTime(clientId);
 
 	const trpcUtils = trpc.useUtils();
 	const { data: client, error } = trpc.clients.byId.useQuery({
@@ -106,50 +119,64 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 			</Head>
 
 			<DetailHeader
+				eyebrow={
+					variant === "C" && <VariantDialogEyebrow clientId={client.id} />
+				}
 				title={client.name}
 				badge={!client.active && <Badge variant="secondary">Inactive</Badge>}
 				subline={`Bill to ${client.billTo ?? client.name}`}
 				actions={
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" size="icon" aria-label="Client actions">
-								<EllipsisVertical />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							<Link href={`/dashboard/clients/${client.id}/edit`}>
-								<DropdownMenuItem className="cursor-pointer">
-									<Pencil className="mr-2 h-4 w-4" />
-									<span>Edit</span>
+					<div className="flex items-center gap-1">
+						{variant === "C" && (
+							<VariantDialogAction
+								clientId={client.id}
+								clientName={client.name}
+								hasDistance={!!client.distanceToClient}
+							/>
+						)}
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button variant="ghost" size="icon" aria-label="Client actions">
+									<EllipsisVertical />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<Link
+									href={`/dashboard/clients/${client.id}/edit${variant === "B" ? "?variant=B" : ""}`}
+								>
+									<DropdownMenuItem className="cursor-pointer">
+										<Pencil className="mr-2 h-4 w-4" />
+										<span>Edit</span>
+									</DropdownMenuItem>
+								</Link>
+
+								<DropdownMenuItem
+									onClick={() => toggleActive()}
+									className="cursor-pointer"
+								>
+									{client.active ? (
+										<>
+											<Archive className="mr-2 h-4 w-4" />
+											<span>Deactivate</span>
+										</>
+									) : (
+										<>
+											<ArchiveRestore className="mr-2 h-4 w-4" />
+											<span>Reactivate</span>
+										</>
+									)}
 								</DropdownMenuItem>
-							</Link>
 
-							<DropdownMenuItem
-								onClick={() => toggleActive()}
-								className="cursor-pointer"
-							>
-								{client.active ? (
-									<>
-										<Archive className="mr-2 h-4 w-4" />
-										<span>Deactivate</span>
-									</>
-								) : (
-									<>
-										<ArchiveRestore className="mr-2 h-4 w-4" />
-										<span>Reactivate</span>
-									</>
-								)}
-							</DropdownMenuItem>
-
-							<DropdownMenuItem
-								onClick={() => deleteClient()}
-								className="text-destructive focus:text-destructive cursor-pointer"
-							>
-								<Trash className="mr-2 h-4 w-4" />
-								<span>Delete</span>
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+								<DropdownMenuItem
+									onClick={() => deleteClient()}
+									className="text-destructive focus:text-destructive cursor-pointer"
+								>
+									<Trash className="mr-2 h-4 w-4" />
+									<span>Delete</span>
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
 				}
 			>
 				<FactGrid>
@@ -165,15 +192,26 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 						)}
 					</Fact>
 
-					<Fact icon={Route} label="Transit rate">
-						{client.transitRatePerKm ? (
-							`$${client.transitRatePerKm.toString()}/km`
-						) : (
-							<NotSet>Using default</NotSet>
-						)}
-					</Fact>
+					{variant === "B" ? (
+						<VariantFormFact clientId={client.id} />
+					) : (
+						<Fact icon={Route} label="Transit rate">
+							{client.transitRatePerKm ? (
+								`$${client.transitRatePerKm.toString()}/km`
+							) : (
+								<NotSet>Using default</NotSet>
+							)}
+						</Fact>
+					)}
 				</FactGrid>
 			</DetailHeader>
+
+			{variant === "D" && (
+				<VariantSentence
+					clientId={client.id}
+					hasDistance={!!client.distanceToClient}
+				/>
+			)}
 
 			<DetailSection title="Details">
 				<FactList>
@@ -212,6 +250,13 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 				</FactList>
 			</DetailSection>
 
+			{variant === "A" && (
+				<VariantSection
+					clientId={client.id}
+					hasDistance={!!client.distanceToClient}
+				/>
+			)}
+
 			<DetailSection
 				title="Custom rates"
 				caption="Rates that override the support item's own"
@@ -223,6 +268,12 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 			</DetailSection>
 
 			<InvoiceList clientId={client.id} />
+
+			<PrototypeSwitcher
+				variants={VARIANTS}
+				current={variant}
+				state={regularTime}
+			/>
 		</DetailPage>
 	);
 };
