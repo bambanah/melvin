@@ -13,6 +13,9 @@ interface Props {
 	isToday: boolean;
 	isFocused: boolean;
 	onDayClick: (day: Date) => void;
+	// PROTOTYPE (#502)
+	className?: string;
+	badge?: React.ReactNode;
 }
 
 const CalendarDayCell = ({
@@ -21,7 +24,9 @@ const CalendarDayCell = ({
 	isCurrentMonth,
 	isToday,
 	isFocused,
-	onDayClick
+	onDayClick,
+	className,
+	badge
 }: Props) => {
 	const visibleActivities = activities.slice(0, MAX_VISIBLE_ACTIVITIES);
 	const overflowCount = activities.length - MAX_VISIBLE_ACTIVITIES;
@@ -37,7 +42,8 @@ const CalendarDayCell = ({
 				getDay(day) === 1 && "border-l",
 				!isCurrentMonth && "bg-muted/30",
 				isCurrentMonth && !hasActivities && "bg-muted/10",
-				isFocused && "ring-ring ring-2 ring-inset"
+				isFocused && "ring-ring ring-2 ring-inset",
+				className
 			)}
 		>
 			<div className="flex items-center justify-between">
@@ -50,6 +56,7 @@ const CalendarDayCell = ({
 				>
 					{getDate(day)}
 				</span>
+				{badge}
 			</div>
 
 			{/* Mobile: activity dots */}

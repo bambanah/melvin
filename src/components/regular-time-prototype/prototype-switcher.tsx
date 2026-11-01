@@ -1,22 +1,22 @@
 // PROTOTYPE - throwaway. Floating bottom bar that cycles UI variants via the
 // ?variant= search param. Deliberately high-contrast so it reads as scaffolding,
-// not part of the design being judged. Hidden in production builds. Copied
-// from the #464 Log prototype; shows the in-memory state underneath.
+// not part of the design being judged. Hidden in production builds. Mounted in
+// Layout because the apply variants live on different pages; each variant names
+// where to find it and links there.
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { APPLY_VARIANTS, useApplyVariant, useCreated } from "./apply-store";
+import { useAllRegularTimes } from "./store";
 
-export function PrototypeSwitcher({
-	variants,
-	current,
-	state
-}: {
-	variants: { key: string; name: string }[];
-	current: string;
-	state: unknown;
-}) {
+export function PrototypeSwitcher() {
 	const router = useRouter();
+	const current = useApplyVariant();
+	const regularTimes = useAllRegularTimes();
+	const created = useCreated();
 
+	const variants = APPLY_VARIANTS;
 	const index = Math.max(
 		variants.findIndex((v) => v.key === current),
 		0
@@ -47,12 +47,15 @@ export function PrototypeSwitcher({
 
 	if (process.env.NODE_ENV === "production") return null;
 
+	const variant = variants[index];
+
 	return (
-		<div className="fixed bottom-2 left-1/2 z-50 flex -translate-x-1/2 flex-col items-center gap-1">
-			<pre className="max-w-[90vw] overflow-x-auto rounded border border-dashed border-fuchsia-500 bg-black/85 px-2 py-1 font-mono text-[10px] text-white">
-				regularTime = {JSON.stringify(state)}
+		<div className="pointer-events-none fixed bottom-2 left-1/2 z-[60] flex -translate-x-1/2 flex-col items-center gap-1">
+			<pre className="pointer-events-auto max-h-24 max-w-[90vw] overflow-auto rounded border border-dashed border-fuchsia-500 bg-black/85 px-2 py-1 font-mono text-[10px] text-white">
+				regularTimes = {JSON.stringify(Object.fromEntries(regularTimes))}
+				{"\n"}created = {JSON.stringify(created)}
 			</pre>
-			<div className="flex items-center gap-1 rounded-full border-2 border-dashed border-fuchsia-500 bg-black/85 px-2 py-1 font-mono text-xs text-white shadow-xl backdrop-blur">
+			<div className="pointer-events-auto flex items-center gap-1 rounded-full border-2 border-dashed border-fuchsia-500 bg-black/85 px-2 py-1 font-mono text-xs text-white shadow-xl backdrop-blur">
 				<button
 					className="cursor-pointer rounded-full p-1 hover:bg-white/20"
 					onClick={() => go(-1)}
@@ -60,9 +63,16 @@ export function PrototypeSwitcher({
 				>
 					<ChevronLeft className="size-4" />
 				</button>
-				<span className="min-w-32 text-center">
-					{variants[index].key} - {variants[index].name}
-				</span>
+				<Link
+					href={`${variant.href}?variant=${variant.key}`}
+					className="flex min-w-48 flex-col items-center hover:underline"
+					title="Go to where this variant lives"
+				>
+					<span>
+						{variant.key} - {variant.name}
+					</span>
+					<span className="text-[10px] text-white/60">{variant.hint}</span>
+				</Link>
 				<button
 					className="cursor-pointer rounded-full p-1 hover:bg-white/20"
 					onClick={() => go(1)}

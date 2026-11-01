@@ -11,12 +11,25 @@ export type RegularTime = {
 	claimsTravel: boolean;
 };
 
-const store = new Map<string, RegularTime | null>();
+let store = new Map<string, RegularTime>();
 const listeners = new Set<() => void>();
 
 export function setRegularTime(clientId: string, value: RegularTime | null) {
-	store.set(clientId, value);
+	store = new Map(store);
+	if (value) store.set(clientId, value);
+	else store.delete(clientId);
 	listeners.forEach((l) => l());
+}
+
+export function useAllRegularTimes() {
+	return useSyncExternalStore(
+		(l) => {
+			listeners.add(l);
+			return () => listeners.delete(l);
+		},
+		() => store,
+		() => store
+	);
 }
 
 export function useRegularTime(clientId: string) {

@@ -20,6 +20,9 @@ interface Props {
 	activities: ActivityByDateRangeOutput;
 	isLoading: boolean;
 	onDayClick: (day: Date) => void;
+	// PROTOTYPE (#502)
+	dayClassName?: (day: Date) => string | undefined;
+	dayBadge?: (day: Date) => React.ReactNode;
 }
 
 function getCalendarDays(month: Date) {
@@ -59,7 +62,9 @@ const CalendarMonth = ({
 	currentMonth,
 	activities,
 	isLoading,
-	onDayClick
+	onDayClick,
+	dayClassName,
+	dayBadge
 }: Props) => {
 	const days = useMemo(() => getCalendarDays(currentMonth), [currentMonth]);
 	const activitiesByDate = useMemo(
@@ -155,6 +160,8 @@ const CalendarMonth = ({
 							isCurrentMonth={isCurrentMonth}
 							isToday={isToday}
 							isFocused={focusedIndex === index}
+							className={dayClassName?.(day)}
+							badge={dayBadge?.(day)}
 							onDayClick={(d) => {
 								handleFocus(index);
 								onDayClick(d);

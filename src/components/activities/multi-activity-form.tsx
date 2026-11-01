@@ -1,4 +1,14 @@
 import { ClientQuickSelect } from "@/components/forms/client-quick-select";
+import {
+	createActivities,
+	useApplyVariant
+} from "@/components/regular-time-prototype/apply-store";
+import { useAllRegularTimes } from "@/components/regular-time-prototype/store";
+import { RegularTimeSummary } from "@/components/regular-time-prototype/variant-e-row";
+import {
+	QuickAddTabs,
+	RegularTimeTab
+} from "@/components/regular-time-prototype/variant-c-quick-add";
 import { GroupParticipantsEditor } from "@/components/forms/group-participants-editor";
 import { SummingDistanceInput } from "@/components/forms/summing-distance-input";
 import { TimeRangeInput } from "@/components/forms/time-range-input";
@@ -58,6 +68,20 @@ export function MultiActivityForm({
 	const { data: { defaultSupportItemId, defaultGroupSupportItemId } = {} } =
 		trpc.user.fetch.useQuery();
 	const bulkAddMutation = trpc.activity.bulkAdd.useMutation();
+	// PROTOTYPE (#502)
+	const variant = useApplyVariant();
+	const [tab, setTab] = useState<"custom" | "regular">("custom");
+	const regularTimes = useAllRegularTimes();
+	// Field ids of rows whose Regular Time the Provider chose to override.
+	const [overridden, setOverridden] = useState<Set<string>>(new Set());
+	const usesRegularTime = (
+		row: MultiActivityFormModel["activities"][number],
+		fieldId: string
+	) =>
+		variant === "E" &&
+		!row.isGroup &&
+		regularTimes.has(row.clientId) &&
+		!overridden.has(fieldId);
 
 	const form = useForm<MultiActivityFormModel>({
 		resolver: zodResolver(multiActivityFormSchema),
@@ -88,6 +112,35 @@ export function MultiActivityForm({
 	};
 
 	const onSubmit = async (data: MultiActivityFormModel) => {
+		// PROTOTYPE (#502): Regular Time rows go to the in-memory stub; any
+		// others still save for real through bulkAdd, as today.
+		const regularRows = data.activities.filter((row, i) =>
+			usesRegularTime(row, fields[i].id)
+		);
+		if (regularRows.length > 0) {
+			createActivities(
+				regularRows.map((row) => ({
+					clientId: row.clientId,
+					date: data.date,
+					regularTime: regularTimes.get(row.clientId)!
+				}))
+			);
+			const rest = data.activities.filter(
+				(row, i) => !usesRegularTime(row, fields[i].id)
+			);
+			if (rest.every((row) => !row.clientId)) {
+				onSuccess?.();
+				onOpenChange(false);
+				form.reset({
+					date: form.getValues("date"),
+					activities: [createEmptyRow()]
+				});
+				setOverridden(new Set());
+				return;
+			}
+			data = { ...data, activities: rest };
+		}
+
 		const payload = buildBulkAddPayload(data.activities, data.date, {
 			defaultSupportItemId: defaultSupportItemId ?? undefined,
 			defaultGroupSupportItemId: defaultGroupSupportItemId ?? undefined
@@ -136,66 +189,86 @@ export function MultiActivityForm({
 					<DialogTitle>Add Activities</DialogTitle>
 				</DialogHeader>
 
-				<form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
-					<div className="flex flex-col gap-6">
-						<div className="flex items-center gap-4">
-							<Label className="w-12">Date</Label>
-							<Controller
-								control={form.control}
-								name="date"
-								render={({ field }) => (
-									<DatePicker
-										date={field.value}
-										setDate={(d) => d && field.onChange(d)}
-									/>
-								)}
-							/>
-						</div>
+				{variant === "C" && <QuickAddTabs tab={tab} onTabChange={setTab} />}
 
-						<div className="flex flex-col gap-4">
-							{fields.map((field, index) => (
-								<ActivityRow
-									key={field.id}
-									form={form}
-									index={index}
-									defaultSupportItemId={defaultSupportItemId ?? undefined}
-									onRemove={() => remove(index)}
-									canRemove={fields.length > 1}
+				{variant === "C" && tab === "regular" ? (
+					<RegularTimeTab
+						date={initialDate ?? new Date()}
+						onDone={() => {
+							onSuccess?.();
+							onOpenChange(false);
+						}}
+					/>
+				) : (
+					<form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
+						<div className="flex flex-col gap-6">
+							<div className="flex items-center gap-4">
+								<Label className="w-12">Date</Label>
+								<Controller
+									control={form.control}
+									name="date"
+									render={({ field }) => (
+										<DatePicker
+											date={field.value}
+											setDate={(d) => d && field.onChange(d)}
+										/>
+									)}
 								/>
-							))}
+							</div>
+
+							<div className="flex flex-col gap-4">
+								{fields.map((field, index) => (
+									<ActivityRow
+										key={field.id}
+										form={form}
+										index={index}
+										defaultSupportItemId={defaultSupportItemId ?? undefined}
+										onRemove={() => remove(index)}
+										canRemove={fields.length > 1}
+										regularMode={variant === "E"}
+										overridden={overridden.has(field.id)}
+										onOverriddenChange={(on) => {
+											const next = new Set(overridden);
+											if (on) next.add(field.id);
+											else next.delete(field.id);
+											setOverridden(next);
+										}}
+									/>
+								))}
+							</div>
+
+							<Button
+								type="button"
+								variant="outline"
+								onClick={addRow}
+								className="w-full"
+							>
+								<Plus className="mr-2 h-4 w-4" />
+								Add activity
+							</Button>
 						</div>
 
-						<Button
-							type="button"
-							variant="outline"
-							onClick={addRow}
-							className="w-full"
-						>
-							<Plus className="mr-2 h-4 w-4" />
-							Add activity
-						</Button>
-					</div>
-
-					<DialogFooter className="mt-6">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => onOpenChange(false)}
-						>
-							Cancel
-						</Button>
-						<Button type="submit" disabled={bulkAddMutation.isPending}>
-							{bulkAddMutation.isPending ? (
-								<>
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									Saving...
-								</>
-							) : (
-								"Save all"
-							)}
-						</Button>
-					</DialogFooter>
-				</form>
+						<DialogFooter className="mt-6">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => onOpenChange(false)}
+							>
+								Cancel
+							</Button>
+							<Button type="submit" disabled={bulkAddMutation.isPending}>
+								{bulkAddMutation.isPending ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										Saving...
+									</>
+								) : (
+									"Save all"
+								)}
+							</Button>
+						</DialogFooter>
+					</form>
+				)}
 			</DialogContent>
 		</Dialog>
 	);
@@ -207,6 +280,10 @@ interface ActivityRowProps {
 	defaultSupportItemId?: string;
 	onRemove: () => void;
 	canRemove: boolean;
+	// PROTOTYPE (#502)
+	regularMode: boolean;
+	overridden: boolean;
+	onOverriddenChange: (overridden: boolean) => void;
 }
 
 function ActivityRow({
@@ -214,7 +291,10 @@ function ActivityRow({
 	index,
 	defaultSupportItemId,
 	onRemove,
-	canRemove
+	canRemove,
+	regularMode,
+	overridden,
+	onOverriddenChange
 }: ActivityRowProps) {
 	const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -225,6 +305,26 @@ function ActivityRow({
 	const startTime = watch(`activities.${index}.timeRange.startTime`);
 	const clientId = watch(`activities.${index}.clientId`);
 	const supportItemId = watch(`activities.${index}.supportItemId`);
+	const date = watch("date");
+	const regularTimes = useAllRegularTimes();
+	const regularTime =
+		regularMode && !isGroup ? regularTimes.get(clientId) : undefined;
+	const usesRegularTime = !!regularTime && !overridden;
+
+	// Copies the Regular Time into the row, so the fields arrive prefilled
+	// when overridden and the next row's start time chains off it.
+	const fillFromRegularTime = (id: string) => {
+		const rt = regularTimes.get(id);
+		if (!regularMode || !rt) return;
+		setValue(`activities.${index}.timeRange`, {
+			startTime: rt.startTime,
+			endTime: rt.endTime
+		});
+		setValue(`activities.${index}.transportKm`, undefined);
+		setValue(`activities.${index}.transportItems`, []);
+		setValue(`activities.${index}.supportItemId`, rt.supportItemId);
+		clearErrors(`activities.${index}.timeRange`);
+	};
 
 	// Check if this activity is contiguous with a potential previous one
 	const isContiguous = startTime !== "";
@@ -291,7 +391,11 @@ function ActivityRow({
 						render={({ field }) => (
 							<ClientQuickSelect
 								value={field.value}
-								onChange={field.onChange}
+								onChange={(id) => {
+									field.onChange(id);
+									onOverriddenChange(false);
+									fillFromRegularTime(id);
+								}}
 							/>
 						)}
 					/>
@@ -337,54 +441,81 @@ function ActivityRow({
 					</div>
 				)}
 
-				<div className="grid grid-cols-2 gap-4">
-					<div>
-						<Label className={cn(rowErrors?.timeRange && "text-destructive")}>
-							Time
-						</Label>
-						<Controller
-							control={control}
-							name={`activities.${index}.timeRange`}
-							render={({ field }) => (
-								<TimeRangeInput
-									value={field.value}
-									onChange={field.onChange}
-									error={rowErrors?.timeRange?.message}
-								/>
-							)}
-						/>
-						{rowErrors?.timeRange && (
-							<p className="text-destructive mt-1 text-sm">
-								{rowErrors.timeRange.message}
-							</p>
+				{usesRegularTime ? (
+					<RegularTimeSummary
+						clientId={clientId}
+						regularTime={regularTime}
+						date={date}
+						onOverride={() => onOverriddenChange(true)}
+					/>
+				) : (
+					<>
+						{regularTime && (
+							<Button
+								type="button"
+								variant="link"
+								size="sm"
+								className="h-auto self-start p-0"
+								onClick={() => {
+									fillFromRegularTime(clientId);
+									onOverriddenChange(false);
+								}}
+							>
+								Use regular time
+							</Button>
 						)}
-					</div>
+						<div className="grid grid-cols-2 gap-4">
+							<div>
+								<Label
+									className={cn(rowErrors?.timeRange && "text-destructive")}
+								>
+									Time
+								</Label>
+								<Controller
+									control={control}
+									name={`activities.${index}.timeRange`}
+									render={({ field }) => (
+										<TimeRangeInput
+											value={field.value}
+											onChange={field.onChange}
+											error={rowErrors?.timeRange?.message}
+										/>
+									)}
+								/>
+								{rowErrors?.timeRange && (
+									<p className="text-destructive mt-1 text-sm">
+										{rowErrors.timeRange.message}
+									</p>
+								)}
+							</div>
 
-					<div>
-						<Label>Transport (km)</Label>
+							<div>
+								<Label>Transport (km)</Label>
+								<Controller
+									control={control}
+									name={`activities.${index}.transportKm`}
+									render={({ field }) => (
+										<SummingDistanceInput
+											value={field.value}
+											onChange={field.onChange}
+										/>
+									)}
+								/>
+							</div>
+						</div>
+
 						<Controller
 							control={control}
-							name={`activities.${index}.transportKm`}
+							name={`activities.${index}.transportItems`}
 							render={({ field }) => (
-								<SummingDistanceInput
+								<TransportItemsEditor
 									value={field.value}
 									onChange={field.onChange}
 								/>
 							)}
 						/>
-					</div>
-				</div>
-
-				<Controller
-					control={control}
-					name={`activities.${index}.transportItems`}
-					render={({ field }) => (
-						<TransportItemsEditor
-							value={field.value}
-							onChange={field.onChange}
-						/>
-					)}
-				/>
+					</>
+				)}
 
 				{/* Advanced (Support Item override) */}
 				<div>

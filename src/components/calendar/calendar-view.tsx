@@ -16,6 +16,7 @@ import CalendarAgenda from "./calendar-agenda";
 import CalendarDayModal from "./calendar-day-modal";
 import CalendarMonth from "./calendar-month";
 import { MultiActivityForm } from "@/components/activities/multi-activity-form";
+import { useCalendarSelectMode } from "@/components/regular-time-prototype/variant-b-calendar";
 
 type ViewMode = "calendar" | "list";
 
@@ -41,6 +42,8 @@ const CalendarView = () => {
 	}, []);
 	const [selectedDay, setSelectedDay] = useState<Date | null>(null);
 	const [quickAddDay, setQuickAddDay] = useState<Date | null>(null);
+	// PROTOTYPE (#502)
+	const selectMode = useCalendarSelectMode();
 
 	const startDate = currentMonth;
 	const endDate = addMonths(currentMonth, 1);
@@ -108,6 +111,7 @@ const CalendarView = () => {
 				</div>
 
 				<div className="flex items-center gap-1">
+					{selectMode.headerButton}
 					<ViewToggle
 						viewMode={viewMode}
 						onViewModeChange={handleViewModeChange}
@@ -136,12 +140,15 @@ const CalendarView = () => {
 				</div>
 			</div>
 
-			{isMonthView ? (
+			{selectMode.bar}
+			{isMonthView || selectMode.on ? (
 				<CalendarMonth
 					currentMonth={currentMonth}
 					activities={activities ?? []}
 					isLoading={isLoading}
-					onDayClick={handleDayClick}
+					onDayClick={selectMode.on ? selectMode.onDayClick : handleDayClick}
+					dayClassName={selectMode.dayClassName}
+					dayBadge={selectMode.dayBadge}
 				/>
 			) : (
 				<CalendarAgenda />

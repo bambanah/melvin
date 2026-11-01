@@ -1,5 +1,8 @@
-// PROTOTYPE - throwaway (#502). Variant A: a "Regular time" section on the
-// Client page that flips between a read view and an inline edit view in place.
+// PROTOTYPE - throwaway (#502). The set-up verdict (variant A of the first
+// prototype): a "Regular time" section on the Client page that flips between a
+// read view and an inline edit view in place. Hosts apply variant A's button.
+import { useApplyVariant } from "./apply-store";
+import { ApplyDialogButton } from "./variant-a-dialog";
 import { RegularTimeFields } from "./fields";
 import {
 	blankRegularTime,
@@ -16,13 +19,16 @@ import { Button } from "@/components/ui/button";
 import { CalendarClock, Pencil, X } from "lucide-react";
 import { useState } from "react";
 
-export function VariantSection({
+export function SetupSection({
 	clientId,
+	clientName,
 	hasDistance
 }: {
 	clientId: string;
+	clientName: string;
 	hasDistance: boolean;
 }) {
+	const variant = useApplyVariant();
 	const regularTime = useRegularTime(clientId);
 	const { items, defaultId } = useSoloHourlyItems();
 	const [draft, setDraft] = useState<RegularTime | null>(null);
@@ -67,35 +73,46 @@ export function VariantSection({
 					</div>
 				</div>
 			) : regularTime ? (
-				<div className="flex items-start justify-between gap-2 pr-3">
-					<FactList>
-						<Fact label="Time">{formatSpan(regularTime)}</Fact>
-						<Fact label="Support Item">
-							{items.find((i) => i.id === regularTime.supportItemId)
-								?.description ?? "-"}
-						</Fact>
-						<Fact label="Provider Travel">
-							{regularTime.claimsTravel ? "Claimed" : "Not claimed"}
-						</Fact>
-					</FactList>
-					<div className="flex shrink-0 gap-1 py-3">
-						<Button
-							variant="ghost"
-							size="icon"
-							aria-label="Edit regular time"
-							onClick={() => setDraft(regularTime)}
-						>
-							<Pencil />
-						</Button>
-						<Button
-							variant="ghost"
-							size="icon"
-							aria-label="Clear regular time"
-							onClick={() => setRegularTime(clientId, null)}
-						>
-							<X />
-						</Button>
+				<div>
+					<div className="flex items-start justify-between gap-2 pr-3">
+						<FactList>
+							<Fact label="Time">{formatSpan(regularTime)}</Fact>
+							<Fact label="Support Item">
+								{items.find((i) => i.id === regularTime.supportItemId)
+									?.description ?? "-"}
+							</Fact>
+							<Fact label="Provider Travel">
+								{regularTime.claimsTravel ? "Claimed" : "Not claimed"}
+							</Fact>
+						</FactList>
+						<div className="flex shrink-0 gap-1 py-3">
+							<Button
+								variant="ghost"
+								size="icon"
+								aria-label="Edit regular time"
+								onClick={() => setDraft(regularTime)}
+							>
+								<Pencil />
+							</Button>
+							<Button
+								variant="ghost"
+								size="icon"
+								aria-label="Clear regular time"
+								onClick={() => setRegularTime(clientId, null)}
+							>
+								<X />
+							</Button>
+						</div>
 					</div>
+					{variant === "A" && (
+						<div className="px-5 pb-4">
+							<ApplyDialogButton
+								clientId={clientId}
+								clientName={clientName}
+								regularTime={regularTime}
+							/>
+						</div>
+					)}
 				</div>
 			) : (
 				<div className="flex flex-col items-start gap-2 px-5 py-4">

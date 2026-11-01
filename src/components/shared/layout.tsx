@@ -1,6 +1,7 @@
 import { QuickAddFab } from "@/components/activities/quick-add-fab";
 import { OpenSessionBanner } from "@/components/log/open-session-banner";
 import Navbar from "@/components/navigation/navbar";
+import { PrototypeSwitcher } from "@/components/regular-time-prototype/prototype-switcher";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/router";
@@ -45,6 +46,8 @@ const Layout = ({ children, isLoading, className }: Props) => {
 			{/* The Log tab has its own capture affordances - the Activities FAB
 			    would overlap the console's bottom actions on a phone. */}
 			{session && router.pathname !== "/dashboard/log" && <QuickAddFab />}
+			{/* PROTOTYPE (#502) */}
+			{session && <PrototypeSwitcher />}
 		</div>
 	);
 };

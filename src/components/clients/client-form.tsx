@@ -1,10 +1,3 @@
-import { VariantFormFields } from "@/components/regular-time-prototype/variant-form";
-import {
-	type RegularTime,
-	setRegularTime,
-	useRegularTime,
-	validate
-} from "@/components/regular-time-prototype/store";
 import { Button } from "@/components/ui/button";
 import {
 	Form,
@@ -24,7 +17,6 @@ import { ClientByIdOutput } from "@/server/api/routers/client-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -36,14 +28,6 @@ const ClientForm = ({ existingClient }: Props) => {
 	const formPurpose = existingClient ? "update" : "create";
 
 	const router = useRouter();
-	// PROTOTYPE (#502): variant B puts Regular Time on this form, in memory only.
-	const isRegularTimePrototype =
-		router.query.variant === "B" && !!existingClient;
-	const savedRegularTime = useRegularTime(existingClient?.id ?? "");
-	const [regularTime, setRegularTimeDraft] = useState<RegularTime | null>(
-		savedRegularTime
-	);
-	const [regularTimeTried, setRegularTimeTried] = useState(false);
 
 	const trpcUtils = trpc.useUtils();
 	const updateClientMutation = trpc.clients.update.useMutation();
@@ -71,16 +55,6 @@ const ClientForm = ({ existingClient }: Props) => {
 	};
 
 	const onSubmit = (data: ClientSchema) => {
-		if (isRegularTimePrototype && existingClient) {
-			setRegularTimeTried(true);
-			if (regularTime && validate(regularTime)) return;
-			setRegularTime(existingClient.id, regularTime);
-			toast.info(
-				"PROTOTYPE: Regular Time saved in memory; other fields not saved"
-			);
-			router.back();
-			return;
-		}
 		if (existingClient?.id) {
 			updateClientMutation
 				.mutateAsync({
@@ -225,15 +199,6 @@ const ClientForm = ({ existingClient }: Props) => {
 							</FormItem>
 						)}
 					/>
-
-					{isRegularTimePrototype && (
-						<VariantFormFields
-							value={regularTime}
-							onChange={setRegularTimeDraft}
-							hasDistance={!!existingClient?.distanceToClient}
-							showErrors={regularTimeTried}
-						/>
-					)}
 
 					<div className="mt-4 flex justify-center gap-4">
 						<Button type="submit" disabled={form.formState.isSubmitting}>
