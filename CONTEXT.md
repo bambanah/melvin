@@ -38,6 +38,9 @@ An Activity for which the next action toward getting paid still lies with the Pr
 **Client**
 A participant receiving NDIS-funded support. Has a stored `distanceToClient` used to calculate Provider Travel. Either active (a current client) or inactive (a former client, hidden from pickers but retained with full invoice history). A Client with any sent Invoice cannot be deleted — only deactivated.
 
+**Regular Time**
+A Client's usual time span and Support Item (solo and hourly only), plus whether that work claims Provider Travel, for work that repeats unchanged. At most one per Client, and optional. The Provider applies it to one or more chosen dates, past or today but never future, to create Pending Activities in one step, without going through the Log. Whether travel is claimed is fixed by the Regular Time, not chosen each time it's applied; an exception is handled by editing the resulting Activity. When travel is claimed, it is a plain home → Client → home return from the Client's stored distance, never part of a Trip. It is a template only: it never creates Activities by itself, and the Activities it creates keep no link to it. Dates that already have an Activity for that Client are flagged and left unselected by default. The Client's other, irregular work still uses the normal Provider Travel derivation. Providers call this "regular time", even though it is more of a template than a time.
+
 **Trip**
 A group of back-to-back Activities on the same day where transit is shared. The first leg's transit is from home, middle legs have inter-client transit, and the last leg includes the return segment.
 
