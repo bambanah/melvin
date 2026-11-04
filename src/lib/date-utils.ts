@@ -102,3 +102,7 @@ export const stripTimezone = (date: Date) => {
 		Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0)
 	);
 };
+
+/** A stored time span, e.g. "2:35pm - 4:35pm". */
+export const formatTimeSpan = (startTime: Date, endTime: Date) =>
+	`${format(utcDate(startTime), "h:mmaaa")} - ${format(utcDate(endTime), "h:mmaaa")}`;

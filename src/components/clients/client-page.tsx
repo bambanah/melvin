@@ -1,4 +1,5 @@
 import CustomRatesTable from "@/components/clients/custom-rates-table";
+import { RegularTimeSection } from "@/components/clients/regular-time-section";
 import SupportItemOverrideDialog from "@/components/clients/support-item-override-dialog";
 import InvoiceList from "@/components/invoices/invoice-list";
 import {
@@ -211,6 +212,8 @@ const ClientPage = ({ clientId }: { clientId: string }) => {
 					</Fact>
 				</FactList>
 			</DetailSection>
+
+			<RegularTimeSection client={client} />
 
 			<DetailSection
 				title="Custom rates"

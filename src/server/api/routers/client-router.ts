@@ -75,7 +75,15 @@ export const clientRouter = router({
 					distanceToClient: true,
 					travelTimeToClient: true,
 					transitRatePerKm: true,
-					invoiceEmail: true
+					invoiceEmail: true,
+					regularTime: {
+						select: {
+							startTime: true,
+							endTime: true,
+							claimsTravel: true,
+							supportItem: { select: { id: true, description: true } }
+						}
+					}
 				},
 				where: {
 					id: input.id

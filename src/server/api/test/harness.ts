@@ -29,6 +29,7 @@ const APP_TABLES = [
 	"WorkSessionTransportItem",
 	"WorkSessionParticipant",
 	"WorkSession",
+	"RegularTime",
 	"ActivityTransportItem",
 	"InterClientLeg",
 	"Activity",

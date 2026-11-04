@@ -109,8 +109,23 @@ model Client {
   owner               User                     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   supportItemRates    SupportItemRates[]
   workSessions        WorkSessionParticipant[]
+  regularTime         RegularTime?
 
   @@index([ownerId])
+}
+
+// A Client's usual work, applied to chosen dates to create Activities. A row
+// exists only while one is set - clearing it deletes the row.
+model RegularTime {
+  clientId      String      @id
+  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  startTime     DateTime    @db.Time(6)
+  endTime       DateTime    @db.Time(6)
+  supportItemId String
+  supportItem   SupportItem @relation(fields: [supportItemId], references: [id], onDelete: Cascade)
+  claimsTravel  Boolean
+
+  @@index([supportItemId])
 }
 
 model Invoice {
@@ -229,6 +244,7 @@ model SupportItem {
   supportItemRates     SupportItemRates[]
   defaultForUsers      User[]             @relation("defaultSupportItem")
   defaultGroupForUsers User[]             @relation("defaultGroupSupportItem")
+  regularTimes         RegularTime[]
 
   @@index([ownerId])
 }
