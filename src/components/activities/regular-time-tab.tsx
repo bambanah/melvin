@@ -63,9 +63,7 @@ export function RegularTimeTab({
 				dates: ticked.map(stripTimezone)
 			});
 
-			await trpcUtils.activity.byDateRange.invalidate();
-			trpcUtils.activity.list.invalidate();
-			trpcUtils.activity.pending.invalidate();
+			await trpcUtils.activity.invalidate();
 			trpcUtils.regularTime.datesWithActivity.invalidate();
 
 			toast.success(

@@ -103,9 +103,7 @@ export function MultiActivityForm({
 		try {
 			const result = await bulkAddMutation.mutateAsync(payload);
 
-			await trpcUtils.activity.byDateRange.invalidate();
-			trpcUtils.activity.list.invalidate();
-			trpcUtils.activity.pending.invalidate();
+			await trpcUtils.activity.invalidate();
 
 			const tripMessage = result.tripId ? " · Linked as trip" : "";
 			toast.success(
