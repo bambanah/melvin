@@ -27,6 +27,7 @@ import {
 	Users
 } from "lucide-react";
 import { useState } from "react";
+import { RegularTimeTab } from "./regular-time-tab";
 import {
 	Controller,
 	useFieldArray,
@@ -58,6 +59,7 @@ export function MultiActivityForm({
 	const { data: { defaultSupportItemId, defaultGroupSupportItemId } = {} } =
 		trpc.user.fetch.useQuery();
 	const bulkAddMutation = trpc.activity.bulkAdd.useMutation();
+	const [tab, setTab] = useState<"activities" | "regular">("activities");
 
 	const form = useForm<MultiActivityFormModel>({
 		resolver: zodResolver(multiActivityFormSchema),
@@ -136,66 +138,101 @@ export function MultiActivityForm({
 					<DialogTitle>Add Activities</DialogTitle>
 				</DialogHeader>
 
-				<form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
-					<div className="flex flex-col gap-6">
-						<div className="flex items-center gap-4">
-							<Label className="w-12">Date</Label>
-							<Controller
-								control={form.control}
-								name="date"
-								render={({ field }) => (
-									<DatePicker
-										date={field.value}
-										setDate={(d) => d && field.onChange(d)}
-									/>
-								)}
-							/>
-						</div>
-
-						<div className="flex flex-col gap-4">
-							{fields.map((field, index) => (
-								<ActivityRow
-									key={field.id}
-									form={form}
-									index={index}
-									defaultSupportItemId={defaultSupportItemId ?? undefined}
-									onRemove={() => remove(index)}
-									canRemove={fields.length > 1}
-								/>
-							))}
-						</div>
-
-						<Button
+				<div role="tablist" className="bg-muted flex rounded-md p-0.5">
+					{(
+						[
+							["activities", "Activities"],
+							["regular", "Regular time"]
+						] as const
+					).map(([key, label]) => (
+						<button
+							key={key}
 							type="button"
-							variant="outline"
-							onClick={addRow}
-							className="w-full"
-						>
-							<Plus className="mr-2 h-4 w-4" />
-							Add activity
-						</Button>
-					</div>
-
-					<DialogFooter className="mt-6">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => onOpenChange(false)}
-						>
-							Cancel
-						</Button>
-						<Button type="submit" disabled={bulkAddMutation.isPending}>
-							{bulkAddMutation.isPending ? (
-								<>
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									Saving...
-								</>
-							) : (
-								"Save all"
+							role="tab"
+							aria-selected={tab === key}
+							onClick={() => setTab(key)}
+							className={cn(
+								"flex-1 rounded-sm px-3 py-1.5 text-sm font-medium transition-colors",
+								tab === key
+									? "bg-background text-foreground shadow-sm"
+									: "text-muted-foreground hover:text-foreground"
 							)}
-						</Button>
-					</DialogFooter>
-				</form>
+						>
+							{label}
+						</button>
+					))}
+				</div>
+
+				{tab === "regular" ? (
+					<RegularTimeTab
+						date={initialDate ?? new Date()}
+						onDone={() => {
+							onSuccess?.();
+							onOpenChange(false);
+						}}
+					/>
+				) : (
+					<form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
+						<div className="flex flex-col gap-6">
+							<div className="flex items-center gap-4">
+								<Label className="w-12">Date</Label>
+								<Controller
+									control={form.control}
+									name="date"
+									render={({ field }) => (
+										<DatePicker
+											date={field.value}
+											setDate={(d) => d && field.onChange(d)}
+										/>
+									)}
+								/>
+							</div>
+
+							<div className="flex flex-col gap-4">
+								{fields.map((field, index) => (
+									<ActivityRow
+										key={field.id}
+										form={form}
+										index={index}
+										defaultSupportItemId={defaultSupportItemId ?? undefined}
+										onRemove={() => remove(index)}
+										canRemove={fields.length > 1}
+									/>
+								))}
+							</div>
+
+							<Button
+								type="button"
+								variant="outline"
+								onClick={addRow}
+								className="w-full"
+							>
+								<Plus className="mr-2 h-4 w-4" />
+								Add activity
+							</Button>
+						</div>
+
+						<DialogFooter className="mt-6">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => onOpenChange(false)}
+							>
+								Cancel
+							</Button>
+							<Button type="submit" disabled={bulkAddMutation.isPending}>
+								{bulkAddMutation.isPending ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										Saving...
+									</>
+								) : (
+									"Save all"
+								)}
+							</Button>
+						</DialogFooter>
+					</form>
+				)}
 			</DialogContent>
 		</Dialog>
 	);
