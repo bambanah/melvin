@@ -186,3 +186,28 @@ test("Can delete activity", async ({ page }) => {
 	await page.getByRole("menuitem", { name: "Delete" }).click();
 	await waitForAlert(page, "activity deleted");
 });
+
+test("Adding an activity refreshes the dashboard list view", async ({
+	page
+}) => {
+	const client = await createRandomClient();
+	const supportItem = await createDefaultSupportItem();
+	// The summary only renders once there is something unbilled
+	await createRandomActivity(client.id, supportItem.id);
+
+	await page.goto("/dashboard");
+	await page.getByRole("button", { name: "List" }).click();
+	const summary = page.getByText(/^\d+ activit(y|ies) · /);
+	await expect(summary).toBeVisible();
+	const countBefore = parseInt((await summary.textContent()) ?? "");
+
+	await page.getByRole("button", { name: "Add Activity" }).click();
+	await page.getByTestId("client-search-input").click();
+	await page.getByPlaceholder("Search clients...").fill(client.name);
+	await page.getByRole("button", { name: client.name }).click();
+	await page.getByTestId("time-range-input").fill("08:00-09:00");
+	await page.getByRole("button", { name: "Save all" }).click();
+
+	await waitForAlert(page, "saved");
+	await expect(summary).toHaveText(new RegExp(`^${countBefore + 1} activit`));
+});
